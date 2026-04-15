@@ -8,6 +8,7 @@ export function RegionSelector() {
   const vaultPath = useVaultStore((s) => s.vaultPath);
   const captureMode = useCaptureStore((s) => s.captureMode);
   const setLastRegion = useCaptureStore((s) => s.setLastRegion);
+  const addToQueue = useCaptureStore((s) => s.addToQueue);
   const [isDragging, setIsDragging] = useState(false);
   const [region, setRegion] = useState<Region | null>(null);
   const startPoint = useRef<{ x: number; y: number } | null>(null);
@@ -32,7 +33,7 @@ export function RegionSelector() {
     [isDragging],
   );
 
-  const handleMouseUp = useCallback(async () => {
+  const handleMouseUp = useCallback(async (e: React.MouseEvent) => {
     if (!isDragging || !region || region.width < 5 || region.height < 5) {
       setIsDragging(false);
       setRegion(null);
@@ -43,7 +44,7 @@ export function RegionSelector() {
     setLastRegion(region);
 
     try {
-      await commands.finishCapture(
+      const result = await commands.finishCapture(
         captureMode,
         region.x,
         region.y,
@@ -51,11 +52,18 @@ export function RegionSelector() {
         region.height,
         vaultPath ?? '',
       );
-      window.history.back();
-    } catch (e) {
-      console.error('Capture failed:', e);
+
+      // Multi-capture: if Shift is held, keep overlay open and queue the capture
+      if (e.shiftKey) {
+        addToQueue(result);
+        setRegion(null);
+      } else {
+        window.history.back();
+      }
+    } catch (err) {
+      console.error('Capture failed:', err);
     }
-  }, [isDragging, region, captureMode, vaultPath, setLastRegion]);
+  }, [isDragging, region, captureMode, vaultPath, setLastRegion, addToQueue]);
 
   return (
     <div

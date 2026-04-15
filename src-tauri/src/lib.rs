@@ -27,6 +27,10 @@ pub fn run() {
             let conn = rusqlite::Connection::open_in_memory()
                 .expect("failed to create placeholder database");
             app.manage(DbState(Mutex::new(conn)));
+
+            // In-memory store for repeat-last-capture
+            app.manage(capture_commands::new_last_capture_store());
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -34,6 +38,7 @@ pub fn run() {
             capture_commands::start_capture,
             capture_commands::finish_capture,
             capture_commands::repeat_last_capture,
+            capture_commands::get_window_list,
             // vault
             vault_commands::create_vault,
             vault_commands::open_vault,

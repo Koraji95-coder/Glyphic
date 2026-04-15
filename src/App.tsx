@@ -3,12 +3,14 @@ import { Routes, Route } from 'react-router-dom';
 import { useVault } from './hooks/useVault';
 import { useTheme } from './hooks/useTheme';
 import { useSettingsStore } from './stores/settingsStore';
+import { useVaultStore } from './stores/vaultStore';
 import { TitleBar } from './components/Layout/TitleBar';
 import { StatusBar } from './components/Layout/StatusBar';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { Editor } from './components/Editor/Editor';
 import { CaptureOverlay } from './components/Capture/CaptureOverlay';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
+import { commands } from './lib/tauri/commands';
 
 function MainLayout() {
   return (
@@ -30,6 +32,7 @@ export default function App() {
   const { openVault, createVault } = useVault();
   const { applyTheme } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
+  const vaultPath = useVaultStore((s) => s.vaultPath);
 
   useEffect(() => {
     const init = async () => {
@@ -53,6 +56,14 @@ export default function App() {
     };
     init();
   }, []);
+
+  // Reindex vault for FTS5 search on vault open
+  useEffect(() => {
+    if (!vaultPath) return;
+    commands.reindexVault(vaultPath).catch((e) => {
+      console.warn('Reindex failed (non-critical):', e);
+    });
+  }, [vaultPath]);
 
   useEffect(() => {
     const theme = settings?.appearance?.theme ?? 'system';
