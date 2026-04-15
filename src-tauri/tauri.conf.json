@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicegui/nicegui/main/nicegui/static/tauri.conf.json",
+  "productName": "Glyphic",
+  "version": "1.0.0",
+  "identifier": "com.glyphic.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Glyphic",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "decorations": false,
+        "transparent": false
+      },
+      {
+        "label": "capture-overlay",
+        "title": "",
+        "url": "/capture",
+        "fullscreen": true,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "resizable": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; style-src 'self' 'unsafe-inline'"
+    }
+  },
+  "plugins": {
+    "global-shortcut": {},
+    "fs": {
+      "scope": {
+        "allow": ["$HOME/Glyphic/**", "$APPDATA/**", "$TEMP/**"]
+      }
+    }
+  }
+}
