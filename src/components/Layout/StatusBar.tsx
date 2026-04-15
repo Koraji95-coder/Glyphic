@@ -12,42 +12,41 @@ export function StatusBar() {
     ? 'var(--warning)'
     : isDirty
       ? 'var(--error)'
-      : 'var(--success)';
+      : 'var(--green)';
 
   return (
     <div
-      className="flex items-center justify-between px-4 shrink-0"
+      className="flex items-center justify-between shrink-0"
       style={{
-        backgroundColor: 'var(--bg-secondary)',
+        height: 'var(--statusbar-height)',
+        backgroundColor: 'var(--bg-sidebar)',
         borderTop: '1px solid var(--border)',
-        height: '1.75rem',
-        fontSize: '0.75rem',
+        paddingLeft: '16px',
+        paddingRight: '16px',
+        fontSize: '11px',
         color: 'var(--text-tertiary)',
+        fontFamily: 'var(--font-mono)',
       }}
     >
-      {/* Word count */}
-      <span>{wordCount} words</span>
-
-      <div className="flex items-center gap-4">
-        {/* Lecture timer */}
-        {lectureModeActive && (
-          <span
-            className="flex items-center gap-1"
-            style={{ color: 'var(--accent)' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            {getElapsedTime()}
-          </span>
-        )}
-
+      <div className="flex items-center gap-3">
         {/* Save status */}
-        <span className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5">
           <span
             className="w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: dotColor }}
+            style={{ backgroundColor: dotColor, display: 'inline-block' }}
           />
-          {saveLabel}
-        </span>
+          <span>{saveLabel}</span>
+        </div>
+        <span style={{ color: 'var(--text-ghost)' }}>|</span>
+        <span>{wordCount} words</span>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {lectureModeActive && (
+          <span style={{ color: 'var(--green)' }}>
+            ● Lecture — {getElapsedTime()}
+          </span>
+        )}
       </div>
     </div>
   );

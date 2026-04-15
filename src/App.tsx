@@ -4,22 +4,38 @@ import { useVault } from './hooks/useVault';
 import { useTheme } from './hooks/useTheme';
 import { useSettingsStore } from './stores/settingsStore';
 import { useVaultStore } from './stores/vaultStore';
+import { useChatStore } from './stores/chatStore';
 import { TitleBar } from './components/Layout/TitleBar';
 import { StatusBar } from './components/Layout/StatusBar';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { Editor } from './components/Editor/Editor';
 import { CaptureOverlay } from './components/Capture/CaptureOverlay';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
+import { ChatPanel } from './components/Chat/ChatPanel';
 import { commands } from './lib/tauri/commands';
 
 function MainLayout() {
+  const toggleChatPanel = useChatStore((s) => s.togglePanel);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        toggleChatPanel();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleChatPanel]);
+
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden">
+    <div className="flex flex-col h-screen w-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-app)' }}>
       <TitleBar />
       <div className="flex flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <main className="flex-1 flex min-w-0 overflow-hidden">
           <Editor />
+          <ChatPanel />
         </main>
       </div>
       <StatusBar />

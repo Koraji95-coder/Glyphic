@@ -9,7 +9,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 use commands::{
-    capture_commands, export_commands, search_commands, settings_commands, vault_commands,
+    ai_commands, capture_commands, export_commands, search_commands, settings_commands, vault_commands,
 };
 
 pub struct DbState(pub Mutex<rusqlite::Connection>);
@@ -59,6 +59,11 @@ pub fn run() {
             // settings
             settings_commands::get_settings,
             settings_commands::update_settings,
+            // ai
+            ai_commands::ai_chat,
+            ai_commands::ai_summarize,
+            ai_commands::ai_flashcards,
+            ai_commands::ai_explain,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");

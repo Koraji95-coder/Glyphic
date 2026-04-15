@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Minus, Maximize2, Minimize2, X } from 'lucide-react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useVaultStore } from '../../stores/vaultStore';
+import { useChatStore } from '../../stores/chatStore';
+import { MessageSquare } from 'lucide-react';
 
 export function TitleBar() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
+  const { isOpen: chatOpen, togglePanel } = useChatStore();
   const [isMaximized, setIsMaximized] = useState(false);
 
   const appWindow = getCurrentWindow();
@@ -35,9 +37,9 @@ export function TitleBar() {
     return () => unlisten?.();
   }, []);
 
-  const noteTitle = activeNotePath
-    ? activeNotePath.split('/').pop()?.replace(/\.md$/, '') ?? ''
-    : '';
+  const noteParts = activeNotePath
+    ? activeNotePath.replace(/\.md$/, '').split('/')
+    : [];
 
   const handleMinimize = useCallback(() => appWindow.minimize(), []);
   const handleToggleMaximize = useCallback(async () => {
@@ -49,55 +51,107 @@ export function TitleBar() {
   return (
     <div
       data-tauri-drag-region
-      className="flex items-center justify-between h-10 px-3 select-none shrink-0"
+      className="flex items-center justify-between select-none shrink-0"
       style={{
-        backgroundColor: 'var(--bg-secondary)',
+        height: 'var(--titlebar-height)',
+        backgroundColor: 'var(--bg-sidebar)',
         borderBottom: '1px solid var(--border)',
+        paddingLeft: '12px',
+        paddingRight: '12px',
       }}
     >
-      {/* App name */}
-      <div className="flex items-center gap-2 min-w-[120px]">
-        <span
-          className="text-sm font-semibold tracking-wide"
-          style={{ color: 'var(--accent)' }}
-        >
-          Glyphic
-        </span>
+      {/* Left: traffic lights + brand */}
+      <div className="flex items-center gap-3" style={{ minWidth: '160px' }}>
+        {/* macOS-style traffic light dots */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={handleClose}
+            aria-label="Close"
+            className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
+            style={{ backgroundColor: '#ff5f57' }}
+          />
+          <button
+            onClick={handleMinimize}
+            aria-label="Minimize"
+            className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
+            style={{ backgroundColor: '#febc2e' }}
+          />
+          <button
+            onClick={handleToggleMaximize}
+            aria-label={isMaximized ? 'Restore' : 'Maximize'}
+            className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
+            style={{ backgroundColor: '#28c840' }}
+          />
+        </div>
+
+        {/* Separator */}
+        <div className="w-px h-4" style={{ backgroundColor: 'var(--border)' }} />
+
+        {/* Brand logo + name */}
+        <div className="flex items-center gap-1.5">
+          <div
+            className="flex items-center justify-center rounded text-xs font-bold"
+            style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'var(--accent)',
+              color: 'var(--bg-app)',
+              fontFamily: 'var(--font-display)',
+              borderRadius: '4px',
+            }}
+          >
+            G
+          </div>
+          <span
+            className="text-sm font-medium"
+            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}
+          >
+            Glyphic
+          </span>
+        </div>
       </div>
 
-      {/* Active note title */}
+      {/* Center: breadcrumb path */}
       <div
-        className="flex-1 text-center text-sm truncate px-4"
-        style={{ color: 'var(--text-secondary)' }}
+        className="flex-1 flex items-center justify-center text-xs truncate px-4"
+        style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
       >
-        {noteTitle}
+        {noteParts.length > 0 ? (
+          <span>
+            {noteParts.map((part, i) => (
+              <span key={i}>
+                {i > 0 && (
+                  <span style={{ color: 'var(--text-ghost)', margin: '0 4px' }}>/</span>
+                )}
+                <span style={{ color: i === noteParts.length - 1 ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}>
+                  {part}
+                </span>
+              </span>
+            ))}
+          </span>
+        ) : (
+          <span style={{ color: 'var(--text-ghost)' }}>No note selected</span>
+        )}
       </div>
 
-      {/* Window controls */}
-      <div className="flex items-center gap-0.5 min-w-[80px] justify-end">
+      {/* Right: Chat toggle */}
+      <div className="flex items-center" style={{ minWidth: '160px', justifyContent: 'flex-end' }}>
         <button
-          onClick={handleMinimize}
-          className="p-1.5 rounded transition-colors hover:opacity-80"
-          style={{ color: 'var(--text-secondary)' }}
-          aria-label="Minimize"
+          onClick={togglePanel}
+          title="ScribeAI Chat (Ctrl+Shift+A)"
+          className="p-1.5 rounded transition-colors"
+          style={{
+            backgroundColor: chatOpen ? 'var(--accent-dim)' : 'transparent',
+            color: chatOpen ? 'var(--accent)' : 'var(--text-tertiary)',
+          }}
+          onMouseEnter={(e) => {
+            if (!chatOpen) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = chatOpen ? 'var(--accent-dim)' : 'transparent';
+          }}
         >
-          <Minus size={14} />
-        </button>
-        <button
-          onClick={handleToggleMaximize}
-          className="p-1.5 rounded transition-colors hover:opacity-80"
-          style={{ color: 'var(--text-secondary)' }}
-          aria-label={isMaximized ? 'Restore' : 'Maximize'}
-        >
-          {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-        </button>
-        <button
-          onClick={handleClose}
-          className="p-1.5 rounded transition-colors hover:bg-red-500/20 hover:text-red-500"
-          style={{ color: 'var(--text-secondary)' }}
-          aria-label="Close"
-        >
-          <X size={14} />
+          <MessageSquare size={15} />
         </button>
       </div>
     </div>

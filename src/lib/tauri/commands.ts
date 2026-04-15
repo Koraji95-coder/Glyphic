@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { VaultConfig, NoteFile, VaultEntry } from '../../types/vault';
 import { CaptureResult, WindowInfo } from '../../types/capture';
 import { SearchResult } from '../../types/editor';
+import { Flashcard } from '../../types/ai';
 
 export const commands = {
   // Vault
@@ -69,4 +70,14 @@ export const commands = {
     invoke<void>('export_pdf', { vaultPath, notePath, outputPath }),
   exportMarkdown: (vaultPath: string, notePath: string, outputPath: string) =>
     invoke<void>('export_markdown', { vaultPath, notePath, outputPath }),
+
+  // AI (ScribeAI)
+  aiChat: (message: string, noteContext?: string) =>
+    invoke<string>('ai_chat', { message, noteContext: noteContext ?? null }),
+  aiSummarize: (noteContent: string) =>
+    invoke<string>('ai_summarize', { noteContent }),
+  aiFlashcards: (noteContent: string) =>
+    invoke<Flashcard[]>('ai_flashcards', { noteContent }),
+  aiExplain: (text: string) =>
+    invoke<string>('ai_explain', { text }),
 };
