@@ -1,5 +1,4 @@
-// Provider pattern inspired by ZeroClaw's provider trait abstraction.
-// Routes AI requests to either Ollama (local/offline) or OpenAI (cloud).
+// ScribeAI provider dispatcher — routes AI requests to Ollama or OpenAI.
 
 use crate::ai::config::{AiConfig, AiProvider};
 use crate::ai::ollama::OllamaProvider;

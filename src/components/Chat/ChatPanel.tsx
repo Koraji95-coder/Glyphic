@@ -1,11 +1,11 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { X, Send, Bot, FileText, CreditCard, HelpCircle, Camera, Settings, ArrowLeft } from 'lucide-react';
-import { useChatStore } from '../../stores/chatStore';
+import { useChatStore, TOOL_LABELS } from '../../stores/chatStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { AiSettingsPanel } from './AiSettingsPanel';
 
 export function ChatPanel() {
-  const { messages, isOpen, isLoading, isConnected, model, sendMessage, togglePanel, clearChat, checkConnection, fetchConfig } =
+  const { messages, isOpen, isLoading, isConnected, model, activeTools, sendMessage, togglePanel, clearChat, checkConnection, fetchConfig } =
     useChatStore();
   const [input, setInput] = useState('');
   const [showSettings, setShowSettings] = useState(false);
@@ -179,23 +179,44 @@ export function ChatPanel() {
           </div>
         ))}
         {isLoading && (
-          <div className="flex items-start gap-2">
-            <div
-              className="rounded-lg px-3 py-2.5 flex gap-1 items-center"
-              style={{ backgroundColor: 'var(--bg-elevated)' }}
-            >
-              <span
-                className="typing-dot w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
-              />
-              <span
-                className="typing-dot w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
-              />
-              <span
-                className="typing-dot w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
-              />
+          <div className="flex flex-col items-start gap-1.5">
+            {/* MCP tool execution indicator pills */}
+            {activeTools.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-1">
+                {activeTools.map((tool, i) => (
+                  <span
+                    key={i}
+                    className="text-xs px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: 'var(--accent-dim)',
+                      color: 'var(--accent)',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    {TOOL_LABELS[tool.toolName] ?? `⚙️ ${tool.toolName}...`}
+                  </span>
+                ))}
+              </div>
+            )}
+            {/* Typing dots */}
+            <div className="flex items-start gap-2">
+              <div
+                className="rounded-lg px-3 py-2.5 flex gap-1 items-center"
+                style={{ backgroundColor: 'var(--bg-elevated)' }}
+              >
+                <span
+                  className="typing-dot w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
+                />
+                <span
+                  className="typing-dot w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
+                />
+                <span
+                  className="typing-dot w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
+                />
+              </div>
             </div>
           </div>
         )}

@@ -38,3 +38,9 @@ export interface Flashcard {
   question: string;
   answer: string;
 }
+
+export interface McpToolExecution {
+  toolName: string;
+  status: 'pending' | 'executing' | 'complete' | 'error';
+  result?: string;
+}
