@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { VaultConfig, NoteFile, VaultEntry } from '../../types/vault';
 import { CaptureResult, WindowInfo } from '../../types/capture';
 import { SearchResult } from '../../types/editor';
-import { Flashcard } from '../../types/ai';
+import { AiConfig, Flashcard } from '../../types/ai';
 
 export const commands = {
   // Vault
@@ -80,4 +80,10 @@ export const commands = {
     invoke<Flashcard[]>('ai_flashcards', { noteContent }),
   aiExplain: (text: string) =>
     invoke<string>('ai_explain', { text }),
+  aiCheckConnection: () =>
+    invoke<boolean>('ai_check_connection'),
+  aiGetConfig: () =>
+    invoke<AiConfig>('ai_get_config'),
+  aiUpdateConfig: (config: AiConfig) =>
+    invoke<void>('ai_update_config', { config }),
 };

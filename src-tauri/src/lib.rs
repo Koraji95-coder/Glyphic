@@ -1,3 +1,4 @@
+pub mod ai;
 pub mod capture;
 pub mod commands;
 pub mod db;
@@ -9,7 +10,8 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 use commands::{
-    ai_commands, capture_commands, export_commands, search_commands, settings_commands, vault_commands,
+    ai_commands::{self, AiState},
+    capture_commands, export_commands, search_commands, settings_commands, vault_commands,
 };
 
 pub struct DbState(pub Mutex<rusqlite::Connection>);
@@ -30,6 +32,9 @@ pub fn run() {
 
             // In-memory store for repeat-last-capture
             app.manage(capture_commands::new_last_capture_store());
+
+            // ScribeAI state (provider config + shared HTTP client)
+            app.manage(AiState::new());
 
             Ok(())
         })
@@ -64,6 +69,9 @@ pub fn run() {
             ai_commands::ai_summarize,
             ai_commands::ai_flashcards,
             ai_commands::ai_explain,
+            ai_commands::ai_check_connection,
+            ai_commands::ai_get_config,
+            ai_commands::ai_update_config,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");

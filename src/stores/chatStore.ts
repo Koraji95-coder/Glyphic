@@ -1,21 +1,26 @@
 import { create } from 'zustand';
-import { ChatMessage } from '../types/ai';
+import { ChatMessage, AiConfig } from '../types/ai';
 import { commands } from '../lib/tauri/commands';
 
 interface ChatState {
   messages: ChatMessage[];
   isOpen: boolean;
   isLoading: boolean;
+  isConnected: boolean | null;
   model: string;
   sendMessage: (content: string, noteContext?: string) => Promise<void>;
   togglePanel: () => void;
   clearChat: () => void;
+  checkConnection: () => Promise<void>;
+  fetchConfig: () => Promise<void>;
+  updateConfig: (config: AiConfig) => Promise<void>;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   isOpen: false,
   isLoading: false,
+  isConnected: null,
   model: 'ScribeAI',
 
   sendMessage: async (content: string, noteContext?: string) => {
@@ -37,11 +42,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
         timestamp: new Date().toISOString(),
       };
       set((s) => ({ messages: [...s.messages, assistantMsg], isLoading: false }));
-    } catch {
+    } catch (err) {
       const errorMsg: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'ScribeAI is not yet connected. The AI backend will be wired in Phase 5.',
+        content: typeof err === 'string' ? err : 'ScribeAI: Something went wrong. Please check your AI settings.',
         timestamp: new Date().toISOString(),
       };
       set((s) => ({ messages: [...s.messages, errorMsg], isLoading: false }));
@@ -51,4 +56,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
   togglePanel: () => set((s) => ({ isOpen: !s.isOpen })),
 
   clearChat: () => set({ messages: [] }),
+
+  checkConnection: async () => {
+    try {
+      const connected = await commands.aiCheckConnection();
+      set({ isConnected: connected });
+    } catch {
+      set({ isConnected: false });
+    }
+  },
+
+  fetchConfig: async () => {
+    try {
+      const config = await commands.aiGetConfig();
+      const providerName = config.provider === 'ollama' ? config.ollama.model : config.openai.model;
+      set({ model: providerName });
+    } catch {
+      // Keep the current model label if fetching fails.
+    }
+  },
+
+  updateConfig: async (config: AiConfig) => {
+    await commands.aiUpdateConfig(config);
+    const providerName = config.provider === 'ollama' ? config.ollama.model : config.openai.model;
+    set({ model: providerName });
+  },
 }));
