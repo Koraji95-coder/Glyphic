@@ -69,8 +69,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   fetchConfig: async () => {
     try {
       const config = await commands.aiGetConfig();
-      const providerName = config.provider === 'ollama' ? config.ollama.model : config.openai.model;
-      set({ model: providerName });
+      const modelName = config.provider === 'ollama' ? config.ollama.model : config.openai.model;
+      set({ model: modelName });
     } catch {
       // Keep the current model label if fetching fails.
     }
@@ -78,7 +78,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   updateConfig: async (config: AiConfig) => {
     await commands.aiUpdateConfig(config);
-    const providerName = config.provider === 'ollama' ? config.ollama.model : config.openai.model;
-    set({ model: providerName });
+    const modelName = config.provider === 'ollama' ? config.ollama.model : config.openai.model;
+    set({ model: modelName });
   },
 }));
