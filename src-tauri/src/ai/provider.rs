@@ -33,10 +33,11 @@ impl ScribeAiProvider {
         &self,
         messages: Vec<ChatMessage>,
         system_prompt: Option<String>,
+        model_override: Option<String>,
     ) -> Result<String, String> {
         match self {
-            Self::Ollama(p) => p.chat(messages, system_prompt).await,
-            Self::OpenAi(p) => p.chat(messages, system_prompt).await,
+            Self::Ollama(p) => p.chat(messages, system_prompt, model_override).await,
+            Self::OpenAi(p) => p.chat(messages, system_prompt, model_override).await,
         }
     }
 

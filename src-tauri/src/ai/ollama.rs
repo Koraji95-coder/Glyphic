@@ -43,6 +43,7 @@ impl OllamaProvider {
         &self,
         messages: Vec<ChatMessage>,
         system_prompt: Option<String>,
+        model_override: Option<String>,
     ) -> Result<String, String> {
         let mut ollama_messages: Vec<OllamaMessage> = Vec::new();
 
@@ -60,8 +61,13 @@ impl OllamaProvider {
             });
         }
 
+        let model = model_override
+            .as_deref()
+            .unwrap_or(&self.config.model)
+            .to_string();
+
         let request = OllamaChatRequest {
-            model: self.config.model.clone(),
+            model,
             messages: ollama_messages,
             stream: false,
         };

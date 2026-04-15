@@ -20,11 +20,34 @@ pub struct OpenAiConfig {
     pub endpoint: String,
 }
 
+/// Per-task model routing — each AI task type can use a different model.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModelRouting {
+    pub chat: String,
+    pub summarize: String,
+    pub flashcards: String,
+    pub explain: String,
+    pub vision: String,
+}
+
+impl Default for ModelRouting {
+    fn default() -> Self {
+        Self {
+            chat: "llama3.1".into(),
+            summarize: "llama3.1".into(),
+            flashcards: "llama3.1".into(),
+            explain: "deepseek-r1:32b".into(),
+            vision: "llava:13b".into(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AiConfig {
     pub provider: AiProvider,
     pub ollama: OllamaConfig,
     pub openai: OpenAiConfig,
+    pub model_routing: ModelRouting,
 }
 
 impl Default for AiConfig {
@@ -33,13 +56,14 @@ impl Default for AiConfig {
             provider: AiProvider::Ollama,
             ollama: OllamaConfig {
                 endpoint: "http://localhost:11434".into(),
-                model: "llama3.2:3b".into(),
+                model: "llama3.1".into(),
             },
             openai: OpenAiConfig {
                 api_key: String::new(),
                 model: "gpt-4o-mini".into(),
                 endpoint: "https://api.openai.com/v1".into(),
             },
+            model_routing: ModelRouting::default(),
         }
     }
 }

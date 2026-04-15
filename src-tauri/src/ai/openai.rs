@@ -47,6 +47,7 @@ impl OpenAiProvider {
         &self,
         messages: Vec<ChatMessage>,
         system_prompt: Option<String>,
+        model_override: Option<String>,
     ) -> Result<String, String> {
         if self.config.api_key.is_empty() {
             return Err("ScribeAI: No OpenAI API key configured. Please add your API key in Settings.".to_string());
@@ -68,8 +69,13 @@ impl OpenAiProvider {
             });
         }
 
+        let model = model_override
+            .as_deref()
+            .unwrap_or(&self.config.model)
+            .to_string();
+
         let request = OpenAiRequest {
-            model: self.config.model.clone(),
+            model,
             messages: openai_messages,
         };
 
