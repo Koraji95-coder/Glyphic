@@ -33,15 +33,22 @@ export default function App() {
 
   useEffect(() => {
     const init = async () => {
-      const defaultPath = '~/Glyphic';
       try {
-        await openVault(defaultPath);
-      } catch {
+        const { homeDir } = await import('@tauri-apps/api/path');
+        const home = await homeDir();
+        const defaultPath = `${home}Glyphic`;
         try {
-          await createVault(defaultPath, 'Glyphic');
-        } catch (e) {
-          console.error('Failed to initialize vault:', e);
+          await openVault(defaultPath);
+        } catch {
+          try {
+            await createVault(defaultPath, 'Glyphic');
+          } catch (e) {
+            console.error('Failed to initialize vault:', e);
+          }
         }
+      } catch (e) {
+        // Not running in Tauri (e.g., dev browser) — skip vault init
+        console.warn('Vault init skipped (not in Tauri):', e);
       }
     };
     init();
