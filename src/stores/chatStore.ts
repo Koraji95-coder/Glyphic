@@ -10,23 +10,6 @@ const TOOL_LABELS: Record<string, string> = {
   get_recent_notes: '🕐 Getting recent notes...',
 };
 
-/** Detects a tool call JSON in an LLM response and returns the tool name. */
-function detectToolCall(text: string): string | null {
-  const trimmed = text.trim();
-  const candidates = [trimmed, ...trimmed.split('\n')];
-  for (const candidate of candidates) {
-    const s = candidate.trim();
-    if (!s.startsWith('{')) continue;
-    try {
-      const obj = JSON.parse(s);
-      if (typeof obj?.tool === 'string') return obj.tool as string;
-    } catch {
-      // Not valid JSON — keep scanning.
-    }
-  }
-  return null;
-}
-
 interface ChatState {
   messages: ChatMessage[];
   isOpen: boolean;
@@ -62,18 +45,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     try {
       const reply = await commands.aiChat(content, noteContext);
-
-      // Check whether the response contained a tool call so we can show
-      // execution status while the Rust backend processes it.
-      const toolName = detectToolCall(reply);
-      if (toolName) {
-        const toolExec: McpToolExecution = {
-          toolName,
-          status: 'executing',
-        };
-        set({ activeTools: [toolExec] });
-      }
-
       const assistantMsg: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',

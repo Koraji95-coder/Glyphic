@@ -165,7 +165,14 @@ fn execute_get_note(conn: &Connection, args: &serde_json::Value) -> McpToolResul
     match result {
         Ok((title, content)) => {
             let truncated = if content.len() > MAX_CONTEXT_CHARS {
-                format!("{}…\n[content truncated]", &content[..MAX_CONTEXT_CHARS])
+                // Find a safe UTF-8 boundary at or before MAX_CONTEXT_CHARS bytes.
+                let safe_end = content
+                    .char_indices()
+                    .take_while(|(i, _)| *i < MAX_CONTEXT_CHARS)
+                    .last()
+                    .map(|(i, c)| i + c.len_utf8())
+                    .unwrap_or(0);
+                format!("{}…\n[content truncated]", &content[..safe_end])
             } else {
                 content
             };
