@@ -7,6 +7,9 @@ use crate::ai::mcp_server;
 use crate::ai::provider::{ChatMessage, ScribeAiProvider};
 use crate::DbState;
 
+// Maximum number of tool-calling iterations per chat message to prevent loops.
+const MAX_TOOL_ITERATIONS: usize = 3;
+
 // ---------------------------------------------------------------------------
 // Managed state
 // ---------------------------------------------------------------------------
@@ -79,11 +82,16 @@ pub async fn ai_chat(
         config.model_routing.chat.clone()
     };
 
-    // Build system prompt, optionally enriched with vault context (RAG).
+    // Build the tool-aware system prompt.
+    let tools = mcp_server::available_tools();
+    let tool_prompt = mcp_server::format_tools_for_prompt(&tools);
+
     let system_prompt = {
         let mut system = SYSTEM_CHAT.to_string();
+        system.push_str("\n\n");
+        system.push_str(&tool_prompt);
 
-        // Search vault via FTS5 — must complete before any `.await`.
+        // Legacy RAG: also inject FTS5 context as a fallback hint.
         if let Ok(conn) = db_state.0.lock() {
             let search_query = note_context.as_deref().unwrap_or(&message);
             if let Some(ctx) = mcp_server::gather_context(&conn, search_query) {
@@ -103,12 +111,57 @@ pub async fn ai_chat(
         system
     };
 
-    let messages = vec![ChatMessage {
+    // --- MCP tool-calling loop ---
+    // Build an initial message list and iterate up to MAX_TOOL_ITERATIONS.
+    // If the LLM returns a tool call JSON, execute the tool and feed the result
+    // back so the LLM can produce a final answer for the user.
+    let mut messages = vec![ChatMessage {
         role: "user".into(),
         content: message,
     }];
 
-    provider.chat(messages, Some(system_prompt), Some(model)).await
+    for _ in 0..MAX_TOOL_ITERATIONS {
+        let response = provider
+            .chat(messages.clone(), Some(system_prompt.clone()), Some(model.clone()))
+            .await?;
+
+        // Check if the LLM wants to call a vault tool.
+        if let Some(tool_call) = mcp_server::parse_tool_call(&response) {
+            // Execute the tool against the vault database.
+            let tool_result = if let Ok(conn) = db_state.0.lock() {
+                mcp_server::execute_tool(&conn, &tool_call)
+            } else {
+                crate::ai::mcp_protocol::McpToolResult {
+                    tool_name: tool_call.name.clone(),
+                    success: false,
+                    content: "Database unavailable".into(),
+                }
+            };
+
+            // Append the tool call + result to the conversation so the LLM
+            // can formulate a final answer grounded in real vault data.
+            messages.push(ChatMessage {
+                role: "assistant".into(),
+                content: response,
+            });
+            messages.push(ChatMessage {
+                role: "user".into(),
+                content: format!(
+                    "Tool result for `{}`:\n{}",
+                    tool_result.tool_name, tool_result.content
+                ),
+            });
+            // Continue the loop so the LLM can respond with the final answer.
+        } else {
+            // No tool call detected — return the response directly.
+            return Ok(response);
+        }
+    }
+
+    // If we exhausted the iteration limit, do a final call without tool hints.
+    provider
+        .chat(messages, Some(SYSTEM_CHAT.to_string()), Some(model))
+        .await
 }
 
 #[tauri::command]
