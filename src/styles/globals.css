@@ -243,3 +243,22 @@ body {
 [data-tauri-drag-region] input {
   -webkit-app-region: no-drag;
 }
+
+/* ── Timestamp badge inline node ── */
+.ProseMirror span[data-type='timestamp'] {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* ── Annotation overlay canvas ── */
+.annotation-canvas-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.annotation-canvas-wrapper canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

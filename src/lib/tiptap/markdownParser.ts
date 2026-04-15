@@ -127,6 +127,11 @@ export function parseMarkdownToContent(markdown: string): string {
 
 function inlineMarkdown(text: string): string {
   return text
+    // Timestamp badges [T:MM:SS]
+    .replace(
+      /\[T:(\d{2}:\d{2})\]/g,
+      '<span data-type="timestamp" data-elapsed="$1" data-absolute=""></span>',
+    )
     // Bold
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     // Italic

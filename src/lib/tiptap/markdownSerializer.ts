@@ -43,6 +43,10 @@ function serializeNode(node: JSONContent): string {
       const alt = node.attrs?.alt || '';
       return `![${alt}](${src})`;
     }
+    case 'timestamp': {
+      const elapsed = node.attrs?.elapsed || '00:00';
+      return `[T:${elapsed}]`;
+    }
     default:
       return serializeInline(node.content || []);
   }
