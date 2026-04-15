@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { InkPoint } from '../types/ink';
 
+const PALM_REJECTION_DELAY_MS = 300;
+
 interface StylusState {
   isPenActive: boolean;
   currentPressure: number;
@@ -74,7 +76,7 @@ export function useStylus(targetRef: React.RefObject<HTMLElement | null>) {
       setTimeout(() => {
         isPenActiveRef.current = false;
         setState((s) => ({ ...s, isPenActive: false, currentPressure: 0 }));
-      }, 300);
+      }, PALM_REJECTION_DELAY_MS);
     }
   }, []);
 

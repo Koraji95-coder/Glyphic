@@ -125,7 +125,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         gap: '4px',
         overflowX: 'auto',
         overscrollBehavior: 'contain',
-        WebkitOverflowScrolling: 'touch',
       }}
     >
       {/* Button groups */}

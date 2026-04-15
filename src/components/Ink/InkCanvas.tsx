@@ -87,8 +87,12 @@ export function InkCanvas({
       setCurrentPoints((pts) => {
         if (pts.length < 2) return [];
         if (tool !== 'eraser') {
+          const id =
+            typeof crypto !== 'undefined' && crypto.randomUUID
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2);
           const newStroke: InkStroke = {
-            id: crypto.randomUUID(),
+            id,
             points: pts,
             color,
             width: 2,
