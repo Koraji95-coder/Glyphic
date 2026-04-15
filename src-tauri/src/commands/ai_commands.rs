@@ -56,6 +56,12 @@ simple, clear terms. If it's a formula or equation, break it down step by step. 
 If it's a concept, give a brief definition and an example. Keep it accessible \
 for a college student.";
 
+const SYSTEM_VISION: &str = "You are ScribeAI, a visual study assistant. \
+Describe and explain the content of this lecture screenshot in detail. \
+Identify any diagrams, equations, charts, or key concepts shown. \
+Break down complex visuals step by step and explain what the student \
+should take away from this slide or image.";
+
 // ---------------------------------------------------------------------------
 // Commands
 // ---------------------------------------------------------------------------
@@ -68,6 +74,10 @@ pub async fn ai_chat(
     db_state: State<'_, DbState>,
 ) -> Result<String, String> {
     let provider = state.provider();
+    let model = {
+        let config = state.config.lock().unwrap();
+        config.model_routing.chat.clone()
+    };
 
     // Build system prompt, optionally enriched with vault context (RAG).
     let system_prompt = {
@@ -98,7 +108,7 @@ pub async fn ai_chat(
         content: message,
     }];
 
-    provider.chat(messages, Some(system_prompt)).await
+    provider.chat(messages, Some(system_prompt), Some(model)).await
 }
 
 #[tauri::command]
@@ -107,13 +117,17 @@ pub async fn ai_summarize(
     state: State<'_, AiState>,
 ) -> Result<String, String> {
     let provider = state.provider();
+    let model = {
+        let config = state.config.lock().unwrap();
+        config.model_routing.summarize.clone()
+    };
 
     let messages = vec![ChatMessage {
         role: "user".into(),
         content: note_content,
     }];
 
-    provider.chat(messages, Some(SYSTEM_SUMMARIZE.to_string())).await
+    provider.chat(messages, Some(SYSTEM_SUMMARIZE.to_string()), Some(model)).await
 }
 
 #[tauri::command]
@@ -122,6 +136,10 @@ pub async fn ai_flashcards(
     state: State<'_, AiState>,
 ) -> Result<Vec<serde_json::Value>, String> {
     let provider = state.provider();
+    let model = {
+        let config = state.config.lock().unwrap();
+        config.model_routing.flashcards.clone()
+    };
 
     let messages = vec![ChatMessage {
         role: "user".into(),
@@ -129,7 +147,7 @@ pub async fn ai_flashcards(
     }];
 
     let response = provider
-        .chat(messages, Some(SYSTEM_FLASHCARDS.to_string()))
+        .chat(messages, Some(SYSTEM_FLASHCARDS.to_string()), Some(model))
         .await?;
 
     let json_str = extract_json_array(&response);
@@ -144,13 +162,40 @@ pub async fn ai_explain(
     state: State<'_, AiState>,
 ) -> Result<String, String> {
     let provider = state.provider();
+    let model = {
+        let config = state.config.lock().unwrap();
+        if is_vision_content(&text) {
+            config.model_routing.vision.clone()
+        } else {
+            config.model_routing.explain.clone()
+        }
+    };
 
     let messages = vec![ChatMessage {
         role: "user".into(),
         content: text,
     }];
 
-    provider.chat(messages, Some(SYSTEM_EXPLAIN.to_string())).await
+    provider.chat(messages, Some(SYSTEM_EXPLAIN.to_string()), Some(model)).await
+}
+
+#[tauri::command]
+pub async fn ai_explain_screenshot(
+    text: String,
+    state: State<'_, AiState>,
+) -> Result<String, String> {
+    let provider = state.provider();
+    let model = {
+        let config = state.config.lock().unwrap();
+        config.model_routing.vision.clone()
+    };
+
+    let messages = vec![ChatMessage {
+        role: "user".into(),
+        content: text,
+    }];
+
+    provider.chat(messages, Some(SYSTEM_VISION.to_string()), Some(model)).await
 }
 
 #[tauri::command]
@@ -187,6 +232,16 @@ pub async fn ai_update_config(
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/// Returns true if the text appears to reference visual/image content, which
+/// should be routed to the vision model rather than the standard explain model.
+fn is_vision_content(text: &str) -> bool {
+    let lower = text.to_lowercase();
+    lower.contains("screenshot")
+        || lower.contains("image")
+        || lower.contains(".png")
+        || lower.contains(".jpg")
+}
 
 /// Extracts a JSON array from an LLM response that may be wrapped in a
 /// markdown code block.

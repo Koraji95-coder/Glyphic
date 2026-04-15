@@ -5,6 +5,14 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface ModelRouting {
+  chat: string;
+  summarize: string;
+  flashcards: string;
+  explain: string;
+  vision: string;
+}
+
 export interface AiConfig {
   provider: 'ollama' | 'open_ai';
   ollama: {
@@ -16,6 +24,7 @@ export interface AiConfig {
     model: string;
     endpoint: string;
   };
+  model_routing: ModelRouting;
 }
 
 /** @deprecated Use AiConfig directly */

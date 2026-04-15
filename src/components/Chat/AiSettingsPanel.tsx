@@ -13,8 +13,15 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
 
   const [config, setConfig] = useState<AiConfig>({
     provider: 'ollama',
-    ollama: { endpoint: 'http://localhost:11434', model: 'llama3.2:3b' },
+    ollama: { endpoint: 'http://localhost:11434', model: 'llama3.1' },
     openai: { api_key: '', model: 'gpt-4o-mini', endpoint: 'https://api.openai.com/v1' },
+    model_routing: {
+      chat: 'llama3.1',
+      summarize: 'llama3.1',
+      flashcards: 'llama3.1',
+      explain: 'deepseek-r1:32b',
+      vision: 'llava:13b',
+    },
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
@@ -261,6 +268,47 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
             </div>
           </div>
         )}
+
+        {/* Model routing config */}
+        <div style={sectionStyle}>
+          <span
+            style={{
+              color: 'var(--text-secondary)',
+              fontFamily: 'var(--font-display)',
+              fontSize: '11px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Model Routing
+          </span>
+          {(
+            [
+              { key: 'chat', label: 'Chat' },
+              { key: 'summarize', label: 'Summarize' },
+              { key: 'flashcards', label: 'Flashcards' },
+              { key: 'explain', label: 'Explain' },
+              { key: 'vision', label: 'Vision (Screenshot)' },
+            ] as const
+          ).map(({ key, label }) => (
+            <div key={key}>
+              <label style={labelStyle}>{label}</label>
+              <input
+                type="text"
+                value={config.model_routing[key]}
+                onChange={(e) =>
+                  setConfig((c) => ({
+                    ...c,
+                    model_routing: { ...c.model_routing, [key]: e.target.value },
+                  }))
+                }
+                style={inputStyle}
+                placeholder={`e.g. llama3.1`}
+              />
+            </div>
+          ))}
+        </div>
 
         {/* Connection status */}
         <div

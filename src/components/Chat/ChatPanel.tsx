@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { X, Send, Bot, FileText, CreditCard, HelpCircle, Settings } from 'lucide-react';
+import { X, Send, Bot, FileText, CreditCard, HelpCircle, Camera, Settings } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
 import { AiSettingsPanel } from './AiSettingsPanel';
 
@@ -235,6 +235,20 @@ export function ChatPanel() {
         >
           <HelpCircle size={10} />
           Explain
+        </button>
+        <button
+          onClick={() => handleQuickAction('Describe and explain this lecture screenshot.')}
+          className="flex items-center gap-1 px-2 py-1 rounded text-xs"
+          style={{
+            backgroundColor: 'var(--bg-input)',
+            color: 'var(--text-secondary)',
+            border: '1px solid var(--border)',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-input)')}
+        >
+          <Camera size={10} />
+          Screenshot
         </button>
       </div>
 

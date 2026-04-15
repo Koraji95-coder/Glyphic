@@ -69,6 +69,7 @@ pub fn run() {
             ai_commands::ai_summarize,
             ai_commands::ai_flashcards,
             ai_commands::ai_explain,
+            ai_commands::ai_explain_screenshot,
             ai_commands::ai_check_connection,
             ai_commands::ai_get_config,
             ai_commands::ai_update_config,

@@ -80,6 +80,8 @@ export const commands = {
     invoke<Flashcard[]>('ai_flashcards', { noteContent }),
   aiExplain: (text: string) =>
     invoke<string>('ai_explain', { text }),
+  aiExplainScreenshot: (text: string) =>
+    invoke<string>('ai_explain_screenshot', { text }),
   aiCheckConnection: () =>
     invoke<boolean>('ai_check_connection'),
   aiGetConfig: () =>
