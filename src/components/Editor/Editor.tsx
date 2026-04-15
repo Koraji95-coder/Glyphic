@@ -5,11 +5,16 @@ import { serializeToMarkdown } from '../../lib/tiptap/markdownSerializer';
 import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
 import { useEditor } from '../../hooks/useEditor';
 import { useVaultStore } from '../../stores/vaultStore';
+import { useEditorStore } from '../../stores/editorStore';
 import { events } from '../../lib/tauri/events';
 import { EditorToolbar } from './EditorToolbar';
+import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
+import { AnnotationOverlay } from '../Annotation/AnnotationOverlay';
 
 export function Editor() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
+  const lectureModeActive = useEditorStore((s) => s.lectureModeActive);
+  const lectureModeStartedAt = useEditorStore((s) => s.lectureModeStartedAt);
   const { handleContentChange, loadNote } = useEditor();
 
   const editor = useTiptapEditor({
@@ -17,6 +22,32 @@ export function Editor() {
     editorProps: {
       attributes: {
         class: 'ProseMirror focus:outline-none min-h-full',
+      },
+      handleKeyDown: (_view, event) => {
+        // In lecture mode, auto-insert timestamp on Enter (new paragraph)
+        if (lectureModeActive && lectureModeStartedAt && event.key === 'Enter' && !event.shiftKey) {
+          // Let TipTap handle Enter first, then insert timestamp
+          setTimeout(() => {
+            if (!editor) return;
+            const elapsed = formatElapsed(lectureModeStartedAt);
+            const now = new Date();
+            const hours = now.getHours();
+            const mins = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const h = hours % 12 || 12;
+            const absolute = `${h}:${String(mins).padStart(2, '0')} ${ampm}`;
+            editor
+              .chain()
+              .focus()
+              .insertContent({
+                type: 'timestamp',
+                attrs: { elapsed, absolute },
+              })
+              .insertContent(' ')
+              .run();
+          }, 10);
+        }
+        return false;
       },
     },
     onUpdate: ({ editor: ed }) => {
@@ -87,12 +118,21 @@ export function Editor() {
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <EditorToolbar editor={editor} />
+      <LectureModeToggle />
       <div
         className="flex-1 overflow-y-auto"
         style={{ backgroundColor: 'var(--bg-primary)' }}
       >
         <EditorContent editor={editor} />
       </div>
+      <AnnotationOverlay />
     </div>
   );
+}
+
+function formatElapsed(startedAt: Date): string {
+  const elapsed = Math.floor((Date.now() - startedAt.getTime()) / 1000);
+  const minutes = Math.floor(elapsed / 60);
+  const seconds = elapsed % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }

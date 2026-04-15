@@ -7,6 +7,8 @@ import Link from '@tiptap/extension-link';
 import Highlight from '@tiptap/extension-highlight';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
+import { TimestampNode } from './timestampNode';
+import { SlashCommandExtension } from './slashCommand';
 
 const lowlight = createLowlight(common);
 
@@ -33,5 +35,7 @@ export function getEditorExtensions() {
     TaskItem.configure({ nested: true }),
     Link.configure({ openOnClick: false }),
     Highlight.configure({ multicolor: true }),
+    TimestampNode,
+    SlashCommandExtension,
   ];
 }
