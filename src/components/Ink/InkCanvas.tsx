@@ -9,7 +9,7 @@ interface InkCanvasProps {
   onStrokesChange?: (strokes: InkStroke[]) => void;
   initialStrokes?: InkStroke[];
   color?: string;
-  tool?: 'pen' | 'highlighter';
+  tool?: 'pen' | 'highlighter' | 'eraser';
 }
 
 function strokeToPath(points: InkPoint[], baseWidth: number): string {
@@ -86,8 +86,7 @@ export function InkCanvas({
 
       setCurrentPoints((pts) => {
         if (pts.length < 2) return [];
-        if (tool === 'pen') {
-          // Check if tapping an existing stroke for eraser-like behavior
+        if (tool !== 'eraser') {
           const newStroke: InkStroke = {
             id: crypto.randomUUID(),
             points: pts,
@@ -128,7 +127,7 @@ export function InkCanvas({
         width,
         height,
         pointerEvents: isActive ? 'all' : 'none',
-        cursor: isActive ? (tool === 'highlighter' ? 'crosshair' : 'crosshair') : 'default',
+        cursor: isActive ? 'crosshair' : 'default',
         touchAction: isActive ? 'none' : 'auto',
         zIndex: 10,
       }}
@@ -159,8 +158,8 @@ export function InkCanvas({
             strokeLinejoin="round"
             fill="none"
             opacity={stroke.tool === 'highlighter' ? 0.4 : 1}
-            style={{ cursor: tool === 'pen' ? 'default' : 'pointer' }}
-            onClick={tool === 'pen' ? undefined : () => handleEraseStroke(stroke.id)}
+            style={{ cursor: tool === 'eraser' ? 'pointer' : 'default' }}
+            onClick={tool === 'eraser' ? () => handleEraseStroke(stroke.id) : undefined}
           />
         ))}
 

@@ -17,16 +17,24 @@ export function useStylus(targetRef: React.RefObject<HTMLElement | null>) {
   });
 
   const isPenActiveRef = useRef(false);
+  // Use a mutable ref for accumulating points to avoid O(n²) spreading
+  const penPointsRef = useRef<Array<InkPoint & { timestamp: number }>>([]);
 
   const handlePointerDown = useCallback((e: PointerEvent) => {
+    const el = targetRef.current;
+    const rect = el?.getBoundingClientRect();
+    const x = rect ? e.clientX - rect.left : e.offsetX;
+    const y = rect ? e.clientY - rect.top : e.offsetY;
+
     if (e.pointerType === 'pen') {
       isPenActiveRef.current = true;
+      penPointsRef.current = [{ x, y, pressure: e.pressure, timestamp: e.timeStamp }];
       setState((s) => ({
         ...s,
         isPenActive: true,
         pointerType: 'pen',
         currentPressure: e.pressure,
-        penPoints: [{ x: e.offsetX, y: e.offsetY, pressure: e.pressure, timestamp: e.timeStamp }],
+        penPoints: penPointsRef.current,
       }));
     } else if (e.pointerType === 'touch' && isPenActiveRef.current) {
       // Palm rejection: ignore touch when pen is active
@@ -35,7 +43,7 @@ export function useStylus(targetRef: React.RefObject<HTMLElement | null>) {
     } else {
       setState((s) => ({ ...s, pointerType: e.pointerType }));
     }
-  }, []);
+  }, [targetRef]);
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (e.pointerType === 'touch' && isPenActiveRef.current) {
@@ -45,16 +53,20 @@ export function useStylus(targetRef: React.RefObject<HTMLElement | null>) {
       return;
     }
     if (e.pointerType === 'pen' && e.buttons > 0) {
+      const el = targetRef.current;
+      const rect = el?.getBoundingClientRect();
+      const x = rect ? e.clientX - rect.left : e.offsetX;
+      const y = rect ? e.clientY - rect.top : e.offsetY;
+
+      // Push to mutable ref to avoid O(n²) spreading
+      penPointsRef.current.push({ x, y, pressure: e.pressure, timestamp: e.timeStamp });
       setState((s) => ({
         ...s,
         currentPressure: e.pressure,
-        penPoints: [
-          ...s.penPoints,
-          { x: e.offsetX, y: e.offsetY, pressure: e.pressure, timestamp: e.timeStamp },
-        ],
+        penPoints: penPointsRef.current,
       }));
     }
-  }, []);
+  }, [targetRef]);
 
   const handlePointerUp = useCallback((e: PointerEvent) => {
     if (e.pointerType === 'pen') {
@@ -82,6 +94,7 @@ export function useStylus(targetRef: React.RefObject<HTMLElement | null>) {
   }, [targetRef, handlePointerDown, handlePointerMove, handlePointerUp]);
 
   const clearPoints = useCallback(() => {
+    penPointsRef.current = [];
     setState((s) => ({ ...s, penPoints: [] }));
   }, []);
 

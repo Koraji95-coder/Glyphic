@@ -9,5 +9,5 @@ export interface InkStroke {
   points: InkPoint[];
   color: string;
   width: number;
-  tool: 'pen' | 'highlighter';
+  tool: 'pen' | 'highlighter' | 'eraser';
 }
