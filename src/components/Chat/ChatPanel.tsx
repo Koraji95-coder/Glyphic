@@ -1,17 +1,27 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { X, Send, Bot, FileText, CreditCard, HelpCircle } from 'lucide-react';
+import { X, Send, Bot, FileText, CreditCard, HelpCircle, Settings } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
+import { AiSettingsPanel } from './AiSettingsPanel';
 
 export function ChatPanel() {
-  const { messages, isOpen, isLoading, model, sendMessage, togglePanel, clearChat } =
+  const { messages, isOpen, isLoading, isConnected, model, sendMessage, togglePanel, clearChat, checkConnection, fetchConfig } =
     useChatStore();
   const [input, setInput] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // Fetch config and check connection when the panel opens.
+  useEffect(() => {
+    if (isOpen) {
+      fetchConfig();
+      checkConnection();
+    }
+  }, [isOpen, fetchConfig, checkConnection]);
 
   const handleSend = useCallback(async () => {
     const text = input.trim();
@@ -41,8 +51,12 @@ export function ChatPanel() {
         width: '360px',
         borderLeft: '1px solid var(--border)',
         backgroundColor: 'var(--bg-editor)',
+        position: 'relative',
       }}
     >
+      {/* Settings overlay */}
+      {showSettings && <AiSettingsPanel onClose={() => setShowSettings(false)} />}
+
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 shrink-0"
@@ -68,8 +82,32 @@ export function ChatPanel() {
           >
             {model}
           </span>
+          {/* Connection indicator dot */}
+          {isConnected !== null && (
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: isConnected ? 'var(--color-green, #4ade80)' : 'var(--color-red, #f87171)',
+                display: 'inline-block',
+                flexShrink: 0,
+              }}
+              title={isConnected ? 'AI connected' : 'AI not connected'}
+            />
+          )}
         </div>
         <div className="flex items-center gap-1">
+          <button
+            onClick={() => setShowSettings(true)}
+            title="AI settings"
+            className="p-1.5 rounded"
+            style={{ color: 'var(--text-tertiary)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <Settings size={13} />
+          </button>
           <button
             onClick={clearChat}
             title="Clear chat"
