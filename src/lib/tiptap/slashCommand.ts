@@ -145,8 +145,6 @@ function createSlashCommandRenderer() {
         createElement(SlashCommandMenu, {
           items: props.items,
           command: (item: SlashCommandItem) => props.command(item),
-          editor: props.editor,
-          range: props.range,
         }),
       );
     },
@@ -167,8 +165,6 @@ function createSlashCommandRenderer() {
         createElement(SlashCommandMenu, {
           items: props.items,
           command: (item: SlashCommandItem) => props.command(item),
-          editor: props.editor,
-          range: props.range,
         }),
       );
     },

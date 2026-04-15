@@ -15,7 +15,7 @@ export function LectureModeToggle() {
       setElapsed(getElapsedTime());
     }, 1000);
     return () => clearInterval(interval);
-  }, [lectureModeActive, lectureModeStartedAt]);
+  }, [lectureModeActive, getElapsedTime, getTimestamp]);
 
   if (!lectureModeActive) return null;
 

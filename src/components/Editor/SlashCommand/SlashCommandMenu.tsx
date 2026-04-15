@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import type { SlashCommandItem } from '../../../lib/tiptap/slashCommand';
-import type { Editor, Range } from '@tiptap/react';
 
 interface SlashCommandMenuProps {
   items: SlashCommandItem[];
   command: (item: SlashCommandItem) => void;
-  editor: Editor;
-  range: Range;
 }
 
 export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {

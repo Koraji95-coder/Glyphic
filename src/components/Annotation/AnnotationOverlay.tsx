@@ -99,16 +99,16 @@ export function AnnotationOverlay() {
 
       if (activeTool === 'eraser') {
         const target = canvas.findTarget(opt.e);
-        if (target && 'targets' in target) {
-          // target is a search result; the actual object is in targets[0] or the target itself
-          const obj = (target as { targets: FabricObject[] }).targets?.[0];
-          if (obj) {
-            canvas.remove(obj);
-            canvas.requestRenderAll();
-            pushUndo();
+        if (target) {
+          // findTarget may return a search result wrapper or a FabricObject directly
+          if ('targets' in target && Array.isArray((target as { targets: FabricObject[] }).targets)) {
+            const obj = (target as { targets: FabricObject[] }).targets[0];
+            if (obj) {
+              canvas.remove(obj);
+            }
+          } else {
+            canvas.remove(target as unknown as FabricObject);
           }
-        } else if (target) {
-          canvas.remove(target as unknown as FabricObject);
           canvas.requestRenderAll();
           pushUndo();
         }
@@ -237,6 +237,8 @@ export function AnnotationOverlay() {
     const prev = newStack[newStack.length - 1];
     canvas.loadFromJSON(prev).then(() => {
       canvas.requestRenderAll();
+    }).catch((e: unknown) => {
+      console.error('Undo failed:', e);
     });
   }, [undoStack]);
 
@@ -249,6 +251,8 @@ export function AnnotationOverlay() {
     setUndoStack((prev) => [...prev, state]);
     canvas.loadFromJSON(state).then(() => {
       canvas.requestRenderAll();
+    }).catch((e: unknown) => {
+      console.error('Redo failed:', e);
     });
   }, [redoStack]);
 
