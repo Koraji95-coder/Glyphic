@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { VaultConfig, NoteFile, VaultEntry } from '../../types/vault';
-import { CaptureResult } from '../../types/capture';
+import { CaptureResult, WindowInfo } from '../../types/capture';
 import { SearchResult } from '../../types/editor';
 
 export const commands = {
@@ -27,10 +27,28 @@ export const commands = {
   // Capture
   startCapture: () =>
     invoke<void>('start_capture'),
-  finishCapture: (mode: string, x: number, y: number, width: number, height: number, vaultPath: string) =>
-    invoke<CaptureResult>('finish_capture', { mode, x, y, width, height, vaultPath }),
+  finishCapture: (
+    mode: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    vaultPath: string,
+    points?: [number, number][],
+  ) =>
+    invoke<CaptureResult>('finish_capture', {
+      mode,
+      x,
+      y,
+      width,
+      height,
+      vaultPath,
+      points: points ?? null,
+    }),
   repeatLastCapture: () =>
-    invoke<void>('repeat_last_capture'),
+    invoke<CaptureResult>('repeat_last_capture'),
+  getWindowList: () =>
+    invoke<WindowInfo[]>('get_window_list'),
 
   // Search
   searchNotes: (query: string, limit?: number) =>

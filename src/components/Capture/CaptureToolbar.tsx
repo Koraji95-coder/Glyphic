@@ -10,12 +10,25 @@ const modes: { mode: CaptureMode; icon: LucideIcon; label: string; shortcut: str
   { mode: 'fullscreen', icon: Monitor, label: 'Fullscreen', shortcut: 'S' },
 ];
 
-export function CaptureToolbar() {
+interface CaptureToolbarProps {
+  onFullscreen?: () => void;
+  captureCount?: number;
+}
+
+export function CaptureToolbar({ onFullscreen, captureCount = 0 }: CaptureToolbarProps) {
   const captureMode = useCaptureStore((s) => s.captureMode);
   const setCaptureMode = useCaptureStore((s) => s.setCaptureMode);
 
   const handleClose = () => {
     window.history.back();
+  };
+
+  const handleModeClick = (mode: CaptureMode) => {
+    if (mode === 'fullscreen' && onFullscreen) {
+      onFullscreen();
+    } else {
+      setCaptureMode(mode);
+    }
   };
 
   return (
@@ -28,7 +41,7 @@ export function CaptureToolbar() {
       {modes.map(({ mode, icon: Icon, label, shortcut }) => (
         <button
           key={mode}
-          onClick={() => setCaptureMode(mode)}
+          onClick={() => handleModeClick(mode)}
           title={`${label} (${shortcut})`}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors"
           style={{
@@ -40,6 +53,22 @@ export function CaptureToolbar() {
           <span>{label}</span>
         </button>
       ))}
+
+      {/* Multi-capture counter badge */}
+      {captureCount > 0 && (
+        <>
+          <div className="w-px h-5 mx-1" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <div
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium"
+            style={{
+              backgroundColor: 'rgba(99, 102, 241, 0.3)',
+              color: '#a5b4fc',
+            }}
+          >
+            <span>{captureCount} captured</span>
+          </div>
+        </>
+      )}
 
       {/* Divider */}
       <div className="w-px h-5 mx-1" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
