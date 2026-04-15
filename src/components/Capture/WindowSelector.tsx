@@ -20,8 +20,8 @@ export function WindowSelector() {
       try {
         await commands.finishCapture(
           'window',
-          win.x < 0 ? 0 : win.x,
-          win.y < 0 ? 0 : win.y,
+          win.x,
+          win.y,
           win.width,
           win.height,
           vaultPath ?? '',

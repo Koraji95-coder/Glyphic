@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 interface MagnifierProps {
   /** The background screenshot image as a data URL or src, if available. */
@@ -13,7 +13,6 @@ interface MagnifierProps {
 export function Magnifier({ screenshotSrc }: MagnifierProps) {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const size = 120;
   const zoom = 4;
   const offset = 20;
@@ -121,9 +120,6 @@ export function Magnifier({ screenshotSrc }: MagnifierProps) {
             }}
           />
         </div>
-
-        {/* Hidden canvas for potential future use */}
-        <canvas ref={canvasRef} style={{ display: 'none' }} />
       </div>
 
       {/* Coordinates label */}

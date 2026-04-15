@@ -32,10 +32,15 @@ pub fn list_windows() -> Result<Vec<WindowInfo>, String> {
         let parts: Vec<&str> = line.split_whitespace().collect();
         // Format: id desktop x y w h hostname title...
         if parts.len() >= 8 {
-            let x: i32 = parts[2].parse().unwrap_or(0);
-            let y: i32 = parts[3].parse().unwrap_or(0);
-            let width: u32 = parts[4].parse().unwrap_or(0);
-            let height: u32 = parts[5].parse().unwrap_or(0);
+            let (x, y, width, height) = match (
+                parts[2].parse::<i32>(),
+                parts[3].parse::<i32>(),
+                parts[4].parse::<u32>(),
+                parts[5].parse::<u32>(),
+            ) {
+                (Ok(x), Ok(y), Ok(w), Ok(h)) => (x, y, w, h),
+                _ => continue,
+            };
             let title: String = parts[7..].join(" ");
 
             if width > 10 && height > 10 {
@@ -86,10 +91,15 @@ pub fn list_windows() -> Result<Vec<WindowInfo>, String> {
     for line in stdout.lines() {
         let parts: Vec<&str> = line.split(',').collect();
         if parts.len() >= 5 {
-            let x: i32 = parts[0].trim().parse().unwrap_or(0);
-            let y: i32 = parts[1].trim().parse().unwrap_or(0);
-            let width: u32 = parts[2].trim().parse().unwrap_or(0);
-            let height: u32 = parts[3].trim().parse().unwrap_or(0);
+            let (x, y, width, height) = match (
+                parts[0].trim().parse::<i32>(),
+                parts[1].trim().parse::<i32>(),
+                parts[2].trim().parse::<u32>(),
+                parts[3].trim().parse::<u32>(),
+            ) {
+                (Ok(x), Ok(y), Ok(w), Ok(h)) => (x, y, w, h),
+                _ => continue,
+            };
             let title = parts[4..].join(",").trim().to_string();
 
             if width > 10 && height > 10 {
@@ -161,10 +171,15 @@ pub fn list_windows() -> Result<Vec<WindowInfo>, String> {
     for line in stdout.lines() {
         let parts: Vec<&str> = line.split(',').collect();
         if parts.len() >= 5 {
-            let x: i32 = parts[0].trim().parse().unwrap_or(0);
-            let y: i32 = parts[1].trim().parse().unwrap_or(0);
-            let width: u32 = parts[2].trim().parse().unwrap_or(0);
-            let height: u32 = parts[3].trim().parse().unwrap_or(0);
+            let (x, y, width, height) = match (
+                parts[0].trim().parse::<i32>(),
+                parts[1].trim().parse::<i32>(),
+                parts[2].trim().parse::<u32>(),
+                parts[3].trim().parse::<u32>(),
+            ) {
+                (Ok(x), Ok(y), Ok(w), Ok(h)) => (x, y, w, h),
+                _ => continue,
+            };
             let title = parts[4..].join(",").trim().to_string();
 
             if width > 10 && height > 10 {

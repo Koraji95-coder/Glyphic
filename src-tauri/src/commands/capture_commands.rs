@@ -64,7 +64,7 @@ pub fn finish_capture(
     let cropped = match mode.as_str() {
         "fullscreen" => screenshot,
         "freeform" => {
-            let pts = points.ok_or_else(|| "Freeform mode requires points".to_string())?;
+            let pts = points.ok_or_else(|| "Internal error: freeform mode called without points parameter".to_string())?;
             crop::crop_freeform(&screenshot, &pts)?
         }
         _ => {
