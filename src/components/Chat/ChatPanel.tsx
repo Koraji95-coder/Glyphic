@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { X, Send, Bot, FileText, CreditCard, HelpCircle, Camera, Settings } from 'lucide-react';
+import { X, Send, Bot, FileText, CreditCard, HelpCircle, Camera, Settings, ArrowLeft } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { AiSettingsPanel } from './AiSettingsPanel';
 
 export function ChatPanel() {
@@ -10,6 +11,7 @@ export function ChatPanel() {
   const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -44,14 +46,25 @@ export function ChatPanel() {
 
   if (!isOpen) return null;
 
+  const mobileOverlayStyle = isMobile
+    ? {
+        position: 'fixed' as const,
+        inset: 0,
+        zIndex: 60,
+        width: '100%',
+        height: '100%',
+      }
+    : {};
+
   return (
     <div
       className="flex flex-col shrink-0 h-full"
       style={{
-        width: '360px',
-        borderLeft: '1px solid var(--border)',
+        width: isMobile ? '100%' : '360px',
+        borderLeft: isMobile ? 'none' : '1px solid var(--border)',
         backgroundColor: 'var(--bg-editor)',
         position: 'relative',
+        ...mobileOverlayStyle,
       }}
     >
       {/* Settings overlay */}
@@ -101,7 +114,7 @@ export function ChatPanel() {
           <button
             onClick={() => setShowSettings(true)}
             title="AI settings"
-            className="p-1.5 rounded"
+            className="touch-target p-1.5 rounded"
             style={{ color: 'var(--text-tertiary)' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -111,7 +124,7 @@ export function ChatPanel() {
           <button
             onClick={clearChat}
             title="Clear chat"
-            className="p-1 rounded text-xs"
+            className="touch-target p-1 rounded text-xs"
             style={{ color: 'var(--text-tertiary)' }}
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-tertiary)')}
@@ -121,12 +134,12 @@ export function ChatPanel() {
           <button
             onClick={togglePanel}
             title="Close chat"
-            className="p-1.5 rounded"
+            className="touch-target p-1.5 rounded"
             style={{ color: 'var(--text-tertiary)' }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
-            <X size={14} />
+            {isMobile ? <ArrowLeft size={18} /> : <X size={14} />}
           </button>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import type { Editor } from '@tiptap/react';
 import type { LucideIcon } from 'lucide-react';
 import { useLectureMode } from '../../hooks/useLectureMode';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useLayoutStore } from '../../stores/layoutStore';
 import { commands } from '../../lib/tauri/commands';
 import {
   Bold,
@@ -14,6 +16,7 @@ import {
   List,
   ListChecks,
   Camera,
+  Pencil,
 } from 'lucide-react';
 
 interface EditorToolbarProps {
@@ -29,8 +32,14 @@ interface ToolbarButton {
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   const { lectureModeActive, toggleLectureMode, getElapsedTime } = useLectureMode();
+  const isMobile = useIsMobile();
+  const { isInkMode, toggleInkMode } = useLayoutStore();
 
   if (!editor) return null;
+
+  // On mobile, use minimum 44px touch targets per Apple HIG
+  const btnSize = isMobile ? '44px' : undefined;
+  const iconSize = isMobile ? 18 : 15;
 
   const groups: ToolbarButton[][] = [
     // Formatting
@@ -108,17 +117,19 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     <div
       className="flex items-center shrink-0"
       style={{
-        height: 'var(--toolbar-height)',
+        height: isMobile ? '52px' : 'var(--toolbar-height)',
         backgroundColor: 'var(--bg-editor)',
         borderBottom: '1px solid var(--border)',
         paddingLeft: '12px',
         paddingRight: '12px',
         gap: '4px',
+        overflowX: 'auto',
+        overscrollBehavior: 'contain',
       }}
     >
       {/* Button groups */}
       {groups.map((group, gi) => (
-        <div key={gi} className="flex items-center" style={{ gap: '2px' }}>
+        <div key={gi} className="flex items-center shrink-0" style={{ gap: '2px' }}>
           {gi > 0 && (
             <div
               className="h-5 mx-1.5"
@@ -133,10 +144,17 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 key={btn.label}
                 onClick={btn.action}
                 title={btn.label}
-                className="p-1.5 rounded transition-colors text-xs font-medium"
+                className="touch-target rounded transition-colors text-xs font-medium"
                 style={{
                   backgroundColor: active ? 'var(--accent-dim)' : 'transparent',
                   color: active ? 'var(--accent)' : 'var(--text-secondary)',
+                  minWidth: btnSize,
+                  minHeight: btnSize,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: isMobile ? '0' : '6px',
+                  flexShrink: 0,
                 }}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
@@ -147,7 +165,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                     : 'transparent';
                 }}
               >
-                <Icon size={15} />
+                <Icon size={iconSize} />
               </button>
             );
           })}
@@ -155,17 +173,45 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       ))}
 
       {/* Spacer */}
-      <div className="flex-1" />
+      <div className="flex-1 shrink-0" style={{ minWidth: '8px' }} />
+
+      {/* Draw / Ink mode toggle — shown on touch devices or when pen is detected */}
+      <button
+        onClick={toggleInkMode}
+        title="Draw Mode"
+        className="touch-target rounded transition-colors shrink-0"
+        style={{
+          backgroundColor: isInkMode ? 'var(--accent-dim)' : 'transparent',
+          color: isInkMode ? 'var(--accent)' : 'var(--text-secondary)',
+          minWidth: btnSize,
+          minHeight: btnSize,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: isMobile ? '0' : '6px',
+        }}
+        onMouseEnter={(e) => {
+          if (!isInkMode) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = isInkMode ? 'var(--accent-dim)' : 'transparent';
+        }}
+      >
+        <Pencil size={iconSize} />
+      </button>
+
+      <div className="h-5 mx-1.5 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
 
       {/* Lecture mode toggle */}
       <button
         onClick={toggleLectureMode}
         title="Lecture Mode"
-        className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors shrink-0"
         style={{
           backgroundColor: lectureModeActive ? 'var(--green-dim)' : 'transparent',
           color: lectureModeActive ? 'var(--green)' : 'var(--text-secondary)',
           border: lectureModeActive ? '1px solid rgba(126,200,155,0.2)' : '1px solid transparent',
+          minHeight: btnSize,
         }}
       >
         <span
@@ -181,28 +227,31 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         {lectureModeActive ? `Lecture — ${getElapsedTime()}` : 'Lecture'}
       </button>
 
-      <div className="h-5 mx-1.5" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
+      <div className="h-5 mx-1.5 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
 
       {/* Capture button */}
       <button
         onClick={() => commands.startCapture().catch(() => {})}
         title="Capture screenshot (⌘⇧S)"
-        className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition-colors"
+        className="touch-target flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition-colors shrink-0"
         style={{
           backgroundColor: 'var(--accent)',
           color: 'var(--bg-app)',
+          minHeight: btnSize,
         }}
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
       >
-        <Camera size={13} />
+        <Camera size={isMobile ? 16 : 13} />
         Capture
-        <span
-          className="text-xs opacity-60"
-          style={{ fontFamily: 'var(--font-mono)', fontSize: '9px' }}
-        >
-          ⌘⇧S
-        </span>
+        {!isMobile && (
+          <span
+            className="text-xs opacity-60"
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '9px' }}
+          >
+            ⌘⇧S
+          </span>
+        )}
       </button>
     </div>
   );

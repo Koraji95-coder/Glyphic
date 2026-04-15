@@ -2,16 +2,22 @@ import { useState, useEffect, useCallback } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useVaultStore } from '../../stores/vaultStore';
 import { useChatStore } from '../../stores/chatStore';
-import { MessageSquare } from 'lucide-react';
+import { useLayoutStore } from '../../stores/layoutStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { MessageSquare, Menu } from 'lucide-react';
 
 export function TitleBar() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const { isOpen: chatOpen, togglePanel } = useChatStore();
+  const { toggleSidebar } = useLayoutStore();
   const [isMaximized, setIsMaximized] = useState(false);
+  const isMobile = useIsMobile();
 
   const appWindow = getCurrentWindow();
 
   useEffect(() => {
+    if (isMobile) return;
+
     const checkMaximized = async () => {
       try {
         setIsMaximized(await appWindow.isMaximized());
@@ -35,7 +41,7 @@ export function TitleBar() {
       });
 
     return () => unlisten?.();
-  }, []);
+  }, [isMobile]);
 
   const noteParts = activeNotePath
     ? activeNotePath.replace(/\.md$/, '').split('/')
@@ -60,86 +66,110 @@ export function TitleBar() {
         paddingRight: '12px',
       }}
     >
-      {/* Left: traffic lights + brand */}
-      <div className="flex items-center gap-3" style={{ minWidth: '160px' }}>
-        {/* macOS-style traffic light dots */}
-        <div className="flex items-center gap-1.5">
+      {/* Left: hamburger (mobile) or traffic lights + brand (desktop) */}
+      <div className="flex items-center gap-3" style={{ minWidth: isMobile ? 'auto' : '160px' }}>
+        {isMobile ? (
+          /* Hamburger menu for mobile */
           <button
-            onClick={handleClose}
-            aria-label="Close"
-            className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
-            style={{ backgroundColor: '#ff5f57' }}
-          />
-          <button
-            onClick={handleMinimize}
-            aria-label="Minimize"
-            className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
-            style={{ backgroundColor: '#febc2e' }}
-          />
-          <button
-            onClick={handleToggleMaximize}
-            aria-label={isMaximized ? 'Restore' : 'Maximize'}
-            className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
-            style={{ backgroundColor: '#28c840' }}
-          />
-        </div>
-
-        {/* Separator */}
-        <div className="w-px h-4" style={{ backgroundColor: 'var(--border)' }} />
-
-        {/* Brand logo + name */}
-        <div className="flex items-center gap-1.5">
-          <div
-            className="flex items-center justify-center rounded text-xs font-bold"
-            style={{
-              width: '20px',
-              height: '20px',
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-app)',
-              fontFamily: 'var(--font-display)',
-              borderRadius: '4px',
-            }}
+            onClick={toggleSidebar}
+            aria-label="Open sidebar"
+            className="touch-target p-2 rounded transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
-            G
-          </div>
-          <span
-            className="text-sm font-medium"
-            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}
-          >
-            Glyphic
-          </span>
-        </div>
+            <Menu size={18} />
+          </button>
+        ) : (
+          <>
+            {/* macOS-style traffic light dots */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleClose}
+                aria-label="Close"
+                className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
+                style={{ backgroundColor: '#ff5f57' }}
+              />
+              <button
+                onClick={handleMinimize}
+                aria-label="Minimize"
+                className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
+                style={{ backgroundColor: '#febc2e' }}
+              />
+              <button
+                onClick={handleToggleMaximize}
+                aria-label={isMaximized ? 'Restore' : 'Maximize'}
+                className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
+                style={{ backgroundColor: '#28c840' }}
+              />
+            </div>
+
+            {/* Separator */}
+            <div className="w-px h-4" style={{ backgroundColor: 'var(--border)' }} />
+
+            {/* Brand logo + name */}
+            <div className="flex items-center gap-1.5">
+              <div
+                className="flex items-center justify-center rounded text-xs font-bold"
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  backgroundColor: 'var(--accent)',
+                  color: 'var(--bg-app)',
+                  fontFamily: 'var(--font-display)',
+                  borderRadius: '4px',
+                }}
+              >
+                G
+              </div>
+              <span
+                className="text-sm font-medium"
+                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}
+              >
+                Glyphic
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Center: breadcrumb path */}
+      {/* Center: breadcrumb path (full on desktop, note title only on mobile) */}
       <div
         className="flex-1 flex items-center justify-center text-xs truncate px-4"
         style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
       >
         {noteParts.length > 0 ? (
-          <span>
-            {noteParts.map((part, i) => (
-              <span key={i}>
-                {i > 0 && (
-                  <span style={{ color: 'var(--text-ghost)', margin: '0 4px' }}>/</span>
-                )}
-                <span style={{ color: i === noteParts.length - 1 ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}>
-                  {part}
+          isMobile ? (
+            /* Mobile: show only the note title */
+            <span style={{ color: 'var(--text-secondary)' }}>
+              {noteParts[noteParts.length - 1]}
+            </span>
+          ) : (
+            /* Desktop: full breadcrumb path */
+            <span>
+              {noteParts.map((part, i) => (
+                <span key={i}>
+                  {i > 0 && (
+                    <span style={{ color: 'var(--text-ghost)', margin: '0 4px' }}>/</span>
+                  )}
+                  <span style={{ color: i === noteParts.length - 1 ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}>
+                    {part}
+                  </span>
                 </span>
-              </span>
-            ))}
-          </span>
+              ))}
+            </span>
+          )
         ) : (
           <span style={{ color: 'var(--text-ghost)' }}>No note selected</span>
         )}
       </div>
 
       {/* Right: Chat toggle */}
-      <div className="flex items-center" style={{ minWidth: '160px', justifyContent: 'flex-end' }}>
+      <div className="flex items-center" style={{ minWidth: isMobile ? 'auto' : '160px', justifyContent: 'flex-end' }}>
         <button
           onClick={togglePanel}
           title="ScribeAI Chat (Ctrl+Shift+A)"
-          className="p-1.5 rounded transition-colors"
+          className="touch-target p-1.5 rounded transition-colors"
           style={{
             backgroundColor: chatOpen ? 'var(--accent-dim)' : 'transparent',
             color: chatOpen ? 'var(--accent)' : 'var(--text-tertiary)',

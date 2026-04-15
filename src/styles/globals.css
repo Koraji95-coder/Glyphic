@@ -367,3 +367,38 @@ body {
 .capture-thumb:hover {
   transform: scale(1.05);
 }
+
+/* ── Touch / Mobile styles ── */
+
+/* Prevent blue tap highlight flash on iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent double-tap zoom on interactive elements */
+button,
+a,
+input,
+textarea,
+select,
+label,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+/* Prevent pull-to-refresh on scrollable areas */
+.overflow-y-auto,
+.overflow-x-auto,
+[class*='overflow-y'],
+[class*='overflow-x'] {
+  overscroll-behavior: contain;
+}
+
+/* Minimum 44px hit target utility (Apple HIG) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
