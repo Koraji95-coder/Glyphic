@@ -1,12 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useSettingsStore } from '../../stores/settingsStore';
 import { SearchBar } from './SearchBar';
 import { FileTree } from './FileTree';
 
 export function Sidebar() {
-  const settings = useSettingsStore((s) => s.settings);
-  const defaultWidth = settings?.appearance?.sidebar_width ?? 280;
-  const [width, setWidth] = useState(defaultWidth);
+  const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -44,19 +41,21 @@ export function Sidebar() {
       className="flex flex-col shrink-0 h-full relative"
       style={{
         width: `${width}px`,
-        backgroundColor: 'var(--bg-secondary)',
+        backgroundColor: 'var(--bg-sidebar)',
         borderRight: '1px solid var(--border)',
       }}
     >
       <SearchBar />
-      <div className="flex-1 overflow-y-auto px-1 py-1">
+      <div className="flex-1 overflow-y-auto py-1">
         <FileTree />
       </div>
 
       {/* Resize handle */}
       <div
         onMouseDown={handleMouseDown}
-        className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-blue-500/30 transition-colors z-10"
+        className="absolute top-0 right-0 w-1 h-full cursor-col-resize z-10 transition-colors"
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-dim)')}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
       />
     </aside>
   );

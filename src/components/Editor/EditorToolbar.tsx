@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/react';
 import type { LucideIcon } from 'lucide-react';
 import { useLectureMode } from '../../hooks/useLectureMode';
+import { commands } from '../../lib/tauri/commands';
 import {
   Bold,
   Italic,
@@ -11,16 +12,8 @@ import {
   Heading2,
   Heading3,
   List,
-  ListOrdered,
   ListChecks,
-  CodeSquare,
-  Quote,
-  Minus,
-  Link,
-  Image,
-  Undo2,
-  Redo2,
-  Presentation,
+  Camera,
 } from 'lucide-react';
 
 interface EditorToolbarProps {
@@ -35,12 +28,12 @@ interface ToolbarButton {
 }
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
-  const { lectureModeActive, toggleLectureMode } = useLectureMode();
+  const { lectureModeActive, toggleLectureMode, getElapsedTime } = useLectureMode();
 
   if (!editor) return null;
 
   const groups: ToolbarButton[][] = [
-    // Text formatting
+    // Formatting
     [
       {
         icon: Bold,
@@ -66,35 +59,29 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         action: () => editor.chain().focus().toggleCode().run(),
         isActive: () => editor.isActive('code'),
       },
-      {
-        icon: Highlighter,
-        label: 'Highlight',
-        action: () => editor.chain().focus().toggleHighlight().run(),
-        isActive: () => editor.isActive('highlight'),
-      },
     ],
     // Headings
     [
       {
         icon: Heading1,
-        label: 'Heading 1',
+        label: 'H1',
         action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
         isActive: () => editor.isActive('heading', { level: 1 }),
       },
       {
         icon: Heading2,
-        label: 'Heading 2',
+        label: 'H2',
         action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
         isActive: () => editor.isActive('heading', { level: 2 }),
       },
       {
         icon: Heading3,
-        label: 'Heading 3',
+        label: 'H3',
         action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
         isActive: () => editor.isActive('heading', { level: 3 }),
       },
     ],
-    // Lists
+    // Lists + highlight
     [
       {
         icon: List,
@@ -103,91 +90,39 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive: () => editor.isActive('bulletList'),
       },
       {
-        icon: ListOrdered,
-        label: 'Ordered List',
-        action: () => editor.chain().focus().toggleOrderedList().run(),
-        isActive: () => editor.isActive('orderedList'),
-      },
-      {
         icon: ListChecks,
         label: 'Task List',
         action: () => editor.chain().focus().toggleTaskList().run(),
         isActive: () => editor.isActive('taskList'),
       },
-    ],
-    // Blocks
-    [
       {
-        icon: CodeSquare,
-        label: 'Code Block',
-        action: () => editor.chain().focus().toggleCodeBlock().run(),
-        isActive: () => editor.isActive('codeBlock'),
-      },
-      {
-        icon: Quote,
-        label: 'Blockquote',
-        action: () => editor.chain().focus().toggleBlockquote().run(),
-        isActive: () => editor.isActive('blockquote'),
-      },
-      {
-        icon: Minus,
-        label: 'Horizontal Rule',
-        action: () => editor.chain().focus().setHorizontalRule().run(),
-      },
-    ],
-    // Media
-    [
-      {
-        icon: Link,
-        label: 'Link',
-        action: () => {
-          const url = window.prompt('Enter URL:');
-          if (url) {
-            editor.chain().focus().setLink({ href: url }).run();
-          }
-        },
-        isActive: () => editor.isActive('link'),
-      },
-      {
-        icon: Image,
-        label: 'Image',
-        action: () => {
-          const url = window.prompt('Enter image URL:');
-          if (url) {
-            editor.chain().focus().setImage({ src: url }).run();
-          }
-        },
-      },
-    ],
-    // History
-    [
-      {
-        icon: Undo2,
-        label: 'Undo',
-        action: () => editor.chain().focus().undo().run(),
-      },
-      {
-        icon: Redo2,
-        label: 'Redo',
-        action: () => editor.chain().focus().redo().run(),
+        icon: Highlighter,
+        label: 'Highlight',
+        action: () => editor.chain().focus().toggleHighlight().run(),
+        isActive: () => editor.isActive('highlight'),
       },
     ],
   ];
 
   return (
     <div
-      className="flex items-center gap-0.5 px-3 py-1.5 shrink-0 flex-wrap"
+      className="flex items-center shrink-0"
       style={{
-        backgroundColor: 'var(--bg-secondary)',
+        height: 'var(--toolbar-height)',
+        backgroundColor: 'var(--bg-editor)',
         borderBottom: '1px solid var(--border)',
+        paddingLeft: '12px',
+        paddingRight: '12px',
+        gap: '4px',
       }}
     >
+      {/* Button groups */}
       {groups.map((group, gi) => (
-        <div key={gi} className="flex items-center gap-0.5">
+        <div key={gi} className="flex items-center" style={{ gap: '2px' }}>
           {gi > 0 && (
             <div
-              className="w-px h-5 mx-1"
-              style={{ backgroundColor: 'var(--border)' }}
+              className="h-5 mx-1.5"
+              style={{ width: '1px', backgroundColor: 'var(--border)' }}
             />
           )}
           {group.map((btn) => {
@@ -198,9 +133,9 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 key={btn.label}
                 onClick={btn.action}
                 title={btn.label}
-                className="p-1.5 rounded transition-colors"
+                className="p-1.5 rounded transition-colors text-xs font-medium"
                 style={{
-                  backgroundColor: active ? 'var(--accent-muted)' : 'transparent',
+                  backgroundColor: active ? 'var(--accent-dim)' : 'transparent',
                   color: active ? 'var(--accent)' : 'var(--text-secondary)',
                 }}
                 onMouseEnter={(e) => {
@@ -208,40 +143,66 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = active
-                    ? 'var(--accent-muted)'
+                    ? 'var(--accent-dim)'
                     : 'transparent';
                 }}
               >
-                <Icon size={16} />
+                <Icon size={15} />
               </button>
             );
           })}
         </div>
       ))}
 
+      {/* Spacer */}
+      <div className="flex-1" />
+
       {/* Lecture mode toggle */}
-      <div
-        className="w-px h-5 mx-1"
-        style={{ backgroundColor: 'var(--border)' }}
-      />
       <button
         onClick={toggleLectureMode}
         title="Lecture Mode"
-        className="p-1.5 rounded transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors"
         style={{
-          backgroundColor: lectureModeActive ? 'var(--accent-muted)' : 'transparent',
-          color: lectureModeActive ? 'var(--accent)' : 'var(--text-secondary)',
-        }}
-        onMouseEnter={(e) => {
-          if (!lectureModeActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = lectureModeActive
-            ? 'var(--accent-muted)'
-            : 'transparent';
+          backgroundColor: lectureModeActive ? 'var(--green-dim)' : 'transparent',
+          color: lectureModeActive ? 'var(--green)' : 'var(--text-secondary)',
+          border: lectureModeActive ? '1px solid rgba(126,200,155,0.2)' : '1px solid transparent',
         }}
       >
-        <Presentation size={16} />
+        <span
+          className={lectureModeActive ? 'lecture-pulse' : ''}
+          style={{
+            display: 'inline-block',
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: lectureModeActive ? 'var(--green)' : 'var(--text-tertiary)',
+          }}
+        />
+        {lectureModeActive ? `Lecture — ${getElapsedTime()}` : 'Lecture'}
+      </button>
+
+      <div className="h-5 mx-1.5" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
+
+      {/* Capture button */}
+      <button
+        onClick={() => commands.startCapture().catch(() => {})}
+        title="Capture screenshot (⌘⇧S)"
+        className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition-colors"
+        style={{
+          backgroundColor: 'var(--accent)',
+          color: 'var(--bg-app)',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
+      >
+        <Camera size={13} />
+        Capture
+        <span
+          className="text-xs opacity-60"
+          style={{ fontFamily: 'var(--font-mono)', fontSize: '9px' }}
+        >
+          ⌘⇧S
+        </span>
       </button>
     </div>
   );

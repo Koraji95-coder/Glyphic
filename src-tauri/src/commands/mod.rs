@@ -1,3 +1,4 @@
+pub mod ai_commands;
 pub mod capture_commands;
 pub mod export_commands;
 pub mod search_commands;
