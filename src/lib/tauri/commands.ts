@@ -1,0 +1,54 @@
+import { invoke } from '@tauri-apps/api/core';
+import { VaultConfig, NoteFile, VaultEntry } from '../../types/vault';
+import { CaptureResult } from '../../types/capture';
+import { SearchResult } from '../../types/editor';
+
+export const commands = {
+  // Vault
+  createVault: (path: string, name: string) =>
+    invoke<VaultConfig>('create_vault', { path, name }),
+  openVault: (path: string) =>
+    invoke<VaultConfig>('open_vault', { path }),
+  listVaultContents: (vaultPath: string) =>
+    invoke<VaultEntry[]>('list_vault_contents', { vaultPath }),
+  createNote: (vaultPath: string, folder: string, title: string) =>
+    invoke<NoteFile>('create_note', { vaultPath, folder, title }),
+  readNote: (vaultPath: string, notePath: string) =>
+    invoke<string>('read_note', { vaultPath, notePath }),
+  saveNote: (vaultPath: string, notePath: string, content: string) =>
+    invoke<void>('save_note', { vaultPath, notePath, content }),
+  deleteNote: (vaultPath: string, notePath: string) =>
+    invoke<void>('delete_note', { vaultPath, notePath }),
+  renameNote: (vaultPath: string, oldPath: string, newName: string) =>
+    invoke<NoteFile>('rename_note', { vaultPath, oldPath, newName }),
+  createFolder: (vaultPath: string, relativePath: string) =>
+    invoke<void>('create_folder', { vaultPath, relativePath }),
+
+  // Capture
+  startCapture: () =>
+    invoke<void>('start_capture'),
+  finishCapture: (mode: string, x: number, y: number, width: number, height: number, vaultPath: string) =>
+    invoke<CaptureResult>('finish_capture', { mode, x, y, width, height, vaultPath }),
+  repeatLastCapture: () =>
+    invoke<void>('repeat_last_capture'),
+
+  // Search
+  searchNotes: (query: string, limit?: number) =>
+    invoke<SearchResult[]>('search_notes', { query, limit: limit || 20 }),
+  searchAll: (query: string, limit?: number) =>
+    invoke<SearchResult[]>('search_all', { query, limit: limit || 20 }),
+  reindexVault: (vaultPath: string) =>
+    invoke<number>('reindex_vault', { vaultPath }),
+
+  // Settings
+  getSettings: (vaultPath: string) =>
+    invoke<VaultConfig>('get_settings', { vaultPath }),
+  updateSettings: (vaultPath: string, settings: VaultConfig) =>
+    invoke<void>('update_settings', { vaultPath, settings }),
+
+  // Export
+  exportPdf: (vaultPath: string, notePath: string, outputPath: string) =>
+    invoke<void>('export_pdf', { vaultPath, notePath, outputPath }),
+  exportMarkdown: (vaultPath: string, notePath: string, outputPath: string) =>
+    invoke<void>('export_markdown', { vaultPath, notePath, outputPath }),
+};
