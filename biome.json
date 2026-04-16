@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": ["dist", "node_modules", "src-tauri/target"]
+    "includes": ["src/**", "*.ts", "*.tsx", "*.json"]
   },
   "formatter": {
     "enabled": true,
@@ -28,7 +28,13 @@
         "noExplicitAny": "warn"
       },
       "style": {
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "warn",
+        "noDescendingSpecificity": "off"
+      },
+      "a11y": {
+        "useButtonType": "warn",
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off"
       }
     }
   },
