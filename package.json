@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "desktop": "tauri dev",
     "lint": "biome check .",
     "lint:fix": "biome check --write ."
   },
