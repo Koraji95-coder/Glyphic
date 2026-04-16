@@ -149,8 +149,12 @@ export function SearchBar() {
 
 /**
  * Sanitize FTS5 snippet HTML — only allow <mark> tags for highlighting.
- * Strips all other HTML tags to prevent XSS.
+ * Strips all other HTML tags to prevent XSS, and escapes raw ampersands
+ * that are not already part of valid HTML entities.
  */
 function sanitizeSnippet(html: string): string {
-  return html.replace(/<(?!\/?mark\b)[^>]*>/gi, '').replace(/&(?!(amp|lt|gt|quot|#39);)/g, '&amp;');
+  // Strip all tags except <mark> and </mark>
+  const stripped = html.replace(/<(?!\/?mark\b)[^>]*>/gi, '');
+  // Escape ampersands that aren't part of valid HTML entities (named or numeric)
+  return stripped.replace(/&(?!(?:amp|lt|gt|quot|#\d{1,5}|#x[\da-fA-F]{1,4}|[a-zA-Z]{2,8});)/g, '&amp;');
 }

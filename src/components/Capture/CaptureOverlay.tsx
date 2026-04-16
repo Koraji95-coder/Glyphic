@@ -17,6 +17,7 @@ export function CaptureOverlay() {
   const captureDelay = useCaptureStore((s) => s.captureDelay);
   const cycleDelay = useCaptureStore((s) => s.cycleDelay);
   const vaultPath = useVaultStore((s) => s.vaultPath);
+  // Screenshot background state — setter will be used when screenshot capture integration is added
   const [screenshotBg, _setScreenshotBg] = useState<string | null>(null);
   const [delayCountdown, setDelayCountdown] = useState<number | null>(null);
   const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
