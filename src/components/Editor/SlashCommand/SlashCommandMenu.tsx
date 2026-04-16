@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { SlashCommandItem } from '../../../lib/tiptap/slashCommand';
 
 interface SlashCommandMenuProps {
@@ -89,10 +89,7 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
           </span>
           <div className="min-w-0">
             <div className="font-medium truncate">{item.title}</div>
-            <div
-              className="text-xs truncate"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
+            <div className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>
               {item.description}
             </div>
           </div>

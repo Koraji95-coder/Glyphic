@@ -26,6 +26,8 @@ pub struct VaultEntry {
     pub path: String,
     pub entry_type: String,
     pub children: Option<Vec<VaultEntry>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modified_at: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -195,13 +197,22 @@ fn build_tree(base: &Path, dir: &Path) -> Result<Vec<VaultEntry>, String> {
                 path: rel_path,
                 entry_type: "folder".to_string(),
                 children: Some(children),
+                modified_at: None,
             });
         } else {
+            let modified_at = std::fs::metadata(&path)
+                .ok()
+                .and_then(|m| m.modified().ok())
+                .map(|t| {
+                    let dt: chrono::DateTime<chrono::Utc> = t.into();
+                    dt.to_rfc3339()
+                });
             entries.push(VaultEntry {
                 name,
                 path: rel_path,
                 entry_type: "file".to_string(),
                 children: None,
+                modified_at,
             });
         }
     }

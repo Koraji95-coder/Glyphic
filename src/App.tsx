@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { useVault } from './hooks/useVault';
+import { Route, Routes } from 'react-router-dom';
+import { CaptureOverlay } from './components/Capture/CaptureOverlay';
+import { ChatPanel } from './components/Chat/ChatPanel';
+import { Editor } from './components/Editor/Editor';
+import { StatusBar } from './components/Layout/StatusBar';
+import { TitleBar } from './components/Layout/TitleBar';
+import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
+import { Sidebar } from './components/Sidebar/Sidebar';
 import { useTheme } from './hooks/useTheme';
+import { useVault } from './hooks/useVault';
+import { commands } from './lib/tauri/commands';
+import { useChatStore } from './stores/chatStore';
 import { useSettingsStore } from './stores/settingsStore';
 import { useVaultStore } from './stores/vaultStore';
-import { useChatStore } from './stores/chatStore';
-import { TitleBar } from './components/Layout/TitleBar';
-import { StatusBar } from './components/Layout/StatusBar';
-import { Sidebar } from './components/Sidebar/Sidebar';
-import { Editor } from './components/Editor/Editor';
-import { CaptureOverlay } from './components/Capture/CaptureOverlay';
-import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
-import { ChatPanel } from './components/Chat/ChatPanel';
-import { commands } from './lib/tauri/commands';
 
 function MainLayout() {
   const toggleChatPanel = useChatStore((s) => s.togglePanel);

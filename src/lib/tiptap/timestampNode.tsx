@@ -1,5 +1,4 @@
-import { Node, mergeAttributes, type ReactNodeViewProps } from '@tiptap/react';
-import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
+import { mergeAttributes, Node, NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer } from '@tiptap/react';
 import { TimestampBadge } from '../../components/LectureMode/TimestampBadge';
 
 /**
@@ -40,10 +39,7 @@ export const TimestampNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'span',
-      mergeAttributes(HTMLAttributes, { 'data-type': 'timestamp' }),
-    ];
+    return ['span', mergeAttributes(HTMLAttributes, { 'data-type': 'timestamp' })];
   },
 
   addNodeView() {

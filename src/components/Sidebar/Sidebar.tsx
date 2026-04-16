@@ -1,8 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { SearchBar } from './SearchBar';
-import { FileTree } from './FileTree';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { FileTree } from './FileTree';
+import { SearchBar } from './SearchBar';
 
 export function Sidebar() {
   const [width, setWidth] = useState(260);

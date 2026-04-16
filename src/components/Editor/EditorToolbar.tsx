@@ -1,23 +1,23 @@
 import type { Editor } from '@tiptap/react';
 import type { LucideIcon } from 'lucide-react';
-import { useLectureMode } from '../../hooks/useLectureMode';
-import { useIsMobile } from '../../hooks/useIsMobile';
-import { useLayoutStore } from '../../stores/layoutStore';
-import { commands } from '../../lib/tauri/commands';
 import {
   Bold,
-  Italic,
-  Strikethrough,
+  Camera,
   Code,
-  Highlighter,
   Heading1,
   Heading2,
   Heading3,
+  Highlighter,
+  Italic,
   List,
   ListChecks,
-  Camera,
   Pencil,
+  Strikethrough,
 } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useLectureMode } from '../../hooks/useLectureMode';
+import { commands } from '../../lib/tauri/commands';
+import { useLayoutStore } from '../../stores/layoutStore';
 
 interface EditorToolbarProps {
   editor: Editor | null;
@@ -130,12 +130,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       {/* Button groups */}
       {groups.map((group, gi) => (
         <div key={gi} className="flex items-center shrink-0" style={{ gap: '2px' }}>
-          {gi > 0 && (
-            <div
-              className="h-5 mx-1.5"
-              style={{ width: '1px', backgroundColor: 'var(--border)' }}
-            />
-          )}
+          {gi > 0 && <div className="h-5 mx-1.5" style={{ width: '1px', backgroundColor: 'var(--border)' }} />}
           {group.map((btn) => {
             const active = btn.isActive?.() ?? false;
             const Icon = btn.icon;
@@ -160,9 +155,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                   if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = active
-                    ? 'var(--accent-dim)'
-                    : 'transparent';
+                  e.currentTarget.style.backgroundColor = active ? 'var(--accent-dim)' : 'transparent';
                 }}
               >
                 <Icon size={iconSize} />
@@ -245,10 +238,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Camera size={isMobile ? 16 : 13} />
         Capture
         {!isMobile && (
-          <span
-            className="text-xs opacity-60"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '9px' }}
-          >
+          <span className="text-xs opacity-60" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px' }}>
             ⌘⇧S
           </span>
         )}

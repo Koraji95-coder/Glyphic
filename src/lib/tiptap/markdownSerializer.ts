@@ -1,4 +1,4 @@
-import { JSONContent } from '@tiptap/react';
+import type { JSONContent } from '@tiptap/react';
 
 export function serializeToMarkdown(doc: JSONContent): string {
   if (!doc.content) return '';

@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { VaultConfig, VaultEntry } from '../types/vault';
 import { invoke } from '@tauri-apps/api/core';
+import { create } from 'zustand';
+import type { VaultConfig, VaultEntry } from '../types/vault';
 
 interface VaultState {
   vaultPath: string | null;
@@ -32,9 +32,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   setActiveNote: (id, path) => set({ activeNoteId: id, activeNotePath: path }),
   addOpenNote: (path) =>
     set((state) => ({
-      openNotes: state.openNotes.includes(path)
-        ? state.openNotes
-        : [...state.openNotes, path],
+      openNotes: state.openNotes.includes(path) ? state.openNotes : [...state.openNotes, path],
     })),
   removeOpenNote: (path) =>
     set((state) => ({

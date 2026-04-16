@@ -1,14 +1,14 @@
 import {
-  MousePointer2,
   ArrowUpRight,
-  Square,
-  Highlighter,
-  PenTool,
-  Type,
   Eraser,
-  Undo2,
+  Highlighter,
+  type MousePointer2,
+  PenTool,
   Redo2,
   Save,
+  Square,
+  Type,
+  Undo2,
   X,
 } from 'lucide-react';
 import { useAnnotationStore } from '../../stores/annotationStore';
@@ -34,16 +34,8 @@ const TOOLS: { type: AnnotationToolType; icon: typeof MousePointer2; label: stri
 
 const COLORS = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff', '#000000'];
 
-export function AnnotationToolbar({
-  onUndo,
-  onRedo,
-  onSave,
-  onDiscard,
-  canUndo,
-  canRedo,
-}: AnnotationToolbarProps) {
-  const { activeTool, setActiveTool, color, setColor, strokeWidth, setStrokeWidth } =
-    useAnnotationStore();
+export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, canRedo }: AnnotationToolbarProps) {
+  const { activeTool, setActiveTool, color, setColor, strokeWidth, setStrokeWidth } = useAnnotationStore();
 
   return (
     <div

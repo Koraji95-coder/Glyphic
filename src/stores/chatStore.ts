@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { ChatMessage, AiConfig, McpToolExecution } from '../types/ai';
 import { commands } from '../lib/tauri/commands';
+import type { AiConfig, ChatMessage, McpToolExecution } from '../types/ai';
 
 // Tool name → display label mapping for the UI indicator pills.
 const TOOL_LABELS: Record<string, string> = {

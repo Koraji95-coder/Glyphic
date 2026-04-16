@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { VaultConfig } from '../types/vault';
 import { invoke } from '@tauri-apps/api/core';
+import { create } from 'zustand';
+import type { VaultConfig } from '../types/vault';
 
 interface SettingsState {
   settings: VaultConfig | null;

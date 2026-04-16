@@ -1,19 +1,19 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
-  ChevronRight,
   ChevronDown,
+  ChevronRight,
   File,
+  FilePlus,
   Folder,
   FolderOpen,
-  FilePlus,
   FolderPlus,
   Pencil,
   Trash2,
 } from 'lucide-react';
-import type { VaultEntry } from '../../types/vault';
-import { useVaultStore } from '../../stores/vaultStore';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
+import { useVaultStore } from '../../stores/vaultStore';
+import type { VaultEntry } from '../../types/vault';
 
 interface FileTreeItemProps {
   entry: VaultEntry;
@@ -137,9 +137,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isActive
-            ? 'var(--accent-muted)'
-            : 'transparent';
+          e.currentTarget.style.backgroundColor = isActive ? 'var(--accent-muted)' : 'transparent';
         }}
       >
         {/* Expand chevron or spacer */}
@@ -153,11 +151,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
 
         {/* Icon */}
         <span className="shrink-0" style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>
-          {isFolder ? (
-            expanded ? <FolderOpen size={15} /> : <Folder size={15} />
-          ) : (
-            <File size={15} />
-          )}
+          {isFolder ? expanded ? <FolderOpen size={15} /> : <Folder size={15} /> : <File size={15} />}
         </span>
 
         {/* Name */}
@@ -187,9 +181,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           }}
         >
           <CtxItem icon={FilePlus} label="New Note" onClick={handleNewNote} />
-          {isFolder && (
-            <CtxItem icon={FolderPlus} label="New Folder" onClick={handleNewFolder} />
-          )}
+          {isFolder && <CtxItem icon={FolderPlus} label="New Folder" onClick={handleNewFolder} />}
           {!isFolder && (
             <>
               <CtxItem icon={Pencil} label="Rename" onClick={handleRename} />

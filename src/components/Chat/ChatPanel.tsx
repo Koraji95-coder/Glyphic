@@ -1,12 +1,23 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { X, Send, Bot, FileText, CreditCard, HelpCircle, Camera, Settings, ArrowLeft } from 'lucide-react';
-import { useChatStore, TOOL_LABELS } from '../../stores/chatStore';
+import { ArrowLeft, Bot, Camera, CreditCard, FileText, HelpCircle, Send, Settings, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
 import { AiSettingsPanel } from './AiSettingsPanel';
 
 export function ChatPanel() {
-  const { messages, isOpen, isLoading, isConnected, model, activeTools, sendMessage, togglePanel, clearChat, checkConnection, fetchConfig } =
-    useChatStore();
+  const {
+    messages,
+    isOpen,
+    isLoading,
+    isConnected,
+    model,
+    activeTools,
+    sendMessage,
+    togglePanel,
+    clearChat,
+    checkConnection,
+    fetchConfig,
+  } = useChatStore();
   const [input, setInput] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -155,10 +166,7 @@ export function ChatPanel() {
           </div>
         )}
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-          >
+          <div key={msg.id} className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
             <div
               className="rounded-lg px-3 py-2 text-sm max-w-[85%]"
               style={{
@@ -170,10 +178,7 @@ export function ChatPanel() {
             >
               {msg.content}
             </div>
-            <span
-              className="text-xs"
-              style={{ color: 'var(--text-ghost)', fontFamily: 'var(--font-mono)' }}
-            >
+            <span className="text-xs" style={{ color: 'var(--text-ghost)', fontFamily: 'var(--font-mono)' }}>
               {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -224,10 +229,7 @@ export function ChatPanel() {
       </div>
 
       {/* Quick actions */}
-      <div
-        className="px-3 py-2 flex flex-wrap gap-1.5"
-        style={{ borderTop: '1px solid var(--border-subtle)' }}
-      >
+      <div className="px-3 py-2 flex flex-wrap gap-1.5" style={{ borderTop: '1px solid var(--border-subtle)' }}>
         <button
           onClick={() => handleQuickAction('Summarize this note for me.')}
           className="flex items-center gap-1 px-2 py-1 rounded text-xs"
@@ -287,10 +289,7 @@ export function ChatPanel() {
       </div>
 
       {/* Input area */}
-      <div
-        className="px-3 py-3 flex flex-col gap-2"
-        style={{ borderTop: '1px solid var(--border)' }}
-      >
+      <div className="px-3 py-3 flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)' }}>
         <div
           className="flex items-end gap-2 rounded-lg px-3 py-2"
           style={{
