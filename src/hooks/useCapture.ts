@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { events } from '../lib/tauri/events';
 import { commands } from '../lib/tauri/commands';
+import { events } from '../lib/tauri/events';
 import { useCaptureStore } from '../stores/captureStore';
 
 export function useCapture() {

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AnnotationToolType, AnnotationData } from '../types/annotation';
+import type { AnnotationData, AnnotationToolType } from '../types/annotation';
 
 interface AnnotationState {
   isOpen: boolean;
@@ -32,8 +32,7 @@ export const useAnnotationStore = create<AnnotationState>((set) => ({
 
   openAnnotation: (imageSrc, annotationFilePath, data) =>
     set({ isOpen: true, imageSrc, annotationFilePath, annotationData: data }),
-  closeAnnotation: () =>
-    set({ isOpen: false, imageSrc: null, annotationFilePath: null, annotationData: null }),
+  closeAnnotation: () => set({ isOpen: false, imageSrc: null, annotationFilePath: null, annotationData: null }),
   setActiveTool: (tool) => set({ activeTool: tool }),
   setColor: (color) => set({ color }),
   setStrokeWidth: (width) => set({ strokeWidth: width }),

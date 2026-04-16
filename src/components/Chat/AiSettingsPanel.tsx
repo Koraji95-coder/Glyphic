@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Check, X, Loader2, Wifi, WifiOff } from 'lucide-react';
-import { AiConfig } from '../../types/ai';
+import { Check, Loader2, Wifi, WifiOff, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
+import type { AiConfig } from '../../types/ai';
 
 interface AiSettingsPanelProps {
   onClose: () => void;
@@ -28,7 +28,10 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    commands.aiGetConfig().then(setConfig).catch(() => {});
+    commands
+      .aiGetConfig()
+      .then(setConfig)
+      .catch(() => {});
   }, []);
 
   const handleTestConnection = async () => {
@@ -148,8 +151,7 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
                   fontSize: '12px',
                   fontFamily: 'var(--font-body)',
                   border: `1px solid ${config.provider === p ? 'var(--accent)' : 'var(--border)'}`,
-                  backgroundColor:
-                    config.provider === p ? 'var(--bg-active)' : 'var(--bg-input)',
+                  backgroundColor: config.provider === p ? 'var(--bg-active)' : 'var(--bg-input)',
                   color: config.provider === p ? 'var(--accent)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                 }}
@@ -321,15 +323,8 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
           {isConnected === true && <Wifi size={13} style={{ color: 'var(--color-green, #4ade80)' }} />}
           {isConnected === false && <WifiOff size={13} style={{ color: 'var(--color-red, #f87171)' }} />}
           {isConnected === null && <Wifi size={13} style={{ color: 'var(--text-ghost)' }} />}
-          <span
-            className="text-xs flex-1"
-            style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
-          >
-            {isConnected === true
-              ? 'Connected'
-              : isConnected === false
-              ? 'Not connected'
-              : 'Not tested'}
+          <span className="text-xs flex-1" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
+            {isConnected === true ? 'Connected' : isConnected === false ? 'Not connected' : 'Not tested'}
           </span>
           <button
             onClick={handleTestConnection}
@@ -350,10 +345,7 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
       </div>
 
       {/* Footer actions */}
-      <div
-        className="px-3 py-3 flex justify-end gap-2"
-        style={{ borderTop: '1px solid var(--border)' }}
-      >
+      <div className="px-3 py-3 flex justify-end gap-2" style={{ borderTop: '1px solid var(--border)' }}>
         <button
           onClick={onClose}
           className="text-xs px-3 py-1.5 rounded"
@@ -378,11 +370,7 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
             cursor: isSaving ? 'not-allowed' : 'pointer',
           }}
         >
-          {isSaving ? (
-            <Loader2 size={11} className="animate-spin" />
-          ) : saveSuccess ? (
-            <Check size={11} />
-          ) : null}
+          {isSaving ? <Loader2 size={11} className="animate-spin" /> : saveSuccess ? <Check size={11} /> : null}
           {saveSuccess ? 'Saved!' : 'Save'}
         </button>
       </div>

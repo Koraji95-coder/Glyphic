@@ -1,5 +1,5 @@
-import { useEditorStore } from '../stores/editorStore';
 import { format } from 'date-fns';
+import { useEditorStore } from '../stores/editorStore';
 
 export function useLectureMode() {
   const { lectureModeActive, lectureModeStartedAt, toggleLectureMode } = useEditorStore();

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface MagnifierProps {
   /** The background screenshot image as a data URL or src, if available. */

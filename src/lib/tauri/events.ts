@@ -1,5 +1,5 @@
-import { listen, UnlistenFn } from '@tauri-apps/api/event';
-import { CaptureResult } from '../../types/capture';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import type { CaptureResult } from '../../types/capture';
 
 interface VaultChangedPayload {
   event_type: 'created' | 'modified' | 'deleted';
@@ -29,6 +29,5 @@ export const events = {
   onIndexUpdated: (handler: (payload: IndexUpdatedPayload) => void): Promise<UnlistenFn> =>
     listen<IndexUpdatedPayload>('index-updated', (event) => handler(event.payload)),
 
-  onCaptureCancelled: (handler: () => void): Promise<UnlistenFn> =>
-    listen('capture-cancelled', () => handler()),
+  onCaptureCancelled: (handler: () => void): Promise<UnlistenFn> => listen('capture-cancelled', () => handler()),
 };

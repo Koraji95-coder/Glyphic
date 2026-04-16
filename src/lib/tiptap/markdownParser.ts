@@ -3,7 +3,7 @@
 
 export function parseMarkdownToContent(markdown: string): string {
   // Strip YAML frontmatter
-  let content = markdown.replace(/^---[\s\S]*?---\n*/, '');
+  const content = markdown.replace(/^---[\s\S]*?---\n*/, '');
 
   // Convert markdown to basic HTML that TipTap can consume
   const lines = content.split('\n');
@@ -126,32 +126,27 @@ export function parseMarkdownToContent(markdown: string): string {
 }
 
 function inlineMarkdown(text: string): string {
-  return text
-    // Timestamp badges [T:MM:SS]
-    .replace(
-      /\[T:(\d{2}:\d{2})\]/g,
-      '<span data-type="timestamp" data-elapsed="$1" data-absolute=""></span>',
-    )
-    // Bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Italic
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Inline code
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Highlight
-    .replace(/==(.+?)==/g, '<mark>$1</mark>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    // Images inline
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+  return (
+    text
+      // Timestamp badges [T:MM:SS]
+      .replace(/\[T:(\d{2}:\d{2})\]/g, '<span data-type="timestamp" data-elapsed="$1" data-absolute=""></span>')
+      // Bold
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      // Highlight
+      .replace(/==(.+?)==/g, '<mark>$1</mark>')
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+      // Images inline
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />')
+  );
 }
 
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 export function extractFrontmatter(markdown: string): Record<string, unknown> | null {
@@ -171,7 +166,10 @@ export function extractFrontmatter(markdown: string): Record<string, unknown> | 
     if (value === 'true') value = true;
     else if (value === 'false') value = false;
     else if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
-      value = value.slice(1, -1).split(',').map((s) => s.trim().replace(/^["']|["']$/g, ''));
+      value = value
+        .slice(1, -1)
+        .split(',')
+        .map((s) => s.trim().replace(/^["']|["']$/g, ''));
     } else if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
       value = value.slice(1, -1);
     }

@@ -1,5 +1,5 @@
-import { useRef } from 'react';
 import { Search, X } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
 import { useSearch } from '../../hooks/useSearch';
 import { useVaultStore } from '../../stores/vaultStore';
 
@@ -7,12 +7,47 @@ export function SearchBar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { query, results, isSearching, handleQueryChange, clearSearch } = useSearch();
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const handleOpenResult = (id: string, path: string) => {
-    setActiveNote(id, path);
-    clearSearch();
-    inputRef.current?.blur();
-  };
+  const handleOpenResult = useCallback(
+    (id: string, path: string) => {
+      setActiveNote(id, path);
+      clearSearch();
+      setSelectedIndex(-1);
+      inputRef.current?.blur();
+    },
+    [setActiveNote, clearSearch],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!query || results.length === 0) return;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex((i) => Math.max(i - 1, 0));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (selectedIndex >= 0 && results[selectedIndex]) {
+            handleOpenResult(results[selectedIndex].id, results[selectedIndex].path);
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          clearSearch();
+          setSelectedIndex(-1);
+          inputRef.current?.blur();
+          break;
+      }
+    },
+    [query, results, selectedIndex, clearSearch, handleOpenResult],
+  );
 
   return (
     <div className="relative px-3 pt-3 pb-2">
@@ -29,15 +64,21 @@ export function SearchBar() {
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => handleQueryChange(e.target.value)}
+          onChange={(e) => {
+            handleQueryChange(e.target.value);
+            setSelectedIndex(-1);
+          }}
+          onKeyDown={handleKeyDown}
           placeholder="Search notes..."
           className="flex-1 bg-transparent text-sm outline-none"
           style={{ color: 'var(--text-primary)' }}
         />
         {query && (
           <button
+            type="button"
             onClick={() => {
               clearSearch();
+              setSelectedIndex(-1);
               inputRef.current?.focus();
             }}
             className="shrink-0 p-0.5 rounded transition-colors"
@@ -59,53 +100,40 @@ export function SearchBar() {
           }}
         >
           {isSearching ? (
-            <div
-              className="px-3 py-4 text-sm text-center"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
+            <div className="px-3 py-4 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
               Searching...
             </div>
           ) : results.length === 0 ? (
-            <div
-              className="px-3 py-4 text-sm text-center"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
+            <div className="px-3 py-4 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
               No results found
             </div>
           ) : (
-            results.map((result) => {
+            results.map((result, i) => {
               const folder = result.path.split('/').slice(0, -1).join('/');
               return (
                 <button
+                  type="button"
                   key={result.id}
                   onClick={() => handleOpenResult(result.id, result.path)}
                   className="flex flex-col w-full px-3 py-2 text-left transition-colors"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                  style={{
+                    backgroundColor: i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
                   }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
+                  onMouseEnter={() => setSelectedIndex(i)}
                 >
-                  <span
-                    className="text-sm font-medium truncate"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
+                  <span className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                     {result.title}
                   </span>
                   {result.snippet && (
                     <span
-                      className="text-xs truncate mt-0.5"
+                      className="text-xs truncate mt-0.5 search-snippet"
                       style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      {result.snippet}
-                    </span>
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: FTS5 snippets contain <mark> highlights; sanitizeSnippet strips all other tags
+                      dangerouslySetInnerHTML={{ __html: sanitizeSnippet(result.snippet) }}
+                    />
                   )}
                   {folder && (
-                    <span
-                      className="text-xs truncate mt-0.5"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
+                    <span className="text-xs truncate mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                       {folder}
                     </span>
                   )}
@@ -117,4 +145,12 @@ export function SearchBar() {
       )}
     </div>
   );
+}
+
+/**
+ * Sanitize FTS5 snippet HTML — only allow <mark> tags for highlighting.
+ * Strips all other HTML tags to prevent XSS.
+ */
+function sanitizeSnippet(html: string): string {
+  return html.replace(/<(?!\/?mark\b)[^>]*>/gi, '').replace(/&(?!(amp|lt|gt|quot|#39);)/g, '&amp;');
 }

@@ -1,6 +1,6 @@
-import { useLectureMode } from '../../hooks/useLectureMode';
-import { useEffect, useState } from 'react';
 import { Clock, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useLectureMode } from '../../hooks/useLectureMode';
 
 export function LectureModeToggle() {
   const { lectureModeActive, lectureModeStartedAt, toggleLectureMode, getElapsedTime, getTimestamp } = useLectureMode();
@@ -31,9 +31,7 @@ export function LectureModeToggle() {
       <div className="flex items-center gap-2">
         <Clock size={14} />
         <span className="font-medium">Lecture Mode active</span>
-        <span style={{ color: 'var(--text-secondary)' }}>
-          — started at {startTime}
-        </span>
+        <span style={{ color: 'var(--text-secondary)' }}>— started at {startTime}</span>
       </div>
       <div className="flex items-center gap-3">
         <span className="font-mono font-medium">{elapsed}</span>

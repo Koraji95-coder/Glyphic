@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { useVaultStore } from '../../stores/vaultStore';
+import { Menu, MessageSquare } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { useChatStore } from '../../stores/chatStore';
 import { useLayoutStore } from '../../stores/layoutStore';
-import { useIsMobile } from '../../hooks/useIsMobile';
-import { MessageSquare, Menu } from 'lucide-react';
+import { useVaultStore } from '../../stores/vaultStore';
 
 export function TitleBar() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
@@ -43,9 +43,7 @@ export function TitleBar() {
     return () => unlisten?.();
   }, [isMobile]);
 
-  const noteParts = activeNotePath
-    ? activeNotePath.replace(/\.md$/, '').split('/')
-    : [];
+  const noteParts = activeNotePath ? activeNotePath.replace(/\.md$/, '').split('/') : [];
 
   const handleMinimize = useCallback(() => appWindow.minimize(), []);
   const handleToggleMaximize = useCallback(async () => {
@@ -141,18 +139,16 @@ export function TitleBar() {
         {noteParts.length > 0 ? (
           isMobile ? (
             /* Mobile: show only the note title */
-            <span style={{ color: 'var(--text-secondary)' }}>
-              {noteParts[noteParts.length - 1]}
-            </span>
+            <span style={{ color: 'var(--text-secondary)' }}>{noteParts[noteParts.length - 1]}</span>
           ) : (
             /* Desktop: full breadcrumb path */
             <span>
               {noteParts.map((part, i) => (
                 <span key={i}>
-                  {i > 0 && (
-                    <span style={{ color: 'var(--text-ghost)', margin: '0 4px' }}>/</span>
-                  )}
-                  <span style={{ color: i === noteParts.length - 1 ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}>
+                  {i > 0 && <span style={{ color: 'var(--text-ghost)', margin: '0 4px' }}>/</span>}
+                  <span
+                    style={{ color: i === noteParts.length - 1 ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}
+                  >
                     {part}
                   </span>
                 </span>

@@ -1,15 +1,15 @@
-import { useEffect, useCallback } from 'react';
-import { useEditor as useTiptapEditor, EditorContent } from '@tiptap/react';
-import { getEditorExtensions } from '../../lib/tiptap/extensions';
-import { serializeToMarkdown } from '../../lib/tiptap/markdownSerializer';
-import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
+import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
+import { useCallback, useEffect } from 'react';
 import { useEditor } from '../../hooks/useEditor';
-import { useVaultStore } from '../../stores/vaultStore';
-import { useEditorStore } from '../../stores/editorStore';
 import { events } from '../../lib/tauri/events';
-import { EditorToolbar } from './EditorToolbar';
-import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
+import { getEditorExtensions } from '../../lib/tiptap/extensions';
+import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
+import { serializeToMarkdown } from '../../lib/tiptap/markdownSerializer';
+import { useEditorStore } from '../../stores/editorStore';
+import { useVaultStore } from '../../stores/vaultStore';
 import { AnnotationOverlay } from '../Annotation/AnnotationOverlay';
+import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
+import { EditorToolbar } from './EditorToolbar';
 
 export function Editor() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
@@ -82,11 +82,7 @@ export function Editor() {
   const insertImage = useCallback(
     (result: { path: string }) => {
       if (!editor) return;
-      editor
-        .chain()
-        .focus()
-        .setImage({ src: result.path })
-        .run();
+      editor.chain().focus().setImage({ src: result.path }).run();
     },
     [editor],
   );
@@ -106,10 +102,7 @@ export function Editor() {
 
   if (!activeNotePath) {
     return (
-      <div
-        className="flex-1 flex items-center justify-center"
-        style={{ color: 'var(--text-tertiary)' }}
-      >
+      <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--text-tertiary)' }}>
         <p className="text-lg">Select or create a note to get started</p>
       </div>
     );
@@ -119,10 +112,7 @@ export function Editor() {
     <div className="flex-1 flex flex-col min-h-0">
       <EditorToolbar editor={editor} />
       <LectureModeToggle />
-      <div
-        className="flex-1 overflow-y-auto"
-        style={{ backgroundColor: 'var(--bg-primary)' }}
-      >
+      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-primary)' }}>
         <EditorContent editor={editor} />
       </div>
       <AnnotationOverlay />

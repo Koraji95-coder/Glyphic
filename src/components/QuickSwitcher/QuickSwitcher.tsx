@@ -1,19 +1,24 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Fuse from 'fuse.js';
 import { Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
 
 interface NoteOption {
   title: string;
   path: string;
+  modified_at?: string;
 }
 
 function flattenEntries(entries: VaultEntry[]): NoteOption[] {
   const notes: NoteOption[] = [];
   for (const entry of entries) {
     if (entry.entry_type === 'file') {
-      notes.push({ title: entry.name.replace(/\.md$/, ''), path: entry.path });
+      notes.push({
+        title: entry.name.replace(/\.md$/, ''),
+        path: entry.path,
+        modified_at: entry.modified_at,
+      });
     }
     if (entry.children) {
       notes.push(...flattenEntries(entry.children));
@@ -108,10 +113,7 @@ export function QuickSwitcher() {
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-50 bg-black/40"
-        onClick={() => setOpen(false)}
-      />
+      <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setOpen(false)} />
 
       {/* Modal */}
       <div
@@ -123,10 +125,7 @@ export function QuickSwitcher() {
         }}
       >
         {/* Search input */}
-        <div
-          className="flex items-center gap-2 px-4 py-3"
-          style={{ borderBottom: '1px solid var(--border)' }}
-        >
+        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
           <Search size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
           <input
             ref={inputRef}
@@ -146,36 +145,38 @@ export function QuickSwitcher() {
         {/* Results */}
         <div className="max-h-72 overflow-y-auto">
           {results.length === 0 ? (
-            <div
-              className="px-4 py-6 text-sm text-center"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
+            <div className="px-4 py-6 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
               No notes found
             </div>
           ) : (
             results.map((note, i) => {
               const folder = note.path.split('/').slice(0, -1).join('/');
+              const modifiedLabel = note.modified_at ? formatRelativeDate(note.modified_at) : '';
               return (
                 <button
+                  type="button"
                   key={note.path}
                   onClick={() => handleSelect(note)}
                   className="flex items-center justify-between w-full px-4 py-2 text-left text-sm transition-colors"
                   style={{
-                    backgroundColor:
-                      i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
+                    backgroundColor: i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
                     color: 'var(--text-primary)',
                   }}
                   onMouseEnter={() => setSelectedIndex(i)}
                 >
                   <span className="truncate font-medium">{note.title}</span>
-                  {folder && (
-                    <span
-                      className="text-xs ml-2 shrink-0"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      {folder}
-                    </span>
-                  )}
+                  <span className="flex items-center gap-2 ml-2 shrink-0">
+                    {modifiedLabel && (
+                      <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                        {modifiedLabel}
+                      </span>
+                    )}
+                    {folder && (
+                      <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                        {folder}
+                      </span>
+                    )}
+                  </span>
                 </button>
               );
             })
@@ -184,4 +185,27 @@ export function QuickSwitcher() {
       </div>
     </>
   );
+}
+
+/** Format an ISO date string to a concise relative or short date label. */
+function formatRelativeDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `${diffH}h ago`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD < 7) return `${diffD}d ago`;
+
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined,
+  });
 }

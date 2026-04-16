@@ -1,9 +1,13 @@
-import { Extension } from '@tiptap/react';
-import Suggestion, { type SuggestionOptions, type SuggestionProps, type SuggestionKeyDownProps } from '@tiptap/suggestion';
-import { createRoot, type Root } from 'react-dom/client';
-import { createElement } from 'react';
-import { SlashCommandMenu } from '../../components/Editor/SlashCommand/SlashCommandMenu';
 import type { Editor, Range } from '@tiptap/react';
+import { Extension } from '@tiptap/react';
+import Suggestion, {
+  type SuggestionKeyDownProps,
+  type SuggestionOptions,
+  type SuggestionProps,
+} from '@tiptap/suggestion';
+import { createElement } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { SlashCommandMenu } from '../../components/Editor/SlashCommand/SlashCommandMenu';
 
 export interface SlashCommandItem {
   title: string;
@@ -201,21 +205,11 @@ export const SlashCommandExtension = Extension.create({
     return {
       suggestion: {
         char: '/',
-        command: ({
-          editor,
-          range,
-          props,
-        }: {
-          editor: Editor;
-          range: Range;
-          props: SlashCommandItem;
-        }) => {
+        command: ({ editor, range, props }: { editor: Editor; range: Range; props: SlashCommandItem }) => {
           props.command({ editor, range });
         },
         items: ({ query }: { query: string }) => {
-          return SLASH_COMMANDS.filter((item) =>
-            item.title.toLowerCase().includes(query.toLowerCase()),
-          );
+          return SLASH_COMMANDS.filter((item) => item.title.toLowerCase().includes(query.toLowerCase()));
         },
         render: createSlashCommandRenderer,
       } satisfies Partial<SuggestionOptions<SlashCommandItem>>,

@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStylus } from '../../hooks/useStylus';
-import type { InkStroke, InkPoint } from '../../types/ink';
+import type { InkPoint, InkStroke } from '../../types/ink';
 
 interface InkCanvasProps {
   width: number;
@@ -139,11 +139,7 @@ export function InkCanvas({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      <svg
-        width={width}
-        height={height}
-        style={{ position: 'absolute', inset: 0, overflow: 'visible' }}
-      >
+      <svg width={width} height={height} style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
         {/* Committed strokes */}
         {strokes.map((stroke) => (
           <path
@@ -174,10 +170,7 @@ export function InkCanvas({
             stroke={color}
             strokeWidth={
               currentPoints.length > 0
-                ? pressureToWidth(
-                    currentPoints.reduce((sum, p) => sum + p.pressure, 0) / currentPoints.length,
-                    2,
-                  )
+                ? pressureToWidth(currentPoints.reduce((sum, p) => sum + p.pressure, 0) / currentPoints.length, 2)
                 : 2
             }
             strokeLinecap="round"

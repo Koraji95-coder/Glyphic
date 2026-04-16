@@ -45,6 +45,7 @@ export interface VaultEntry {
   path: string;
   entry_type: 'folder' | 'file';
   children?: VaultEntry[];
+  modified_at?: string;
 }
 
 export type CaptureMode = 'region' | 'window' | 'freeform' | 'fullscreen';

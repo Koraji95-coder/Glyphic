@@ -1,9 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Canvas, Line, Rect, IText, PencilBrush, type FabricObject, type TPointerEventInfo, type TPointerEvent } from 'fabric';
-import { useAnnotationStore } from '../../stores/annotationStore';
+import {
+  Canvas,
+  type FabricObject,
+  IText,
+  Line,
+  PencilBrush,
+  Rect,
+  type TPointerEvent,
+  type TPointerEventInfo,
+} from 'fabric';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { saveAnnotations } from '../../lib/annotation/annotationIO';
-import { AnnotationToolbar } from './AnnotationToolbar';
+import { useAnnotationStore } from '../../stores/annotationStore';
 import type { AnnotationData, AnnotationObject } from '../../types/annotation';
+import { AnnotationToolbar } from './AnnotationToolbar';
 
 export function AnnotationOverlay() {
   const {
@@ -136,7 +145,8 @@ export function AnnotationOverlay() {
     };
 
     const handleMouseMove = (opt: TPointerEventInfo<TPointerEvent>) => {
-      if (!drawStartRef.current || activeTool === 'freehand' || activeTool === 'eraser' || activeTool === 'text') return;
+      if (!drawStartRef.current || activeTool === 'freehand' || activeTool === 'eraser' || activeTool === 'text')
+        return;
       const pointer = canvas.getScenePoint(opt.e);
       const { x: sx, y: sy } = drawStartRef.current;
 
@@ -235,11 +245,14 @@ export function AnnotationOverlay() {
     setRedoStack((prev) => [...prev, current]);
     setUndoStack(newStack);
     const prev = newStack[newStack.length - 1];
-    canvas.loadFromJSON(prev).then(() => {
-      canvas.requestRenderAll();
-    }).catch((e: unknown) => {
-      console.error('Undo failed:', e);
-    });
+    canvas
+      .loadFromJSON(prev)
+      .then(() => {
+        canvas.requestRenderAll();
+      })
+      .catch((e: unknown) => {
+        console.error('Undo failed:', e);
+      });
   }, [undoStack]);
 
   const handleRedo = useCallback(() => {
@@ -249,11 +262,14 @@ export function AnnotationOverlay() {
     const state = newRedoStack.pop()!;
     setRedoStack(newRedoStack);
     setUndoStack((prev) => [...prev, state]);
-    canvas.loadFromJSON(state).then(() => {
-      canvas.requestRenderAll();
-    }).catch((e: unknown) => {
-      console.error('Redo failed:', e);
-    });
+    canvas
+      .loadFromJSON(state)
+      .then(() => {
+        canvas.requestRenderAll();
+      })
+      .catch((e: unknown) => {
+        console.error('Redo failed:', e);
+      });
   }, [redoStack]);
 
   const handleSave = useCallback(async () => {
@@ -300,10 +316,7 @@ export function AnnotationOverlay() {
   if (!isOpen || !imageSrc) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
       <div
         ref={containerRef}
         className="flex flex-col items-center gap-3"
@@ -375,10 +388,11 @@ function loadObjectsToCanvas(
   for (const obj of objects) {
     if (obj.type === 'arrow' && obj.x1 != null && obj.y1 != null && obj.x2 != null && obj.y2 != null) {
       canvas.add(
-        new Line(
-          [obj.x1 * scale, obj.y1 * scale, obj.x2 * scale, obj.y2 * scale],
-          { stroke: obj.color, strokeWidth: obj.strokeWidth, selectable: false },
-        ),
+        new Line([obj.x1 * scale, obj.y1 * scale, obj.x2 * scale, obj.y2 * scale], {
+          stroke: obj.color,
+          strokeWidth: obj.strokeWidth,
+          selectable: false,
+        }),
       );
     } else if ((obj.type === 'rect' || obj.type === 'highlight') && obj.x != null && obj.y != null) {
       canvas.add(
@@ -441,7 +455,7 @@ function canvasToAnnotationObjects(canvas: Canvas): AnnotationObject[] {
         width: item.width,
         height: item.height,
         fill: item.fill as string,
-        color: isHighlight ? (item.fill as string) : (item.stroke as string) ?? '#ef4444',
+        color: isHighlight ? (item.fill as string) : ((item.stroke as string) ?? '#ef4444'),
       });
     } else if (item instanceof IText) {
       objects.push({
@@ -458,9 +472,7 @@ function canvasToAnnotationObjects(canvas: Canvas): AnnotationObject[] {
       // Freehand path — serialize the path points
       const pathObj = item as FabricObject & { path?: Array<Array<number>> };
       if (pathObj.path) {
-        const points = pathObj.path
-          .filter((seg) => seg.length >= 3)
-          .map((seg) => ({ x: seg[1], y: seg[2] }));
+        const points = pathObj.path.filter((seg) => seg.length >= 3).map((seg) => ({ x: seg[1], y: seg[2] }));
         objects.push({
           ...base,
           type: 'freehand',

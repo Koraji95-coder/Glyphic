@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { commands } from '../lib/tauri/commands';
-import { SearchResult } from '../types/editor';
 import { debounce } from '../lib/utils/debounce';
+import type { SearchResult } from '../types/editor';
 
 export function useSearch() {
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -25,7 +25,7 @@ export function useSearch() {
         setIsSearching(false);
       }
     }, 300) as (q: string) => void,
-    []
+    [],
   );
 
   const handleQueryChange = (q: string) => {

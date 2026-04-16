@@ -1,9 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
-import { useVaultStore } from '../../stores/vaultStore';
+import { useCallback, useRef, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
+import { useCaptureStore } from '../../stores/captureStore';
+import { useVaultStore } from '../../stores/vaultStore';
 
 export function FreeformSelector() {
   const vaultPath = useVaultStore((s) => s.vaultPath);
+  const addToQueue = useCaptureStore((s) => s.addToQueue);
   const [isDrawing, setIsDrawing] = useState(false);
   const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -21,36 +23,35 @@ export function FreeformSelector() {
     [isDrawing],
   );
 
-  const handleMouseUp = useCallback(async () => {
-    if (!isDrawing || points.length < 3) {
+  const handleMouseUp = useCallback(
+    async (e: React.MouseEvent) => {
+      if (!isDrawing || points.length < 3) {
+        setIsDrawing(false);
+        setPoints([]);
+        return;
+      }
+
       setIsDrawing(false);
-      setPoints([]);
-      return;
-    }
 
-    setIsDrawing(false);
+      // Convert points to (u32, u32) tuples for Rust
+      const pointTuples: [number, number][] = points.map((p) => [Math.round(p.x), Math.round(p.y)]);
 
-    // Convert points to (u32, u32) tuples for Rust
-    const pointTuples: [number, number][] = points.map((p) => [
-      Math.round(p.x),
-      Math.round(p.y),
-    ]);
+      try {
+        const result = await commands.finishCapture('freeform', 0, 0, 0, 0, vaultPath ?? '', pointTuples);
 
-    try {
-      await commands.finishCapture(
-        'freeform',
-        0,
-        0,
-        0,
-        0,
-        vaultPath ?? '',
-        pointTuples,
-      );
-      window.history.back();
-    } catch (e) {
-      console.error('Freeform capture failed:', e);
-    }
-  }, [isDrawing, points, vaultPath]);
+        // Multi-capture: if Shift is held, keep overlay open and queue
+        if (e.shiftKey) {
+          addToQueue(result);
+          setPoints([]);
+        } else {
+          window.history.back();
+        }
+      } catch (e) {
+        console.error('Freeform capture failed:', e);
+      }
+    },
+    [isDrawing, points, vaultPath, addToQueue],
+  );
 
   // Build SVG path data from points
   const pathData =
@@ -70,11 +71,7 @@ export function FreeformSelector() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <svg
-        ref={svgRef}
-        className="absolute inset-0 w-full h-full"
-        style={{ pointerEvents: 'none' }}
-      >
+      <svg ref={svgRef} className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }} aria-hidden="true">
         {points.length > 1 && (
           <>
             {/* Freeform path */}

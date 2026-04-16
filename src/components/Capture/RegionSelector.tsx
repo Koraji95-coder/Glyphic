@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef } from 'react';
-import { useVaultStore } from '../../stores/vaultStore';
-import { useCaptureStore } from '../../stores/captureStore';
+import { useCallback, useRef, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
+import { useCaptureStore } from '../../stores/captureStore';
+import { useVaultStore } from '../../stores/vaultStore';
 import type { Region } from '../../types/capture';
 
 export function RegionSelector() {
@@ -33,37 +33,40 @@ export function RegionSelector() {
     [isDragging],
   );
 
-  const handleMouseUp = useCallback(async (e: React.MouseEvent) => {
-    if (!isDragging || !region || region.width < 5 || region.height < 5) {
-      setIsDragging(false);
-      setRegion(null);
-      return;
-    }
-
-    setIsDragging(false);
-    setLastRegion(region);
-
-    try {
-      const result = await commands.finishCapture(
-        captureMode,
-        region.x,
-        region.y,
-        region.width,
-        region.height,
-        vaultPath ?? '',
-      );
-
-      // Multi-capture: if Shift is held, keep overlay open and queue the capture
-      if (e.shiftKey) {
-        addToQueue(result);
+  const handleMouseUp = useCallback(
+    async (e: React.MouseEvent) => {
+      if (!isDragging || !region || region.width < 5 || region.height < 5) {
+        setIsDragging(false);
         setRegion(null);
-      } else {
-        window.history.back();
+        return;
       }
-    } catch (err) {
-      console.error('Capture failed:', err);
-    }
-  }, [isDragging, region, captureMode, vaultPath, setLastRegion, addToQueue]);
+
+      setIsDragging(false);
+      setLastRegion(region);
+
+      try {
+        const result = await commands.finishCapture(
+          captureMode,
+          region.x,
+          region.y,
+          region.width,
+          region.height,
+          vaultPath ?? '',
+        );
+
+        // Multi-capture: if Shift is held, keep overlay open and queue the capture
+        if (e.shiftKey) {
+          addToQueue(result);
+          setRegion(null);
+        } else {
+          window.history.back();
+        }
+      } catch (err) {
+        console.error('Capture failed:', err);
+      }
+    },
+    [isDragging, region, captureMode, vaultPath, setLastRegion, addToQueue],
+  );
 
   return (
     <div
