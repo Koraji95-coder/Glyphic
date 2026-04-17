@@ -1,0 +1,20 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for Glyphic",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "global-shortcut:default",
+    "dialog:default",
+    "clipboard-manager:default",
+    "shell:default",
+    {
+      "identifier": "fs:default",
+      "allow": [
+        { "path": "$HOME/Glyphic/**" },
+        { "path": "$APPDATA/**" },
+        { "path": "$TEMP/**" }
+      ]
+    }
+  ]
+}

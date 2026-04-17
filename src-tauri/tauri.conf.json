@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/nicegui/nicegui/main/nicegui/static/tauri.conf.json",
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "Glyphic",
   "version": "1.0.0",
   "identifier": "com.glyphic.app",
@@ -49,9 +49,7 @@
   },
   "plugins": {
     "fs": {
-      "scope": {
-        "allow": ["$HOME/Glyphic/**", "$APPDATA/**", "$TEMP/**"]
-      }
+      "requireLiteralLeadingDot": false
     }
   }
 }
