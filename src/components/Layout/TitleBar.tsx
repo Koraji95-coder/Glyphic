@@ -1,5 +1,5 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { Menu, MessageSquare } from 'lucide-react';
+import { Menu, MessageSquare, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useChatStore } from '../../stores/chatStore';
@@ -8,12 +8,23 @@ import { useVaultStore } from '../../stores/vaultStore';
 
 export function TitleBar() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
+  const openNotes = useVaultStore((s) => s.openNotes);
+  const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const addOpenNote = useVaultStore((s) => s.addOpenNote);
+  const removeOpenNote = useVaultStore((s) => s.removeOpenNote);
   const { isOpen: chatOpen, togglePanel } = useChatStore();
   const { toggleSidebar } = useLayoutStore();
   const [isMaximized, setIsMaximized] = useState(false);
   const isMobile = useIsMobile();
 
   const appWindow = getCurrentWindow();
+
+  // Track open notes — ensure active note is in the tab list
+  useEffect(() => {
+    if (activeNotePath && !openNotes.includes(activeNotePath)) {
+      addOpenNote(activeNotePath);
+    }
+  }, [activeNotePath, openNotes, addOpenNote]);
 
   useEffect(() => {
     if (isMobile) return;
@@ -43,8 +54,6 @@ export function TitleBar() {
     return () => unlisten?.();
   }, [isMobile]);
 
-  const noteParts = activeNotePath ? activeNotePath.replace(/\.md$/, '').split('/') : [];
-
   const handleMinimize = useCallback(() => appWindow.minimize(), []);
   const handleToggleMaximize = useCallback(async () => {
     await appWindow.toggleMaximize();
@@ -52,22 +61,44 @@ export function TitleBar() {
   }, []);
   const handleClose = useCallback(() => appWindow.close(), []);
 
+  const handleCloseTab = useCallback(
+    (path: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      removeOpenNote(path);
+      // If closing the active tab, switch to an adjacent one
+      if (path === activeNotePath) {
+        const remaining = openNotes.filter((p) => p !== path);
+        if (remaining.length > 0) {
+          setActiveNote(remaining[remaining.length - 1], remaining[remaining.length - 1]);
+        }
+      }
+    },
+    [activeNotePath, openNotes, removeOpenNote, setActiveNote],
+  );
+
+  const handleTabClick = useCallback(
+    (path: string) => {
+      setActiveNote(path, path);
+    },
+    [setActiveNote],
+  );
+
   return (
     <div
       data-tauri-drag-region
-      className="flex items-center justify-between select-none shrink-0"
+      className="flex items-center select-none shrink-0"
       style={{
         height: 'var(--titlebar-height)',
         backgroundColor: 'var(--bg-sidebar)',
         borderBottom: '1px solid var(--border)',
         paddingLeft: '12px',
         paddingRight: '12px',
+        gap: '10px',
       }}
     >
-      {/* Left: hamburger (mobile) or traffic lights + brand (desktop) */}
-      <div className="flex items-center gap-3" style={{ minWidth: isMobile ? 'auto' : '160px' }}>
+      {/* Left: hamburger (mobile) or traffic lights (desktop) */}
+      <div className="flex items-center shrink-0" style={{ gap: '8px' }}>
         {isMobile ? (
-          /* Hamburger menu for mobile */
           <button
             onClick={toggleSidebar}
             aria-label="Open sidebar"
@@ -80,7 +111,7 @@ export function TitleBar() {
           </button>
         ) : (
           <>
-            {/* macOS-style traffic light dots */}
+            {/* macOS traffic lights */}
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handleClose}
@@ -101,67 +132,124 @@ export function TitleBar() {
                 style={{ backgroundColor: '#28c840' }}
               />
             </div>
-
-            {/* Separator */}
             <div className="w-px h-4" style={{ backgroundColor: 'var(--border)' }} />
-
-            {/* Brand logo + name */}
-            <div className="flex items-center gap-1.5">
-              <div
-                className="flex items-center justify-center rounded text-xs font-bold"
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  backgroundColor: 'var(--accent)',
-                  color: 'var(--bg-app)',
-                  fontFamily: 'var(--font-display)',
-                  borderRadius: '4px',
-                }}
-              >
-                G
-              </div>
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}
-              >
-                Glyphic
-              </span>
-            </div>
           </>
         )}
       </div>
 
-      {/* Center: breadcrumb path (full on desktop, note title only on mobile) */}
-      <div
-        className="flex-1 flex items-center justify-center text-xs truncate px-4"
-        style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
-      >
-        {noteParts.length > 0 ? (
-          isMobile ? (
-            /* Mobile: show only the note title */
-            <span style={{ color: 'var(--text-secondary)' }}>{noteParts[noteParts.length - 1]}</span>
-          ) : (
-            /* Desktop: full breadcrumb path */
-            <span>
-              {noteParts.map((part, i) => (
-                <span key={i}>
-                  {i > 0 && <span style={{ color: 'var(--text-ghost)', margin: '0 4px' }}>/</span>}
-                  <span
-                    style={{ color: i === noteParts.length - 1 ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}
-                  >
-                    {part}
-                  </span>
+      {/* Tab bar */}
+      {!isMobile && openNotes.length > 0 ? (
+        <div className="flex items-center flex-1 min-w-0 overflow-x-auto" style={{ gap: '2px', padding: '0 4px' }}>
+          {openNotes.map((path) => {
+            const name = path.replace(/\.md$/, '').split('/').pop() || path;
+            const isActive = path === activeNotePath;
+            return (
+              <div
+                key={path}
+                onClick={() => handleTabClick(path)}
+                className="flex items-center shrink-0 cursor-pointer"
+                style={{
+                  gap: '5px',
+                  padding: '4px 10px',
+                  borderRadius: '8px 8px 0 0',
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                  color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                  backgroundColor: isActive ? 'var(--bg-editor)' : 'transparent',
+                  position: 'relative',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = 'var(--text-tertiary)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+              >
+                <span style={{ fontSize: '11px' }}>📄</span>
+                <span className="truncate" style={{ maxWidth: '120px' }}>
+                  {name}
                 </span>
-              ))}
-            </span>
-          )
-        ) : (
-          <span style={{ color: 'var(--text-ghost)' }}>No note selected</span>
-        )}
-      </div>
+                <span
+                  onClick={(e) => handleCloseTab(path, e)}
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    borderRadius: '3px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '9px',
+                    color: 'var(--text-ghost)',
+                    marginLeft: '2px',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-active)';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-ghost)';
+                  }}
+                >
+                  <X size={9} />
+                </span>
+                {/* Active tab indicator bar */}
+                {isActive && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      bottom: '-1px',
+                      left: 0,
+                      right: 0,
+                      height: '2px',
+                      background: 'var(--accent)',
+                      borderRadius: '2px 2px 0 0',
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Fallback: center breadcrumb when no tabs (mobile or empty) */
+        <div
+          className="flex-1 flex items-center justify-center text-xs truncate px-4"
+          style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
+        >
+          {activeNotePath ? (
+            isMobile ? (
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {activeNotePath.replace(/\.md$/, '').split('/').pop()}
+              </span>
+            ) : (
+              <span style={{ color: 'var(--text-ghost)' }}>No note selected</span>
+            )
+          ) : (
+            <span style={{ color: 'var(--text-ghost)' }}>No note selected</span>
+          )}
+        </div>
+      )}
 
-      {/* Right: Chat toggle */}
-      <div className="flex items-center" style={{ minWidth: isMobile ? 'auto' : '160px', justifyContent: 'flex-end' }}>
+      {/* Right: actions */}
+      <div className="flex items-center shrink-0" style={{ gap: '4px' }}>
+        <button
+          title="Quick Switcher (⌘P)"
+          className="p-1.5 rounded transition-colors"
+          style={{ color: 'var(--text-tertiary)', backgroundColor: 'transparent' }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        >
+          <Search size={14} />
+        </button>
         <button
           onClick={togglePanel}
           title="ScribeAI Chat (Ctrl+Shift+A)"

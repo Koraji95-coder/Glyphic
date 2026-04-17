@@ -50,13 +50,15 @@ export function SearchBar() {
   );
 
   return (
-    <div className="relative px-3 pt-3 pb-2">
+    <div className="relative">
       {/* Input container */}
       <div
         className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
         style={{
-          backgroundColor: 'var(--bg-tertiary)',
+          backgroundColor: 'var(--bg-input)',
           border: '1px solid var(--border)',
+          transition: 'all 0.15s',
+          cursor: 'text',
         }}
       >
         <Search size={14} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />

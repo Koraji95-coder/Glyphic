@@ -22,7 +22,7 @@ export interface VaultConfig {
     spell_check: boolean;
   };
   appearance: {
-    theme: 'light' | 'dark' | 'system';
+    theme: 'light' | 'dark' | 'system' | 'indigo' | 'emerald' | 'amber' | 'rose';
     sidebar_width: number;
     accent_color: string;
   };
