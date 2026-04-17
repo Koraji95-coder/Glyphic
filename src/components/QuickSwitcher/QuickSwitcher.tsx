@@ -117,11 +117,12 @@ export function QuickSwitcher() {
 
       {/* Modal */}
       <div
-        className="fixed z-50 top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg rounded-lg overflow-hidden"
+        className="fixed z-50 top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg overflow-hidden"
         style={{
-          backgroundColor: 'var(--bg-secondary)',
+          backgroundColor: 'var(--bg-sidebar)',
           border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow-md)',
+          boxShadow: 'var(--shadow-lg), var(--shadow-glow)',
+          borderRadius: '14px',
         }}
       >
         {/* Search input */}

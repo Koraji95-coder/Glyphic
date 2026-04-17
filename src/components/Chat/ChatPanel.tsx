@@ -1,4 +1,4 @@
-import { ArrowLeft, Bot, Camera, CreditCard, FileText, HelpCircle, Send, Settings, X } from 'lucide-react';
+import { ArrowLeft, Send, Settings, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
@@ -91,17 +91,34 @@ export function ChatPanel() {
         }}
       >
         <div className="flex items-center gap-2">
-          <Bot size={16} style={{ color: 'var(--accent)' }} />
+          {/* AI Avatar */}
+          <div
+            className="flex items-center justify-center shrink-0"
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '6px',
+              background: 'var(--accent-gradient)',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#fff',
+              fontFamily: 'var(--font-display)',
+            }}
+          >
+            G
+          </div>
           <span className="text-sm font-semibold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
             ScribeAI
           </span>
           <span
-            className="text-xs px-1.5 py-0.5 rounded"
+            className="text-xs"
             style={{
+              padding: '1px 6px',
+              borderRadius: '999px',
               backgroundColor: 'var(--bg-input)',
-              color: 'var(--text-tertiary)',
+              color: 'var(--text-ghost)',
               fontFamily: 'var(--font-mono)',
-              fontSize: '10px',
+              fontSize: '9px',
             }}
           >
             {model}
@@ -113,7 +130,7 @@ export function ChatPanel() {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: isConnected ? 'var(--color-green, #4ade80)' : 'var(--color-red, #f87171)',
+                backgroundColor: isConnected ? 'var(--green)' : 'var(--red)',
                 display: 'inline-block',
                 flexShrink: 0,
               }}
@@ -121,7 +138,7 @@ export function ChatPanel() {
             />
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center" style={{ gap: '2px' }}>
           <button
             onClick={() => setShowSettings(true)}
             title="AI settings"
@@ -155,32 +172,91 @@ export function ChatPanel() {
         </div>
       </div>
 
+      {/* Context chips */}
+      <div className="flex shrink-0" style={{ gap: '3px', padding: '6px 14px' }}>
+        <ContextChip label="📄 Current note" active />
+        <ContextChip label="📁 Vault search" />
+        <ContextChip label="📷 Screenshots" />
+      </div>
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-            <Bot size={32} style={{ color: 'var(--accent-dim)', opacity: 0.5 }} />
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'var(--accent-gradient)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                fontWeight: 700,
+                color: '#fff',
+                opacity: 0.4,
+                fontFamily: 'var(--font-display)',
+              }}
+            >
+              G
+            </div>
             <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
               Ask ScribeAI anything about your notes
             </p>
           </div>
         )}
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+          <div
+            key={msg.id}
+            className="flex"
+            style={{ gap: '8px', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row' }}
+          >
+            {/* Avatar */}
             <div
-              className="rounded-lg px-3 py-2 text-sm max-w-[85%]"
+              className="flex items-center justify-center shrink-0"
               style={{
-                backgroundColor: msg.role === 'user' ? 'var(--bg-active)' : 'var(--bg-elevated)',
-                color: 'var(--text-primary)',
-                lineHeight: 1.55,
-                fontFamily: 'var(--font-body)',
+                width: '24px',
+                height: '24px',
+                borderRadius: '6px',
+                background: msg.role === 'user' ? 'var(--bg-elevated)' : 'var(--accent-gradient)',
+                fontSize: '10px',
+                fontWeight: 600,
+                color: msg.role === 'user' ? 'var(--text-secondary)' : '#fff',
+                fontFamily: msg.role === 'user' ? 'var(--font-body)' : 'var(--font-display)',
               }}
             >
-              {msg.content}
+              {msg.role === 'user' ? 'U' : 'G'}
             </div>
-            <span className="text-xs" style={{ color: 'var(--text-ghost)', fontFamily: 'var(--font-mono)' }}>
-              {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
+            {/* Body */}
+            <div
+              className="flex flex-col"
+              style={{
+                gap: '3px',
+                maxWidth: '82%',
+                minWidth: 0,
+                alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <div
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  lineHeight: 1.6,
+                  backgroundColor: msg.role === 'user' ? 'var(--bg-active)' : 'var(--bg-elevated)',
+                  color: 'var(--text-primary)',
+                  borderBottomRightRadius: msg.role === 'user' ? '4px' : '12px',
+                  borderBottomLeftRadius: msg.role === 'user' ? '12px' : '4px',
+                  fontFamily: 'var(--font-body)',
+                }}
+              >
+                {msg.content}
+              </div>
+              <span style={{ fontSize: '9px', color: 'var(--text-ghost)', fontFamily: 'var(--font-mono)' }}>
+                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
           </div>
         ))}
         {isLoading && (
@@ -188,13 +264,19 @@ export function ChatPanel() {
             {/* MCP tool execution indicator pills */}
             {activeTools.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-1">
-                {activeTools.map((tool, i) => (
+                {activeTools.map((tool) => (
                   <span
-                    key={i}
-                    className="text-xs px-2 py-0.5 rounded-full"
+                    key={tool.toolName}
                     style={{
+                      fontSize: '9px',
+                      padding: '2px 8px',
+                      borderRadius: '999px',
                       backgroundColor: 'var(--accent-dim)',
                       color: 'var(--accent)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      fontWeight: 500,
                       fontFamily: 'var(--font-body)',
                     }}
                   >
@@ -204,97 +286,97 @@ export function ChatPanel() {
               </div>
             )}
             {/* Typing dots */}
-            <div className="flex items-start gap-2">
+            <div className="flex items-center" style={{ gap: '8px' }}>
               <div
-                className="rounded-lg px-3 py-2.5 flex gap-1 items-center"
-                style={{ backgroundColor: 'var(--bg-elevated)' }}
+                className="flex items-center"
+                style={{
+                  gap: '3px',
+                  padding: '8px 12px',
+                  backgroundColor: 'var(--bg-elevated)',
+                  borderRadius: '12px',
+                  borderBottomLeftRadius: '4px',
+                }}
               >
                 <span
-                  className="typing-dot w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
+                  className="typing-dot"
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--accent)',
+                    display: 'inline-block',
+                  }}
                 />
                 <span
-                  className="typing-dot w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
+                  className="typing-dot"
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--accent)',
+                    display: 'inline-block',
+                  }}
                 />
                 <span
-                  className="typing-dot w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: 'var(--accent)', display: 'inline-block' }}
+                  className="typing-dot"
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--accent)',
+                    display: 'inline-block',
+                  }}
                 />
               </div>
+              <span style={{ fontSize: '10px', color: 'var(--text-ghost)', fontStyle: 'italic' }}>thinking…</span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick actions */}
-      <div className="px-3 py-2 flex flex-wrap gap-1.5" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-        <button
+      {/* Quick action cards */}
+      <div
+        className="flex shrink-0 overflow-x-auto"
+        style={{ padding: '8px 12px', borderTop: '1px solid var(--border-subtle)', gap: '6px' }}
+      >
+        <QuickActionCard
+          icon="📝"
+          title="Summarize"
+          desc="Condense note"
           onClick={() => handleQuickAction('Summarize this note for me.')}
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs"
-          style={{
-            backgroundColor: 'var(--bg-input)',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border)',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-input)')}
-        >
-          <FileText size={10} />
-          Summarize
-        </button>
-        <button
+        />
+        <QuickActionCard
+          icon="🃏"
+          title="Flashcards"
+          desc="Study cards"
           onClick={() => handleQuickAction('Generate flashcards from this note.')}
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs"
-          style={{
-            backgroundColor: 'var(--bg-input)',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border)',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-input)')}
-        >
-          <CreditCard size={10} />
-          Flashcards
-        </button>
-        <button
+        />
+        <QuickActionCard
+          icon="💡"
+          title="Explain"
+          desc="Break down"
           onClick={() => handleQuickAction('Explain the selected text.')}
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs"
-          style={{
-            backgroundColor: 'var(--bg-input)',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border)',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-input)')}
-        >
-          <HelpCircle size={10} />
-          Explain
-        </button>
-        <button
+        />
+        <QuickActionCard
+          icon="📷"
+          title="Screenshot"
+          desc="Describe"
           onClick={() => handleQuickAction('Describe and explain this lecture screenshot.')}
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs"
-          style={{
-            backgroundColor: 'var(--bg-input)',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border)',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-input)')}
-        >
-          <Camera size={10} />
-          Screenshot
-        </button>
+        />
       </div>
 
       {/* Input area */}
-      <div className="px-3 py-3 flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="px-3 py-3 flex flex-col" style={{ borderTop: '1px solid var(--border)', gap: '4px' }}>
         <div
-          className="flex items-end gap-2 rounded-lg px-3 py-2"
+          className="flex items-end"
           style={{
+            gap: '6px',
+            borderRadius: '10px',
+            padding: '6px 10px',
             backgroundColor: 'var(--bg-input)',
             border: '1px solid var(--border)',
+            transition: 'border-color 0.2s',
           }}
         >
           <textarea
@@ -302,35 +384,153 @@ export function ChatPanel() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask ScribeAI anything about your notes..."
+            placeholder="Ask ScribeAI…"
             rows={1}
             className="flex-1 resize-none bg-transparent outline-none text-sm"
             style={{
               color: 'var(--text-primary)',
               fontFamily: 'var(--font-body)',
               lineHeight: 1.5,
-              maxHeight: '120px',
+              fontSize: '12px',
+              minHeight: '18px',
+              maxHeight: '100px',
               overflowY: 'auto',
             }}
             onInput={(e) => {
               const t = e.currentTarget;
               t.style.height = 'auto';
-              t.style.height = Math.min(t.scrollHeight, 120) + 'px';
+              t.style.height = `${Math.min(t.scrollHeight, 100)}px`;
             }}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="p-1.5 rounded transition-colors shrink-0"
+            className="shrink-0"
             style={{
-              backgroundColor: input.trim() && !isLoading ? 'var(--accent)' : 'var(--bg-elevated)',
-              color: input.trim() && !isLoading ? 'var(--bg-app)' : 'var(--text-ghost)',
+              width: '28px',
+              height: '28px',
+              borderRadius: '7px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              cursor: 'pointer',
+              background: input.trim() && !isLoading ? 'var(--accent-gradient)' : 'var(--bg-elevated)',
+              color: input.trim() && !isLoading ? '#fff' : 'var(--text-ghost)',
+              transition: 'all 0.15s',
             }}
           >
-            <Send size={14} />
+            <Send size={12} />
           </button>
+        </div>
+        <div
+          className="flex justify-between"
+          style={{ fontSize: '9px', color: 'var(--text-ghost)', paddingTop: '2px' }}
+        >
+          <span>
+            <kbd
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '8px',
+                padding: '0 3px',
+                borderRadius: '2px',
+                backgroundColor: 'var(--bg-elevated)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              Enter
+            </kbd>{' '}
+            send ·{' '}
+            <kbd
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '8px',
+                padding: '0 3px',
+                borderRadius: '2px',
+                backgroundColor: 'var(--bg-elevated)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              Shift+Enter
+            </kbd>{' '}
+            newline
+          </span>
+          <span>⌘⇧A</span>
         </div>
       </div>
     </div>
+  );
+}
+
+function ContextChip({ label, active }: { label: string; active?: boolean }) {
+  return (
+    <span
+      style={{
+        fontSize: '9px',
+        padding: '2px 7px',
+        borderRadius: '5px',
+        backgroundColor: active ? 'var(--accent-dim)' : 'var(--bg-card)',
+        border: `1px solid ${active ? 'var(--accent-dim)' : 'var(--border-subtle)'}`,
+        color: active ? 'var(--accent)' : 'var(--text-ghost)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '3px',
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+function QuickActionCard({
+  icon,
+  title,
+  desc,
+  onClick,
+}: {
+  icon: string;
+  title: string;
+  desc: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col shrink-0"
+      style={{
+        gap: '2px',
+        padding: '8px 12px',
+        minWidth: '90px',
+        borderRadius: '8px',
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        cursor: 'pointer',
+        transition: 'all 0.15s',
+        textAlign: 'left',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+        e.currentTarget.style.borderColor = 'var(--accent-dim)';
+        e.currentTarget.style.transform = 'translateY(-1px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.transform = 'none';
+      }}
+    >
+      <span style={{ fontSize: '14px' }}>{icon}</span>
+      <span
+        style={{
+          fontSize: '10px',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {title}
+      </span>
+      <span style={{ fontSize: '9px', color: 'var(--text-ghost)', whiteSpace: 'nowrap' }}>{desc}</span>
+    </button>
   );
 }

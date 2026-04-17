@@ -83,7 +83,7 @@ export default function App() {
 
   useEffect(() => {
     const theme = settings?.appearance?.theme ?? 'system';
-    applyTheme(theme);
+    applyTheme(theme as Parameters<typeof applyTheme>[0]);
   }, [settings?.appearance?.theme, applyTheme]);
 
   return (

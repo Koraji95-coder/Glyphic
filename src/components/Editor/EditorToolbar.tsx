@@ -122,15 +122,24 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         borderBottom: '1px solid var(--border)',
         paddingLeft: '12px',
         paddingRight: '12px',
-        gap: '4px',
+        gap: '5px',
         overflowX: 'auto',
         overscrollBehavior: 'contain',
       }}
     >
-      {/* Button groups */}
-      {groups.map((group, gi) => (
-        <div key={gi} className="flex items-center shrink-0" style={{ gap: '2px' }}>
-          {gi > 0 && <div className="h-5 mx-1.5" style={{ width: '1px', backgroundColor: 'var(--border)' }} />}
+      {/* Button groups — pill-style groups */}
+      {groups.map((group) => (
+        <div
+          key={`group-${group[0]?.label}`}
+          className="flex items-center shrink-0"
+          style={{
+            gap: '1px',
+            padding: '2px',
+            borderRadius: '8px',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           {group.map((btn) => {
             const active = btn.isActive?.() ?? false;
             const Icon = btn.icon;
@@ -139,17 +148,20 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 key={btn.label}
                 onClick={btn.action}
                 title={btn.label}
-                className="touch-target rounded transition-colors text-xs font-medium"
+                className="rounded transition-colors text-xs font-medium"
                 style={{
                   backgroundColor: active ? 'var(--accent-dim)' : 'transparent',
                   color: active ? 'var(--accent)' : 'var(--text-secondary)',
-                  minWidth: btnSize,
-                  minHeight: btnSize,
+                  width: isMobile ? '44px' : '28px',
+                  height: isMobile ? '44px' : '28px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: isMobile ? '0' : '6px',
+                  padding: '0',
                   flexShrink: 0,
+                  borderRadius: '6px',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
@@ -168,42 +180,51 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       {/* Spacer */}
       <div className="flex-1 shrink-0" style={{ minWidth: '8px' }} />
 
-      {/* Draw / Ink mode toggle — shown on touch devices or when pen is detected */}
+      {/* Draw / Ink mode toggle — hero button style */}
       <button
         onClick={toggleInkMode}
         title="Draw Mode"
-        className="touch-target rounded transition-colors shrink-0"
+        className="flex items-center shrink-0 transition-colors"
         style={{
-          backgroundColor: isInkMode ? 'var(--accent-dim)' : 'transparent',
-          color: isInkMode ? 'var(--accent)' : 'var(--text-secondary)',
-          minWidth: btnSize,
+          gap: '5px',
+          padding: '5px 10px',
+          borderRadius: '8px',
+          fontSize: '11px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          border: '1px solid rgba(91, 141, 240, 0.12)',
+          backgroundColor: isInkMode ? 'rgba(91, 141, 240, 0.18)' : 'var(--blue-dim)',
+          color: 'var(--blue)',
           minHeight: btnSize,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: isMobile ? '0' : '6px',
         }}
         onMouseEnter={(e) => {
-          if (!isInkMode) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+          e.currentTarget.style.backgroundColor = 'rgba(91, 141, 240, 0.18)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isInkMode ? 'var(--accent-dim)' : 'transparent';
+          e.currentTarget.style.backgroundColor = isInkMode ? 'rgba(91, 141, 240, 0.18)' : 'var(--blue-dim)';
         }}
       >
-        <Pencil size={iconSize} />
+        <Pencil size={isMobile ? 16 : 13} />
+        Draw
       </button>
 
-      <div className="h-5 mx-1.5 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
+      <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
 
-      {/* Lecture mode toggle */}
+      {/* Lecture mode toggle — hero button style */}
       <button
         onClick={toggleLectureMode}
         title="Lecture Mode"
-        className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors shrink-0"
+        className="flex items-center shrink-0 transition-colors"
         style={{
-          backgroundColor: lectureModeActive ? 'var(--green-dim)' : 'transparent',
-          color: lectureModeActive ? 'var(--green)' : 'var(--text-secondary)',
-          border: lectureModeActive ? '1px solid rgba(126,200,155,0.2)' : '1px solid transparent',
+          gap: '5px',
+          padding: '5px 10px',
+          borderRadius: '8px',
+          fontSize: '11px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          backgroundColor: lectureModeActive ? 'var(--green-dim)' : 'var(--green-dim)',
+          color: 'var(--green)',
+          border: '1px solid rgba(94, 196, 158, 0.15)',
           minHeight: btnSize,
         }}
       >
@@ -211,8 +232,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           className={lectureModeActive ? 'lecture-pulse' : ''}
           style={{
             display: 'inline-block',
-            width: '6px',
-            height: '6px',
+            width: '5px',
+            height: '5px',
             borderRadius: '50%',
             backgroundColor: lectureModeActive ? 'var(--green)' : 'var(--text-tertiary)',
           }}
@@ -220,28 +241,31 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         {lectureModeActive ? `Lecture — ${getElapsedTime()}` : 'Lecture'}
       </button>
 
-      <div className="h-5 mx-1.5 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
+      <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
 
-      {/* Capture button */}
+      {/* Capture button — gradient hero */}
       <button
         onClick={() => commands.startCapture().catch(() => {})}
         title="Capture screenshot (⌘⇧S)"
-        className="touch-target flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold transition-colors shrink-0"
+        className="flex items-center shrink-0 transition-colors"
         style={{
-          backgroundColor: 'var(--accent)',
-          color: 'var(--bg-app)',
+          gap: '5px',
+          padding: '5px 10px',
+          borderRadius: '8px',
+          fontSize: '11px',
+          fontWeight: 600,
+          cursor: 'pointer',
+          border: 'none',
+          background: 'var(--accent-gradient)',
+          color: '#fff',
           minHeight: btnSize,
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
+        onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+        onMouseLeave={(e) => (e.currentTarget.style.filter = 'none')}
       >
         <Camera size={isMobile ? 16 : 13} />
         Capture
-        {!isMobile && (
-          <span className="text-xs opacity-60" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px' }}>
-            ⌘⇧S
-          </span>
-        )}
+        {!isMobile && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', opacity: 0.6 }}>⌘⇧S</span>}
       </button>
     </div>
   );

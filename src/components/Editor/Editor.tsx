@@ -108,11 +108,40 @@ export function Editor() {
     );
   }
 
+  // Build breadcrumb parts from the note path
+  const pathParts = activeNotePath.replace(/\.md$/, '').split('/').filter(Boolean);
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <EditorToolbar editor={editor} />
       <LectureModeToggle />
-      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      {/* Breadcrumb bar */}
+      {pathParts.length > 1 && (
+        <div
+          className="flex items-center shrink-0"
+          style={{
+            gap: '3px',
+            padding: '5px 28px',
+            fontSize: '11px',
+            color: 'var(--text-ghost)',
+            backgroundColor: 'var(--bg-editor)',
+          }}
+        >
+          {pathParts.map((part, i) => (
+            <span key={part}>
+              {i > 0 && <span style={{ margin: '0 1px' }}>/</span>}
+              <span
+                style={{
+                  color: i === pathParts.length - 1 ? 'var(--text-tertiary)' : 'var(--text-ghost)',
+                }}
+              >
+                {part}
+              </span>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-editor)' }}>
         <EditorContent editor={editor} />
       </div>
       <AnnotationOverlay />

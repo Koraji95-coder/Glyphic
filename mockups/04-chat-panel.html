@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glyphic Mockup — Chat Panel Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-app:#0e0f14;--bg-sidebar:#13141a;--bg-editor:#181920;--bg-editor-paper:#1c1d26;
+  --bg-hover:rgba(255,255,255,0.04);--bg-active:rgba(255,255,255,0.07);--bg-elevated:#22232e;
+  --bg-input:rgba(255,255,255,0.05);--bg-card:rgba(255,255,255,0.025);
+  --text-primary:#e4e4ec;--text-secondary:#8888a0;--text-tertiary:#555568;--text-ghost:#33334a;
+  --border:rgba(255,255,255,0.06);--border-subtle:rgba(255,255,255,0.03);
+  --accent:#7c6df0;--accent-dim:rgba(124,109,240,0.12);--accent-hover:#9488f5;
+  --accent-muted:rgba(124,109,240,0.1);--accent-gradient:linear-gradient(135deg,#7c6df0,#5b8df0);
+  --green:#5ec49e;--green-dim:rgba(94,196,158,0.12);--red:#e07070;--blue:#5b8df0;
+  --blue-dim:rgba(91,141,240,0.1);--orange:#e0a050;
+  --font-body:'DM Sans',sans-serif;--font-display:'DM Serif Display',serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.4);--shadow-md:0 4px 20px rgba(0,0,0,0.4);
+}
+[data-theme="emerald"]{--accent:#3dd68c;--accent-dim:rgba(61,214,140,0.12);--accent-hover:#5be0a2;--accent-muted:rgba(61,214,140,0.1);--accent-gradient:linear-gradient(135deg,#3dd68c,#20b2aa)}
+[data-theme="amber"]{--accent:#e0a050;--accent-dim:rgba(224,160,80,0.12);--accent-hover:#e8b06a;--accent-muted:rgba(224,160,80,0.1);--accent-gradient:linear-gradient(135deg,#e0a050,#d06848)}
+[data-theme="rose"]{--accent:#e06088;--accent-dim:rgba(224,96,136,0.12);--accent-hover:#e880a0;--accent-muted:rgba(224,96,136,0.1);--accent-gradient:linear-gradient(135deg,#e06088,#c050d0)}
+[data-theme="light"]{--bg-app:#f4f3f0;--bg-sidebar:#eae9e5;--bg-editor:#faf9f7;--bg-editor-paper:#fff;--bg-hover:rgba(0,0,0,0.04);--bg-active:rgba(0,0,0,0.06);--bg-elevated:#e4e3df;--bg-input:rgba(0,0,0,0.05);--bg-card:rgba(0,0,0,0.02);--text-primary:#1a1a24;--text-secondary:#5a5a70;--text-tertiary:#9a9aaf;--text-ghost:#c0c0d0;--border:rgba(0,0,0,0.08);--border-subtle:rgba(0,0,0,0.04);--accent:#5850d8;--accent-dim:rgba(88,80,216,0.1);--accent-hover:#6860e0;--accent-muted:rgba(88,80,216,0.08);--accent-gradient:linear-gradient(135deg,#5850d8,#4070c8);--green:#2d9e6a;--shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 16px rgba(0,0,0,0.08)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg-app);color:var(--text-primary);overflow:hidden;height:100vh;-webkit-font-smoothing:antialiased}
+
+.theme-switcher{position:fixed;top:12px;right:12px;z-index:999;display:flex;gap:6px;padding:6px 10px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:999px}
+.theme-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .2s}
+.theme-btn:hover{transform:scale(1.15)}.theme-btn.active{border-color:var(--text-primary)}
+.theme-btn[data-t="indigo"]{background:#7c6df0}.theme-btn[data-t="emerald"]{background:#3dd68c}
+.theme-btn[data-t="amber"]{background:#e0a050}.theme-btn[data-t="rose"]{background:#e06088}
+.theme-btn[data-t="light"]{background:linear-gradient(135deg,#fff 50%,#ddd 50%)}
+
+/* ── Layout: editor + chat side by side ── */
+.layout{display:flex;height:100vh}
+.editor-placeholder{flex:1;background:var(--bg-editor);display:flex;align-items:center;justify-content:center;color:var(--text-ghost);font-size:14px;border-right:1px solid var(--border)}
+
+/* ══ CHAT PANEL ══ */
+.chat-panel{width:400px;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg-editor);height:100vh}
+
+/* Header */
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:50px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg-sidebar)}
+.chat-brand{display:flex;align-items:center;gap:10px}
+.chat-avatar{width:28px;height:28px;border-radius:8px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:var(--font-display)}
+.chat-title{font-size:14px;font-weight:600;color:var(--accent);font-family:var(--font-display)}
+.chat-model{font-size:10px;padding:2px 8px;border-radius:999px;background:var(--bg-input);color:var(--text-tertiary);font-family:var(--font-mono)}
+.chat-status{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.chat-status.connected{background:var(--green)}
+.chat-status.disconnected{background:var(--red)}
+.chat-header-actions{display:flex;align-items:center;gap:4px}
+.chat-header-btn{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-tertiary);cursor:pointer;font-size:14px;transition:all .12s}
+.chat-header-btn:hover{background:var(--bg-hover);color:var(--text-secondary)}
+
+/* Connection Banner (NEW) */
+.connection-banner{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:12px;flex-shrink:0}
+.connection-banner.ok{background:var(--green-dim);color:var(--green)}
+.connection-banner.error{background:rgba(224,112,112,0.1);color:var(--red)}
+.banner-icon{font-size:14px}
+.banner-text{flex:1}
+.banner-action{font-size:11px;padding:3px 10px;border-radius:6px;background:rgba(255,255,255,0.08);border:none;color:inherit;cursor:pointer;font-weight:500}
+.banner-action:hover{background:rgba(255,255,255,0.12)}
+
+/* Messages */
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+
+/* Date divider (NEW) */
+.date-divider{display:flex;align-items:center;gap:12px;padding:8px 0}
+.date-line{flex:1;height:1px;background:var(--border)}
+.date-label{font-size:10px;color:var(--text-ghost);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+
+/* Message */
+.msg{display:flex;gap:10px;max-width:100%}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:600}
+.msg.ai .msg-avatar{background:var(--accent-gradient);color:#fff;font-family:var(--font-display)}
+.msg.user .msg-avatar{background:var(--bg-elevated);color:var(--text-secondary)}
+.msg-body{display:flex;flex-direction:column;gap:4px;max-width:80%;min-width:0}
+.msg.user .msg-body{align-items:flex-end}
+.msg-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6}
+.msg.user .msg-bubble{background:var(--bg-active);color:var(--text-primary);border-bottom-right-radius:4px}
+.msg.ai .msg-bubble{background:var(--bg-elevated);color:var(--text-primary);border-bottom-left-radius:4px}
+.msg-time{font-size:10px;color:var(--text-ghost);font-family:var(--font-mono)}
+
+/* AI message markdown rendering */
+.msg-bubble strong{font-weight:600}
+.msg-bubble code{font-family:var(--font-mono);font-size:0.85em;padding:1px 5px;border-radius:4px;background:var(--bg-input);color:var(--accent)}
+.msg-bubble pre{background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;margin:8px 0;overflow-x:auto;border:1px solid var(--border)}
+.msg-bubble pre code{background:none;padding:0;color:var(--text-primary);font-size:12px;line-height:1.5}
+.msg-bubble ul{padding-left:16px;margin:4px 0}
+.msg-bubble li{margin:2px 0}
+
+/* Tool execution pills */
+.tool-pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px}
+.tool-pill{font-size:10px;padding:3px 10px;border-radius:999px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;gap:4px;font-weight:500}
+.tool-pill-icon{font-size:11px}
+
+/* Thinking indicator */
+.thinking{display:flex;align-items:center;gap:10px}
+.thinking-dots{display:flex;gap:4px;padding:10px 14px;background:var(--bg-elevated);border-radius:14px;border-bottom-left-radius:4px}
+.thinking-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.thinking-dot:nth-child(1){animation:tdot 1.2s infinite 0s}
+.thinking-dot:nth-child(2){animation:tdot 1.2s infinite .2s}
+.thinking-dot:nth-child(3){animation:tdot 1.2s infinite .4s}
+@keyframes tdot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.thinking-label{font-size:11px;color:var(--text-ghost);font-style:italic}
+
+/* ── Quick Actions (redesigned as scrollable cards) ── */
+.quick-actions{padding:10px 16px;border-top:1px solid var(--border-subtle);flex-shrink:0;overflow-x:auto;display:flex;gap:8px}
+.qa-card{display:flex;flex-direction:column;gap:4px;padding:10px 14px;min-width:120px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);cursor:pointer;transition:all .15s;flex-shrink:0}
+.qa-card:hover{background:var(--bg-hover);border-color:var(--accent-dim);transform:translateY(-1px)}
+.qa-icon{font-size:16px}
+.qa-title{font-size:11px;font-weight:600;color:var(--text-primary);white-space:nowrap}
+.qa-desc{font-size:10px;color:var(--text-tertiary);white-space:nowrap}
+
+/* ── Context Chips (NEW: show what AI can see) ── */
+.context-chips{display:flex;gap:4px;padding:4px 16px;flex-shrink:0}
+.context-chip{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-subtle);color:var(--text-ghost);display:flex;align-items:center;gap:4px}
+.context-chip-icon{font-size:11px}
+.context-chip.active{color:var(--accent);border-color:var(--accent-dim);background:var(--accent-dim)}
+
+/* ── Input Area ── */
+.chat-input-area{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.chat-input-box{display:flex;align-items:flex-end;gap:8px;border-radius:12px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);transition:border-color .2s}
+.chat-input-box:focus-within{border-color:var(--accent-dim)}
+.chat-textarea{flex:1;border:none;background:transparent;outline:none;resize:none;font-family:var(--font-body);font-size:13px;color:var(--text-primary);line-height:1.5;min-height:20px;max-height:120px}
+.chat-textarea::placeholder{color:var(--text-ghost)}
+.chat-send{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-size:14px;transition:all .15s;flex-shrink:0}
+.chat-send.active{background:var(--accent-gradient);color:#fff}
+.chat-send.inactive{background:var(--bg-elevated);color:var(--text-ghost)}
+.input-hint{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--text-ghost)}
+.input-hint kbd{font-family:var(--font-mono);font-size:9px;padding:1px 4px;border-radius:3px;background:var(--bg-elevated);border:1px solid var(--border)}
+
+.annotation{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-md);z-index:100}
+.annotation-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--text-ghost);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="theme-switcher">
+  <button class="theme-btn active" data-t="indigo" onclick="setTheme('indigo')"></button>
+  <button class="theme-btn" data-t="emerald" onclick="setTheme('emerald')"></button>
+  <button class="theme-btn" data-t="amber" onclick="setTheme('amber')"></button>
+  <button class="theme-btn" data-t="rose" onclick="setTheme('rose')"></button>
+  <button class="theme-btn" data-t="light" onclick="setTheme('light')"></button>
+</div>
+
+<div class="layout">
+  <div class="editor-placeholder">← Editor area (see other mockups)</div>
+
+  <!-- ══ CHAT PANEL ══ -->
+  <div class="chat-panel">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-brand">
+        <div class="chat-avatar">G</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="chat-title">ScribeAI</span>
+            <span class="chat-model">llama3.1</span>
+            <span class="chat-status connected" title="Connected"></span>
+          </div>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="chat-header-btn" title="Settings">⚙️</button>
+        <button class="chat-header-btn" title="Clear chat">🗑</button>
+        <button class="chat-header-btn" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- Connection Banner -->
+    <div class="connection-banner ok">
+      <span class="banner-icon">✓</span>
+      <span class="banner-text">Connected to Ollama (localhost:11434)</span>
+    </div>
+
+    <!-- Context Chips -->
+    <div class="context-chips">
+      <span class="context-chip active"><span class="context-chip-icon">📄</span> Current note</span>
+      <span class="context-chip"><span class="context-chip-icon">📁</span> Vault search</span>
+      <span class="context-chip"><span class="context-chip-icon">📷</span> Screenshots</span>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages">
+      <div class="date-divider">
+        <div class="date-line"></div>
+        <span class="date-label">Today</span>
+        <div class="date-line"></div>
+      </div>
+
+      <!-- User message -->
+      <div class="msg user">
+        <div class="msg-avatar">K</div>
+        <div class="msg-body">
+          <div class="msg-bubble">Summarize this note for me. Focus on the key data structures and their time complexities.</div>
+          <span class="msg-time">2:45 PM</span>
+        </div>
+      </div>
+
+      <!-- AI response with markdown -->
+      <div class="msg ai">
+        <div class="msg-avatar">G</div>
+        <div class="msg-body">
+          <div class="tool-pills">
+            <span class="tool-pill"><span class="tool-pill-icon">📄</span> Reading note</span>
+            <span class="tool-pill"><span class="tool-pill-icon">🔍</span> Analyzing</span>
+          </div>
+          <div class="msg-bubble">
+            Here's a summary of your <strong>Data Structures Final Review</strong>:
+
+            <br><br><strong>Binary Search Trees (BST)</strong>
+            <ul>
+              <li>Search, insert, delete: <code>O(log n)</code> average</li>
+              <li>Worst case degrades to <code>O(n)</code> for unbalanced trees</li>
+            </ul>
+
+            <strong>AVL Trees</strong>
+            <ul>
+              <li>Self-balancing BST with balance factor ≤ 1</li>
+              <li>Guarantees <code>O(log n)</code> for all operations</li>
+              <li>Uses left/right rotations to maintain balance</li>
+            </ul>
+
+            <strong>Hash Tables</strong>
+            <ul>
+              <li>Average <code>O(1)</code> lookup via hash functions</li>
+              <li>Collision strategies: chaining vs open addressing</li>
+            </ul>
+
+            <br>💡 <strong>Key exam tip:</strong> Mention worst-case scenarios for unbalanced BSTs and hash table collisions.
+          </div>
+          <span class="msg-time">2:45 PM</span>
+        </div>
+      </div>
+
+      <!-- User follow-up -->
+      <div class="msg user">
+        <div class="msg-avatar">K</div>
+        <div class="msg-body">
+          <div class="msg-bubble">Generate flashcards from this note</div>
+          <span class="msg-time">2:48 PM</span>
+        </div>
+      </div>
+
+      <!-- AI thinking -->
+      <div class="msg ai">
+        <div class="msg-avatar">G</div>
+        <div class="msg-body">
+          <div class="tool-pills">
+            <span class="tool-pill"><span class="tool-pill-icon">🃏</span> Generating flashcards…</span>
+          </div>
+          <div class="thinking">
+            <div class="thinking-dots">
+              <span class="thinking-dot"></span>
+              <span class="thinking-dot"></span>
+              <span class="thinking-dot"></span>
+            </div>
+            <span class="thinking-label">ScribeAI is thinking…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions (redesigned) -->
+    <div class="quick-actions">
+      <div class="qa-card">
+        <span class="qa-icon">📝</span>
+        <span class="qa-title">Summarize</span>
+        <span class="qa-desc">Condense this note</span>
+      </div>
+      <div class="qa-card">
+        <span class="qa-icon">🃏</span>
+        <span class="qa-title">Flashcards</span>
+        <span class="qa-desc">Generate study cards</span>
+      </div>
+      <div class="qa-card">
+        <span class="qa-icon">💡</span>
+        <span class="qa-title">Explain</span>
+        <span class="qa-desc">Break down selection</span>
+      </div>
+      <div class="qa-card">
+        <span class="qa-icon">📷</span>
+        <span class="qa-title">Screenshot</span>
+        <span class="qa-desc">Describe capture</span>
+      </div>
+      <div class="qa-card">
+        <span class="qa-icon">✏️</span>
+        <span class="qa-title">Rewrite</span>
+        <span class="qa-desc">Improve clarity</span>
+      </div>
+      <div class="qa-card">
+        <span class="qa-icon">🔗</span>
+        <span class="qa-title">Find Related</span>
+        <span class="qa-desc">Search vault</span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="chat-input-box">
+        <textarea class="chat-textarea" placeholder="Ask ScribeAI about your notes…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';document.querySelector('.chat-send').className='chat-send '+(this.value.trim()?'active':'inactive')"></textarea>
+        <button class="chat-send inactive">➤</button>
+      </div>
+      <div class="input-hint">
+        <span><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for newline</span>
+        <span>⌘⇧A to toggle</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="annotation"><div class="annotation-dot"></div>MOCKUP 04 — Chat Panel • Avatars, markdown, context chips, quick action cards, connection banner</div>
+
+<script>
+function setTheme(t){
+  if(t==='indigo')document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+}
+</script>
+</body>
+</html>

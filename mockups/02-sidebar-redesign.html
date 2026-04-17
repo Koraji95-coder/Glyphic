@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glyphic Mockup — Sidebar Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-app: #0e0f14;
+  --bg-sidebar: #13141a;
+  --bg-editor: #181920;
+  --bg-hover: rgba(255,255,255,0.04);
+  --bg-active: rgba(255,255,255,0.07);
+  --bg-elevated: #22232e;
+  --bg-input: rgba(255,255,255,0.05);
+  --bg-card: rgba(255,255,255,0.025);
+  --text-primary: #e4e4ec;
+  --text-secondary: #8888a0;
+  --text-tertiary: #555568;
+  --text-ghost: #33334a;
+  --border: rgba(255,255,255,0.06);
+  --border-subtle: rgba(255,255,255,0.03);
+  --accent: #7c6df0;
+  --accent-dim: rgba(124,109,240,0.12);
+  --accent-glow: rgba(124,109,240,0.06);
+  --accent-hover: #9488f5;
+  --accent-muted: rgba(124,109,240,0.1);
+  --accent-gradient: linear-gradient(135deg,#7c6df0,#5b8df0);
+  --green: #5ec49e;
+  --green-dim: rgba(94,196,158,0.12);
+  --red: #e07070;
+  --blue: #5b8df0;
+  --blue-dim: rgba(91,141,240,0.1);
+  --orange: #e0a050;
+  --font-body: 'DM Sans',sans-serif;
+  --font-display: 'DM Serif Display',serif;
+  --font-mono: 'JetBrains Mono',monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 40px rgba(124,109,240,0.08);
+}
+[data-theme="emerald"] {
+  --accent:#3dd68c;--accent-dim:rgba(61,214,140,0.12);--accent-hover:#5be0a2;
+  --accent-muted:rgba(61,214,140,0.1);--accent-gradient:linear-gradient(135deg,#3dd68c,#20b2aa);
+}
+[data-theme="amber"] {
+  --accent:#e0a050;--accent-dim:rgba(224,160,80,0.12);--accent-hover:#e8b06a;
+  --accent-muted:rgba(224,160,80,0.1);--accent-gradient:linear-gradient(135deg,#e0a050,#d06848);
+}
+[data-theme="rose"] {
+  --accent:#e06088;--accent-dim:rgba(224,96,136,0.12);--accent-hover:#e880a0;
+  --accent-muted:rgba(224,96,136,0.1);--accent-gradient:linear-gradient(135deg,#e06088,#c050d0);
+}
+[data-theme="light"] {
+  --bg-app:#f4f3f0;--bg-sidebar:#eae9e5;--bg-editor:#faf9f7;
+  --bg-hover:rgba(0,0,0,0.04);--bg-active:rgba(0,0,0,0.06);
+  --bg-elevated:#e4e3df;--bg-input:rgba(0,0,0,0.05);--bg-card:rgba(0,0,0,0.02);
+  --text-primary:#1a1a24;--text-secondary:#5a5a70;--text-tertiary:#9a9aaf;
+  --text-ghost:#c0c0d0;--border:rgba(0,0,0,0.08);--border-subtle:rgba(0,0,0,0.04);
+  --accent:#5850d8;--accent-dim:rgba(88,80,216,0.1);--accent-hover:#6860e0;
+  --accent-muted:rgba(88,80,216,0.08);--accent-gradient:linear-gradient(135deg,#5850d8,#4070c8);
+  --green:#2d9e6a;--red:#c04040;--blue:#3060c0;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 16px rgba(0,0,0,0.08);
+}
+
+* { box-sizing:border-box;margin:0;padding:0; }
+body { font-family:var(--font-body);background:var(--bg-app);color:var(--text-primary);overflow:hidden;height:100vh;-webkit-font-smoothing:antialiased; }
+
+.theme-switcher{position:fixed;top:12px;right:12px;z-index:999;display:flex;gap:6px;padding:6px 10px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:999px}
+.theme-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .2s}
+.theme-btn:hover{transform:scale(1.15)}
+.theme-btn.active{border-color:var(--text-primary)}
+.theme-btn[data-t="indigo"]{background:#7c6df0}
+.theme-btn[data-t="emerald"]{background:#3dd68c}
+.theme-btn[data-t="amber"]{background:#e0a050}
+.theme-btn[data-t="rose"]{background:#e06088}
+.theme-btn[data-t="light"]{background:linear-gradient(135deg,#fff 50%,#ddd 50%)}
+
+.app-shell{display:flex;flex-direction:column;height:100vh}
+.titlebar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;background:var(--bg-sidebar);border-bottom:1px solid var(--border)}
+.titlebar-left{display:flex;align-items:center;gap:10px;min-width:200px}
+.traffic-lights{display:flex;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot-close{background:#ff5f57}.dot-min{background:#febc2e}.dot-max{background:#28c840}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;background:var(--accent-gradient);color:#fff;font-family:var(--font-display)}
+.brand-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+
+.main-area{display:flex;flex:1;min-height:0}
+
+/* ── SIDEBAR ── */
+.sidebar{width:280px;flex-shrink:0;background:var(--bg-sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+
+.sidebar-header{padding:12px 12px 8px;display:flex;flex-direction:column;gap:8px}
+
+.sidebar-user{display:flex;align-items:center;gap:8px;padding:4px 4px}
+.user-avatar{width:28px;height:28px;border-radius:8px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text-primary);flex:1}
+.user-vault{font-size:10px;color:var(--text-tertiary)}
+
+.sidebar-search{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);transition:all .15s;cursor:text}
+.sidebar-search:hover{border-color:var(--accent-dim);background:var(--bg-hover)}
+.search-icon{color:var(--text-ghost);font-size:13px;flex-shrink:0}
+.search-text{font-size:12px;color:var(--text-ghost);flex:1}
+.search-kbd{font-family:var(--font-mono);font-size:10px;color:var(--text-ghost);background:var(--bg-elevated);padding:1px 5px;border-radius:4px}
+
+.sidebar-actions{display:flex;gap:6px;padding:0 2px}
+.sidebar-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 0;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);transition:all .15s}
+.sidebar-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+.sidebar-btn.primary{background:var(--accent-dim);color:var(--accent);border-color:transparent}
+.sidebar-btn.primary:hover{background:var(--accent-muted)}
+
+/* ── Nav Sections ── */
+.sidebar-nav{flex:1;overflow-y:auto;padding:4px 0}
+
+.nav-section{padding:2px 8px}
+.nav-section-header{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 4px;cursor:pointer}
+.nav-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-ghost)}
+.nav-section-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.nav-section:hover .nav-section-actions{opacity:1}
+.nav-mini-btn{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-tertiary);cursor:pointer;font-size:12px}
+.nav-mini-btn:hover{background:var(--bg-hover);color:var(--text-secondary)}
+
+/* ── Tree Items ── */
+.tree-item{display:flex;align-items:center;gap:8px;padding:5px 8px;margin:1px 6px;border-radius:7px;cursor:pointer;transition:all .12s;position:relative;font-size:13px;color:var(--text-secondary)}
+.tree-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+.tree-item.active{background:var(--accent-dim);color:var(--accent)}
+.tree-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;border-radius:0 3px 3px 0;background:var(--accent)}
+.tree-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.tree-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400}
+.tree-item.active .tree-name{font-weight:500}
+.tree-badge{font-size:9px;padding:1px 6px;border-radius:10px;background:var(--bg-elevated);color:var(--text-ghost);font-family:var(--font-mono)}
+.tree-item.active .tree-badge{background:var(--accent-muted);color:var(--accent)}
+
+/* Folder indent */
+.tree-children{padding-left:12px}
+.tree-folder .tree-icon{color:var(--text-tertiary)}
+.tree-item.folder-open .tree-icon{color:var(--accent)}
+
+/* ── Tags Section ── */
+.tag-row{display:flex;flex-wrap:wrap;gap:4px;padding:4px 14px}
+.tag-pill{font-size:10px;padding:3px 8px;border-radius:999px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-tertiary);cursor:pointer;transition:all .15s}
+.tag-pill:hover{border-color:var(--accent-dim);color:var(--accent);background:var(--accent-dim)}
+
+/* ── Sidebar Footer ── */
+.sidebar-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0}
+.footer-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 0;border-radius:7px;font-size:11px;color:var(--text-tertiary);cursor:pointer;border:none;background:transparent;transition:all .15s}
+.footer-btn:hover{background:var(--bg-hover);color:var(--text-secondary)}
+
+/* ── Editor area (placeholder) ── */
+.editor-area{flex:1;display:flex;flex-direction:column;background:var(--bg-editor)}
+.editor-toolbar{height:44px;border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:6px}
+.editor-content{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-ghost);font-size:14px}
+
+/* ── Status Bar ── */
+.statusbar{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;background:var(--bg-sidebar);border-top:1px solid var(--border);font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono)}
+
+.annotation{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-md);z-index:100}
+.annotation-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--text-ghost);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
+</style>
+</head>
+<body>
+<div class="theme-switcher">
+  <button class="theme-btn active" data-t="indigo" onclick="setTheme('indigo')"></button>
+  <button class="theme-btn" data-t="emerald" onclick="setTheme('emerald')"></button>
+  <button class="theme-btn" data-t="amber" onclick="setTheme('amber')"></button>
+  <button class="theme-btn" data-t="rose" onclick="setTheme('rose')"></button>
+  <button class="theme-btn" data-t="light" onclick="setTheme('light')"></button>
+</div>
+
+<div class="app-shell">
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <div class="traffic-lights"><div class="dot dot-close"></div><div class="dot dot-min"></div><div class="dot dot-max"></div></div>
+      <div style="width:1px;height:16px;background:var(--border)"></div>
+      <div class="brand"><div class="brand-icon">G</div><span class="brand-name">Glyphic</span></div>
+    </div>
+    <div style="flex:1;text-align:center;font-size:12px;color:var(--text-tertiary)">
+      <span style="color:var(--text-ghost)">Lectures / CS301 /</span>
+      <span style="color:var(--text-secondary)"> Data Structures Final Review</span>
+    </div>
+    <div style="min-width:200px;display:flex;justify-content:flex-end;gap:8px">
+      <div style="padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;color:var(--text-tertiary);transition:all .15s" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">🔍</div>
+      <div style="padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;color:var(--accent);background:var(--accent-dim);transition:all .15s">🤖</div>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <!-- ═══ SIDEBAR ═══ -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <!-- User / Vault -->
+        <div class="sidebar-user">
+          <div class="user-avatar">K</div>
+          <div>
+            <div class="user-name">Koraji's Vault</div>
+            <div class="user-vault">12 notes · 3 folders</div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="sidebar-search" tabindex="0">
+          <span class="search-icon">🔍</span>
+          <span class="search-text">Search notes…</span>
+          <span class="search-kbd">⌘P</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sidebar-actions">
+          <button class="sidebar-btn primary">✚ Note</button>
+          <button class="sidebar-btn">📁 Folder</button>
+        </div>
+      </div>
+
+      <!-- ── Nav Tree ── -->
+      <div class="sidebar-nav">
+        <!-- Pinned -->
+        <div class="nav-section">
+          <div class="nav-section-header">
+            <span class="nav-section-title">📌 Pinned</span>
+          </div>
+          <div class="tree-item active">
+            <span class="tree-icon">📄</span>
+            <span class="tree-name">Data Structures Final Review</span>
+            <span class="tree-badge">2h</span>
+          </div>
+          <div class="tree-item">
+            <span class="tree-icon">📄</span>
+            <span class="tree-name">Quick Reference Card</span>
+          </div>
+        </div>
+
+        <!-- Folders -->
+        <div class="nav-section">
+          <div class="nav-section-header">
+            <span class="nav-section-title">Explorer</span>
+            <div class="nav-section-actions">
+              <button class="nav-mini-btn" title="New Note">✚</button>
+              <button class="nav-mini-btn" title="New Folder">📁</button>
+              <button class="nav-mini-btn" title="Collapse All">⊟</button>
+            </div>
+          </div>
+
+          <!-- Lectures Folder -->
+          <div class="tree-item folder-open" onclick="this.classList.toggle('folder-open')">
+            <span class="tree-icon">📂</span>
+            <span class="tree-name">Lectures</span>
+            <span class="tree-badge">5</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-item folder-open">
+              <span class="tree-icon">📂</span>
+              <span class="tree-name">CS301</span>
+              <span class="tree-badge">3</span>
+            </div>
+            <div class="tree-children">
+              <div class="tree-item active">
+                <span class="tree-icon">📄</span>
+                <span class="tree-name">Data Structures Final Review</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📄</span>
+                <span class="tree-name">Binary Trees & Heaps</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📄</span>
+                <span class="tree-name">Graph Algorithms</span>
+              </div>
+            </div>
+            <div class="tree-item">
+              <span class="tree-icon">📁</span>
+              <span class="tree-name">MATH 220</span>
+              <span class="tree-badge">2</span>
+            </div>
+          </div>
+
+          <!-- Projects Folder -->
+          <div class="tree-item">
+            <span class="tree-icon">📁</span>
+            <span class="tree-name">Projects</span>
+            <span class="tree-badge">4</span>
+          </div>
+
+          <!-- Work Folder -->
+          <div class="tree-item">
+            <span class="tree-icon">📁</span>
+            <span class="tree-name">Work</span>
+            <span class="tree-badge">3</span>
+          </div>
+
+          <!-- Loose Notes -->
+          <div class="tree-item">
+            <span class="tree-icon">📄</span>
+            <span class="tree-name">Quick Reference Card</span>
+          </div>
+          <div class="tree-item">
+            <span class="tree-icon">📄</span>
+            <span class="tree-name">Scratch Pad</span>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="nav-section">
+          <div class="nav-section-header">
+            <span class="nav-section-title">Tags</span>
+          </div>
+          <div class="tag-row">
+            <span class="tag-pill">#exam-prep</span>
+            <span class="tag-pill">#algorithms</span>
+            <span class="tag-pill">#meeting</span>
+            <span class="tag-pill">#todo</span>
+            <span class="tag-pill">#research</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <button class="footer-btn">⚙️ Settings</button>
+        <button class="footer-btn">🗑️ Trash</button>
+        <button class="footer-btn">❓ Help</button>
+      </div>
+    </div>
+
+    <!-- Editor placeholder -->
+    <div class="editor-area">
+      <div class="editor-toolbar">
+        <span style="font-size:12px;color:var(--text-ghost)">Toolbar area (see mockup 03)</span>
+      </div>
+      <div class="editor-content">Editor content area (see mockup 05 for full layout)</div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>
+      <span>Saved</span>
+      <span style="color:var(--text-ghost)">|</span>
+      <span>1,247 words</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span>Ln 42, Col 18</span>
+      <span style="color:var(--text-ghost)">|</span>
+      <span>~6 min read</span>
+    </div>
+  </div>
+</div>
+
+<div class="annotation"><div class="annotation-dot"></div>MOCKUP 02 — Sidebar Redesign • Vault header, pinned, tags, footer actions</div>
+
+<script>
+function setTheme(t){
+  if(t==='indigo')document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+}
+</script>
+</body>
+</html>
