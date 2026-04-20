@@ -10,6 +10,7 @@ import { Sidebar } from './components/Sidebar/Sidebar';
 import { useTheme } from './hooks/useTheme';
 import { useVault } from './hooks/useVault';
 import { commands } from './lib/tauri/commands';
+import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
 import { useSettingsStore } from './stores/settingsStore';
 import { useVaultStore } from './stores/vaultStore';
@@ -79,6 +80,33 @@ export default function App() {
     commands.reindexVault(vaultPath).catch((e) => {
       console.warn('Reindex failed (non-critical):', e);
     });
+  }, [vaultPath]);
+
+  // Refresh the sidebar tree when files change on disk (external editors,
+  // sync clients, capture saves, etc.).
+  useEffect(() => {
+    if (!vaultPath) return;
+    let cleanup: (() => void) | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const refresh = useVaultStore.getState().refreshFileTree;
+    events
+      .onVaultChanged(() => {
+        // Coalesce bursts of FS events into a single tree refresh.
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          refresh().catch((e) => console.warn('refreshFileTree failed:', e));
+        }, 250);
+      })
+      .then((unlisten) => {
+        cleanup = unlisten;
+      })
+      .catch(() => {
+        // Not running in Tauri (e.g., dev browser) — listener is unavailable.
+      });
+    return () => {
+      if (timer) clearTimeout(timer);
+      cleanup?.();
+    };
   }, [vaultPath]);
 
   useEffect(() => {

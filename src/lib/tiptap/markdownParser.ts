@@ -1,9 +1,22 @@
 // Basic markdown to HTML parser for loading into TipTap
 // TipTap's setContent() accepts HTML strings
 
+/**
+ * Split a raw note file into its frontmatter block (including the surrounding
+ * `---` fences and trailing newlines) and the markdown body. If no frontmatter
+ * is present, `frontmatter` is an empty string.
+ */
+export function splitFrontmatter(markdown: string): { frontmatter: string; body: string } {
+  const match = markdown.match(/^---\n[\s\S]*?\n---\n*/);
+  if (!match) {
+    return { frontmatter: '', body: markdown };
+  }
+  return { frontmatter: match[0], body: markdown.slice(match[0].length) };
+}
+
 export function parseMarkdownToContent(markdown: string): string {
   // Strip YAML frontmatter
-  const content = markdown.replace(/^---[\s\S]*?---\n*/, '');
+  const { body: content } = splitFrontmatter(markdown);
 
   // Convert markdown to basic HTML that TipTap can consume
   const lines = content.split('\n');
@@ -127,7 +140,7 @@ export function parseMarkdownToContent(markdown: string): string {
 
 function inlineMarkdown(text: string): string {
   return (
-    text
+    escapeHtml(text)
       // Timestamp badges [T:MM:SS]
       .replace(/\[T:(\d{2}:\d{2})\]/g, '<span data-type="timestamp" data-elapsed="$1" data-absolute=""></span>')
       // Bold

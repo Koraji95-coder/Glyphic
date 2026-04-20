@@ -13,8 +13,10 @@ use commands::{
     ai_commands::{self, AiState},
     capture_commands, export_commands, search_commands, settings_commands, vault_commands,
 };
+use vault::watcher::VaultWatcher;
 
 pub struct DbState(pub Mutex<rusqlite::Connection>);
+pub struct WatcherState(pub Mutex<Option<VaultWatcher>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -32,6 +34,9 @@ pub fn run() {
 
             // In-memory store for repeat-last-capture
             app.manage(capture_commands::new_last_capture_store());
+
+            // Holds the currently-running vault filesystem watcher (if any).
+            app.manage(WatcherState(Mutex::new(None)));
 
             // ScribeAI state (provider config + shared HTTP client)
             app.manage(AiState::new());

@@ -1,3 +1,4 @@
+import { convertFileSrc } from '@tauri-apps/api/core';
 import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
 import { useCallback, useEffect } from 'react';
 import { useEditor } from '../../hooks/useEditor';
@@ -82,7 +83,10 @@ export function Editor() {
   const insertImage = useCallback(
     (result: { path: string }) => {
       if (!editor) return;
-      editor.chain().focus().setImage({ src: result.path }).run();
+      // Tauri webviews can't load raw OS paths via <img src>; route them through
+      // the asset: protocol so the file actually renders in the editor.
+      const src = convertFileSrc(result.path);
+      editor.chain().focus().setImage({ src }).run();
     },
     [editor],
   );
