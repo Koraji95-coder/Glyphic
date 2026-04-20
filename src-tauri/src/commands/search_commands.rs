@@ -1,4 +1,4 @@
-use crate::db::{index, search};
+use crate::db::{backlinks, index, search};
 use crate::DbState;
 
 #[tauri::command]
@@ -28,4 +28,13 @@ pub fn reindex_vault(
 ) -> Result<usize, String> {
     let conn = state.0.lock().map_err(|e| format!("DB lock error: {e}"))?;
     index::reindex_vault(&conn, &vault_path)
+}
+
+#[tauri::command]
+pub fn get_backlinks(
+    state: tauri::State<'_, DbState>,
+    note_path: String,
+) -> Result<Vec<backlinks::Backlink>, String> {
+    let conn = state.0.lock().map_err(|e| format!("DB lock error: {e}"))?;
+    backlinks::get_backlinks(&conn, &note_path)
 }

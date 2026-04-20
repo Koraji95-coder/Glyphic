@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import type { AiConfig, Flashcard } from '../../types/ai';
 import type { CaptureResult, WindowInfo } from '../../types/capture';
-import type { SearchResult } from '../../types/editor';
+import type { Backlink, SearchResult } from '../../types/editor';
 import type { NoteFile, VaultConfig, VaultEntry } from '../../types/vault';
 
 export const commands = {
@@ -41,11 +41,13 @@ export const commands = {
     }),
   repeatLastCapture: () => invoke<CaptureResult>('repeat_last_capture'),
   getWindowList: () => invoke<WindowInfo[]>('get_window_list'),
+  reocrVault: (vaultPath: string) => invoke<[number, number]>('reocr_vault', { vaultPath }),
 
   // Search
   searchNotes: (query: string, limit?: number) => invoke<SearchResult[]>('search_notes', { query, limit: limit || 20 }),
   searchAll: (query: string, limit?: number) => invoke<SearchResult[]>('search_all', { query, limit: limit || 20 }),
   reindexVault: (vaultPath: string) => invoke<number>('reindex_vault', { vaultPath }),
+  getBacklinks: (notePath: string) => invoke<Backlink[]>('get_backlinks', { notePath }),
 
   // Settings
   getSettings: (vaultPath: string) => invoke<VaultConfig>('get_settings', { vaultPath }),

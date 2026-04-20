@@ -16,5 +16,12 @@ export interface SearchResult {
   path: string;
   title: string;
   snippet: string;
-  match_type: 'note' | 'screenshot';
+  match_type: 'note' | 'screenshot' | 'annotation';
+}
+
+export interface Backlink {
+  source_id: string;
+  source_path: string;
+  source_title: string;
+  context: string;
 }

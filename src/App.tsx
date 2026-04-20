@@ -5,6 +5,7 @@ import { ChatPanel } from './components/Chat/ChatPanel';
 import { Editor } from './components/Editor/Editor';
 import { StatusBar } from './components/Layout/StatusBar';
 import { TitleBar } from './components/Layout/TitleBar';
+import { PrintPreview } from './components/PrintPreview/PrintPreview';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { useTheme } from './hooks/useTheme';
@@ -51,7 +52,15 @@ export default function App() {
   const settings = useSettingsStore((s) => s.settings);
   const vaultPath = useVaultStore((s) => s.vaultPath);
 
+  // Skip the heavy vault init/reindex/watcher work when this webview is
+  // serving a transient route (capture overlay, print preview) — those
+  // windows just need their route component to mount.
+  const isAuxRoute =
+    typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/capture') || window.location.pathname.startsWith('/print-preview'));
+
   useEffect(() => {
+    if (isAuxRoute) return;
     const init = async () => {
       try {
         const { homeDir } = await import('@tauri-apps/api/path');
@@ -72,19 +81,21 @@ export default function App() {
       }
     };
     init();
-  }, []);
+  }, [isAuxRoute]);
 
   // Reindex vault for FTS5 search on vault open
   useEffect(() => {
+    if (isAuxRoute) return;
     if (!vaultPath) return;
     commands.reindexVault(vaultPath).catch((e) => {
       console.warn('Reindex failed (non-critical):', e);
     });
-  }, [vaultPath]);
+  }, [vaultPath, isAuxRoute]);
 
   // Refresh the sidebar tree when files change on disk (external editors,
   // sync clients, capture saves, etc.).
   useEffect(() => {
+    if (isAuxRoute) return;
     if (!vaultPath) return;
     let cleanup: (() => void) | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -107,7 +118,7 @@ export default function App() {
       if (timer) clearTimeout(timer);
       cleanup?.();
     };
-  }, [vaultPath]);
+  }, [vaultPath, isAuxRoute]);
 
   useEffect(() => {
     const theme = settings?.appearance?.theme ?? 'system';
@@ -118,6 +129,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<MainLayout />} />
       <Route path="/capture" element={<CaptureOverlay />} />
+      <Route path="/print-preview" element={<PrintPreview />} />
     </Routes>
   );
 }

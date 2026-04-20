@@ -3,6 +3,7 @@ pub mod capture;
 pub mod commands;
 pub mod db;
 pub mod export;
+pub mod ocr;
 pub mod vault;
 
 use std::sync::Mutex;
@@ -11,7 +12,8 @@ use tauri::Manager;
 
 use commands::{
     ai_commands::{self, AiState},
-    capture_commands, export_commands, search_commands, settings_commands, vault_commands,
+    annotation_commands, capture_commands, export_commands, search_commands, settings_commands,
+    vault_commands,
 };
 use vault::watcher::VaultWatcher;
 
@@ -49,6 +51,7 @@ pub fn run() {
             capture_commands::finish_capture,
             capture_commands::repeat_last_capture,
             capture_commands::get_window_list,
+            capture_commands::reocr_vault,
             // vault
             vault_commands::create_vault,
             vault_commands::open_vault,
@@ -63,9 +66,13 @@ pub fn run() {
             search_commands::search_notes,
             search_commands::search_all,
             search_commands::reindex_vault,
+            search_commands::get_backlinks,
             // export
             export_commands::export_pdf,
             export_commands::export_markdown,
+            // annotations
+            annotation_commands::save_annotations,
+            annotation_commands::load_annotations,
             // settings
             settings_commands::get_settings,
             settings_commands::update_settings,

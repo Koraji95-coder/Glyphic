@@ -2,10 +2,15 @@ import type { JSONContent } from '@tiptap/react';
 
 export function serializeToMarkdown(doc: JSONContent): string {
   if (!doc.content) return '';
-  return doc.content.map((node) => serializeNode(node)).join('\n\n');
+  return doc.content.map((node) => serializeNode(node, 0)).join('\n\n');
 }
 
-function serializeNode(node: JSONContent): string {
+/**
+ * Serialize a node. `depth` is the list-nesting depth (0 = top-level), used so
+ * nested bullet/ordered/task lists round-trip with two-space indentation per
+ * level (CommonMark convention).
+ */
+function serializeNode(node: JSONContent, depth: number): string {
   switch (node.type) {
     case 'paragraph':
       return serializeInline(node.content || []);
@@ -15,29 +20,41 @@ function serializeNode(node: JSONContent): string {
       return `${prefix} ${serializeInline(node.content || [])}`;
     }
     case 'bulletList':
-      return (node.content || []).map((item) => `- ${serializeNode(item)}`).join('\n');
-    case 'orderedList':
-      return (node.content || []).map((item, i) => `${i + 1}. ${serializeNode(item)}`).join('\n');
-    case 'listItem':
-      return (node.content || []).map((n) => serializeNode(n)).join('\n');
+      return serializeList(node, depth, (_item, _i) => '- ');
+    case 'orderedList': {
+      const start = typeof node.attrs?.start === 'number' ? node.attrs.start : 1;
+      return serializeList(node, depth, (_item, i) => `${start + i}. `);
+    }
     case 'taskList':
-      return (node.content || [])
-        .map((item) => {
-          const checked = item.attrs?.checked ? 'x' : ' ';
-          return `- [${checked}] ${serializeNode(item)}`;
-        })
-        .join('\n');
+      return serializeList(node, depth, (item) => {
+        const checked = item.attrs?.checked ? 'x' : ' ';
+        return `- [${checked}] `;
+      });
+    case 'listItem':
     case 'taskItem':
-      return (node.content || []).map((n) => serializeNode(n)).join('\n');
+      // listItem/taskItem children are joined with single newlines; nested
+      // lists handle their own indentation.
+      return (node.content || []).map((n) => serializeNode(n, depth)).join('\n');
     case 'codeBlock': {
       const lang = node.attrs?.language || '';
       const code = node.content?.map((n) => n.text || '').join('') || '';
       return `\`\`\`${lang}\n${code}\n\`\`\``;
     }
-    case 'blockquote':
-      return (node.content || []).map((n) => `> ${serializeNode(n)}`).join('\n');
+    case 'blockquote': {
+      // Render inner content first, then prefix every output line with `> `
+      // so multi-line blockquotes (paragraphs, nested lists, hard breaks)
+      // keep the marker on every line per CommonMark.
+      const inner = (node.content || []).map((n) => serializeNode(n, depth)).join('\n\n');
+      return inner
+        .split('\n')
+        .map((line) => (line.length > 0 ? `> ${line}` : '>'))
+        .join('\n');
+    }
     case 'horizontalRule':
       return '---';
+    case 'hardBreak':
+      // Markdown hard line break: two trailing spaces + newline.
+      return '  \n';
     case 'image': {
       const src = node.attrs?.src || '';
       const alt = node.attrs?.alt || '';
@@ -52,9 +69,41 @@ function serializeNode(node: JSONContent): string {
   }
 }
 
+/**
+ * Serialize a list-like node (bulletList, orderedList, taskList). Each item's
+ * first content block gets the marker (e.g. `- `, `1. `, `- [ ] `); subsequent
+ * blocks (nested lists, additional paragraphs) are indented to align under it.
+ *
+ * Indentation comes purely from the parent item's marker padding propagating
+ * down — `serializeList` itself doesn't add depth-based indent, so nested
+ * lists end up indented by exactly one marker-width per level (CommonMark).
+ */
+function serializeList(node: JSONContent, depth: number, marker: (item: JSONContent, index: number) => string): string {
+  const items = node.content || [];
+  return items
+    .map((item, i) => {
+      const m = marker(item, i);
+      const childIndent = ' '.repeat(m.length);
+      const blocks = (item.content || []).map((child) => serializeNode(child, depth + 1));
+      // Join blocks within an item with single newlines so nested lists hug
+      // the parent item rather than creating a paragraph break.
+      const body = blocks.join('\n');
+      const lines = body.split('\n');
+      return lines
+        .map((line, idx) => {
+          if (idx === 0) return `${m}${line}`;
+          return `${childIndent}${line}`;
+        })
+        .join('\n');
+    })
+    .join('\n');
+}
+
 function serializeInline(nodes: JSONContent[]): string {
   return nodes
     .map((node) => {
+      // Inline hard break (TipTap can put hardBreak inside paragraph content).
+      if (node.type === 'hardBreak') return '  \n';
       let text = node.text || '';
       if (node.marks) {
         for (const mark of node.marks) {
