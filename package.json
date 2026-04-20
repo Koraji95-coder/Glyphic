@@ -10,7 +10,10 @@
     "tauri": "tauri",
     "desktop": "tauri dev",
     "lint": "biome check .",
-    "lint:fix": "biome check --write ."
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@biomejs/cli-linux-x64": "^2.4.12",
@@ -46,10 +49,14 @@
   "devDependencies": {
     "@biomejs/biome": "^2",
     "@tauri-apps/cli": "^2",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6",
+    "@vitest/ui": "^4.1.4",
+    "jsdom": "^29.0.2",
     "typescript": "^5",
-    "vite": "^8"
+    "vite": "^8",
+    "vitest": "^4.1.4"
   }
 }
