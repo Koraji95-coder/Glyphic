@@ -75,6 +75,36 @@ pub fn search_all(
         .collect();
 
     results.extend(screenshot_results);
+
+    // Also search text-annotation content (image_path is the result key —
+    // there's no separate id for annotation rows).
+    let mut stmt = conn
+        .prepare(
+            "SELECT a.image_path,
+                    snippet(annotation_blobs_fts, 0, '<mark>', '</mark>', '…', 32)
+             FROM annotation_blobs_fts
+             JOIN annotation_blobs a ON a.rowid = annotation_blobs_fts.rowid
+             WHERE annotation_blobs_fts MATCH ?1
+             LIMIT ?2",
+        )
+        .map_err(|e| format!("Failed to prepare annotation search: {e}"))?;
+
+    let annotation_results: Vec<SearchResult> = stmt
+        .query_map(params![query, limit as i64], |row| {
+            let path: String = row.get(0)?;
+            Ok(SearchResult {
+                id: path.clone(),
+                path,
+                title: String::new(),
+                snippet: row.get(1)?,
+                match_type: "annotation".to_string(),
+            })
+        })
+        .map_err(|e| format!("Annotation search failed: {e}"))?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    results.extend(annotation_results);
     results.truncate(limit);
     Ok(results)
 }

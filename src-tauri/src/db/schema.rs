@@ -53,7 +53,7 @@ pub fn init_database(vault_path: &Path) -> Result<Connection, String> {
             content_rowid='rowid'
         );
 
-        -- Annotations table
+        -- Annotations table (legacy per-shape rows; kept for forward compat)
         CREATE TABLE IF NOT EXISTS annotations (
             id            TEXT PRIMARY KEY,
             screenshot_id TEXT NOT NULL,
@@ -64,6 +64,23 @@ pub fn init_database(vault_path: &Path) -> Result<Connection, String> {
             height        REAL NOT NULL DEFAULT 0,
             created_at    TEXT NOT NULL,
             FOREIGN KEY (screenshot_id) REFERENCES screenshots(id) ON DELETE CASCADE
+        );
+
+        -- Per-image Fabric.js annotation blobs (sidecar mirror).
+        -- One row per image; the JSON blob is the same payload that lives in
+        -- the `<image>.annotations.json` sidecar file (the source of truth).
+        -- We keep this table so search can hit text annotations via FTS.
+        CREATE TABLE IF NOT EXISTS annotation_blobs (
+            image_path  TEXT PRIMARY KEY,
+            data        TEXT NOT NULL DEFAULT '',
+            text_index  TEXT NOT NULL DEFAULT '',
+            updated_at  TEXT NOT NULL
+        );
+
+        CREATE VIRTUAL TABLE IF NOT EXISTS annotation_blobs_fts USING fts5(
+            text_index,
+            content='annotation_blobs',
+            content_rowid='rowid'
         );
 
         -- Tags table
@@ -116,6 +133,24 @@ pub fn init_database(vault_path: &Path) -> Result<Connection, String> {
             VALUES ('delete', old.rowid, old.ocr_text);
             INSERT INTO screenshots_fts(rowid, ocr_text)
             VALUES (new.rowid, new.ocr_text);
+        END;
+
+        -- Triggers: keep annotation_blobs_fts in sync with annotation_blobs
+        CREATE TRIGGER IF NOT EXISTS annotation_blobs_ai AFTER INSERT ON annotation_blobs BEGIN
+            INSERT INTO annotation_blobs_fts(rowid, text_index)
+            VALUES (new.rowid, new.text_index);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS annotation_blobs_ad AFTER DELETE ON annotation_blobs BEGIN
+            INSERT INTO annotation_blobs_fts(annotation_blobs_fts, rowid, text_index)
+            VALUES ('delete', old.rowid, old.text_index);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS annotation_blobs_au AFTER UPDATE ON annotation_blobs BEGIN
+            INSERT INTO annotation_blobs_fts(annotation_blobs_fts, rowid, text_index)
+            VALUES ('delete', old.rowid, old.text_index);
+            INSERT INTO annotation_blobs_fts(rowid, text_index)
+            VALUES (new.rowid, new.text_index);
         END;
         ",
     )
