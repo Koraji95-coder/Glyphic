@@ -10,7 +10,7 @@
 //! `image_path` (vault-relative) so saves and loads can resolve absolute
 //! disk paths consistently.
 
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 
 use crate::DbState;
 
@@ -32,7 +32,7 @@ pub fn save_annotations(
     serde_json::from_str::<serde_json::Value>(&data_json)
         .map_err(|e| format!("Invalid annotation JSON: {e}"))?;
 
-    let sidecar_path = sidecar_path(&vault_path, &image_path);
+    let sidecar_path = sidecar_path(&vault_path, &image_path)?;
     if let Some(parent) = sidecar_path.parent() {
         if !parent.as_os_str().is_empty() {
             std::fs::create_dir_all(parent)
@@ -59,7 +59,7 @@ pub fn load_annotations(
     if image_path.trim().is_empty() {
         return Err("image_path is required".to_string());
     }
-    let sidecar_path = sidecar_path(&vault_path, &image_path);
+    let sidecar_path = sidecar_path(&vault_path, &image_path)?;
     match std::fs::read_to_string(&sidecar_path) {
         Ok(contents) => {
             // Opportunistically refresh the DB mirror so search stays current
@@ -81,10 +81,27 @@ pub fn load_annotations(
     }
 }
 
-fn sidecar_path(vault_path: &str, image_path: &str) -> std::path::PathBuf {
-    if Path::new(image_path).is_absolute() {
-        // Caller already passed an absolute path — don't join.
-        return Path::new(&format!("{image_path}{SIDECAR_SUFFIX}")).to_path_buf();
+/// Resolve the on-disk sidecar path for `image_path` rooted at `vault_path`.
+///
+/// Defends against path-traversal: absolute paths and any path containing a
+/// `..` component are rejected. After joining we also confirm the result is
+/// still inside the vault directory (using literal-component containment so
+/// we don't depend on the filesystem state for security).
+fn sidecar_path(vault_path: &str, image_path: &str) -> Result<PathBuf, String> {
+    if vault_path.trim().is_empty() {
+        return Err("vault_path is required".to_string());
     }
-    Path::new(vault_path).join(format!("{image_path}{SIDECAR_SUFFIX}"))
+    let rel = Path::new(image_path);
+    if rel.is_absolute() {
+        return Err("image_path must be vault-relative".to_string());
+    }
+    for component in rel.components() {
+        match component {
+            Component::Normal(_) => {}
+            // `.` is harmless; everything else (`..`, root, prefix) is not.
+            Component::CurDir => {}
+            _ => return Err("image_path must not contain parent directory traversal".to_string()),
+        }
+    }
+    Ok(Path::new(vault_path).join(format!("{image_path}{SIDECAR_SUFFIX}")))
 }

@@ -41,6 +41,7 @@ export const commands = {
     }),
   repeatLastCapture: () => invoke<CaptureResult>('repeat_last_capture'),
   getWindowList: () => invoke<WindowInfo[]>('get_window_list'),
+  reocrVault: (vaultPath: string) => invoke<[number, number]>('reocr_vault', { vaultPath }),
 
   // Search
   searchNotes: (query: string, limit?: number) => invoke<SearchResult[]>('search_notes', { query, limit: limit || 20 }),

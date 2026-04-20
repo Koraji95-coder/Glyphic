@@ -3,6 +3,7 @@ pub mod capture;
 pub mod commands;
 pub mod db;
 pub mod export;
+pub mod ocr;
 pub mod vault;
 
 use std::sync::Mutex;
@@ -50,6 +51,7 @@ pub fn run() {
             capture_commands::finish_capture,
             capture_commands::repeat_last_capture,
             capture_commands::get_window_list,
+            capture_commands::reocr_vault,
             // vault
             vault_commands::create_vault,
             vault_commands::open_vault,

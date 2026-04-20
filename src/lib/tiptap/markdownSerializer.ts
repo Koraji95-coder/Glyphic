@@ -78,11 +78,7 @@ function serializeNode(node: JSONContent, depth: number): string {
  * down — `serializeList` itself doesn't add depth-based indent, so nested
  * lists end up indented by exactly one marker-width per level (CommonMark).
  */
-function serializeList(
-  node: JSONContent,
-  depth: number,
-  marker: (item: JSONContent, index: number) => string,
-): string {
+function serializeList(node: JSONContent, depth: number, marker: (item: JSONContent, index: number) => string): string {
   const items = node.content || [];
   return items
     .map((item, i) => {

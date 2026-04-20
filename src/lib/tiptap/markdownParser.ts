@@ -127,9 +127,7 @@ export function parseMarkdownToContent(markdown: string): string {
 
       if (taskMatch && !isOrdered) {
         const checked = taskMatch[1] !== ' ' ? ' data-checked="true"' : '';
-        htmlLines.push(
-          `<li data-type="taskItem"${checked}><p>${inlineMarkdown(taskMatch[2])}</p>`,
-        );
+        htmlLines.push(`<li data-type="taskItem"${checked}><p>${inlineMarkdown(taskMatch[2])}</p>`);
       } else {
         htmlLines.push(`<li><p>${inlineMarkdown(rest)}</p>`);
       }

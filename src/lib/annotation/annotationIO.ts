@@ -16,10 +16,7 @@ export function getAnnotationPath(imagePath: string): string {
  * `vaultPath` is optional — when omitted, `imagePath` is treated as an
  * absolute filesystem path (matches the existing call sites).
  */
-export async function loadAnnotations(
-  imagePath: string,
-  vaultPath = '',
-): Promise<AnnotationData | null> {
+export async function loadAnnotations(imagePath: string, vaultPath = ''): Promise<AnnotationData | null> {
   try {
     const { invoke } = await import('@tauri-apps/api/core');
     const raw = await invoke<string | null>('load_annotations', {
@@ -39,11 +36,7 @@ export async function loadAnnotations(
  * truth) and mirrors the payload into the SQLite annotations table so any
  * text annotations show up in vault search.
  */
-export async function saveAnnotations(
-  imagePath: string,
-  data: AnnotationData,
-  vaultPath = '',
-): Promise<void> {
+export async function saveAnnotations(imagePath: string, data: AnnotationData, vaultPath = ''): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
   await invoke<void>('save_annotations', {
     vaultPath,
