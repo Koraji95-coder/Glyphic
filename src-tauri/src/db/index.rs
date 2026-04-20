@@ -12,9 +12,16 @@ pub fn index_note(
     created_at: &str,
     modified_at: &str,
 ) -> Result<(), String> {
+    // Upsert by path so saving the same note repeatedly keeps a stable id and
+    // FTS rowid (avoiding duplicate rows or churn on every keystroke save).
     conn.execute(
-        "INSERT OR REPLACE INTO notes (id, path, title, content, tags, created_at, modified_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+        "INSERT INTO notes (id, path, title, content, tags, created_at, modified_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+         ON CONFLICT(path) DO UPDATE SET
+             title       = excluded.title,
+             content     = excluded.content,
+             tags        = excluded.tags,
+             modified_at = excluded.modified_at",
         params![id, path, title, content, tags, created_at, modified_at],
     )
     .map_err(|e| format!("Failed to index note: {e}"))?;
