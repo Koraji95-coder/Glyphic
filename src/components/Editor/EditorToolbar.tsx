@@ -4,6 +4,7 @@ import {
   Bold,
   Camera,
   Code,
+  Download,
   Heading1,
   Heading2,
   Heading3,
@@ -14,10 +15,12 @@ import {
   Pencil,
   Strikethrough,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLectureMode } from '../../hooks/useLectureMode';
 import { commands } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { useVaultStore } from '../../stores/vaultStore';
 
 interface EditorToolbarProps {
   editor: Editor | null;
@@ -34,8 +37,56 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   const { lectureModeActive, toggleLectureMode, getElapsedTime } = useLectureMode();
   const isMobile = useIsMobile();
   const { isInkMode, toggleInkMode } = useLayoutStore();
+  const vaultPath = useVaultStore((s) => s.vaultPath);
+  const activeNotePath = useVaultStore((s) => s.activeNotePath);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
 
   if (!editor) return null;
+
+  const handleExportMarkdown = async () => {
+    setExportMenuOpen(false);
+    if (!vaultPath || !activeNotePath) {
+      setExportStatus('Open a note first');
+      setTimeout(() => setExportStatus(null), 3000);
+      return;
+    }
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const defaultName = activeNotePath.split('/').pop() ?? 'note.md';
+      const target = await save({
+        defaultPath: defaultName,
+        filters: [{ name: 'Markdown', extensions: ['md'] }],
+      });
+      if (!target) return;
+      await commands.exportMarkdown(vaultPath, activeNotePath, target);
+      setExportStatus('Exported');
+      setTimeout(() => setExportStatus(null), 2000);
+    } catch (e) {
+      console.error('Markdown export failed:', e);
+      setExportStatus(`Export failed: ${e}`);
+      setTimeout(() => setExportStatus(null), 4000);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setExportMenuOpen(false);
+    if (!vaultPath || !activeNotePath) {
+      setExportStatus('Open a note first');
+      setTimeout(() => setExportStatus(null), 3000);
+      return;
+    }
+    try {
+      // The backend opens a hidden print-preview window that triggers the
+      // OS print dialog (with "Save as PDF" available). The user picks the
+      // output path in that dialog, so we don't pass one here.
+      await commands.exportPdf(vaultPath, activeNotePath, '');
+    } catch (e) {
+      console.error('PDF export failed:', e);
+      setExportStatus(`PDF export failed: ${e}`);
+      setTimeout(() => setExportStatus(null), 4000);
+    }
+  };
 
   // On mobile, use minimum 44px touch targets per Apple HIG
   const btnSize = isMobile ? '44px' : undefined;
@@ -240,6 +291,129 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         />
         {lectureModeActive ? `Lecture — ${getElapsedTime()}` : 'Lecture'}
       </button>
+
+      <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
+
+      {/* Export menu */}
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onClick={() => setExportMenuOpen((v) => !v)}
+          title="Export note"
+          className="flex items-center shrink-0 transition-colors"
+          style={{
+            gap: '5px',
+            padding: '5px 10px',
+            borderRadius: '8px',
+            fontSize: '11px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            border: '1px solid var(--border-subtle)',
+            backgroundColor: exportMenuOpen ? 'var(--bg-hover)' : 'transparent',
+            color: 'var(--text-secondary)',
+            minHeight: btnSize,
+          }}
+        >
+          <Download size={isMobile ? 16 : 13} />
+          Export
+        </button>
+        {exportMenuOpen && (
+          <>
+            {/* Click-away catcher */}
+            <button
+              type="button"
+              aria-label="Close export menu"
+              onClick={() => setExportMenuOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'default',
+                zIndex: 40,
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 4px)',
+                right: 0,
+                minWidth: '180px',
+                padding: '4px',
+                borderRadius: '8px',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.25)',
+                zIndex: 50,
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleExportMarkdown}
+                className="flex items-center"
+                style={{
+                  width: '100%',
+                  gap: '8px',
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-primary)',
+                  textAlign: 'left',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                Export as Markdown…
+              </button>
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                className="flex items-center"
+                style={{
+                  width: '100%',
+                  gap: '8px',
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-primary)',
+                  textAlign: 'left',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                Export as PDF…
+              </button>
+            </div>
+          </>
+        )}
+        {exportStatus && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 'calc(100% + 4px)',
+              right: 0,
+              padding: '6px 10px',
+              borderRadius: '6px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              fontSize: '11px',
+              color: 'var(--text-secondary)',
+              whiteSpace: 'nowrap',
+              zIndex: 50,
+            }}
+          >
+            {exportStatus}
+          </div>
+        )}
+      </div>
 
       <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
 
