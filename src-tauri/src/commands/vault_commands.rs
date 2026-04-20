@@ -71,6 +71,9 @@ pub fn create_note(
 ) -> Result<NoteFile, String> {
     let note = manager::create_note(&vault_path, &folder, &title)?;
     if let Ok(conn) = db_state.0.lock() {
+        // Newly-created notes only contain frontmatter at this point, so we
+        // index an empty body/tags. The first save will upsert the real
+        // content via `save_note`.
         let _ = index::index_note(
             &conn,
             &note.id,
@@ -98,14 +101,15 @@ pub fn save_note(
     content: String,
 ) -> Result<(), String> {
     manager::save_note(&vault_path, &note_path, &content)?;
-    // Keep FTS index up to date so search reflects the latest body.
+    // Keep FTS index up to date so search reflects the latest body. The
+    // upsert in `index_note` is keyed on `path`, so re-saving the same note
+    // updates the existing row instead of creating duplicates.
     if let Ok(conn) = db_state.0.lock() {
         let now = chrono::Utc::now().to_rfc3339();
         let id = uuid::Uuid::new_v4().to_string();
-        let title = note_path
-            .rsplit('/')
-            .next()
-            .map(|s| s.trim_end_matches(".md").to_string())
+        let title = Path::new(&note_path)
+            .file_stem()
+            .map(|s| s.to_string_lossy().to_string())
             .unwrap_or_else(|| "Untitled".to_string());
         let _ = index::index_note(&conn, &id, &note_path, &title, &content, "", &now, &now);
     }

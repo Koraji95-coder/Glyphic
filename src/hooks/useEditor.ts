@@ -13,12 +13,20 @@ interface PendingSave {
 
 /**
  * Apply the editor body back into the original frontmatter, refreshing the
- * `modified:` field so the on-disk metadata stays accurate.
+ * `modified:` field so the on-disk metadata stays accurate. If the original
+ * frontmatter has no `modified:` line (e.g. notes created in another tool),
+ * one is injected before the closing `---`.
  */
 function composeNote({ body, frontmatter }: { body: string; frontmatter: string }): string {
   if (!frontmatter) return body;
-  const updated = frontmatter.replace(/^modified:\s*"[^"]*"\s*$/m, `modified: "${new Date().toISOString()}"`);
-  return updated + body;
+  const now = new Date().toISOString();
+  const modifiedLine = `modified: "${now}"`;
+  if (/^modified:\s*"[^"]*"\s*$/m.test(frontmatter)) {
+    return frontmatter.replace(/^modified:\s*"[^"]*"\s*$/m, modifiedLine) + body;
+  }
+  // Inject before the closing `---` fence (and any trailing newlines).
+  const injected = frontmatter.replace(/(\n)?---(\n*)$/, `\n${modifiedLine}\n---$2`);
+  return injected + body;
 }
 
 export function useEditor() {
