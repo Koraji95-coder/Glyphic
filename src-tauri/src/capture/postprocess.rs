@@ -44,7 +44,7 @@ pub fn trim_uniform_borders(img: DynamicImage) -> DynamicImage {
     // Trim top: iterate rows from 0 downward.
     let mut top = 0u32;
     while top < h {
-        let bg = if same_color(&top_left, &top_right) {
+        let bg = if pixel_close(&top_left, &top_right) {
             top_left
         } else {
             // Mixed top-corner colors → bail and use top-left only.
@@ -59,7 +59,7 @@ pub fn trim_uniform_borders(img: DynamicImage) -> DynamicImage {
     // Trim bottom.
     let mut bottom = h;
     while bottom > top {
-        let bg = if same_color(&bottom_left, &bottom_right) {
+        let bg = if pixel_close(&bottom_left, &bottom_right) {
             bottom_left
         } else {
             bottom_left
@@ -73,7 +73,7 @@ pub fn trim_uniform_borders(img: DynamicImage) -> DynamicImage {
     // Trim left.
     let mut left = 0u32;
     while left < w {
-        let bg = if same_color(&top_left, &bottom_left) {
+        let bg = if pixel_close(&top_left, &bottom_left) {
             top_left
         } else {
             top_left
@@ -87,7 +87,7 @@ pub fn trim_uniform_borders(img: DynamicImage) -> DynamicImage {
     // Trim right.
     let mut right = w;
     while right > left {
-        let bg = if same_color(&top_right, &bottom_right) {
+        let bg = if pixel_close(&top_right, &bottom_right) {
             top_right
         } else {
             top_right
@@ -104,10 +104,6 @@ pub fn trim_uniform_borders(img: DynamicImage) -> DynamicImage {
         return img;
     }
     img.crop_imm(left, top, new_w, new_h)
-}
-
-fn same_color(a: &[u8; 4], b: &[u8; 4]) -> bool {
-    pixel_close(a, b)
 }
 
 fn pixel_close(a: &[u8; 4], b: &[u8; 4]) -> bool {

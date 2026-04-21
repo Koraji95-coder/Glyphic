@@ -16,6 +16,9 @@ import { useLightboxStore } from '../../stores/lightboxStore';
  */
 export const ScreenshotNode = Image.extend({
   name: 'image',
+  // Block-level reorder is driven by the explicit `data-drag-handle` rendered
+  // in the NodeView below, not by this flag — but ProseMirror still needs the
+  // node to be marked draggable for the drag-handle to take effect.
   draggable: true,
   selectable: true,
 

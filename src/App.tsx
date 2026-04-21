@@ -52,6 +52,9 @@ function MainLayout() {
         return;
       }
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'w' || e.key === 'W')) {
+        // Only intercept Ctrl+W when there's actually a split open. With no
+        // split, fall through to the platform default (close window/tab) so we
+        // don't surprise users with a no-op shortcut.
         if (useSplitStore.getState().secondaryNotePath) {
           e.preventDefault();
           useSplitStore.getState().closeSplit();

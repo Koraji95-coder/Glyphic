@@ -88,9 +88,14 @@ export function Editor({
       try {
         // In read-only mode, bypass `loadNote`'s save-flushing side effects so
         // we don't disturb the primary editor's pending-save state.
-        const raw = readOnly
-          ? await commands.readNote(useVaultStore.getState().vaultPath ?? '', activeNotePath)
-          : await loadNote(activeNotePath);
+        let raw: string;
+        if (readOnly) {
+          const vp = useVaultStore.getState().vaultPath;
+          if (!vp) return; // No vault open yet — nothing to load.
+          raw = await commands.readNote(vp, activeNotePath);
+        } else {
+          raw = await loadNote(activeNotePath);
+        }
         if (cancelled) return;
         const content = parseMarkdownToContent(raw);
         editor.commands.setContent(content);

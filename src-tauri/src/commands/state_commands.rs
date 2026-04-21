@@ -24,12 +24,28 @@ fn state_file_path() -> Result<PathBuf, String> {
 fn load_state() -> AppState {
     let path = match state_file_path() {
         Ok(p) => p,
-        Err(_) => return AppState::default(),
+        Err(e) => {
+            eprintln!("[state] could not resolve state file path: {e}");
+            return AppState::default();
+        }
     };
-    let Ok(contents) = std::fs::read_to_string(&path) else {
-        return AppState::default();
+    let contents = match std::fs::read_to_string(&path) {
+        Ok(c) => c,
+        Err(e) => {
+            // ENOENT on first launch is expected and not worth logging; everything else is.
+            if e.kind() != std::io::ErrorKind::NotFound {
+                eprintln!("[state] failed to read {}: {e}", path.display());
+            }
+            return AppState::default();
+        }
     };
-    serde_json::from_str(&contents).unwrap_or_default()
+    match serde_json::from_str(&contents) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("[state] failed to parse {}: {e}", path.display());
+            AppState::default()
+        }
+    }
 }
 
 fn save_state(state: &AppState) -> Result<(), String> {
