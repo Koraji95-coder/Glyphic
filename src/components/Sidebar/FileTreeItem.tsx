@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ChevronDown,
   ChevronRight,
+  Columns2,
   File,
   FilePlus,
   Folder,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
+import { useSplitStore } from '../../stores/splitStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
 
@@ -184,6 +186,14 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           {isFolder && <CtxItem icon={FolderPlus} label="New Folder" onClick={handleNewFolder} />}
           {!isFolder && (
             <>
+              <CtxItem
+                icon={Columns2}
+                label="Open in Split"
+                onClick={() => {
+                  setCtxMenu(null);
+                  useSplitStore.getState().openSplit(entry.path, 'vertical');
+                }}
+              />
               <CtxItem icon={Pencil} label="Rename" onClick={handleRename} />
               <CtxItem icon={Trash2} label="Delete" onClick={handleDelete} danger />
             </>

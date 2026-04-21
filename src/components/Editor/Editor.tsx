@@ -2,6 +2,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
 import { useCallback, useEffect } from 'react';
 import { useEditor } from '../../hooks/useEditor';
+import { commands } from '../../lib/tauri/commands';
 import { events } from '../../lib/tauri/events';
 import { getEditorExtensions } from '../../lib/tiptap/extensions';
 import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
@@ -13,21 +14,32 @@ import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
 import { EditorToolbar } from './EditorToolbar';
 import { NoteTagChips } from './NoteTagChips';
 
-export function Editor() {
-  const activeNotePath = useVaultStore((s) => s.activeNotePath);
+export function Editor({
+  notePath: notePathProp,
+  readOnly = false,
+}: { notePath?: string | null; readOnly?: boolean } = {}) {
+  const globalActivePath = useVaultStore((s) => s.activeNotePath);
+  const activeNotePath = notePathProp !== undefined ? notePathProp : globalActivePath;
   const lectureModeActive = useEditorStore((s) => s.lectureModeActive);
   const lectureModeStartedAt = useEditorStore((s) => s.lectureModeStartedAt);
   const { handleContentChange, loadNote } = useEditor();
 
   const editor = useTiptapEditor({
     extensions: getEditorExtensions(),
+    editable: !readOnly,
     editorProps: {
       attributes: {
         class: 'ProseMirror focus:outline-none min-h-full',
       },
       handleKeyDown: (_view, event) => {
         // In lecture mode, auto-insert timestamp on Enter (new paragraph)
-        if (lectureModeActive && lectureModeStartedAt && event.key === 'Enter' && !event.shiftKey) {
+        if (
+          !readOnly &&
+          lectureModeActive &&
+          lectureModeStartedAt &&
+          event.key === 'Enter' &&
+          !event.shiftKey
+        ) {
           // Let TipTap handle Enter first, then insert timestamp
           setTimeout(() => {
             if (!editor) return;
@@ -53,10 +65,16 @@ export function Editor() {
       },
     },
     onUpdate: ({ editor: ed }) => {
+      if (readOnly) return;
       const markdown = serializeToMarkdown(ed.getJSON());
       handleContentChange(markdown);
     },
   });
+
+  // Keep `editable` in sync if the prop changes after mount.
+  useEffect(() => {
+    editor?.setEditable(!readOnly);
+  }, [editor, readOnly]);
 
   // Load active note content
   useEffect(() => {
@@ -65,7 +83,11 @@ export function Editor() {
     let cancelled = false;
     const load = async () => {
       try {
-        const raw = await loadNote(activeNotePath);
+        // In read-only mode, bypass `loadNote`'s save-flushing side effects so
+        // we don't disturb the primary editor's pending-save state.
+        const raw = readOnly
+          ? await commands.readNote(useVaultStore.getState().vaultPath ?? '', activeNotePath)
+          : await loadNote(activeNotePath);
         if (cancelled) return;
         const content = parseMarkdownToContent(raw);
         editor.commands.setContent(content);
@@ -78,18 +100,18 @@ export function Editor() {
     return () => {
       cancelled = true;
     };
-  }, [editor, activeNotePath]);
+  }, [editor, activeNotePath, readOnly]);
 
   // Listen for captured screenshots to insert images
   const insertImage = useCallback(
     (result: { path: string }) => {
-      if (!editor) return;
+      if (!editor || readOnly) return;
       // Tauri webviews can't load raw OS paths via <img src>; route them through
       // the asset: protocol so the file actually renders in the editor.
       const src = convertFileSrc(result.path);
       editor.chain().focus().setImage({ src }).run();
     },
-    [editor],
+    [editor, readOnly],
   );
 
   useEffect(() => {
@@ -118,8 +140,8 @@ export function Editor() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <EditorToolbar editor={editor} />
-      <LectureModeToggle />
+      {!readOnly && <EditorToolbar editor={editor} />}
+      {!readOnly && <LectureModeToggle />}
       <NoteTagChips notePath={activeNotePath} />
       {/* Breadcrumb bar */}
       {pathParts.length > 1 && (
@@ -150,7 +172,7 @@ export function Editor() {
       <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-editor)' }}>
         <EditorContent editor={editor} />
       </div>
-      <AnnotationOverlay />
+      {!readOnly && <AnnotationOverlay />}
     </div>
   );
 }

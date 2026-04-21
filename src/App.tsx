@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { CaptureOverlay } from './components/Capture/CaptureOverlay';
 import { ChatPanel } from './components/Chat/ChatPanel';
-import { Editor } from './components/Editor/Editor';
+import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { StatusBar } from './components/Layout/StatusBar';
 import { TitleBar } from './components/Layout/TitleBar';
 import { PrintPreview } from './components/PrintPreview/PrintPreview';
@@ -14,6 +14,7 @@ import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
 import { useSettingsStore } from './stores/settingsStore';
+import { useSplitStore } from './stores/splitStore';
 import { useTagsStore } from './stores/tagsStore';
 import { useVaultStore } from './stores/vaultStore';
 
@@ -25,6 +26,21 @@ function MainLayout() {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
         e.preventDefault();
         toggleChatPanel();
+        return;
+      }
+      // Split pane: Ctrl+\ → split right, Ctrl+Shift+\ → split down, Ctrl+W → close
+      if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
+        const activePath = useVaultStore.getState().activeNotePath;
+        if (!activePath) return;
+        e.preventDefault();
+        useSplitStore.getState().openSplit(activePath, e.shiftKey ? 'horizontal' : 'vertical');
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'w' || e.key === 'W')) {
+        if (useSplitStore.getState().secondaryNotePath) {
+          e.preventDefault();
+          useSplitStore.getState().closeSplit();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -37,7 +53,7 @@ function MainLayout() {
       <div className="flex flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 flex min-w-0 overflow-hidden">
-          <Editor />
+          <EditorPaneGroup />
           <ChatPanel />
         </main>
       </div>
