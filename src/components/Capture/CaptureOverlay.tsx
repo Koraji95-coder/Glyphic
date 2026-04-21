@@ -1,3 +1,4 @@
+import { convertFileSrc } from '@tauri-apps/api/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useCaptureStore } from '../../stores/captureStore';
@@ -17,10 +18,19 @@ export function CaptureOverlay() {
   const captureDelay = useCaptureStore((s) => s.captureDelay);
   const cycleDelay = useCaptureStore((s) => s.cycleDelay);
   const vaultPath = useVaultStore((s) => s.vaultPath);
-  // Screenshot background state — setter will be used when screenshot capture integration is added
-  const [screenshotBg, _setScreenshotBg] = useState<string | null>(null);
+  // Screenshot background state
+  const [screenshotBg, setScreenshotBg] = useState<string | null>(null);
   const [delayCountdown, setDelayCountdown] = useState<number | null>(null);
   const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // On mount, read the frozen screenshot path from the URL query param and load it.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const bg = params.get('bg');
+    if (bg) {
+      setScreenshotBg(convertFileSrc(bg));
+    }
+  }, []);
 
   /** Execute a capture action after applying the configured delay. */
   const withDelay = useCallback(
@@ -80,6 +90,8 @@ export function CaptureOverlay() {
       };
 
       if (key === 'escape') {
+        // Cancel the capture session (hides overlay and cleans up temp file).
+        commands.cancelCapture().catch(() => {});
         // If there are queued multi-captures, they were already emitted as events
         // and inserted by the editor; just clear the queue and close
         clearQueue();
