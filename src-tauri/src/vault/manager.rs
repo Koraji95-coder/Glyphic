@@ -184,6 +184,21 @@ fn build_tree(base: &Path, dir: &Path) -> Result<Vec<VaultEntry>, String> {
             continue;
         }
 
+        // Skip attachments directories and image files
+        if path.is_dir() {
+            if name == "attachments" {
+                continue;
+            }
+        } else if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+            let lower = ext.to_ascii_lowercase();
+            if matches!(
+                lower.as_str(),
+                "png" | "jpg" | "jpeg" | "gif" | "webp" | "svg" | "bmp" | "ico"
+            ) {
+                continue;
+            }
+        }
+
         let rel_path = path
             .strip_prefix(base)
             .unwrap_or(&path)
