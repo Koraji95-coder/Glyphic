@@ -83,7 +83,7 @@ function serializeList(node: JSONContent, depth: number, marker: (item: JSONCont
   return items
     .map((item, i) => {
       const m = marker(item, i);
-      const childIndent = ' '.repeat(m.length);
+      const childIndent = '  ';
       const blocks = (item.content || []).map((child) => serializeNode(child, depth + 1));
       // Join blocks within an item with single newlines so nested lists hug
       // the parent item rather than creating a paragraph break.
@@ -104,6 +104,8 @@ function serializeInline(nodes: JSONContent[]): string {
     .map((node) => {
       // Inline hard break (TipTap can put hardBreak inside paragraph content).
       if (node.type === 'hardBreak') return '  \n';
+      // Inline timestamp atom.
+      if (node.type === 'timestamp') return `[T:${node.attrs?.elapsed || '00:00'}]`;
       let text = node.text || '';
       if (node.marks) {
         for (const mark of node.marks) {

@@ -120,8 +120,12 @@ export function parseMarkdownToContent(markdown: string): string {
         listStack.push(newFrame);
         if (wantTask) {
           htmlLines.push('<ul data-type="taskList">');
+        } else if (wantType === 'ol') {
+          const startNum = parseInt(marker, 10) || 1;
+          const startAttr = startNum !== 1 ? ` start="${startNum}"` : '';
+          htmlLines.push(`<ol${startAttr}>`);
         } else {
-          htmlLines.push(wantType === 'ul' ? '<ul>' : '<ol>');
+          htmlLines.push('<ul>');
         }
       }
 
