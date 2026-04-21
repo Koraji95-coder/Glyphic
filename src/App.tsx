@@ -20,6 +20,7 @@ const PrintPreview = lazy(() =>
   import('./components/PrintPreview/PrintPreview').then((m) => ({ default: m.PrintPreview })),
 );
 
+import { useGlobalShortcuts } from './hooks/useGlobalShortcuts';
 import { useTheme } from './hooks/useTheme';
 import { useVault } from './hooks/useVault';
 import { commands } from './lib/tauri/commands';
@@ -35,6 +36,8 @@ import { useVaultStore } from './stores/vaultStore';
 
 function MainLayout() {
   const toggleChatPanel = useChatStore((s) => s.togglePanel);
+
+  useGlobalShortcuts();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
