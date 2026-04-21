@@ -31,7 +31,7 @@ export function OcrBanner() {
       }}
     >
       <span style={{ color: 'var(--text-secondary)' }}>
-        OCR is unavailable — screenshot text won&apos;t be searchable. Install tesseract:{' '}
+        OCR is unavailable — screenshot text won't be searchable. Install tesseract:{' '}
         <code style={{ fontFamily: 'var(--font-mono)', color: 'var(--warning)' }}>brew install tesseract</code> (macOS),{' '}
         <code style={{ fontFamily: 'var(--font-mono)', color: 'var(--warning)' }}>apt install tesseract-ocr</code>{' '}
         (Linux),{' '}
