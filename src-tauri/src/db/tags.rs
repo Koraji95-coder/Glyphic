@@ -110,7 +110,9 @@ mod tests {
 
     #[test]
     fn strips_quotes_and_hash() {
-        assert_eq!(parse_tags_line(r#"["#math", '#calc']"#), vec!["math", "calc"]);
+        // Use a raw string with two-hash delimiter so single `#` characters
+        // inside the literal don't terminate the string early.
+        assert_eq!(parse_tags_line(r##"["#math", '#calc']"##), vec!["math", "calc"]);
     }
 
     #[test]
