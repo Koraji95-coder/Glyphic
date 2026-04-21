@@ -2,6 +2,7 @@ import { Check, Loader2, Wifi, WifiOff, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
+import { useVaultStore } from '../../stores/vaultStore';
 import type { AiConfig } from '../../types/ai';
 
 interface AiSettingsPanelProps {
@@ -12,6 +13,7 @@ interface AiSettingsPanelProps {
 
 export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelProps) {
   const { isConnected, checkConnection, updateConfig } = useChatStore();
+  const vaultPath = useVaultStore((s) => s.vaultPath);
 
   const [config, setConfig] = useState<AiConfig>({
     provider: 'ollama',
@@ -45,7 +47,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateConfig(config);
+      await updateConfig(vaultPath ?? '', config);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch {
@@ -387,13 +389,13 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
         </button>
         <button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || !vaultPath}
           className="text-xs px-3 py-1.5 rounded flex items-center gap-1"
           style={{
             backgroundColor: saveSuccess ? 'var(--color-green, #4ade80)' : 'var(--accent)',
             color: 'var(--bg-app)',
             fontFamily: 'var(--font-body)',
-            cursor: isSaving ? 'not-allowed' : 'pointer',
+            cursor: isSaving || !vaultPath ? 'not-allowed' : 'pointer',
           }}
         >
           {isSaving ? <Loader2 size={11} className="animate-spin" /> : saveSuccess ? <Check size={11} /> : null}

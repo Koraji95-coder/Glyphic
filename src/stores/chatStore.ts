@@ -22,7 +22,7 @@ interface ChatState {
   clearChat: () => void;
   checkConnection: () => Promise<void>;
   fetchConfig: () => Promise<void>;
-  updateConfig: (config: AiConfig) => Promise<void>;
+  updateConfig: (vaultPath: string, config: AiConfig) => Promise<void>;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -90,8 +90,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  updateConfig: async (config: AiConfig) => {
-    await commands.aiUpdateConfig(config);
+  updateConfig: async (vaultPath: string, config: AiConfig) => {
+    await commands.aiUpdateConfig(vaultPath, config);
     const modelName = config.model_routing.chat;
     set({ model: modelName });
   },

@@ -1,5 +1,7 @@
 use std::path::Path;
 
+use tauri::Manager;
+
 use crate::db::{index, schema};
 use crate::vault::config::VaultConfig;
 use crate::vault::manager::{self, NoteFile, VaultEntry};
@@ -29,6 +31,16 @@ fn activate_vault(
     if let Ok(mut guard) = watcher_state.0.lock() {
         *guard = new_watcher;
     }
+
+    // Load persisted AI config, if any.
+    if let Some(loaded) = crate::ai::config::load(Path::new(path)) {
+        if let Some(ai_state) = app.try_state::<crate::commands::ai_commands::AiState>() {
+            if let Ok(mut cfg) = ai_state.config.lock() {
+                *cfg = loaded;
+            }
+        }
+    }
+
     Ok(())
 }
 

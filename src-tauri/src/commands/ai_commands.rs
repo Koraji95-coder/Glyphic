@@ -271,15 +271,18 @@ pub async fn ai_get_config(
 
 #[tauri::command]
 pub async fn ai_update_config(
+    vault_path: String,
     config: AiConfig,
     state: State<'_, AiState>,
 ) -> Result<(), String> {
-    let mut current = state
-        .config
-        .lock()
-        .map_err(|e| format!("Failed to lock AI config: {e}"))?;
-    *current = config;
-    Ok(())
+    {
+        let mut current = state
+            .config
+            .lock()
+            .map_err(|e| format!("Failed to lock AI config: {e}"))?;
+        *current = config.clone();
+    }
+    crate::ai::config::save(std::path::Path::new(&vault_path), &config)
 }
 
 // ---------------------------------------------------------------------------

@@ -67,3 +67,23 @@ impl Default for AiConfig {
         }
     }
 }
+
+use std::path::Path;
+
+/// Load AI config from `<vault>/.glyphic/ai.toml`. Returns `None` if the file
+/// is missing or unparseable — the caller should fall back to `AiConfig::default()`.
+pub fn load(vault_path: &Path) -> Option<AiConfig> {
+    let p = vault_path.join(".glyphic").join("ai.toml");
+    let s = std::fs::read_to_string(p).ok()?;
+    toml::from_str(&s).ok()
+}
+
+/// Save AI config to `<vault>/.glyphic/ai.toml`. Creates the `.glyphic`
+/// directory if it does not already exist.
+pub fn save(vault_path: &Path, config: &AiConfig) -> Result<(), String> {
+    let dir = vault_path.join(".glyphic");
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    let p = dir.join("ai.toml");
+    let s = toml::to_string_pretty(config).map_err(|e| e.to_string())?;
+    std::fs::write(p, s).map_err(|e| e.to_string())
+}
