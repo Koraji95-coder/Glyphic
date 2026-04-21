@@ -1,5 +1,6 @@
 import { Camera, Cog, Keyboard, Mic, PenTool, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { commands } from '../../lib/tauri/commands';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { type SettingsSection, useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -187,7 +188,9 @@ export function SettingsModal() {
               <GeneralSection draft={draft} onChange={persist} vaultPath={vaultPath} />
             )}
             {section === 'editor' && draft && <EditorSection draft={draft} onChange={persist} />}
-            {section === 'capture' && draft && <CaptureSection draft={draft} onChange={persist} />}
+            {section === 'capture' && draft && (
+              <CaptureSection draft={draft} onChange={persist} vaultPath={vaultPath} />
+            )}
             {section === 'lecture' && draft && <LectureSection draft={draft} onChange={persist} />}
             {section === 'ai' && <AiSettingsPanel onClose={close} embedded />}
             {section === 'shortcuts' && <ShortcutsList />}
@@ -384,8 +387,24 @@ function EditorSection({ draft, onChange }: SectionProps) {
   );
 }
 
-function CaptureSection({ draft, onChange }: SectionProps) {
+function CaptureSection({ draft, onChange, vaultPath }: SectionProps & { vaultPath?: string | null }) {
   const c = draft.capture;
+  const [isOcrIndexing, setIsOcrIndexing] = useState(false);
+  const [ocrStatus, setOcrStatus] = useState<string | null>(null);
+
+  const handleReocrVault = async () => {
+    if (!vaultPath) return;
+    setIsOcrIndexing(true);
+    setOcrStatus(null);
+    try {
+      const [, screenshotCount] = await commands.reocrVault(vaultPath); // first element is note count
+      setOcrStatus(`Re-indexed ${screenshotCount} screenshot${screenshotCount !== 1 ? 's' : ''}`);
+    } catch (e) {
+      setOcrStatus(`Failed: ${e}`);
+    } finally {
+      setIsOcrIndexing(false);
+    }
+  };
   return (
     <div>
       <Field label="Default mode">
@@ -468,6 +487,25 @@ function CaptureSection({ draft, onChange }: SectionProps) {
           />
         </Field>
       )}
+      <Field label="OCR search index" hint="Re-scan all screenshots for searchable text. Requires tesseract on PATH.">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={handleReocrVault}
+            disabled={isOcrIndexing || !vaultPath}
+            style={{
+              ...inputStyle,
+              padding: '6px 14px',
+              cursor: isOcrIndexing || !vaultPath ? 'not-allowed' : 'pointer',
+              opacity: isOcrIndexing || !vaultPath ? 0.6 : 1,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {isOcrIndexing ? 'Indexing…' : 'Re-index Screenshots'}
+          </button>
+          {ocrStatus && <span style={{ fontSize: '12px', color: 'var(--text-ghost)' }}>{ocrStatus}</span>}
+        </div>
+      </Field>
     </div>
   );
 }

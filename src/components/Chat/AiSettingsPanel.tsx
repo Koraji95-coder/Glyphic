@@ -186,8 +186,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               Ollama
             </span>
             <div>
-              <label style={labelStyle}>Endpoint</label>
+              <label htmlFor="ollama-endpoint" style={labelStyle}>
+                Endpoint
+              </label>
               <input
+                id="ollama-endpoint"
                 type="text"
                 value={config.ollama.endpoint}
                 onChange={(e) =>
@@ -200,8 +203,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               />
             </div>
             <div>
-              <label style={labelStyle}>Model</label>
+              <label htmlFor="ollama-model" style={labelStyle}>
+                Model
+              </label>
               <input
+                id="ollama-model"
                 type="text"
                 value={config.ollama.model}
                 onChange={(e) =>
@@ -233,8 +239,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               OpenAI
             </span>
             <div>
-              <label style={labelStyle}>API Key</label>
+              <label htmlFor="openai-apikey" style={labelStyle}>
+                API Key
+              </label>
               <input
+                id="openai-apikey"
                 type="password"
                 value={config.openai.api_key}
                 onChange={(e) =>
@@ -248,8 +257,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               />
             </div>
             <div>
-              <label style={labelStyle}>Model</label>
+              <label htmlFor="openai-model" style={labelStyle}>
+                Model
+              </label>
               <input
+                id="openai-model"
                 type="text"
                 value={config.openai.model}
                 onChange={(e) =>
@@ -263,8 +275,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               />
             </div>
             <div>
-              <label style={labelStyle}>Endpoint</label>
+              <label htmlFor="openai-endpoint" style={labelStyle}>
+                Endpoint
+              </label>
               <input
+                id="openai-endpoint"
                 type="text"
                 value={config.openai.endpoint}
                 onChange={(e) =>
@@ -303,8 +318,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
             ] as const
           ).map(({ key, label }) => (
             <div key={key}>
-              <label style={labelStyle}>{label}</label>
+              <label htmlFor={`model-routing-${key}`} style={labelStyle}>
+                {label}
+              </label>
               <input
+                id={`model-routing-${key}`}
                 type="text"
                 value={config.model_routing[key]}
                 onChange={(e) =>

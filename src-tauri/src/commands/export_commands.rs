@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 #[tauri::command]
@@ -55,21 +53,16 @@ pub fn export_markdown(
     note_path: String,
     output_path: String,
 ) -> Result<(), String> {
-    let src = Path::new(&vault_path).join(&note_path);
-    if !src.exists() {
-        return Err(format!("Note not found: {note_path}"));
+    if vault_path.trim().is_empty() {
+        return Err("vault_path is required".to_string());
     }
-
-    let dest = Path::new(&output_path);
-    if let Some(parent) = dest.parent() {
-        if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("Failed to create export directory: {e}"))?;
-        }
+    if note_path.trim().is_empty() {
+        return Err("note_path is required".to_string());
     }
-
-    std::fs::copy(&src, dest).map_err(|e| format!("Failed to export markdown: {e}"))?;
-    Ok(())
+    if output_path.trim().is_empty() {
+        return Err("output_path is required".to_string());
+    }
+    crate::export::markdown::export_markdown(&vault_path, &note_path, &output_path)
 }
 
 /// Minimal URL encoder for the few characters that appear in vault/note
