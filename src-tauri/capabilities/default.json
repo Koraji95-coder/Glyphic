@@ -1,7 +1,7 @@
 {
   "identifier": "default",
   "description": "Default capabilities for Glyphic",
-  "windows": ["main", "print-preview"],
+  "windows": ["main", "capture-overlay", "print-preview"],
   "permissions": [
     "core:default",
     "global-shortcut:default",
