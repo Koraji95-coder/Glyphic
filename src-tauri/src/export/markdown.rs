@@ -135,7 +135,9 @@ fn rewrite_image_paths(
 /// Returns `None` if the resolved path does not exist on disk.
 fn resolve_image_path(src: &str, vault_path: &str) -> Option<std::path::PathBuf> {
     let path: std::path::PathBuf = if let Some(rest) = src.strip_prefix("asset://localhost/") {
-        // On Windows the encoded path starts with `/C:/…`; strip the leading slash.
+        // On Windows, Tauri encodes paths as `asset://localhost//C:/…` — the
+        // extra leading slash before the drive letter must be stripped. UNC
+        // paths (\\server\share) are not currently supported by this flow.
         let fs_path = if cfg!(windows) && rest.starts_with('/') {
             &rest[1..]
         } else {
@@ -165,22 +167,24 @@ fn find_char(s: &str, start: usize, ch: char) -> Option<usize> {
 }
 
 /// Decode `%XX` percent-encoded bytes in a URL path segment into a UTF-8 string.
+/// Collects decoded bytes into a buffer first so that multi-byte UTF-8 code
+/// points are reconstructed correctly before being pushed to the output string.
 fn percent_decode(s: &str) -> String {
-    let mut out = String::with_capacity(s.len());
+    let mut decoded: Vec<u8> = Vec::with_capacity(s.len());
     let bytes = s.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] == b'%' && i + 2 < bytes.len() {
             if let (Some(hi), Some(lo)) = (from_hex(bytes[i + 1]), from_hex(bytes[i + 2])) {
-                out.push(char::from(hi * 16 + lo));
+                decoded.push(hi * 16 + lo);
                 i += 3;
                 continue;
             }
         }
-        out.push(char::from(bytes[i]));
+        decoded.push(bytes[i]);
         i += 1;
     }
-    out
+    String::from_utf8_lossy(&decoded).into_owned()
 }
 
 fn from_hex(b: u8) -> Option<u8> {

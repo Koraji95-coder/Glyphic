@@ -397,7 +397,7 @@ function CaptureSection({ draft, onChange, vaultPath }: SectionProps & { vaultPa
     setIsOcrIndexing(true);
     setOcrStatus(null);
     try {
-      const [, screenshotCount] = await commands.reocrVault(vaultPath);
+      const [, screenshotCount] = await commands.reocrVault(vaultPath); // first element is note count
       setOcrStatus(`Re-indexed ${screenshotCount} screenshot${screenshotCount !== 1 ? 's' : ''}`);
     } catch (e) {
       setOcrStatus(`Failed: ${e}`);
