@@ -116,7 +116,7 @@ pub fn save_note(vault_path: &str, note_path: &str, content: &str) -> Result<(),
 
 pub fn delete_note(vault_path: &str, note_path: &str) -> Result<(), String> {
     let full_path = Path::new(vault_path).join(note_path);
-    std::fs::remove_file(&full_path).map_err(|e| format!("Failed to delete note: {e}"))
+    trash::delete(&full_path).map_err(|e| format!("Failed to move to trash: {e}"))
 }
 
 pub fn rename_note(vault_path: &str, old_path: &str, new_name: &str) -> Result<NoteFile, String> {
