@@ -5,6 +5,7 @@ import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { FileTree } from './FileTree';
 import { SearchBar } from './SearchBar';
+import { TagsPanel } from './TagsPanel';
 
 export function Sidebar() {
   const [width, setWidth] = useState(260);
@@ -98,6 +99,9 @@ export function Sidebar() {
           <SidebarActionButton onClick={() => {}}>📁 Folder</SidebarActionButton>
         </div>
       </div>
+
+      {/* Tag filter chips */}
+      <TagsPanel />
 
       {/* File tree */}
       <div className="flex-1 overflow-y-auto" style={{ padding: '4px 0' }}>

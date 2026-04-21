@@ -14,6 +14,7 @@ import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
 import { useSettingsStore } from './stores/settingsStore';
+import { useTagsStore } from './stores/tagsStore';
 import { useVaultStore } from './stores/vaultStore';
 
 function MainLayout() {
@@ -87,9 +88,16 @@ export default function App() {
   useEffect(() => {
     if (isAuxRoute) return;
     if (!vaultPath) return;
-    commands.reindexVault(vaultPath).catch((e) => {
-      console.warn('Reindex failed (non-critical):', e);
-    });
+    commands
+      .reindexVault(vaultPath)
+      .then(() => {
+        // Tags table is derived from the indexed `notes` rows, so refresh
+        // after every reindex to surface tags from existing notes on launch.
+        void useTagsStore.getState().refreshTags();
+      })
+      .catch((e) => {
+        console.warn('Reindex failed (non-critical):', e);
+      });
   }, [vaultPath, isAuxRoute]);
 
   // Refresh the sidebar tree when files change on disk (external editors,
@@ -106,6 +114,8 @@ export default function App() {
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
           refresh().catch((e) => console.warn('refreshFileTree failed:', e));
+          // Tags may have changed too (frontmatter edits, new files, etc.).
+          void useTagsStore.getState().refreshTags();
         }, 250);
       })
       .then((unlisten) => {

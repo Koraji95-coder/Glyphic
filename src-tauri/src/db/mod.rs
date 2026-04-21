@@ -4,3 +4,4 @@ pub mod index;
 pub mod schema;
 pub mod screenshots;
 pub mod search;
+pub mod tags;

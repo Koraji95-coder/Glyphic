@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { AiConfig, Flashcard } from '../../types/ai';
 import type { CaptureResult, WindowInfo } from '../../types/capture';
 import type { Backlink, SearchResult } from '../../types/editor';
+import type { TagInfo } from '../../types/tags';
 import type { NoteFile, VaultConfig, VaultEntry } from '../../types/vault';
 
 export const commands = {
@@ -48,6 +49,11 @@ export const commands = {
   searchAll: (query: string, limit?: number) => invoke<SearchResult[]>('search_all', { query, limit: limit || 20 }),
   reindexVault: (vaultPath: string) => invoke<number>('reindex_vault', { vaultPath }),
   getBacklinks: (notePath: string) => invoke<Backlink[]>('get_backlinks', { notePath }),
+
+  // Tags
+  listAllTags: () => invoke<TagInfo[]>('list_all_tags'),
+  tagsForNote: (notePath: string) => invoke<string[]>('tags_for_note', { notePath }),
+  notesWithTag: (tag: string) => invoke<string[]>('notes_with_tag', { tag }),
 
   // Settings
   getSettings: (vaultPath: string) => invoke<VaultConfig>('get_settings', { vaultPath }),

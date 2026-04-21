@@ -11,6 +11,7 @@ import { useVaultStore } from '../../stores/vaultStore';
 import { AnnotationOverlay } from '../Annotation/AnnotationOverlay';
 import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
 import { EditorToolbar } from './EditorToolbar';
+import { NoteTagChips } from './NoteTagChips';
 
 export function Editor() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
@@ -119,6 +120,7 @@ export function Editor() {
     <div className="flex-1 flex flex-col min-h-0">
       <EditorToolbar editor={editor} />
       <LectureModeToggle />
+      <NoteTagChips notePath={activeNotePath} />
       {/* Breadcrumb bar */}
       {pathParts.length > 1 && (
         <div
