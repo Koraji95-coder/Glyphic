@@ -40,6 +40,7 @@ export const commands = {
       vaultPath,
       points: points ?? null,
     }),
+  cancelCapture: () => invoke<void>('cancel_capture'),
   repeatLastCapture: () => invoke<CaptureResult>('repeat_last_capture'),
   getWindowList: () => invoke<WindowInfo[]>('get_window_list'),
   reocrVault: (vaultPath: string) => invoke<[number, number]>('reocr_vault', { vaultPath }),

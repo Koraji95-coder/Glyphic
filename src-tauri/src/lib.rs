@@ -6,6 +6,7 @@ pub mod export;
 pub mod ocr;
 pub mod vault;
 
+use std::path::PathBuf;
 use std::sync::Mutex;
 
 use tauri::Manager;
@@ -19,6 +20,7 @@ use vault::watcher::VaultWatcher;
 
 pub struct DbState(pub Mutex<rusqlite::Connection>);
 pub struct WatcherState(pub Mutex<Option<VaultWatcher>>);
+pub struct CaptureSessionState(pub Mutex<Option<PathBuf>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -37,6 +39,9 @@ pub fn run() {
             // In-memory store for repeat-last-capture
             app.manage(capture_commands::new_last_capture_store());
 
+            // In-memory store for the current capture session's temp screenshot path
+            app.manage(CaptureSessionState(Mutex::new(None)));
+
             // Holds the currently-running vault filesystem watcher (if any).
             app.manage(WatcherState(Mutex::new(None)));
 
@@ -49,6 +54,7 @@ pub fn run() {
             // capture
             capture_commands::start_capture,
             capture_commands::finish_capture,
+            capture_commands::cancel_capture,
             capture_commands::repeat_last_capture,
             capture_commands::get_window_list,
             capture_commands::reocr_vault,

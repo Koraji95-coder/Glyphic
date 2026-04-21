@@ -3,12 +3,13 @@ use serde::Serialize;
 use std::path::Path;
 use std::sync::Mutex;
 use tauri::Emitter;
+use uuid::Uuid;
 
 use crate::capture::{crop, overlay, postprocess, screen, window_detect};
 use crate::db::screenshots as screenshots_db;
 use crate::ocr;
 use crate::vault::config as vault_config;
-use crate::DbState;
+use crate::{CaptureSessionState, DbState};
 
 /// Read the vault config and decide whether to apply auto-trim. Failures to
 /// read the config (missing file, parse error) are non-fatal: the user just
@@ -52,8 +53,29 @@ pub fn new_last_capture_store() -> LastCaptureStore {
 }
 
 #[tauri::command]
-pub fn start_capture(app: tauri::AppHandle) -> Result<(), String> {
-    overlay::show_overlay(&app)
+pub fn start_capture(
+    app: tauri::AppHandle,
+    session: tauri::State<'_, CaptureSessionState>,
+) -> Result<(), String> {
+    // Capture fullscreen BEFORE showing the overlay so the overlay is not in the shot.
+    let screenshot = screen::capture_fullscreen()?;
+    let tmp = std::env::temp_dir().join(format!("glyphic-capture-{}.png", Uuid::new_v4()));
+    screenshot
+        .save(&tmp)
+        .map_err(|e| format!("Failed to save temp capture: {e}"))?;
+
+    // Store the path so finish_capture / cancel_capture can clean up.
+    if let Ok(mut guard) = session.0.lock() {
+        *guard = Some(tmp.clone());
+    }
+
+    let bg_path_str = tmp.to_string_lossy().to_string();
+    if let Err(e) = overlay::show_overlay_with_bg(&app, &bg_path_str) {
+        // Clean up on failure to show overlay.
+        cleanup_session(&session);
+        return Err(e);
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -61,6 +83,7 @@ pub fn finish_capture(
     app: tauri::AppHandle,
     db_state: tauri::State<'_, DbState>,
     last_capture: tauri::State<'_, LastCaptureStore>,
+    session: tauri::State<'_, CaptureSessionState>,
     mode: String,
     x: u32,
     y: u32,
@@ -69,13 +92,21 @@ pub fn finish_capture(
     points: Option<Vec<(u32, u32)>>,
     vault_path: String,
 ) -> Result<CaptureResult, String> {
-    // Hide the overlay first so it doesn't appear in the capture
-    overlay::hide_overlay(&app)?;
-
-    // Small delay to let the overlay disappear
-    std::thread::sleep(std::time::Duration::from_millis(150));
-
-    let screenshot = screen::capture_fullscreen()?;
+    // Load the cached pre-overlay screenshot; fall back to a fresh capture if unavailable.
+    let cached_path = {
+        let guard = session.0.lock().map_err(|e| format!("Lock error: {e}"))?;
+        guard.clone()
+    };
+    let screenshot = match cached_path {
+        Some(ref path) => match image::open(path) {
+            Ok(img) => img,
+            Err(e) => {
+                eprintln!("[capture] failed to load cached screenshot, falling back to fresh capture: {e}");
+                screen::capture_fullscreen()?
+            }
+        },
+        None => screen::capture_fullscreen()?,
+    };
 
     let cropped = match mode.as_str() {
         "fullscreen" => screenshot,
@@ -95,6 +126,9 @@ pub fn finish_capture(
     } else {
         cropped
     };
+
+    // Hide the overlay — order no longer matters since the screenshot was captured beforehand.
+    overlay::hide_overlay(&app)?;
 
     let (img_path, thumb_path) = postprocess::save_capture(&cropped, &vault_path)?;
     let now = Utc::now().to_rfc3339();
@@ -134,7 +168,26 @@ pub fn finish_capture(
 
     let _ = app.emit("screenshot-captured", &result);
 
+    cleanup_session(&session);
     Ok(result)
+}
+
+#[tauri::command]
+pub fn cancel_capture(
+    app: tauri::AppHandle,
+    session: tauri::State<'_, CaptureSessionState>,
+) -> Result<(), String> {
+    overlay::hide_overlay(&app)?;
+    cleanup_session(&session);
+    Ok(())
+}
+
+fn cleanup_session(session: &tauri::State<'_, CaptureSessionState>) {
+    if let Ok(mut guard) = session.0.lock() {
+        if let Some(path) = guard.take() {
+            let _ = std::fs::remove_file(path);
+        }
+    }
 }
 
 #[tauri::command]
