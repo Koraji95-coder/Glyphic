@@ -43,19 +43,29 @@ All commands run from the repo root unless otherwise noted.
 
 ### `npm run build` (= `tsc && vite build`)
 - **Status:** ✅ success — TypeScript compiles cleanly, Vite build finishes in
-  ~627 ms, 2,243 modules transformed.
-- **Output sizes (pre-gzip):**
-  - `dist/index.html` — 0.84 kB
+  ~470 ms, 2,259 modules transformed.
+- **Output sizes (post Phase 5 PR 8 perf pass, pre-gzip):**
+  - `dist/index.html` — 1.24 kB
   - `dist/assets/index-*.css` — 11.49 kB
-  - `dist/assets/index-*.js` — **1,191.88 kB** (370.21 kB gzipped)
+  - `dist/assets/index-*.js` — **174.17 kB** (48.08 kB gzipped) ← main chunk
+  - `dist/assets/tiptap-*.js` — 364.37 kB (116.02 kB gzipped)
+  - `dist/assets/fabric-*.js` — 289.84 kB (87.99 kB gzipped) — lazy-loaded with the annotation overlay
+  - `dist/assets/react-vendor-*.js` — 209.49 kB (66.76 kB gzipped)
+  - `dist/assets/lowlight-*.js` — 161.70 kB (51.40 kB gzipped)
+  - `dist/assets/CaptureOverlay-*.js` — 11.41 kB (lazy route)
+  - `dist/assets/AnnotationOverlay-*.js` — 10.50 kB (lazy)
+  - `dist/assets/PrintPreview-*.js` — 4.47 kB (lazy route)
   - several small Tauri API chunks (core, path, webviewWindow, …)
-- **Non-blocking build warnings:**
-  - Main JS chunk exceeds Vite's 500 kB warning threshold (code-splitting /
-    `build.rolldownOptions.output.codeSplitting` suggested).
-  - `INEFFECTIVE_DYNAMIC_IMPORT` for `src/lib/tauri/commands.ts` — the module is
-    dynamically imported by `src/components/Sidebar/FileTreeItem.tsx` but also
-    statically imported by `App.tsx`, the Capture components, etc., so the
-    dynamic import does not produce a separate chunk.
+- **Build warnings:** none. The previous `INEFFECTIVE_DYNAMIC_IMPORT` and the
+  500 kB chunk-size warnings are both gone — `commands.ts` is now imported
+  statically everywhere, and `vite.config.ts`'s `manualChunks` splits
+  `react-vendor`, `tiptap`, `fabric`, and `lowlight` into their own files.
+
+#### Historical baseline (pre-perf-pass)
+- Main chunk was **1,191.88 kB** (370.21 kB gzipped). Vite emitted a
+  `INEFFECTIVE_DYNAMIC_IMPORT` warning for `src/lib/tauri/commands.ts` because
+  the module was both dynamically imported by `Sidebar/FileTreeItem.tsx` and
+  statically imported elsewhere.
 
 ### `npm run lint` (= `biome check .`)
 - **Status:** ⚠️ fails with pre-existing findings, as expected by the plan.
@@ -96,7 +106,7 @@ What was verified headlessly that stands in for parts of the smoke test:
 | `npm install`                       | 0 vulnerabilities      |
 | `cargo check` (first-party)         | 0 errors, 0 warnings   |
 | `cargo check` (transitive)          | 1 future-incompat warn (xcap 0.0.14) |
-| `npm run build`                     | success, ~1.19 MB JS   |
+| `npm run build`                     | success, main 174 kB / total 1.23 MB across split chunks |
 | `npm run lint` errors               | 8                      |
 | `npm run lint` warnings             | 61                     |
 | `npm run lint` info                 | 1                      |

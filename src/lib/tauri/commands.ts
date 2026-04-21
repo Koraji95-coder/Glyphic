@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { AiConfig, Flashcard } from '../../types/ai';
 import type { CaptureResult, WindowInfo } from '../../types/capture';
 import type { Backlink, SearchResult } from '../../types/editor';
+import type { TagInfo } from '../../types/tags';
 import type { NoteFile, VaultConfig, VaultEntry } from '../../types/vault';
 
 export const commands = {
@@ -49,10 +50,19 @@ export const commands = {
   reindexVault: (vaultPath: string) => invoke<number>('reindex_vault', { vaultPath }),
   getBacklinks: (notePath: string) => invoke<Backlink[]>('get_backlinks', { notePath }),
 
+  // Tags
+  listAllTags: () => invoke<TagInfo[]>('list_all_tags'),
+  tagsForNote: (notePath: string) => invoke<string[]>('tags_for_note', { notePath }),
+  notesWithTag: (tag: string) => invoke<string[]>('notes_with_tag', { tag }),
+
   // Settings
   getSettings: (vaultPath: string) => invoke<VaultConfig>('get_settings', { vaultPath }),
   updateSettings: (vaultPath: string, settings: VaultConfig) =>
     invoke<void>('update_settings', { vaultPath, settings }),
+
+  // App-level state (recent vaults / first-launch detection)
+  getRecentVaults: () => invoke<string[]>('get_recent_vaults'),
+  addRecentVault: (vaultPath: string) => invoke<string[]>('add_recent_vault', { vaultPath }),
 
   // Export
   exportPdf: (vaultPath: string, notePath: string, outputPath: string) =>

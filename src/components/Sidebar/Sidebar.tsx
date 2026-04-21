@@ -1,10 +1,13 @@
 import { HelpCircle, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { FileTree } from './FileTree';
 import { SearchBar } from './SearchBar';
+import { TagsPanel } from './TagsPanel';
 
 export function Sidebar() {
   const [width, setWidth] = useState(260);
@@ -99,6 +102,9 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* Tag filter chips */}
+      <TagsPanel />
+
       {/* File tree */}
       <div className="flex-1 overflow-y-auto" style={{ padding: '4px 0' }}>
         <FileTree />
@@ -113,9 +119,13 @@ export function Sidebar() {
           gap: '4px',
         }}
       >
-        <FooterButton icon={<Settings size={12} />} label="Settings" />
+        <FooterButton
+          icon={<Settings size={12} />}
+          label="Settings"
+          onClick={() => useSettingsUiStore.getState().open('general')}
+        />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" />
-        <FooterButton icon={<HelpCircle size={12} />} label="Help" />
+        <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
       </div>
     </>
   );
@@ -241,9 +251,11 @@ function SidebarActionButton({
   );
 }
 
-function FooterButton({ icon, label }: { icon: React.ReactNode; label: string }) {
+function FooterButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
   return (
     <button
+      type="button"
+      onClick={onClick}
       className="flex items-center justify-center"
       style={{
         flex: 1,

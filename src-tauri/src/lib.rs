@@ -13,7 +13,7 @@ use tauri::Manager;
 use commands::{
     ai_commands::{self, AiState},
     annotation_commands, capture_commands, export_commands, search_commands, settings_commands,
-    vault_commands,
+    state_commands, tag_commands, vault_commands,
 };
 use vault::watcher::VaultWatcher;
 
@@ -67,6 +67,10 @@ pub fn run() {
             search_commands::search_all,
             search_commands::reindex_vault,
             search_commands::get_backlinks,
+            // tags
+            tag_commands::list_all_tags,
+            tag_commands::tags_for_note,
+            tag_commands::notes_with_tag,
             // export
             export_commands::export_pdf,
             export_commands::export_markdown,
@@ -76,6 +80,9 @@ pub fn run() {
             // settings
             settings_commands::get_settings,
             settings_commands::update_settings,
+            // app state (recent vaults / first-launch detection)
+            state_commands::get_recent_vaults,
+            state_commands::add_recent_vault,
             // ai
             ai_commands::ai_chat,
             ai_commands::ai_summarize,

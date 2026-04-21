@@ -7,7 +7,18 @@ use tauri::Emitter;
 use crate::capture::{crop, overlay, postprocess, screen, window_detect};
 use crate::db::screenshots as screenshots_db;
 use crate::ocr;
+use crate::vault::config as vault_config;
 use crate::DbState;
+
+/// Read the vault config and decide whether to apply auto-trim. Failures to
+/// read the config (missing file, parse error) are non-fatal: the user just
+/// gets an un-trimmed image, which matches the pre-feature behavior.
+fn should_auto_trim(vault_path: &str) -> bool {
+    match vault_config::load_config(Path::new(vault_path)) {
+        Ok(cfg) => cfg.capture.auto_trim_whitespace,
+        Err(_) => false,
+    }
+}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct CaptureResult {
@@ -78,6 +89,13 @@ pub fn finish_capture(
         }
     };
 
+    // Optionally trim solid-color borders (gated by `capture.auto_trim_whitespace`).
+    let cropped = if should_auto_trim(&vault_path) {
+        postprocess::trim_uniform_borders(cropped)
+    } else {
+        cropped
+    };
+
     let (img_path, thumb_path) = postprocess::save_capture(&cropped, &vault_path)?;
     let now = Utc::now().to_rfc3339();
 
@@ -145,6 +163,11 @@ pub fn repeat_last_capture(
     // Capture without showing overlay
     let screenshot = screen::capture_fullscreen()?;
     let cropped = crop::crop_region(&screenshot, x, y, width, height)?;
+    let cropped = if should_auto_trim(&vault_path) {
+        postprocess::trim_uniform_borders(cropped)
+    } else {
+        cropped
+    };
     let (img_path, thumb_path) = postprocess::save_capture(&cropped, &vault_path)?;
     let now = Utc::now().to_rfc3339();
 

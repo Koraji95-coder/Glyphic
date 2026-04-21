@@ -2,7 +2,7 @@ import { ArrowLeft, Send, Settings, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
-import { AiSettingsPanel } from './AiSettingsPanel';
+import { useSettingsUiStore } from '../../stores/settingsUiStore';
 
 export function ChatPanel() {
   const {
@@ -19,7 +19,6 @@ export function ChatPanel() {
     fetchConfig,
   } = useChatStore();
   const [input, setInput] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isMobile = useIsMobile();
@@ -78,9 +77,6 @@ export function ChatPanel() {
         ...mobileOverlayStyle,
       }}
     >
-      {/* Settings overlay */}
-      {showSettings && <AiSettingsPanel onClose={() => setShowSettings(false)} />}
-
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 shrink-0"
@@ -140,7 +136,8 @@ export function ChatPanel() {
         </div>
         <div className="flex items-center" style={{ gap: '2px' }}>
           <button
-            onClick={() => setShowSettings(true)}
+            type="button"
+            onClick={() => useSettingsUiStore.getState().open('ai')}
             title="AI settings"
             className="touch-target p-1.5 rounded"
             style={{ color: 'var(--text-tertiary)' }}

@@ -6,9 +6,11 @@ import type { AiConfig } from '../../types/ai';
 
 interface AiSettingsPanelProps {
   onClose: () => void;
+  /** When true, renders inline (no absolute overlay or header) for embedding in the Settings modal. */
+  embedded?: boolean;
 }
 
-export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
+export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelProps) {
   const { isConnected, checkConnection, updateConfig } = useChatStore();
 
   const [config, setConfig] = useState<AiConfig>({
@@ -85,46 +87,52 @@ export function AiSettingsPanel({ onClose }: AiSettingsPanelProps) {
 
   return (
     <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'var(--bg-editor)',
-        zIndex: 10,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      style={
+        embedded
+          ? { display: 'flex', flexDirection: 'column', gap: '12px' }
+          : {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'var(--bg-editor)',
+              zIndex: 10,
+              display: 'flex',
+              flexDirection: 'column',
+            }
+      }
     >
-      {/* Header */}
-      <div
-        className="flex items-center justify-between px-4 shrink-0"
-        style={{
-          height: 'var(--toolbar-height)',
-          borderBottom: '1px solid var(--border)',
-          backgroundColor: 'var(--bg-sidebar)',
-        }}
-      >
-        <span
-          className="text-sm font-semibold"
-          style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}
+      {/* Header — only shown when not embedded inside a host container that already has its own. */}
+      {!embedded && (
+        <div
+          className="flex items-center justify-between px-4 shrink-0"
+          style={{
+            height: 'var(--toolbar-height)',
+            borderBottom: '1px solid var(--border)',
+            backgroundColor: 'var(--bg-sidebar)',
+          }}
         >
-          AI Settings
-        </span>
-        <button
-          onClick={onClose}
-          className="p-1.5 rounded"
-          style={{ color: 'var(--text-tertiary)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-        >
-          <X size={14} />
-        </button>
-      </div>
+          <span
+            className="text-sm font-semibold"
+            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}
+          >
+            AI Settings
+          </span>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded"
+            style={{ color: 'var(--text-tertiary)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+      <div className={embedded ? 'flex flex-col gap-3' : 'flex-1 overflow-y-auto p-3 flex flex-col gap-3'}>
         {/* Provider selector */}
         <div style={sectionStyle}>
           <span
