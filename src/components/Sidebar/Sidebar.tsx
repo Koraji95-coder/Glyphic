@@ -2,6 +2,7 @@ import { HelpCircle, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { FileTree } from './FileTree';
 import { SearchBar } from './SearchBar';
@@ -117,9 +118,9 @@ export function Sidebar() {
           gap: '4px',
         }}
       >
-        <FooterButton icon={<Settings size={12} />} label="Settings" />
+        <FooterButton icon={<Settings size={12} />} label="Settings" onClick={() => useSettingsUiStore.getState().open('general')} />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" />
-        <FooterButton icon={<HelpCircle size={12} />} label="Help" />
+        <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useSettingsUiStore.getState().open('shortcuts')} />
       </div>
     </>
   );
@@ -245,9 +246,11 @@ function SidebarActionButton({
   );
 }
 
-function FooterButton({ icon, label }: { icon: React.ReactNode; label: string }) {
+function FooterButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
   return (
     <button
+      type="button"
+      onClick={onClick}
       className="flex items-center justify-center"
       style={{
         flex: 1,

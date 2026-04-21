@@ -4,6 +4,7 @@ import { CaptureOverlay } from './components/Capture/CaptureOverlay';
 import { ChatPanel } from './components/Chat/ChatPanel';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { StatusBar } from './components/Layout/StatusBar';
+import { SettingsModal } from './components/Settings/SettingsModal';
 import { TitleBar } from './components/Layout/TitleBar';
 import { PrintPreview } from './components/PrintPreview/PrintPreview';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
@@ -14,6 +15,7 @@ import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
 import { useSettingsStore } from './stores/settingsStore';
+import { useSettingsUiStore } from './stores/settingsUiStore';
 import { useSplitStore } from './stores/splitStore';
 import { useTagsStore } from './stores/tagsStore';
 import { useVaultStore } from './stores/vaultStore';
@@ -42,6 +44,11 @@ function MainLayout() {
           useSplitStore.getState().closeSplit();
         }
       }
+      // Settings (Ctrl+,)
+      if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+        e.preventDefault();
+        useSettingsUiStore.getState().open('general');
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -59,6 +66,7 @@ function MainLayout() {
       </div>
       <StatusBar />
       <QuickSwitcher />
+      <SettingsModal />
     </div>
   );
 }
