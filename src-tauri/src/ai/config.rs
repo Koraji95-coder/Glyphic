@@ -78,10 +78,12 @@ pub fn load(vault_path: &Path) -> Option<AiConfig> {
     toml::from_str(&s).ok()
 }
 
-/// Save AI config to `<vault>/.glyphic/ai.toml`. The `.glyphic` directory
-/// must already exist (it does for any opened vault).
+/// Save AI config to `<vault>/.glyphic/ai.toml`. Creates the `.glyphic`
+/// directory if it does not already exist.
 pub fn save(vault_path: &Path, config: &AiConfig) -> Result<(), String> {
-    let p = vault_path.join(".glyphic").join("ai.toml");
+    let dir = vault_path.join(".glyphic");
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    let p = dir.join("ai.toml");
     let s = toml::to_string_pretty(config).map_err(|e| e.to_string())?;
     std::fs::write(p, s).map_err(|e| e.to_string())
 }
