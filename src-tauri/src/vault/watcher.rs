@@ -69,6 +69,11 @@ impl VaultWatcher {
                             if Instant::now() >= d {
                                 // Drain and emit one event per unique path.
                                 for path_str in pending.drain() {
+                                    // event_type is "changed" for all coalesced events:
+                                    // a single path may have gone through Create+Modify+Modify
+                                    // in the same window, so no single kind is accurate.
+                                    // The frontend onVaultChanged handler uses this only as a
+                                    // "refresh tree" trigger and does not inspect event_type.
                                     let _ = app_handle.emit(
                                         "vault-changed",
                                         VaultChangedPayload {
