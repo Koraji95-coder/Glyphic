@@ -36,8 +36,8 @@ impl Default for ModelRouting {
             chat: "llama3.1".into(),
             summarize: "llama3.1".into(),
             flashcards: "llama3.1".into(),
-            explain: "deepseek-r1:32b".into(),
-            vision: "llava:13b".into(),
+            explain: "llama3.1".into(),
+            vision: "llava".into(),
         }
     }
 }
