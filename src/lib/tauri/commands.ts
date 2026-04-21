@@ -60,6 +60,10 @@ export const commands = {
   updateSettings: (vaultPath: string, settings: VaultConfig) =>
     invoke<void>('update_settings', { vaultPath, settings }),
 
+  // App-level state (recent vaults / first-launch detection)
+  getRecentVaults: () => invoke<string[]>('get_recent_vaults'),
+  addRecentVault: (vaultPath: string) => invoke<string[]>('add_recent_vault', { vaultPath }),
+
   // Export
   exportPdf: (vaultPath: string, notePath: string, outputPath: string) =>
     invoke<void>('export_pdf', { vaultPath, notePath, outputPath }),

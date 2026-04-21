@@ -6,6 +6,7 @@ import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { ShortcutHelp } from './components/Help/ShortcutHelp';
 import { StatusBar } from './components/Layout/StatusBar';
 import { Lightbox } from './components/Lightbox/Lightbox';
+import { Onboarding } from './components/Onboarding/Onboarding';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { TitleBar } from './components/Layout/TitleBar';
 import { PrintPreview } from './components/PrintPreview/PrintPreview';
@@ -17,6 +18,7 @@ import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
 import { useHelpUiStore } from './stores/helpUiStore';
+import { useOnboardingStore } from './stores/onboardingStore';
 import { useSettingsStore } from './stores/settingsStore';
 import { useSettingsUiStore } from './stores/settingsUiStore';
 import { useSplitStore } from './stores/splitStore';
@@ -77,12 +79,13 @@ function MainLayout() {
       <SettingsModal />
       <ShortcutHelp />
       <Lightbox />
+      <Onboarding />
     </div>
   );
 }
 
 export default function App() {
-  const { openVault, createVault } = useVault();
+  const { openVault } = useVault();
   const { applyTheme } = useTheme();
   const settings = useSettingsStore((s) => s.settings);
   const vaultPath = useVaultStore((s) => s.vaultPath);
@@ -98,25 +101,41 @@ export default function App() {
     if (isAuxRoute) return;
     const init = async () => {
       try {
-        const { homeDir } = await import('@tauri-apps/api/path');
-        const home = await homeDir();
-        const defaultPath = `${home}Glyphic`;
+        // Decide first-launch vs returning user from the user-level state file.
+        let recents: string[] = [];
         try {
-          await openVault(defaultPath);
+          recents = await commands.getRecentVaults();
         } catch {
+          // Backend unavailable (e.g., dev browser) — treat as first launch.
+        }
+
+        const lastVault = recents[0];
+        if (lastVault) {
           try {
-            await createVault(defaultPath, 'Glyphic');
+            await openVault(lastVault);
+            useOnboardingStore.setState({ isOpen: false });
+            // Bump it back to the front of the recents list.
+            try {
+              await commands.addRecentVault(lastVault);
+            } catch {
+              // Non-fatal.
+            }
+            return;
           } catch (e) {
-            console.error('Failed to initialize vault:', e);
+            // Stored vault is gone or unreadable — fall through to onboarding.
+            console.warn('Stored vault could not be opened, showing onboarding:', e);
           }
         }
+        // No vault chosen yet (or last one missing): show first-run UX.
+        useOnboardingStore.getState().open();
       } catch (e) {
-        // Not running in Tauri (e.g., dev browser) — skip vault init
+        // Not running in Tauri (e.g., dev browser) — skip vault init.
         console.warn('Vault init skipped (not in Tauri):', e);
+        useOnboardingStore.setState({ isOpen: false });
       }
     };
     init();
-  }, [isAuxRoute]);
+  }, [isAuxRoute, openVault]);
 
   // Reindex vault for FTS5 search on vault open
   useEffect(() => {
