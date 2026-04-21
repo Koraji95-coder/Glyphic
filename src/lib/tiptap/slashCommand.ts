@@ -122,6 +122,22 @@ const SLASH_COMMANDS: SlashCommandItem[] = [
         .run();
     },
   },
+  {
+    title: 'Inline Math',
+    description: 'Insert an inline LaTeX formula ($x^2$)',
+    icon: '∑',
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).insertContent('$x^2$').run();
+    },
+  },
+  {
+    title: 'Math Block',
+    description: 'Insert a centered LaTeX equation block',
+    icon: '∫',
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).insertContent('$$\\int_0^\\infty e^{-x^2}\\,dx$$').run();
+    },
+  },
 ];
 
 function createSlashCommandRenderer() {
