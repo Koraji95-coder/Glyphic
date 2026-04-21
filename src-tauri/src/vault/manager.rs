@@ -111,7 +111,12 @@ pub fn create_note(vault_path: &str, folder: &str, title: &str) -> Result<NoteFi
 
 pub fn save_note(vault_path: &str, note_path: &str, content: &str) -> Result<(), String> {
     let full_path = Path::new(vault_path).join(note_path);
-    std::fs::write(&full_path, content).map_err(|e| format!("Failed to save note: {e}"))
+    let tmp_path = full_path.with_extension("md.tmp");
+    std::fs::write(&tmp_path, content)
+        .map_err(|e| format!("Failed to write temp: {e}"))?;
+    std::fs::rename(&tmp_path, &full_path)
+        .map_err(|e| format!("Failed to rename temp: {e}"))?;
+    Ok(())
 }
 
 pub fn delete_note(vault_path: &str, note_path: &str) -> Result<(), String> {
