@@ -129,11 +129,40 @@ pub fn delete_note(
 
 #[tauri::command]
 pub fn rename_note(
+    db_state: tauri::State<'_, DbState>,
     vault_path: String,
     old_path: String,
     new_name: String,
 ) -> Result<NoteFile, String> {
-    manager::rename_note(&vault_path, &old_path, &new_name)
+    let new_note = manager::rename_note(&vault_path, &old_path, &new_name)?;
+    let new_path = new_note.path.clone();
+
+    let conn = db_state.0.lock().map_err(|e| format!("DB lock error: {e}"))?;
+    index::rename_note_path(&conn, &old_path, &new_path)?;
+
+    // Look up preserved id + created_at.
+    let (id, created_at): (String, String) = conn
+        .query_row(
+            "SELECT id, created_at FROM notes WHERE path = ?1 LIMIT 1",
+            rusqlite::params![&new_path],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .map_err(|e| format!("Failed to look up renamed note: {e}"))?;
+
+    // Refresh outgoing links from the renamed note (re-read disk content).
+    if let Ok(content) =
+        std::fs::read_to_string(std::path::Path::new(&vault_path).join(&new_path))
+    {
+        let _ = crate::db::backlinks::reindex_note_links(&conn, &id, &content);
+    }
+
+    Ok(NoteFile {
+        id,
+        path: new_path,
+        title: new_note.title,
+        created_at,
+        modified_at: new_note.modified_at,
+    })
 }
 
 #[tauri::command]

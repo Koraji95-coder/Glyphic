@@ -143,7 +143,7 @@ pub fn rename_note(vault_path: &str, old_path: &str, new_name: &str) -> Result<N
         .to_string();
 
     Ok(NoteFile {
-        id: Uuid::new_v4().to_string(),
+        id: String::new(),
         path: rel_path,
         title: new_name.to_string(),
         created_at: now.to_rfc3339(),

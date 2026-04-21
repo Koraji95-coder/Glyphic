@@ -49,6 +49,15 @@ pub fn remove_from_index(conn: &Connection, note_path: &str) -> Result<(), Strin
     Ok(())
 }
 
+pub fn rename_note_path(conn: &Connection, old_path: &str, new_path: &str) -> Result<(), String> {
+    conn.execute(
+        "UPDATE notes SET path = ?1, modified_at = ?2 WHERE path = ?3",
+        params![new_path, chrono::Utc::now().to_rfc3339(), old_path],
+    )
+    .map_err(|e| format!("Failed to rename in index: {e}"))?;
+    Ok(())
+}
+
 pub fn reindex_vault(conn: &Connection, vault_path: &str) -> Result<usize, String> {
     // Clear existing index. Backlinks are wiped along with notes via the
     // ON DELETE CASCADE foreign key.
