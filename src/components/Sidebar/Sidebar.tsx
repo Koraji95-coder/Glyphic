@@ -1,6 +1,7 @@
 import { HelpCircle, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -120,7 +121,7 @@ export function Sidebar() {
       >
         <FooterButton icon={<Settings size={12} />} label="Settings" onClick={() => useSettingsUiStore.getState().open('general')} />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" />
-        <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useSettingsUiStore.getState().open('shortcuts')} />
+        <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
       </div>
     </>
   );

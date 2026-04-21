@@ -3,7 +3,9 @@ import { Route, Routes } from 'react-router-dom';
 import { CaptureOverlay } from './components/Capture/CaptureOverlay';
 import { ChatPanel } from './components/Chat/ChatPanel';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
+import { ShortcutHelp } from './components/Help/ShortcutHelp';
 import { StatusBar } from './components/Layout/StatusBar';
+import { Lightbox } from './components/Lightbox/Lightbox';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { TitleBar } from './components/Layout/TitleBar';
 import { PrintPreview } from './components/PrintPreview/PrintPreview';
@@ -14,6 +16,7 @@ import { useVault } from './hooks/useVault';
 import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
+import { useHelpUiStore } from './stores/helpUiStore';
 import { useSettingsStore } from './stores/settingsStore';
 import { useSettingsUiStore } from './stores/settingsUiStore';
 import { useSplitStore } from './stores/splitStore';
@@ -49,6 +52,11 @@ function MainLayout() {
         e.preventDefault();
         useSettingsUiStore.getState().open('general');
       }
+      // Help overlay: Ctrl+? (Shift+/) or Ctrl+/
+      if ((e.ctrlKey || e.metaKey) && (e.key === '?' || e.key === '/')) {
+        e.preventDefault();
+        useHelpUiStore.getState().toggle();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -67,6 +75,8 @@ function MainLayout() {
       <StatusBar />
       <QuickSwitcher />
       <SettingsModal />
+      <ShortcutHelp />
+      <Lightbox />
     </div>
   );
 }
