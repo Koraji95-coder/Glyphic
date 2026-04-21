@@ -26,7 +26,11 @@ interface ListFrame {
 
 export function parseMarkdownToContent(markdown: string): string {
   // Strip YAML frontmatter
-  const { body: content } = splitFrontmatter(markdown);
+  const { body: rawBody } = splitFrontmatter(markdown);
+
+  // Pre-process multi-line block math ($$\n...\n$$) → single-line $$...$$ in a paragraph.
+  // Must be done before splitting into lines so the block is treated as one unit.
+  const content = rawBody.replace(/^\$\$\s*\n([\s\S]*?)\n\$\$\s*$/gm, (_match, latex) => `$$${latex.trim()}$$`);
 
   // Convert markdown to basic HTML that TipTap can consume
   const lines = content.split('\n');

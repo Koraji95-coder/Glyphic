@@ -1,6 +1,7 @@
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
+import Mathematics from '@tiptap/extension-mathematics';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
@@ -36,5 +37,10 @@ export function getEditorExtensions() {
     Highlight.configure({ multicolor: true }),
     TimestampNode,
     SlashCommandExtension,
+    Mathematics.configure({
+      // Match $$...$$ (block) before $...$ (inline) to avoid partial matches.
+      // The `g` flag is required by the extension's regex.exec() while-loop.
+      regex: /\$\$([^$]+)\$\$|\$([^$\n]+)\$/g,
+    }),
   ];
 }
