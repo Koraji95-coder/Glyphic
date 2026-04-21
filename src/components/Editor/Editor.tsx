@@ -1,23 +1,32 @@
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
-import { useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { useEditor } from '../../hooks/useEditor';
 import { commands } from '../../lib/tauri/commands';
 import { events } from '../../lib/tauri/events';
 import { getEditorExtensions } from '../../lib/tiptap/extensions';
 import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
 import { serializeToMarkdown } from '../../lib/tiptap/markdownSerializer';
+import { useAnnotationStore } from '../../stores/annotationStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useVaultStore } from '../../stores/vaultStore';
-import { AnnotationOverlay } from '../Annotation/AnnotationOverlay';
 import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
 import { EditorToolbar } from './EditorToolbar';
 import { NoteTagChips } from './NoteTagChips';
 
+// Fabric.js (~330 kB min) is only needed when the user actually opens an
+// annotation overlay, so split it into its own chunk and load on demand.
+const AnnotationOverlay = lazy(() =>
+  import('../Annotation/AnnotationOverlay').then((m) => ({ default: m.AnnotationOverlay })),
+);
+
 export function Editor({
   notePath: notePathProp,
   readOnly = false,
-}: { notePath?: string | null; readOnly?: boolean } = {}) {
+}: {
+  notePath?: string | null;
+  readOnly?: boolean;
+} = {}) {
   const globalActivePath = useVaultStore((s) => s.activeNotePath);
   const activeNotePath = notePathProp !== undefined ? notePathProp : globalActivePath;
   const lectureModeActive = useEditorStore((s) => s.lectureModeActive);
@@ -33,13 +42,7 @@ export function Editor({
       },
       handleKeyDown: (_view, event) => {
         // In lecture mode, auto-insert timestamp on Enter (new paragraph)
-        if (
-          !readOnly &&
-          lectureModeActive &&
-          lectureModeStartedAt &&
-          event.key === 'Enter' &&
-          !event.shiftKey
-        ) {
+        if (!readOnly && lectureModeActive && lectureModeStartedAt && event.key === 'Enter' && !event.shiftKey) {
           // Let TipTap handle Enter first, then insert timestamp
           setTimeout(() => {
             if (!editor) return;
@@ -172,8 +175,23 @@ export function Editor({
       <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-editor)' }}>
         <EditorContent editor={editor} />
       </div>
-      {!readOnly && <AnnotationOverlay />}
+      {!readOnly && <AnnotationOverlayLazy />}
     </div>
+  );
+}
+
+/**
+ * Only mount the lazy-loaded `AnnotationOverlay` when the annotation overlay is
+ * actually open. This way Fabric.js stays out of the runtime cost when notes
+ * are merely being read or edited.
+ */
+function AnnotationOverlayLazy() {
+  const isOpen = useAnnotationStore((s) => s.isOpen);
+  if (!isOpen) return null;
+  return (
+    <Suspense fallback={null}>
+      <AnnotationOverlay />
+    </Suspense>
   );
 }
 

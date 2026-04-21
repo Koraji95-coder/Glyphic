@@ -1,5 +1,5 @@
-import { useVaultStore } from '../../stores/vaultStore';
 import { useTagsStore } from '../../stores/tagsStore';
+import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
 import { FileTreeItem } from './FileTreeItem';
 

@@ -130,15 +130,7 @@ function ScreenshotNodeView({ node, deleteNode, editor }: ReactNodeViewProps) {
   );
 }
 
-function ToolbarBtn({
-  children,
-  label,
-  onClick,
-}: {
-  children: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
+function ToolbarBtn({ children, label, onClick }: { children: React.ReactNode; label: string; onClick: () => void }) {
   return (
     <button
       type="button"

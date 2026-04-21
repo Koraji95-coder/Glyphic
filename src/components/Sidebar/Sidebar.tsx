@@ -119,7 +119,11 @@ export function Sidebar() {
           gap: '4px',
         }}
       >
-        <FooterButton icon={<Settings size={12} />} label="Settings" onClick={() => useSettingsUiStore.getState().open('general')} />
+        <FooterButton
+          icon={<Settings size={12} />}
+          label="Settings"
+          onClick={() => useSettingsUiStore.getState().open('general')}
+        />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" />
         <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
       </div>

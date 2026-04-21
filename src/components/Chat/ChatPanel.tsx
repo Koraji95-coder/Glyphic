@@ -1,8 +1,8 @@
 import { ArrowLeft, Send, Settings, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
+import { useSettingsUiStore } from '../../stores/settingsUiStore';
 
 export function ChatPanel() {
   const {

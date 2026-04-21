@@ -11,27 +11,27 @@ import { Editor } from './Editor';
  * editor remains the single writer to disk to avoid save-race complexity.
  */
 export function EditorPaneGroup() {
-  const { secondaryNotePath, direction, primarySize, setPrimarySize, closeSplit, setSecondaryNote } =
-    useSplitStore();
+  const { secondaryNotePath, direction, primarySize, setPrimarySize, closeSplit, setSecondaryNote } = useSplitStore();
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const containerRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
 
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isResizing.current = true;
-    document.body.style.cursor = direction === 'vertical' ? 'col-resize' : 'row-resize';
-    document.body.style.userSelect = 'none';
-  }, [direction]);
+  const onMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      isResizing.current = true;
+      document.body.style.cursor = direction === 'vertical' ? 'col-resize' : 'row-resize';
+      document.body.style.userSelect = 'none';
+    },
+    [direction],
+  );
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!isResizing.current || !containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const fraction =
-        direction === 'vertical'
-          ? (e.clientX - rect.left) / rect.width
-          : (e.clientY - rect.top) / rect.height;
+        direction === 'vertical' ? (e.clientX - rect.left) / rect.width : (e.clientY - rect.top) / rect.height;
       setPrimarySize(fraction);
     };
     const onUp = () => {

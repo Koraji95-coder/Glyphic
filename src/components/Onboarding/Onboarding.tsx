@@ -118,21 +118,17 @@ export function Onboarding() {
                 <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
                   Welcome to Glyphic
                 </h2>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-tertiary)' }}>
-                  Let's set up your vault.
-                </p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-tertiary)' }}>Let's set up your vault.</p>
               </div>
             </div>
 
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Your vault is the folder where Glyphic stores notes, screenshots, and settings.
-              You can change this later in Settings → General.
+              Your vault is the folder where Glyphic stores notes, screenshots, and settings. You can change this later
+              in Settings → General.
             </p>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Vault location
-              </span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>Vault location</span>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <input
                   type="text"

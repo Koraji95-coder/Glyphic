@@ -1,17 +1,25 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { CaptureOverlay } from './components/Capture/CaptureOverlay';
 import { ChatPanel } from './components/Chat/ChatPanel';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { ShortcutHelp } from './components/Help/ShortcutHelp';
 import { StatusBar } from './components/Layout/StatusBar';
+import { TitleBar } from './components/Layout/TitleBar';
 import { Lightbox } from './components/Lightbox/Lightbox';
 import { Onboarding } from './components/Onboarding/Onboarding';
-import { SettingsModal } from './components/Settings/SettingsModal';
-import { TitleBar } from './components/Layout/TitleBar';
-import { PrintPreview } from './components/PrintPreview/PrintPreview';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
+import { SettingsModal } from './components/Settings/SettingsModal';
 import { Sidebar } from './components/Sidebar/Sidebar';
+
+// Aux routes that only run inside their own webview windows are lazy-loaded
+// so they don't bloat the main bundle.
+const CaptureOverlay = lazy(() =>
+  import('./components/Capture/CaptureOverlay').then((m) => ({ default: m.CaptureOverlay })),
+);
+const PrintPreview = lazy(() =>
+  import('./components/PrintPreview/PrintPreview').then((m) => ({ default: m.PrintPreview })),
+);
+
 import { useTheme } from './hooks/useTheme';
 import { useVault } from './hooks/useVault';
 import { commands } from './lib/tauri/commands';
@@ -189,10 +197,12 @@ export default function App() {
   }, [settings?.appearance?.theme, applyTheme]);
 
   return (
-    <Routes>
-      <Route path="/" element={<MainLayout />} />
-      <Route path="/capture" element={<CaptureOverlay />} />
-      <Route path="/print-preview" element={<PrintPreview />} />
-    </Routes>
+    <Suspense fallback={null}>
+      <Routes>
+        <Route path="/" element={<MainLayout />} />
+        <Route path="/capture" element={<CaptureOverlay />} />
+        <Route path="/print-preview" element={<PrintPreview />} />
+      </Routes>
+    </Suspense>
   );
 }

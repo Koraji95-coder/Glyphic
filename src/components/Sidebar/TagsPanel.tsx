@@ -39,9 +39,7 @@ export function TagsPanel() {
       >
         {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
         <span>Tags</span>
-        {tags.length > 0 && (
-          <span style={{ marginLeft: 'auto', color: 'var(--text-ghost)' }}>{tags.length}</span>
-        )}
+        {tags.length > 0 && <span style={{ marginLeft: 'auto', color: 'var(--text-ghost)' }}>{tags.length}</span>}
       </button>
 
       {expanded && (
@@ -68,9 +66,7 @@ export function TagsPanel() {
             </button>
           )}
           {tags.length === 0 && !isLoading && (
-            <span style={{ fontSize: '10px', color: 'var(--text-ghost)', padding: '2px 4px' }}>
-              No tags yet
-            </span>
+            <span style={{ fontSize: '10px', color: 'var(--text-ghost)', padding: '2px 4px' }}>No tags yet</span>
           )}
           {tags.map((t) => {
             const active = selectedTag === t.name;
