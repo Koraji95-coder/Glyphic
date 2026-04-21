@@ -107,11 +107,9 @@ pub fn save_note(
     if let Ok(conn) = db_state.0.lock() {
         let now = chrono::Utc::now().to_rfc3339();
         let id = uuid::Uuid::new_v4().to_string();
-        let title = Path::new(&note_path)
-            .file_stem()
-            .map(|s| s.to_string_lossy().to_string())
-            .unwrap_or_else(|| "Untitled".to_string());
-        let _ = index::index_note(&conn, &id, &note_path, &title, &content, "", &now, &now);
+        let title = index::extract_title(&content, Path::new(&note_path));
+        let tags = index::extract_tags(&content);
+        let _ = index::index_note(&conn, &id, &note_path, &title, &content, &tags, &now, &now);
     }
     Ok(())
 }

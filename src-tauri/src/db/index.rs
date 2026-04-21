@@ -119,7 +119,7 @@ pub fn reindex_vault(conn: &Connection, vault_path: &str) -> Result<usize, Strin
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn extract_title(content: &str, path: &Path) -> String {
+pub fn extract_title(content: &str, path: &Path) -> String {
     // Try to get title from YAML frontmatter
     if content.starts_with("---") {
         for line in content.lines().skip(1) {
@@ -137,7 +137,7 @@ fn extract_title(content: &str, path: &Path) -> String {
         .unwrap_or_else(|| "Untitled".to_string())
 }
 
-fn extract_tags(content: &str) -> String {
+pub fn extract_tags(content: &str) -> String {
     if content.starts_with("---") {
         for line in content.lines().skip(1) {
             if line.starts_with("---") {

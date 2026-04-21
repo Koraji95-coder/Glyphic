@@ -139,7 +139,12 @@ export function InkCanvas({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      <svg width={width} height={height} style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
+      <svg
+        width={width}
+        height={height}
+        aria-hidden="true"
+        style={{ position: 'absolute', inset: 0, overflow: 'visible' }}
+      >
         {/* Committed strokes */}
         {strokes.map((stroke) => (
           <path

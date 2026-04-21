@@ -42,7 +42,7 @@ export function WindowSelector() {
     <div className="absolute inset-0 z-10" style={{ cursor: 'pointer' }}>
       {windows.map((win, i) => (
         <div
-          key={`window-${i}`}
+          key={`${win.x}-${win.y}-${win.width}-${win.height}`}
           className="absolute transition-all duration-75"
           style={{
             left: win.x,
