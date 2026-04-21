@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { ChatPanel } from './components/Chat/ChatPanel';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { ShortcutHelp } from './components/Help/ShortcutHelp';
+import { OcrBanner } from './components/Layout/OcrBanner';
 import { StatusBar } from './components/Layout/StatusBar';
 import { TitleBar } from './components/Layout/TitleBar';
 import { Lightbox } from './components/Lightbox/Lightbox';
@@ -81,6 +82,7 @@ function MainLayout() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-app)' }}>
       <TitleBar />
+      <OcrBanner />
       <div className="flex flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 flex min-w-0 overflow-hidden">

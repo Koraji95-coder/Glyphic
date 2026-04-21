@@ -58,6 +58,7 @@ pub fn run() {
             capture_commands::repeat_last_capture,
             capture_commands::get_window_list,
             capture_commands::reocr_vault,
+            capture_commands::ocr_available,
             // vault
             vault_commands::create_vault,
             vault_commands::open_vault,

@@ -301,6 +301,12 @@ pub fn reocr_vault(
     Ok((processed, skipped))
 }
 
+/// Returns `true` if the tesseract CLI is available on PATH.
+#[tauri::command]
+pub fn ocr_available() -> bool {
+    crate::ocr::is_available()
+}
+
 /// Run OCR on a freshly-captured image and insert/update a `screenshots`
 /// row so vault search picks it up. Logs and swallows errors — capture
 /// itself must always succeed even if OCR or the DB is unhappy.
