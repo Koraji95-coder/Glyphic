@@ -21,11 +21,11 @@ export function useGlobalShortcuts() {
         if (cancelled) break;
         try {
           await register(key, handler);
+          // Track first so cleanup can unregister it regardless of timing.
+          registered.push(key);
+          // If cleanup ran while we were awaiting, unregister immediately.
           if (cancelled) {
-            // Cleanup already ran — unregister the shortcut we just registered.
             unregister(key).catch(() => {});
-          } else {
-            registered.push(key);
           }
         } catch (e) {
           // Non-fatal: the OS may have the combo bound to something else,
