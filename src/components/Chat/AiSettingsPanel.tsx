@@ -2,6 +2,7 @@ import { Check, Loader2, Wifi, WifiOff, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
+import { useVaultStore } from '../../stores/vaultStore';
 import type { AiConfig } from '../../types/ai';
 
 interface AiSettingsPanelProps {
@@ -12,6 +13,7 @@ interface AiSettingsPanelProps {
 
 export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelProps) {
   const { isConnected, checkConnection, updateConfig } = useChatStore();
+  const vaultPath = useVaultStore((s) => s.vaultPath);
 
   const [config, setConfig] = useState<AiConfig>({
     provider: 'ollama',
@@ -45,7 +47,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateConfig(config);
+      await updateConfig(vaultPath ?? '', config);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch {

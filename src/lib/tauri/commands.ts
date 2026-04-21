@@ -80,5 +80,5 @@ export const commands = {
   aiExplainScreenshot: (text: string) => invoke<string>('ai_explain_screenshot', { text }),
   aiCheckConnection: () => invoke<boolean>('ai_check_connection'),
   aiGetConfig: () => invoke<AiConfig>('ai_get_config'),
-  aiUpdateConfig: (config: AiConfig) => invoke<void>('ai_update_config', { config }),
+  aiUpdateConfig: (vaultPath: string, config: AiConfig) => invoke<void>('ai_update_config', { vaultPath, config }),
 };
