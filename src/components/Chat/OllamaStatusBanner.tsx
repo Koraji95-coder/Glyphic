@@ -13,9 +13,10 @@ export function OllamaStatusBanner() {
     setChecking(true);
     try {
       const cfg = await commands.aiGetConfig();
-      setProvider(cfg.provider ?? '');
+      const providerLower = (cfg.provider ?? '').toLowerCase();
+      setProvider(providerLower);
       // Only probe connectivity when on Ollama.
-      if ((cfg.provider ?? '') === 'ollama') {
+      if (providerLower === 'ollama') {
         const ok = await commands.aiCheckConnection();
         setConnected(ok);
       } else {
