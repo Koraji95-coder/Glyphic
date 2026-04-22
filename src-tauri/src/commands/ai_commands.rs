@@ -4,7 +4,9 @@ use tauri::State;
 
 use crate::ai::config::AiConfig;
 use crate::ai::mcp_server;
+use crate::ai::ollama::{ChatStreamChunkPayload, ChatStreamOutcome};
 use crate::ai::provider::{ChatMessage, ScribeAiProvider};
+use crate::ActiveStreams;
 use crate::DbState;
 
 // Maximum number of tool-calling iterations per chat message to prevent loops.
@@ -305,6 +307,250 @@ pub async fn pull_model(
         cfg.ollama.endpoint.clone()
     };
     crate::ai::ollama::pull_model_stream(&app, &model, &endpoint, &state.client).await
+}
+
+// ---------------------------------------------------------------------------
+// Streaming chat commands
+// ---------------------------------------------------------------------------
+
+/// Payload for the `chat-stream-done` / `chat-stream-cancelled` Tauri events.
+#[derive(Clone, serde::Serialize)]
+struct ChatStreamEndPayload {
+    stream_id: String,
+}
+
+/// Cancel an in-flight streaming chat by its `stream_id`.
+///
+/// Safe to call even after the stream has already finished — in that case the
+/// id is no longer in the map and the call is a no-op.
+#[tauri::command]
+pub async fn cancel_chat(app: tauri::AppHandle, stream_id: String) -> Result<(), String> {
+    let mut map = app.state::<ActiveStreams>().0.lock().await;
+    if let Some(tx) = map.remove(&stream_id) {
+        let _ = tx.send(());
+    }
+    Ok(())
+}
+
+/// Start a streaming chat request.
+///
+/// The command registers a cancellation token keyed by `stream_id`, then runs
+/// the same MCP tool-calling loop as [`ai_chat`].  For Ollama, each iteration
+/// uses the streaming `/api/chat` endpoint and emits `chat-stream-chunk` Tauri
+/// events as tokens arrive.  Responses that start with `{` are buffered
+/// silently (tool-call detection); everything else is forwarded to the
+/// frontend immediately.
+///
+/// Terminal events:
+/// - `chat-stream-done`      — full response delivered, partial text preserved.
+/// - `chat-stream-cancelled` — user cancelled; partial text preserved.
+///
+/// For OpenAI the command falls back to a single non-streaming call and emits
+/// the entire reply as one `chat-stream-chunk` followed by `chat-stream-done`.
+#[tauri::command]
+pub async fn ai_chat_stream(
+    app: tauri::AppHandle,
+    stream_id: String,
+    message: String,
+    note_context: Option<String>,
+    state: State<'_, AiState>,
+    db_state: State<'_, DbState>,
+    active_streams: State<'_, ActiveStreams>,
+) -> Result<(), String> {
+    // Register cancellation channel.
+    let (cancel_tx, mut cancel_rx) = tokio::sync::oneshot::channel::<()>();
+    {
+        let mut map = active_streams.0.lock().await;
+        map.insert(stream_id.clone(), cancel_tx);
+    }
+
+    let provider = state.provider();
+    let model = {
+        let config = state.config.lock().unwrap();
+        config.model_routing.chat.clone()
+    };
+
+    // Build the tool-aware system prompt (same logic as ai_chat).
+    let tools = mcp_server::available_tools();
+    let tool_prompt = mcp_server::format_tools_for_prompt(&tools);
+
+    let system_prompt = {
+        let mut system = SYSTEM_CHAT.to_string();
+        system.push_str("\n\n");
+        system.push_str(&tool_prompt);
+
+        if let Ok(conn) = db_state.0.lock() {
+            let search_query = note_context.as_deref().unwrap_or(&message);
+            if let Some(ctx) = mcp_server::gather_context(&conn, search_query) {
+                system.push_str("\n\n");
+                system.push_str(&ctx);
+            }
+        }
+
+        if let Some(ctx) = &note_context {
+            if !ctx.is_empty() {
+                system.push_str("\n\nCurrent note context:\n");
+                system.push_str(ctx);
+            }
+        }
+
+        system
+    };
+
+    let mut messages = vec![ChatMessage {
+        role: "user".into(),
+        content: message,
+    }];
+
+    // MCP tool loop — mirrors ai_chat but uses streaming for the final response.
+    let outcome = 'tool_loop: {
+        for _ in 0..MAX_TOOL_ITERATIONS {
+            let stream_outcome = match &provider {
+                ScribeAiProvider::Ollama(p) => {
+                    p.chat_stream(
+                        &app,
+                        &stream_id,
+                        messages.clone(),
+                        Some(system_prompt.clone()),
+                        Some(model.clone()),
+                        &mut cancel_rx,
+                    )
+                    .await?
+                }
+
+                // For non-Ollama providers fall back to a non-streaming call and
+                // emit the whole reply as a single chunk.
+                ScribeAiProvider::OpenAi(_) => {
+                    let reply = provider
+                        .chat(messages.clone(), Some(system_prompt.clone()), Some(model.clone()))
+                        .await?;
+                    let _ = app.emit(
+                        "chat-stream-chunk",
+                        ChatStreamChunkPayload {
+                            stream_id: stream_id.clone(),
+                            content: reply.clone(),
+                        },
+                    );
+                    ChatStreamOutcome::Complete { accumulated: reply }
+                }
+            };
+
+            match stream_outcome {
+                ChatStreamOutcome::Cancelled { .. } => {
+                    let _ = app.emit(
+                        "chat-stream-cancelled",
+                        ChatStreamEndPayload { stream_id: stream_id.clone() },
+                    );
+                    break 'tool_loop Ok(());
+                }
+
+                ChatStreamOutcome::Complete { accumulated } => {
+                    if let Some(tool_call) = mcp_server::parse_tool_call(&accumulated) {
+                        // The response was a tool call — handle it and loop.
+                        let tool_result = if let Ok(conn) = db_state.0.lock() {
+                            mcp_server::execute_tool(&conn, &tool_call)
+                        } else {
+                            crate::ai::mcp_protocol::McpToolResult {
+                                tool_name: tool_call.name.clone(),
+                                success: false,
+                                content: "Database unavailable".into(),
+                            }
+                        };
+
+                        messages.push(ChatMessage {
+                            role: "assistant".into(),
+                            content: accumulated,
+                        });
+                        messages.push(ChatMessage {
+                            role: "user".into(),
+                            content: format!(
+                                "Tool result for `{}`:\n{}",
+                                tool_result.tool_name, tool_result.content
+                            ),
+                        });
+                        // Continue the tool loop.
+                    } else {
+                        // Not a tool call — this is the final user-visible
+                        // response.  If the content was buffered (starts with
+                        // `{` but is not a tool call), emit it now as a single
+                        // chunk so the frontend always receives something.
+                        if accumulated.trim().starts_with('{') {
+                            let _ = app.emit(
+                                "chat-stream-chunk",
+                                ChatStreamChunkPayload {
+                                    stream_id: stream_id.clone(),
+                                    content: accumulated,
+                                },
+                            );
+                        }
+                        let _ = app.emit(
+                            "chat-stream-done",
+                            ChatStreamEndPayload { stream_id: stream_id.clone() },
+                        );
+                        break 'tool_loop Ok(());
+                    }
+                }
+            }
+        }
+
+        // Exhausted tool iterations — do a final streaming call without tool hints.
+        let stream_outcome = match &provider {
+            ScribeAiProvider::Ollama(p) => {
+                p.chat_stream(
+                    &app,
+                    &stream_id,
+                    messages.clone(),
+                    Some(SYSTEM_CHAT.to_string()),
+                    Some(model.clone()),
+                    &mut cancel_rx,
+                )
+                .await?
+            }
+            ScribeAiProvider::OpenAi(_) => {
+                let reply = provider
+                    .chat(messages, Some(SYSTEM_CHAT.to_string()), Some(model))
+                    .await?;
+                let _ = app.emit(
+                    "chat-stream-chunk",
+                    ChatStreamChunkPayload {
+                        stream_id: stream_id.clone(),
+                        content: reply.clone(),
+                    },
+                );
+                ChatStreamOutcome::Complete { accumulated: reply }
+            }
+        };
+
+        match stream_outcome {
+            ChatStreamOutcome::Cancelled { .. } => {
+                let _ = app.emit(
+                    "chat-stream-cancelled",
+                    ChatStreamEndPayload { stream_id: stream_id.clone() },
+                );
+            }
+            ChatStreamOutcome::Complete { accumulated } => {
+                if accumulated.trim().starts_with('{') {
+                    let _ = app.emit(
+                        "chat-stream-chunk",
+                        ChatStreamChunkPayload {
+                            stream_id: stream_id.clone(),
+                            content: accumulated,
+                        },
+                    );
+                }
+                let _ = app.emit(
+                    "chat-stream-done",
+                    ChatStreamEndPayload { stream_id: stream_id.clone() },
+                );
+            }
+        }
+        Ok(())
+    };
+
+    // Always clean up the cancel registration.
+    active_streams.0.lock().await.remove(&stream_id);
+
+    outcome
 }
 
 // ---------------------------------------------------------------------------

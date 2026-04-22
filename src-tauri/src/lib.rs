@@ -6,6 +6,7 @@ pub mod export;
 pub mod ocr;
 pub mod vault;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -21,6 +22,12 @@ use vault::watcher::VaultWatcher;
 pub struct DbState(pub Mutex<rusqlite::Connection>);
 pub struct WatcherState(pub Mutex<Option<VaultWatcher>>);
 pub struct CaptureSessionState(pub Mutex<Option<PathBuf>>);
+
+/// Tracks in-flight streaming chat requests so they can be cancelled.
+/// Maps `stream_id → oneshot::Sender<()>`.
+pub struct ActiveStreams(
+    pub tokio::sync::Mutex<HashMap<String, tokio::sync::oneshot::Sender<()>>>,
+);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -47,6 +54,9 @@ pub fn run() {
 
             // ScribeAI state (provider config + shared HTTP client)
             app.manage(AiState::new());
+
+            // Active streaming chat requests (for Stop-button cancellation)
+            app.manage(ActiveStreams(tokio::sync::Mutex::new(HashMap::new())));
 
             Ok(())
         })
@@ -101,6 +111,8 @@ pub fn run() {
             ai_commands::ai_update_config,
             ai_commands::ai_list_models,
             ai_commands::pull_model,
+            ai_commands::ai_chat_stream,
+            ai_commands::cancel_chat,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");

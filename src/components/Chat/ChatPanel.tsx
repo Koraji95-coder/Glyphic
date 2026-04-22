@@ -1,4 +1,4 @@
-import { ArrowLeft, Send, Settings, X } from 'lucide-react';
+import { ArrowLeft, Send, Settings, Square, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
@@ -15,7 +15,9 @@ export function ChatPanel() {
     isConnected,
     model,
     activeTools,
+    currentStreamId,
     sendMessage,
+    cancelStream,
     togglePanel,
     clearChat,
     checkConnection,
@@ -43,6 +45,13 @@ export function ChatPanel() {
     }
   }, [isOpen, fetchConfig, checkConnection]);
 
+  // Cancel any in-flight stream when the panel closes (navigate away).
+  useEffect(() => {
+    if (!isOpen && currentStreamId) {
+      cancelStream();
+    }
+  }, [isOpen, currentStreamId, cancelStream]);
+
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || isLoading) return;
@@ -55,6 +64,11 @@ export function ChatPanel() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+    // Escape cancels an in-flight stream while focus is in the textarea.
+    if (e.key === 'Escape' && isLoading) {
+      e.preventDefault();
+      cancelStream();
     }
   };
 
@@ -293,51 +307,53 @@ export function ChatPanel() {
                 ))}
               </div>
             )}
-            {/* Typing dots */}
-            <div className="flex items-center" style={{ gap: '8px' }}>
-              <div
-                className="flex items-center"
-                style={{
-                  gap: '3px',
-                  padding: '8px 12px',
-                  backgroundColor: 'var(--bg-elevated)',
-                  borderRadius: '12px',
-                  borderBottomLeftRadius: '4px',
-                }}
-              >
-                <span
-                  className="typing-dot"
+            {/* Only show typing dots while no streamed content has arrived yet */}
+            {(messages.length === 0 || messages[messages.length - 1].content === '') && (
+              <div className="flex items-center" style={{ gap: '8px' }}>
+                <div
+                  className="flex items-center"
                   style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--accent)',
-                    display: 'inline-block',
+                    gap: '3px',
+                    padding: '8px 12px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    borderRadius: '12px',
+                    borderBottomLeftRadius: '4px',
                   }}
-                />
-                <span
-                  className="typing-dot"
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--accent)',
-                    display: 'inline-block',
-                  }}
-                />
-                <span
-                  className="typing-dot"
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--accent)',
-                    display: 'inline-block',
-                  }}
-                />
+                >
+                  <span
+                    className="typing-dot"
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--accent)',
+                      display: 'inline-block',
+                    }}
+                  />
+                  <span
+                    className="typing-dot"
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--accent)',
+                      display: 'inline-block',
+                    }}
+                  />
+                  <span
+                    className="typing-dot"
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--accent)',
+                      display: 'inline-block',
+                    }}
+                  />
+                </div>
+                <span style={{ fontSize: '10px', color: 'var(--text-ghost)', fontStyle: 'italic' }}>thinking…</span>
               </div>
-              <span style={{ fontSize: '10px', color: 'var(--text-ghost)', fontStyle: 'italic' }}>thinking…</span>
-            </div>
+            )}
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -457,26 +473,50 @@ export function ChatPanel() {
               t.style.height = `${Math.min(t.scrollHeight, 100)}px`;
             }}
           />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            className="shrink-0"
-            style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '7px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: 'none',
-              cursor: 'pointer',
-              background: input.trim() && !isLoading ? 'var(--accent-gradient)' : 'var(--bg-elevated)',
-              color: input.trim() && !isLoading ? '#fff' : 'var(--text-ghost)',
-              transition: 'all 0.15s',
-            }}
-          >
-            <Send size={12} />
-          </button>
+          {isLoading ? (
+            /* Stop button — visible while a stream is in flight */
+            <button
+              onClick={cancelStream}
+              title="Stop generation (Esc)"
+              className="shrink-0"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '7px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                cursor: 'pointer',
+                background: 'var(--red, #e05252)',
+                color: '#fff',
+                transition: 'all 0.15s',
+              }}
+            >
+              <Square size={11} fill="currentColor" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSend}
+              disabled={!input.trim()}
+              className="shrink-0"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '7px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                cursor: 'pointer',
+                background: input.trim() ? 'var(--accent-gradient)' : 'var(--bg-elevated)',
+                color: input.trim() ? '#fff' : 'var(--text-ghost)',
+                transition: 'all 0.15s',
+              }}
+            >
+              <Send size={12} />
+            </button>
+          )}
         </div>
         <div
           className="flex justify-between"
@@ -509,6 +549,24 @@ export function ChatPanel() {
               Shift+Enter
             </kbd>{' '}
             newline
+            {isLoading && (
+              <>
+                {' · '}
+                <kbd
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '8px',
+                    padding: '0 3px',
+                    borderRadius: '2px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  Esc
+                </kbd>{' '}
+                stop
+              </>
+            )}
           </span>
           <span>⌘⇧A</span>
         </div>
