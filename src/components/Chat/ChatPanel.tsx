@@ -5,6 +5,7 @@ import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
+import { OllamaStatusBanner } from './OllamaStatusBanner';
 
 export function ChatPanel() {
   const {
@@ -176,6 +177,8 @@ export function ChatPanel() {
           </button>
         </div>
       </div>
+
+      <OllamaStatusBanner />
 
       {/* Context chips */}
       <div className="flex shrink-0" style={{ gap: '3px', padding: '6px 14px' }}>
