@@ -1,9 +1,16 @@
-import { Check, Loader2, Wifi, WifiOff, X } from 'lucide-react';
+import { Check, Loader2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { AiConfig } from '../../types/ai';
+
+type TestResult =
+  | { kind: 'idle' }
+  | { kind: 'testing' }
+  | { kind: 'ok'; models: string[] }
+  | { kind: 'connected_no_listing' }
+  | { kind: 'fail'; error: string };
 
 interface AiSettingsPanelProps {
   onClose: () => void;
@@ -12,7 +19,7 @@ interface AiSettingsPanelProps {
 }
 
 export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelProps) {
-  const { isConnected, checkConnection, updateConfig } = useChatStore();
+  const { updateConfig } = useChatStore();
   const vaultPath = useVaultStore((s) => s.vaultPath);
 
   const [config, setConfig] = useState<AiConfig>({
@@ -28,7 +35,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
     },
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<TestResult>({ kind: 'idle' });
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
@@ -38,10 +45,31 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       .catch(() => {});
   }, []);
 
-  const handleTestConnection = async () => {
-    setIsTesting(true);
-    await checkConnection();
-    setIsTesting(false);
+  const runTest = async () => {
+    setTestResult({ kind: 'testing' });
+    try {
+      const ok = await commands.aiCheckConnection();
+      if (!ok) {
+        setTestResult({ kind: 'fail', error: 'Connection check returned false.' });
+        return;
+      }
+      const listModels = (commands as { aiListModels?: () => Promise<string[]> }).aiListModels;
+      if (typeof listModels === 'function') {
+        try {
+          const models = await listModels();
+          setTestResult({ kind: 'ok', models });
+        } catch (e) {
+          setTestResult({
+            kind: 'fail',
+            error: `Connected but failed to list models: ${e instanceof Error ? e.message : String(e)}`,
+          });
+        }
+      } else {
+        setTestResult({ kind: 'connected_no_listing' });
+      }
+    } catch (e) {
+      setTestResult({ kind: 'fail', error: e instanceof Error ? e.message : String(e) });
+    }
   };
 
   const handleSave = async () => {
@@ -340,35 +368,53 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           ))}
         </div>
 
-        {/* Connection status */}
+        {/* Test connection */}
         <div
-          className="flex items-center gap-2 px-3 py-2 rounded"
+          className="flex flex-col gap-2"
           style={{
+            padding: '12px',
             backgroundColor: 'var(--bg-elevated)',
+            borderRadius: '8px',
             border: '1px solid var(--border-subtle)',
           }}
         >
-          {isConnected === true && <Wifi size={13} style={{ color: 'var(--color-green, #4ade80)' }} />}
-          {isConnected === false && <WifiOff size={13} style={{ color: 'var(--color-red, #f87171)' }} />}
-          {isConnected === null && <Wifi size={13} style={{ color: 'var(--text-ghost)' }} />}
-          <span className="text-xs flex-1" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
-            {isConnected === true ? 'Connected' : isConnected === false ? 'Not connected' : 'Not tested'}
-          </span>
           <button
-            onClick={handleTestConnection}
-            disabled={isTesting}
-            className="text-xs px-2 py-1 rounded flex items-center gap-1"
+            type="button"
+            onClick={runTest}
+            disabled={testResult.kind === 'testing'}
+            title="Tests the currently-saved configuration. Save first to test new values."
+            className="text-xs px-3 py-1.5 rounded flex items-center gap-1 self-start"
             style={{
               backgroundColor: 'var(--bg-input)',
               border: '1px solid var(--border)',
               color: 'var(--text-secondary)',
               fontFamily: 'var(--font-body)',
-              cursor: isTesting ? 'not-allowed' : 'pointer',
+              cursor: testResult.kind === 'testing' ? 'not-allowed' : 'pointer',
             }}
           >
-            {isTesting ? <Loader2 size={11} className="animate-spin" /> : null}
-            Test
+            {testResult.kind === 'testing' ? <Loader2 size={11} className="animate-spin" /> : null}
+            {testResult.kind === 'testing' ? 'Testing…' : 'Test connection'}
           </button>
+
+          {testResult.kind === 'ok' && (
+            <span className="text-xs" style={{ color: 'var(--success-fg, #5ec49e)', fontFamily: 'var(--font-body)' }}>
+              ✓ Connected — {testResult.models.length} model{testResult.models.length === 1 ? '' : 's'}
+              {testResult.models.length > 0 &&
+                `: ${testResult.models.slice(0, 5).join(', ')}${testResult.models.length > 5 ? `, +${testResult.models.length - 5} more` : ''}`}
+            </span>
+          )}
+
+          {testResult.kind === 'connected_no_listing' && (
+            <span className="text-xs" style={{ color: 'var(--success-fg, #5ec49e)', fontFamily: 'var(--font-body)' }}>
+              ✓ Connected
+            </span>
+          )}
+
+          {testResult.kind === 'fail' && (
+            <span className="text-xs" style={{ color: 'var(--error-fg, #e07070)', fontFamily: 'var(--font-body)' }}>
+              ✗ Failed: {testResult.error}
+            </span>
+          )}
         </div>
       </div>
 
