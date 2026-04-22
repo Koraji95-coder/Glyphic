@@ -1,6 +1,8 @@
-import { HelpCircle, Settings, Trash2 } from 'lucide-react';
+import { HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ReviewSession } from '../Flashcards/ReviewSession';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
@@ -14,6 +16,7 @@ export function Sidebar() {
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
   const { isSidebarOpen, closeSidebar } = useLayoutStore();
+  const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
 
@@ -125,8 +128,10 @@ export function Sidebar() {
           onClick={() => useSettingsUiStore.getState().open('general')}
         />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" />
+        <FooterButton icon={<LayoutList size={12} />} label="Review" onClick={openReview} />
         <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
       </div>
+      <ReviewSession />
     </>
   );
 
