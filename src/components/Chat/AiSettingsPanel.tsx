@@ -41,6 +41,8 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const [loadingModels, setLoadingModels] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
 
+  const isOllama = (config.provider ?? '').toLowerCase() === 'ollama';
+
   const refreshModels = useCallback(async () => {
     setLoadingModels(true);
     setModelsError(null);
@@ -63,7 +65,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   }, []);
 
   useEffect(() => {
-    if (config.provider === 'ollama') {
+    if (isOllama) {
       void refreshModels();
     }
   }, [config.provider, refreshModels]);
@@ -222,7 +224,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
         </div>
 
         {/* Ollama config */}
-        {config.provider === 'ollama' && (
+        {isOllama && (
           <div style={sectionStyle}>
             <span
               style={{
@@ -360,7 +362,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
             >
               Model Routing
             </span>
-            {config.provider === 'ollama' && (
+            {isOllama && (
               <button
                 onClick={() => void refreshModels()}
                 disabled={loadingModels}
@@ -378,7 +380,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               </button>
             )}
           </div>
-          {config.provider === 'ollama' && modelsError && (
+          {isOllama && modelsError && (
             <span
               style={{
                 color: 'var(--color-red, #f87171)',
@@ -389,7 +391,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               {modelsError}
             </span>
           )}
-          {config.provider === 'ollama' && !modelsError && models.length === 0 && !loadingModels && (
+          {isOllama && !modelsError && models.length === 0 && !loadingModels && (
             <span
               style={{
                 color: 'var(--text-secondary)',
@@ -413,7 +415,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               <label htmlFor={`model-routing-${key}`} style={labelStyle}>
                 {label}
               </label>
-              {config.provider === 'ollama' ? (
+              {isOllama ? (
                 <select
                   id={`model-routing-${key}`}
                   value={config.model_routing[key]}
