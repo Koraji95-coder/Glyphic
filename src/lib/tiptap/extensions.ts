@@ -1,4 +1,3 @@
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
 import Mathematics from '@tiptap/extension-mathematics';
@@ -6,12 +5,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import StarterKit from '@tiptap/starter-kit';
-import { common, createLowlight } from 'lowlight';
+import { MermaidCodeBlock } from './MermaidExtension';
 import { ScreenshotNode } from './screenshotNode';
 import { SlashCommandExtension } from './slashCommand';
 import { TimestampNode } from './timestampNode';
-
-const lowlight = createLowlight(common);
 
 export function getEditorExtensions() {
   return [
@@ -28,9 +25,7 @@ export function getEditorExtensions() {
     Placeholder.configure({
       placeholder: 'Start typing, or press / for commands...',
     }),
-    CodeBlockLowlight.configure({
-      lowlight,
-    }),
+    MermaidCodeBlock,
     TaskList,
     TaskItem.configure({ nested: true }),
     Link.configure({ openOnClick: false }),

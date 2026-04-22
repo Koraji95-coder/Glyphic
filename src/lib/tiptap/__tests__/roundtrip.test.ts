@@ -108,6 +108,12 @@ describe('markdown serializer/parser roundtrip', () => {
     expect(roundtrip(input).trim()).toBe(input.trim());
   });
 
+  // 12b. Mermaid fenced code block round-trips
+  it('mermaid fenced code block round-trips', () => {
+    const input = '```mermaid\ngraph TD\n  A-->B\n```';
+    expect(roundtrip(input).trim()).toBe(input.trim());
+  });
+
   // 13. Blockquote containing a list (skip: parser emits one blockquote per line)
   it.skip('blockquote containing a list round-trips', () => {
     // TODO(P4.2-followup): The parser handles blockquote line-by-line, emitting
