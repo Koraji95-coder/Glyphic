@@ -224,6 +224,42 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/**
+ * Upsert a scalar string field in a raw frontmatter block (including the
+ * surrounding `---` fences). If the key already exists its value is replaced.
+ * If `value` is `null` the key line is removed. Returns the updated frontmatter
+ * string unchanged when no frontmatter fences are present.
+ */
+export function upsertFrontmatterField(frontmatter: string, key: string, value: string | null): string {
+  if (!frontmatter) return frontmatter;
+  const pattern = new RegExp(`^${key}:[^\n]*\n?`, 'm');
+  if (value === null) {
+    return frontmatter.replace(pattern, '');
+  }
+  const line = `${key}: ${value}`;
+  if (pattern.test(frontmatter)) {
+    return frontmatter.replace(new RegExp(`^${key}:[^\n]*`, 'm'), line);
+  }
+  // Insert before the closing --- fence.
+  return frontmatter.replace(/(\n---\n*)$/, `\n${line}$1`);
+}
+
+/**
+ * Compose a complete note string (frontmatter + body) refreshing the
+ * `modified:` field to the current time. If the frontmatter is empty the body
+ * is returned unchanged.
+ */
+export function composeNote({ body, frontmatter }: { body: string; frontmatter: string }): string {
+  if (!frontmatter) return body;
+  const now = new Date().toISOString();
+  const modifiedLine = `modified: "${now}"`;
+  if (/^modified:\s*"[^"]*"\s*$/m.test(frontmatter)) {
+    return frontmatter.replace(/^modified:\s*"[^"]*"\s*$/m, modifiedLine) + body;
+  }
+  const injected = frontmatter.replace(/(\n)?---(\n*)$/, `\n${modifiedLine}\n---$2`);
+  return injected + body;
+}
+
 export function extractFrontmatter(markdown: string): Record<string, unknown> | null {
   const match = markdown.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return null;

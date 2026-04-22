@@ -9,6 +9,7 @@ export interface NoteFrontmatter {
   modified: string;
   tags: string[];
   lecture_timestamps: boolean;
+  ai_model?: string;
 }
 
 export interface SearchResult {

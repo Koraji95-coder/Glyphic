@@ -73,8 +73,8 @@ export const commands = {
     invoke<void>('export_markdown', { vaultPath, notePath, outputPath }),
 
   // AI (ScribeAI)
-  aiChat: (message: string, noteContext?: string) =>
-    invoke<string>('ai_chat', { message, noteContext: noteContext ?? null }),
+  aiChat: (message: string, noteContext?: string, modelOverride?: string) =>
+    invoke<string>('ai_chat', { message, noteContext: noteContext ?? null, modelOverride: modelOverride ?? null }),
   aiSummarize: (noteContent: string) => invoke<string>('ai_summarize', { noteContent }),
   aiFlashcards: (noteContent: string) => invoke<Flashcard[]>('ai_flashcards', { noteContent }),
   aiExplain: (text: string) => invoke<string>('ai_explain', { text }),

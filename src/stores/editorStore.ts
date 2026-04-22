@@ -8,12 +8,15 @@ interface EditorState {
   wordCount: number;
   lectureModeActive: boolean;
   lectureModeStartedAt: Date | null;
+  /** The `ai_model` value from the active note's frontmatter, or null if unset. */
+  activeNoteAiModel: string | null;
   setContent: (content: string) => void;
   markDirty: () => void;
   markSaved: () => void;
   setWordCount: (count: number) => void;
   setSaving: (saving: boolean) => void;
   toggleLectureMode: () => void;
+  setActiveNoteAiModel: (model: string | null) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -24,6 +27,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   wordCount: 0,
   lectureModeActive: false,
   lectureModeStartedAt: null,
+  activeNoteAiModel: null,
 
   setContent: (content) => set({ content }),
   markDirty: () => set({ isDirty: true }),
@@ -35,4 +39,5 @@ export const useEditorStore = create<EditorState>((set) => ({
       lectureModeActive: !state.lectureModeActive,
       lectureModeStartedAt: !state.lectureModeActive ? new Date() : null,
     })),
+  setActiveNoteAiModel: (model) => set({ activeNoteAiModel: model }),
 }));

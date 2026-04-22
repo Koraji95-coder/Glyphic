@@ -1,4 +1,4 @@
-import { ArrowLeft, Send, Settings, X } from 'lucide-react';
+import { ArrowLeft, Pin, PinOff, Send, Settings, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
@@ -22,14 +22,23 @@ export function ChatPanel() {
     fetchConfig,
     includeNoteContext,
     setIncludeNoteContext,
+    pinModelToNote,
   } = useChatStore();
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const noteContent = useEditorStore((s) => s.content);
+  const activeNoteAiModel = useEditorStore((s) => s.activeNoteAiModel);
   const activeNoteTitle = activeNotePath ? (activeNotePath.split('/').pop()?.replace(/\.md$/, '') ?? null) : null;
   const [input, setInput] = useState('');
+  const [showPinMenu, setShowPinMenu] = useState(false);
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const pinMenuRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  // Effective model: per-note override takes precedence over the global default.
+  const effectiveModel = activeNoteAiModel ?? model;
+  const modelSource: 'note' | 'vault' = activeNoteAiModel ? 'note' : 'vault';
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,13 +52,46 @@ export function ChatPanel() {
     }
   }, [isOpen, fetchConfig, checkConnection]);
 
+  // Close pin menu on outside click.
+  useEffect(() => {
+    if (!showPinMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (pinMenuRef.current && !pinMenuRef.current.contains(e.target as Node)) {
+        setShowPinMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showPinMenu]);
+
+  const openPinMenu = useCallback(async () => {
+    if (!showPinMenu) {
+      try {
+        const { commands } = await import('../../lib/tauri/commands');
+        const list = await commands.aiListModels();
+        setAvailableModels(list);
+      } catch {
+        setAvailableModels([]);
+      }
+    }
+    setShowPinMenu((v) => !v);
+  }, [showPinMenu]);
+
+  const handlePinModel = useCallback(
+    async (selectedModel: string | null) => {
+      setShowPinMenu(false);
+      await pinModelToNote(selectedModel);
+    },
+    [pinModelToNote],
+  );
+
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || isLoading) return;
     setInput('');
     const ctx = includeNoteContext && activeNotePath ? noteContent : undefined;
-    await sendMessage(text, ctx);
-  }, [input, isLoading, sendMessage, includeNoteContext, activeNotePath, noteContent]);
+    await sendMessage(text, ctx, activeNoteAiModel ?? undefined);
+  }, [input, isLoading, sendMessage, includeNoteContext, activeNotePath, noteContent, activeNoteAiModel]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -74,6 +116,12 @@ export function ChatPanel() {
         height: '100%',
       }
     : {};
+
+  // Decide which models to show in the pin dropdown. Always include current
+  // pinned model (if any) and current global default so the list isn't empty.
+  const pinMenuModels = Array.from(
+    new Set([...availableModels, ...(activeNoteAiModel ? [activeNoteAiModel] : []), model]),
+  ).filter(Boolean);
 
   return (
     <div
@@ -115,19 +163,140 @@ export function ChatPanel() {
           <span className="text-sm font-semibold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
             ScribeAI
           </span>
-          <span
-            className="text-xs"
-            style={{
-              padding: '1px 6px',
-              borderRadius: '999px',
-              backgroundColor: 'var(--bg-input)',
-              color: 'var(--text-ghost)',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '9px',
-            }}
-          >
-            {model}
-          </span>
+          {/* Model badge — shows effective model with source hint */}
+          <div style={{ position: 'relative' }} ref={pinMenuRef}>
+            <button
+              type="button"
+              onClick={() => void openPinMenu()}
+              title={
+                modelSource === 'note'
+                  ? `Using ${effectiveModel} (pinned to note) — click to change`
+                  : `Using ${effectiveModel} (vault default) — click to pin a model to this note`
+              }
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                padding: '1px 6px',
+                borderRadius: '999px',
+                backgroundColor: modelSource === 'note' ? 'var(--accent-dim)' : 'var(--bg-input)',
+                border: `1px solid ${modelSource === 'note' ? 'var(--accent-dim)' : 'transparent'}`,
+                color: modelSource === 'note' ? 'var(--accent)' : 'var(--text-ghost)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '9px',
+                cursor: 'pointer',
+              }}
+            >
+              {modelSource === 'note' && <Pin size={8} />}
+              {effectiveModel}
+            </button>
+
+            {/* Pin model dropdown */}
+            {showPinMenu && activeNotePath && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: '4px',
+                  backgroundColor: 'var(--bg-elevated)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                  padding: '4px',
+                  zIndex: 50,
+                  minWidth: '180px',
+                  boxShadow: 'var(--shadow-glow, 0 4px 16px rgba(0,0,0,0.4))',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    padding: '4px 8px 6px',
+                    fontSize: '9px',
+                    fontFamily: 'var(--font-body)',
+                    color: 'var(--text-ghost)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  Pin model to note
+                </span>
+                {/* Clear pin option */}
+                {activeNoteAiModel && (
+                  <button
+                    type="button"
+                    onClick={() => void handlePinModel(null)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      width: '100%',
+                      padding: '5px 8px',
+                      borderRadius: '5px',
+                      fontSize: '11px',
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  >
+                    <PinOff size={11} />
+                    Use vault default ({model})
+                  </button>
+                )}
+                {/* Model list */}
+                {pinMenuModels.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => void handlePinModel(m)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      width: '100%',
+                      padding: '5px 8px',
+                      borderRadius: '5px',
+                      fontSize: '11px',
+                      fontFamily: 'var(--font-body)',
+                      color: m === activeNoteAiModel ? 'var(--accent)' : 'var(--text-primary)',
+                      backgroundColor: m === activeNoteAiModel ? 'var(--accent-dim)' : 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (m !== activeNoteAiModel) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        m === activeNoteAiModel ? 'var(--accent-dim)' : 'transparent';
+                    }}
+                  >
+                    {m === activeNoteAiModel && <Pin size={10} />}
+                    {m}
+                  </button>
+                ))}
+                {pinMenuModels.length === 0 && (
+                  <span
+                    style={{
+                      display: 'block',
+                      padding: '5px 8px',
+                      fontSize: '11px',
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--text-ghost)',
+                    }}
+                  >
+                    No models found — run <code>ollama pull</code>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
           {/* Connection indicator dot */}
           {isConnected !== null && (
             <span

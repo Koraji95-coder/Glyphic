@@ -1,6 +1,10 @@
 import { create } from 'zustand';
+import { frontmatterRegistry } from '../lib/frontmatterRegistry';
 import { commands } from '../lib/tauri/commands';
+import { composeNote, upsertFrontmatterField } from '../lib/tiptap/markdownParser';
 import type { AiConfig, ChatMessage, McpToolExecution } from '../types/ai';
+import { useEditorStore } from './editorStore';
+import { useVaultStore } from './vaultStore';
 
 // Tool name → display label mapping for the UI indicator pills.
 const TOOL_LABELS: Record<string, string> = {
@@ -18,16 +22,18 @@ interface ChatState {
   model: string;
   activeTools: McpToolExecution[];
   includeNoteContext: boolean;
-  sendMessage: (content: string, noteContext?: string) => Promise<void>;
+  sendMessage: (content: string, noteContext?: string, modelOverride?: string) => Promise<void>;
   togglePanel: () => void;
   clearChat: () => void;
   checkConnection: () => Promise<void>;
   fetchConfig: () => Promise<void>;
   updateConfig: (vaultPath: string, config: AiConfig) => Promise<void>;
   setIncludeNoteContext: (v: boolean) => void;
+  /** Write ai_model into the frontmatter of the active note and save. */
+  pinModelToNote: (model: string | null) => Promise<void>;
 }
 
-export const useChatStore = create<ChatState>((set, get) => ({
+export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   isOpen: false,
   isLoading: false,
@@ -36,7 +42,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   activeTools: [],
   includeNoteContext: true,
 
-  sendMessage: async (content: string, noteContext?: string) => {
+  sendMessage: async (content: string, noteContext?: string, modelOverride?: string) => {
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -47,7 +53,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((s) => ({ messages: [...s.messages, userMsg], isLoading: true, activeTools: [] }));
 
     try {
-      const reply = await commands.aiChat(content, noteContext);
+      const reply = await commands.aiChat(content, noteContext, modelOverride);
       const assistantMsg: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
@@ -99,6 +105,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
     await commands.aiUpdateConfig(vaultPath, config);
     const modelName = config.model_routing.chat;
     set({ model: modelName });
+  },
+
+  pinModelToNote: async (model: string | null) => {
+    const { vaultPath, activeNotePath } = useVaultStore.getState();
+    if (!vaultPath || !activeNotePath) return;
+
+    // Update frontmatter in the registry (single source of truth).
+    const currentFm = frontmatterRegistry.get(activeNotePath);
+    const updatedFm = upsertFrontmatterField(currentFm, 'ai_model', model);
+    frontmatterRegistry.set(activeNotePath, updatedFm);
+
+    // Update the in-memory model indicator immediately.
+    useEditorStore.getState().setActiveNoteAiModel(model);
+
+    // Save the note with the patched frontmatter.
+    const body = useEditorStore.getState().content;
+    await commands.saveNote(vaultPath, activeNotePath, composeNote({ body, frontmatter: updatedFm }));
   },
 }));
 
