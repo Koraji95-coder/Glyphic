@@ -35,7 +35,11 @@ export function ReviewSession() {
       if (sessionComplete || cards.length === 0) return;
       const current = cards[currentIndex];
       if (!current) return;
+      // Ignore keypresses when focus is on an interactive element (button, input, etc.)
+      const target = e.target as HTMLElement;
+      const isInteractive = target instanceof HTMLButtonElement || target instanceof HTMLInputElement;
       if (e.key === ' ') {
+        if (isInteractive) return;
         e.preventDefault();
         if (!isFlipped) flipCard();
         return;
@@ -253,14 +257,14 @@ export function ReviewSession() {
             {/* Rating buttons — only show after flip */}
             {isFlipped && (
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <RatingButton label="Again" sublabel="1 min" color="var(--red)" onClick={() => rateCard('again')} />
+                <RatingButton label="Again" sublabel="1 min · 1" color="var(--red)" onClick={() => rateCard('again')} />
                 <RatingButton
                   label="Good"
-                  sublabel="Next session"
+                  sublabel="Next session · 2"
                   color="var(--accent)"
                   onClick={() => rateCard('good')}
                 />
-                <RatingButton label="Easy" sublabel="Skip" color="var(--green)" onClick={() => rateCard('easy')} />
+                <RatingButton label="Easy" sublabel="Skip · 3" color="var(--green)" onClick={() => rateCard('easy')} />
               </div>
             )}
 

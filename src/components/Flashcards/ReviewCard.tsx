@@ -14,7 +14,7 @@ export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
       aria-label={isFlipped ? 'Card answer — click to flip back' : 'Card question — click to reveal answer'}
       onClick={onFlip}
       onKeyDown={(e) => {
-        if (e.key === ' ' || e.key === 'Enter') {
+        if (e.key === 'Enter') {
           e.preventDefault();
           onFlip();
         }
