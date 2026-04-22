@@ -91,4 +91,5 @@ export const commands = {
   aiListModels: () => invoke<string[]>('ai_list_models'),
   aiGetConfig: () => invoke<AiConfig>('ai_get_config'),
   aiUpdateConfig: (vaultPath: string, config: AiConfig) => invoke<void>('ai_update_config', { vaultPath, config }),
+  pullModel: (model: string) => invoke<void>('pull_model', { model }),
 };

@@ -110,6 +110,7 @@ pub fn run() {
             ai_commands::ai_get_config,
             ai_commands::ai_update_config,
             ai_commands::ai_list_models,
+            ai_commands::pull_model,
             ai_commands::ai_chat_stream,
             ai_commands::cancel_chat,
         ])

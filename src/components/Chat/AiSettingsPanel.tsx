@@ -1,9 +1,25 @@
+import { listen } from '@tauri-apps/api/event';
 import { Check, Loader2, RefreshCw, X } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { AiConfig } from '../../types/ai';
+
+const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+interface PullProgressPayload {
+  model: string;
+  status: string;
+  completed?: number;
+  total?: number;
+}
+
+interface ModelPullState {
+  status: string;
+  completed?: number;
+  total?: number;
+}
 
 type TestResult =
   | { kind: 'idle' }
@@ -41,6 +57,13 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const [loadingModels, setLoadingModels] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
 
+  // --- Pull-model state ---
+  const [pullInput, setPullInput] = useState('');
+  const [pullingModels, setPullingModels] = useState<Set<string>>(new Set());
+  const [pullProgress, setPullProgress] = useState<Record<string, ModelPullState>>({});
+  const [pullErrors, setPullErrors] = useState<Record<string, string>>({});
+  const unlistenPullRef = useRef<(() => void) | null>(null);
+
   const isOllama = (config.provider ?? '').toLowerCase() === 'ollama';
 
   const refreshModels = useCallback(async () => {
@@ -69,6 +92,69 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       void refreshModels();
     }
   }, [config.provider, refreshModels]);
+
+  // Listen for Ollama pull-progress events (Tauri only).
+  useEffect(() => {
+    if (!isTauri) return;
+    let cancelled = false;
+
+    listen<PullProgressPayload>('ollama-pull-progress', (event) => {
+      const { model, status, completed, total } = event.payload;
+      setPullProgress((prev) => ({ ...prev, [model]: { status, completed, total } }));
+      if (status === 'success') {
+        setPullingModels((prev) => {
+          const next = new Set(prev);
+          next.delete(model);
+          return next;
+        });
+        // Clear the completed model's progress after a brief display delay.
+        setTimeout(
+          () =>
+            setPullProgress((prev) => {
+              const next = { ...prev };
+              delete next[model];
+              return next;
+            }),
+          1500,
+        );
+        void refreshModels();
+      }
+    }).then((fn) => {
+      if (cancelled) fn();
+      else unlistenPullRef.current = fn;
+    });
+
+    return () => {
+      cancelled = true;
+      unlistenPullRef.current?.();
+      unlistenPullRef.current = null;
+    };
+  }, [refreshModels]);
+
+  const handlePull = async (modelName: string) => {
+    const name = modelName.trim();
+    if (!name || pullingModels.has(name)) return;
+    setPullInput('');
+    setPullingModels((prev) => new Set([...prev, name]));
+    setPullErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+    setPullProgress((prev) => ({ ...prev, [name]: { status: 'starting…' } }));
+    try {
+      await commands.pullModel(name);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setPullErrors((prev) => ({ ...prev, [name]: msg }));
+    } finally {
+      setPullingModels((prev) => {
+        const next = new Set(prev);
+        next.delete(name);
+        return next;
+      });
+    }
+  };
 
   const runTest = async () => {
     setTestResult({ kind: 'testing' });
@@ -347,6 +433,138 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           </div>
         )}
 
+        {/* Pull new model — Ollama only, Tauri only */}
+        {isOllama && isTauri && (
+          <div style={sectionStyle}>
+            <span
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-display)',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Pull New Model
+            </span>
+
+            {/* Quick-pick common models */}
+            <div className="flex flex-wrap gap-1">
+              {['llama3.1', 'llava', 'mistral'].map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => void handlePull(m)}
+                  disabled={pullingModels.has(m)}
+                  style={{
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontFamily: 'var(--font-body)',
+                    backgroundColor: 'var(--bg-tertiary, var(--bg-input))',
+                    border: '1px solid var(--border)',
+                    color: pullingModels.has(m) ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+                    cursor: pullingModels.has(m) ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+
+            {/* Custom model input */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={pullInput}
+                onChange={(e) => setPullInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void handlePull(pullInput);
+                }}
+                placeholder="e.g. llama3.2:3b"
+                style={{ ...inputStyle, flex: 1 }}
+              />
+              <button
+                type="button"
+                onClick={() => void handlePull(pullInput)}
+                disabled={!pullInput.trim() || pullingModels.has(pullInput.trim())}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-body)',
+                  backgroundColor: 'var(--accent)',
+                  color: 'var(--bg-app)',
+                  border: 'none',
+                  cursor: !pullInput.trim() || pullingModels.has(pullInput.trim()) ? 'not-allowed' : 'pointer',
+                  opacity: !pullInput.trim() || pullingModels.has(pullInput.trim()) ? 0.5 : 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Pull
+              </button>
+            </div>
+
+            {/* In-flight pulls + errors */}
+            {(() => {
+              const modelsToDisplay = [
+                ...pullingModels,
+                ...Object.keys(pullErrors).filter((m) => !pullingModels.has(m)),
+              ];
+              return modelsToDisplay.map((m) => {
+                const prog = pullProgress[m];
+                const err = pullErrors[m];
+                const pct =
+                  prog?.total && prog.completed != null && prog.total > 0
+                    ? Math.round((prog.completed / prog.total) * 100)
+                    : null;
+                return (
+                  <div key={m} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div className="flex items-center justify-between">
+                      <span
+                        style={{ fontSize: '11px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
+                      >
+                        {m}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-body)',
+                          color: err ? 'var(--error-fg, #e07070)' : 'var(--text-tertiary)',
+                        }}
+                      >
+                        {err ?? (pct != null ? `${pct}%` : (prog?.status ?? ''))}
+                      </span>
+                    </div>
+                    {!err && (
+                      <div
+                        style={{
+                          height: '3px',
+                          borderRadius: '2px',
+                          backgroundColor: 'var(--bg-input)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: '100%',
+                            width: pct != null ? `${pct}%` : '100%',
+                            backgroundColor: 'var(--accent)',
+                            borderRadius: '2px',
+                            transition: 'width 0.2s ease',
+                            animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        )}
+
         {/* Model routing config */}
         <div style={sectionStyle}>
           <div className="flex items-center justify-between">
@@ -399,7 +617,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                 fontSize: '11px',
               }}
             >
-              No Ollama models installed. Run <code>ollama pull llama3.1</code> in a terminal, then click Refresh.
+              No Ollama models installed. Use the <strong>Pull New Model</strong> section above to download one.
             </span>
           )}
           {(
