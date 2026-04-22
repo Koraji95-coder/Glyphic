@@ -379,6 +379,7 @@ export function ChatPanel() {
             type="button"
             onClick={() => setIncludeNoteContext(false)}
             className="inline-flex items-center gap-1"
+            aria-label={`Remove note context: ${activeNoteTitle}`}
             style={{
               alignSelf: 'flex-start',
               fontSize: '9px',
@@ -401,6 +402,7 @@ export function ChatPanel() {
             type="button"
             onClick={() => setIncludeNoteContext(true)}
             className="inline-flex items-center gap-1"
+            aria-label={`Add note context: ${activeNoteTitle}`}
             style={{
               alignSelf: 'flex-start',
               fontSize: '9px',
