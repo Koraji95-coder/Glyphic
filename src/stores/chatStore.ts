@@ -103,6 +103,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
       currentStreamId: streamId,
     }));
 
+    // `finalizeAll` is defined via `let` so the event handlers below can
+    // close over the variable reference.  The actual value is set once all
+    // three unlisten handles are available.
+    // eslint-disable-next-line prefer-const
+    let finalizeAll = () => {};
+
     // Subscribe to streaming events BEFORE invoking the command so no chunks
     // are missed.
     const unlistenChunk = await events.onChatStreamChunk((payload) => {
@@ -112,26 +118,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }));
     });
 
-    const finalize = (unlistenDone: () => void) => {
-      unlistenChunk();
-      unlistenDone();
-      set({ isLoading: false, activeTools: [], currentStreamId: null });
-    };
-
     const unlistenDone = await events.onChatStreamDone((payload) => {
       if (payload.stream_id !== streamId) return;
-      finalize(() => {});
+      finalizeAll();
     });
 
     const unlistenCancelled = await events.onChatStreamCancelled((payload) => {
       if (payload.stream_id !== streamId) return;
       // Preserve the partial message — just stop loading.
-      finalize(unlistenCancelled);
+      finalizeAll();
     });
 
-    // Wire the done unlisten into the cancelled finaliser closure now that we
-    // have both handles.  Re-define finalize with both handles captured.
-    const finalizeAll = () => {
+    // Now that all handles are available, wire up the real finalizer.
+    finalizeAll = () => {
       unlistenChunk();
       unlistenDone();
       unlistenCancelled();
