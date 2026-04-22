@@ -18,6 +18,7 @@ import {
 import { useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLectureMode } from '../../hooks/useLectureMode';
+import { exportNoteToPdf, suggestPdfFileName } from '../../lib/export/pdfExport';
 import { commands } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -77,10 +78,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       return;
     }
     try {
-      // The backend opens a hidden print-preview window that triggers the
-      // OS print dialog (with "Save as PDF" available). The user picks the
-      // output path in that dialog, so we don't pass one here.
-      await commands.exportPdf(vaultPath, activeNotePath, '');
+      await exportNoteToPdf({ vaultPath, notePath: activeNotePath, suggestedFileName: suggestPdfFileName(activeNotePath) });
     } catch (e) {
       console.error('PDF export failed:', e);
       setExportStatus(`PDF export failed: ${e}`);
