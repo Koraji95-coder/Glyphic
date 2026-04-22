@@ -80,6 +80,7 @@ export const commands = {
   aiExplain: (text: string) => invoke<string>('ai_explain', { text }),
   aiExplainScreenshot: (text: string) => invoke<string>('ai_explain_screenshot', { text }),
   aiCheckConnection: () => invoke<boolean>('ai_check_connection'),
+  aiListModels: () => invoke<string[]>('ai_list_models'),
   aiGetConfig: () => invoke<AiConfig>('ai_get_config'),
   aiUpdateConfig: (vaultPath: string, config: AiConfig) => invoke<void>('ai_update_config', { vaultPath, config }),
 };
