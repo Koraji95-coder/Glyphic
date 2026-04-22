@@ -232,13 +232,15 @@ function escapeHtml(text: string): string {
  */
 export function upsertFrontmatterField(frontmatter: string, key: string, value: string | null): string {
   if (!frontmatter) return frontmatter;
-  const pattern = new RegExp(`^${key}:[^\n]*\n?`, 'm');
+  // Escape any regex metacharacters in the key for safe pattern construction.
+  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`^${escapedKey}:[^\n]*\n?`, 'm');
   if (value === null) {
     return frontmatter.replace(pattern, '');
   }
   const line = `${key}: ${value}`;
   if (pattern.test(frontmatter)) {
-    return frontmatter.replace(new RegExp(`^${key}:[^\n]*`, 'm'), line);
+    return frontmatter.replace(new RegExp(`^${escapedKey}:[^\n]*`, 'm'), line);
   }
   // Insert before the closing --- fence.
   return frontmatter.replace(/(\n---\n*)$/, `\n${line}$1`);

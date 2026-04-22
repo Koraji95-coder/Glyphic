@@ -1,6 +1,7 @@
 import { ArrowLeft, Pin, PinOff, Send, Settings, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { commands } from '../../lib/tauri/commands';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
@@ -67,7 +68,6 @@ export function ChatPanel() {
   const openPinMenu = useCallback(async () => {
     if (!showPinMenu) {
       try {
-        const { commands } = await import('../../lib/tauri/commands');
         const list = await commands.aiListModels();
         setAvailableModels(list);
       } catch {
@@ -121,7 +121,7 @@ export function ChatPanel() {
   // pinned model (if any) and current global default so the list isn't empty.
   const pinMenuModels = Array.from(
     new Set([...availableModels, ...(activeNoteAiModel ? [activeNoteAiModel] : []), model]),
-  ).filter(Boolean);
+  ).filter((m): m is string => m !== null && m !== undefined && m.length > 0);
 
   return (
     <div
