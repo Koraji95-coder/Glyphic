@@ -2,7 +2,9 @@ import { ArrowLeft, Send, Settings, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
+import { useEditorStore } from '../../stores/editorStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
+import { useVaultStore } from '../../stores/vaultStore';
 
 export function ChatPanel() {
   const {
@@ -17,7 +19,12 @@ export function ChatPanel() {
     clearChat,
     checkConnection,
     fetchConfig,
+    includeNoteContext,
+    setIncludeNoteContext,
   } = useChatStore();
+  const activeNotePath = useVaultStore((s) => s.activeNotePath);
+  const noteContent = useEditorStore((s) => s.content);
+  const activeNoteTitle = activeNotePath ? (activeNotePath.split('/').pop()?.replace(/\.md$/, '') ?? null) : null;
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -39,8 +46,9 @@ export function ChatPanel() {
     const text = input.trim();
     if (!text || isLoading) return;
     setInput('');
-    await sendMessage(text);
-  }, [input, isLoading, sendMessage]);
+    const ctx = includeNoteContext && activeNotePath ? noteContent : undefined;
+    await sendMessage(text, ctx);
+  }, [input, isLoading, sendMessage, includeNoteContext, activeNotePath, noteContent]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -365,6 +373,53 @@ export function ChatPanel() {
 
       {/* Input area */}
       <div className="px-3 py-3 flex flex-col" style={{ borderTop: '1px solid var(--border)', gap: '4px' }}>
+        {/* Note context badge */}
+        {includeNoteContext && activeNoteTitle && (
+          <button
+            type="button"
+            onClick={() => setIncludeNoteContext(false)}
+            className="inline-flex items-center gap-1"
+            aria-label={`Remove note context: ${activeNoteTitle}`}
+            style={{
+              alignSelf: 'flex-start',
+              fontSize: '9px',
+              padding: '2px 7px',
+              borderRadius: '5px',
+              backgroundColor: 'var(--accent-dim)',
+              border: '1px solid var(--accent-dim)',
+              color: 'var(--accent)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+            }}
+            title="Click to stop including this note as chat context"
+          >
+            <span>Context: {activeNoteTitle}</span>
+            <span aria-hidden="true">✕</span>
+          </button>
+        )}
+        {!includeNoteContext && activeNoteTitle && (
+          <button
+            type="button"
+            onClick={() => setIncludeNoteContext(true)}
+            className="inline-flex items-center gap-1"
+            aria-label={`Add note context: ${activeNoteTitle}`}
+            style={{
+              alignSelf: 'flex-start',
+              fontSize: '9px',
+              padding: '2px 7px',
+              borderRadius: '5px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-ghost)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+              opacity: 0.6,
+            }}
+            title="Click to include the active note as chat context"
+          >
+            <span>+ Add context: {activeNoteTitle}</span>
+          </button>
+        )}
         <div
           className="flex items-end"
           style={{

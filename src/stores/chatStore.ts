@@ -17,12 +17,14 @@ interface ChatState {
   isConnected: boolean | null;
   model: string;
   activeTools: McpToolExecution[];
+  includeNoteContext: boolean;
   sendMessage: (content: string, noteContext?: string) => Promise<void>;
   togglePanel: () => void;
   clearChat: () => void;
   checkConnection: () => Promise<void>;
   fetchConfig: () => Promise<void>;
   updateConfig: (vaultPath: string, config: AiConfig) => Promise<void>;
+  setIncludeNoteContext: (v: boolean) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -32,6 +34,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isConnected: null,
   model: 'ScribeAI',
   activeTools: [],
+  includeNoteContext: true,
 
   sendMessage: async (content: string, noteContext?: string) => {
     const userMsg: ChatMessage = {
@@ -70,6 +73,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   togglePanel: () => set((s) => ({ isOpen: !s.isOpen })),
 
   clearChat: () => set({ messages: [], activeTools: [] }),
+
+  setIncludeNoteContext: (v) => set({ includeNoteContext: v }),
 
   checkConnection: async () => {
     try {
