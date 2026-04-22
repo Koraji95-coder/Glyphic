@@ -129,6 +129,83 @@ impl OllamaProvider {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Pull
+// ---------------------------------------------------------------------------
+
+/// Progress payload emitted as `ollama-pull-progress` during `pull_model_stream`.
+#[derive(serde::Serialize, Clone)]
+pub struct PullProgress {
+    pub model: String,
+    pub status: String,
+    pub completed: Option<u64>,
+    pub total: Option<u64>,
+}
+
+/// Streams `POST /api/pull` for `model`, emitting `ollama-pull-progress` events
+/// via `app.emit` for each NDJSON line.  Returns `Ok(())` on `{"status":"success"}`.
+pub async fn pull_model_stream(
+    app: &tauri::AppHandle,
+    model: &str,
+    endpoint: &str,
+    client: &reqwest::Client,
+) -> Result<(), String> {
+    use tauri::Emitter;
+
+    let url = format!("{}/api/pull", endpoint.trim_end_matches('/'));
+    let body = serde_json::json!({ "name": model, "stream": true });
+
+    let mut response = client
+        .post(&url)
+        .json(&body)
+        .send()
+        .await
+        .map_err(|e| format!("Failed to reach Ollama: {e}"))?;
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let body_text = response.text().await.unwrap_or_default();
+        return Err(format!("Ollama /api/pull returned {status}: {body_text}"));
+    }
+
+    let mut buffer = String::new();
+
+    while let Some(chunk) = response.chunk().await.map_err(|e| format!("Stream read error: {e}"))? {
+        buffer.push_str(&String::from_utf8_lossy(&chunk));
+
+        // Process every complete NDJSON line in the buffer.
+        while let Some(nl) = buffer.find('\n') {
+            let line = buffer[..nl].trim().to_string();
+            buffer = buffer[nl + 1..].to_string();
+
+            if line.is_empty() {
+                continue;
+            }
+
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(&line) {
+                let status = value.get("status").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let completed = value.get("completed").and_then(|v| v.as_u64());
+                let total = value.get("total").and_then(|v| v.as_u64());
+
+                let _ = app.emit(
+                    "ollama-pull-progress",
+                    PullProgress { model: model.to_string(), status: status.clone(), completed, total },
+                );
+
+                if status == "success" {
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// List
+// ---------------------------------------------------------------------------
+
 /// Lists all models installed in the Ollama server by querying `/api/tags`.
 pub async fn list_models(endpoint: &str, client: &reqwest::Client) -> Result<Vec<String>, String> {
     #[derive(serde::Deserialize)]

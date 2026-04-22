@@ -294,6 +294,19 @@ pub async fn ai_list_models(state: State<'_, AiState>) -> Result<Vec<String>, St
     crate::ai::ollama::list_models(&endpoint, &state.client).await
 }
 
+#[tauri::command]
+pub async fn pull_model(
+    app: tauri::AppHandle,
+    model: String,
+    state: State<'_, AiState>,
+) -> Result<(), String> {
+    let endpoint = {
+        let cfg = state.config.lock().map_err(|e| format!("AI config lock: {e}"))?;
+        cfg.ollama.endpoint.clone()
+    };
+    crate::ai::ollama::pull_model_stream(&app, &model, &endpoint, &state.client).await
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
