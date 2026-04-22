@@ -1,7 +1,11 @@
 import { create } from 'zustand';
+import { frontmatterRegistry } from '../lib/frontmatterRegistry';
 import { commands } from '../lib/tauri/commands';
 import { events } from '../lib/tauri/events';
+import { composeNote, upsertFrontmatterField } from '../lib/tiptap/markdownParser';
 import type { AiConfig, ChatMessage, McpToolExecution } from '../types/ai';
+import { useEditorStore } from './editorStore';
+import { useVaultStore } from './vaultStore';
 
 // Detect whether we're running inside Tauri (vs plain browser dev server).
 function isTauri(): boolean {
@@ -26,7 +30,7 @@ interface ChatState {
   includeNoteContext: boolean;
   /** ID of the currently in-flight streaming request, or null. */
   currentStreamId: string | null;
-  sendMessage: (content: string, noteContext?: string) => Promise<void>;
+  sendMessage: (content: string, noteContext?: string, modelOverride?: string) => Promise<void>;
   /** Cancel the in-flight stream. Safe to call when no stream is active. */
   cancelStream: () => Promise<void>;
   togglePanel: () => void;
@@ -35,6 +39,8 @@ interface ChatState {
   fetchConfig: () => Promise<void>;
   updateConfig: (vaultPath: string, config: AiConfig) => Promise<void>;
   setIncludeNoteContext: (v: boolean) => void;
+  /** Write ai_model into the frontmatter of the active note and save. */
+  pinModelToNote: (model: string | null) => Promise<void>;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -47,7 +53,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   includeNoteContext: true,
   currentStreamId: null,
 
-  sendMessage: async (content: string, noteContext?: string) => {
+  sendMessage: async (content: string, noteContext?: string, modelOverride?: string) => {
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -61,7 +67,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     // synchronous non-streaming command so mock responses still work.
     if (!isTauri()) {
       try {
-        const reply = await commands.aiChat(content, noteContext);
+        const reply = await commands.aiChat(content, noteContext, modelOverride);
         const assistantMsg: ChatMessage = {
           id: crypto.randomUUID(),
           role: 'assistant',
@@ -138,7 +144,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     };
 
     try {
-      await commands.aiChatStream(streamId, content, noteContext);
+      await commands.aiChatStream(streamId, content, noteContext, modelOverride);
       // The stream-done event handler finalises state, but if the command
       // resolves before the event fires (edge case), clean up here too.
       finalizeAll();
@@ -192,6 +198,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
     await commands.aiUpdateConfig(vaultPath, config);
     const modelName = config.model_routing.chat;
     set({ model: modelName });
+  },
+
+  pinModelToNote: async (model: string | null) => {
+    const { vaultPath, activeNotePath } = useVaultStore.getState();
+    if (!vaultPath || !activeNotePath) return;
+
+    // Update frontmatter in the registry (single source of truth).
+    const currentFm = frontmatterRegistry.get(activeNotePath);
+    const updatedFm = upsertFrontmatterField(currentFm, 'ai_model', model);
+    frontmatterRegistry.set(activeNotePath, updatedFm);
+
+    // Update the in-memory model indicator immediately.
+    useEditorStore.getState().setActiveNoteAiModel(model);
+
+    // Save the note with the patched frontmatter.
+    const body = useEditorStore.getState().content;
+    await commands.saveNote(vaultPath, activeNotePath, composeNote({ body, frontmatter: updatedFm }));
   },
 }));
 

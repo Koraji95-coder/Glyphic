@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { frontmatterRegistry } from '../lib/frontmatterRegistry';
 import { commands } from '../lib/tauri/commands';
-import { splitFrontmatter } from '../lib/tiptap/markdownParser';
+import { composeNote, extractFrontmatter, splitFrontmatter } from '../lib/tiptap/markdownParser';
 import { useEditorStore } from '../stores/editorStore';
 import { useVaultStore } from '../stores/vaultStore';
 
@@ -11,24 +12,6 @@ interface PendingSave {
   frontmatter: string;
 }
 
-/**
- * Apply the editor body back into the original frontmatter, refreshing the
- * `modified:` field so the on-disk metadata stays accurate. If the original
- * frontmatter has no `modified:` line (e.g. notes created in another tool),
- * one is injected before the closing `---`.
- */
-function composeNote({ body, frontmatter }: { body: string; frontmatter: string }): string {
-  if (!frontmatter) return body;
-  const now = new Date().toISOString();
-  const modifiedLine = `modified: "${now}"`;
-  if (/^modified:\s*"[^"]*"\s*$/m.test(frontmatter)) {
-    return frontmatter.replace(/^modified:\s*"[^"]*"\s*$/m, modifiedLine) + body;
-  }
-  // Inject before the closing `---` fence (and any trailing newlines).
-  const injected = frontmatter.replace(/(\n)?---(\n*)$/, `\n${modifiedLine}\n---$2`);
-  return injected + body;
-}
-
 export function useEditor() {
   const editorStore = useEditorStore();
   const { vaultPath, activeNotePath } = useVaultStore();
@@ -37,7 +20,6 @@ export function useEditor() {
   // debounced save always writes to the *current* note (not whichever one was
   // active when the hook first mounted) and never drops the YAML header.
   const pendingRef = useRef<PendingSave | null>(null);
-  const frontmatterByPath = useRef<Map<string, string>>(new Map());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const writeNow = useCallback(
@@ -88,7 +70,7 @@ export function useEditor() {
         vaultPath,
         notePath: activeNotePath,
         body: content,
-        frontmatter: frontmatterByPath.current.get(activeNotePath) ?? '',
+        frontmatter: frontmatterRegistry.get(activeNotePath),
       };
       scheduleSave();
     },
@@ -104,7 +86,10 @@ export function useEditor() {
 
       const raw = await commands.readNote(vaultPath, notePath);
       const { frontmatter, body } = splitFrontmatter(raw);
-      frontmatterByPath.current.set(notePath, frontmatter);
+      frontmatterRegistry.set(notePath, frontmatter);
+      // Expose the per-note ai_model so ChatPanel can use it without re-parsing.
+      const fm = extractFrontmatter(raw);
+      editorStore.setActiveNoteAiModel(typeof fm?.ai_model === 'string' ? fm.ai_model : null);
       editorStore.setContent(body);
       editorStore.markSaved();
       return body;

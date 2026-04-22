@@ -75,13 +75,14 @@ should take away from this slide or image.";
 pub async fn ai_chat(
     message: String,
     note_context: Option<String>,
+    model_override: Option<String>,
     state: State<'_, AiState>,
     db_state: State<'_, DbState>,
 ) -> Result<String, String> {
     let provider = state.provider();
     let model = {
         let config = state.config.lock().unwrap();
-        config.model_routing.chat.clone()
+        model_override.unwrap_or_else(|| config.model_routing.chat.clone())
     };
 
     // Build the tool-aware system prompt.
@@ -340,6 +341,7 @@ pub async fn ai_chat_stream(
     stream_id: String,
     message: String,
     note_context: Option<String>,
+    model_override: Option<String>,
     state: State<'_, AiState>,
     db_state: State<'_, DbState>,
     active_streams: State<'_, ActiveStreams>,
@@ -354,7 +356,7 @@ pub async fn ai_chat_stream(
     let provider = state.provider();
     let model = {
         let config = state.config.lock().unwrap();
-        config.model_routing.chat.clone()
+        model_override.unwrap_or_else(|| config.model_routing.chat.clone())
     };
 
     // Build the tool-aware system prompt (same logic as ai_chat).
