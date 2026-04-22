@@ -110,6 +110,9 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
     border: '1px solid var(--border-subtle)',
   };
 
+  const getModelOptions = (currentValue: string): string[] =>
+    models.includes(currentValue) ? models : [currentValue, ...models].filter(Boolean);
+
   return (
     <div
       style={
@@ -399,10 +402,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                   }
                   style={inputStyle}
                 >
-                  {(models.includes(config.model_routing[key])
-                    ? models
-                    : [config.model_routing[key], ...models].filter(Boolean)
-                  ).map((m) => (
+                  {getModelOptions(config.model_routing[key]).map((m) => (
                     <option key={m} value={m}>
                       {m}
                     </option>
