@@ -105,6 +105,16 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           next.delete(model);
           return next;
         });
+        // Clear the completed model's progress after a brief display delay.
+        setTimeout(
+          () =>
+            setPullProgress((prev) => {
+              const next = { ...prev };
+              delete next[model];
+              return next;
+            }),
+          1500,
+        );
         void refreshModels();
       }
     }).then((fn) => {
@@ -122,6 +132,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const handlePull = async (modelName: string) => {
     const name = modelName.trim();
     if (!name || pullingModels.has(name)) return;
+    setPullInput('');
     setPullingModels((prev) => new Set([...prev, name]));
     setPullErrors((prev) => {
       const next = { ...prev };
@@ -134,6 +145,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setPullErrors((prev) => ({ ...prev, [name]: msg }));
+    } finally {
       setPullingModels((prev) => {
         const next = new Set(prev);
         next.delete(name);
@@ -493,53 +505,61 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
             </div>
 
             {/* In-flight pulls + errors */}
-            {[...pullingModels, ...Object.keys(pullErrors).filter((m) => !pullingModels.has(m))].map((m) => {
-              const prog = pullProgress[m];
-              const err = pullErrors[m];
-              const pct =
-                prog?.total && prog.completed != null && prog.total > 0
-                  ? Math.round((prog.completed / prog.total) * 100)
-                  : null;
-              return (
-                <div key={m} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div className="flex items-center justify-between">
-                    <span style={{ fontSize: '11px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
-                      {m}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        fontFamily: 'var(--font-body)',
-                        color: err ? 'var(--error-fg, #e07070)' : 'var(--text-tertiary)',
-                      }}
-                    >
-                      {err ?? (pct != null ? `${pct}%` : (prog?.status ?? ''))}
-                    </span>
-                  </div>
-                  {!err && (
-                    <div
-                      style={{
-                        height: '3px',
-                        borderRadius: '2px',
-                        backgroundColor: 'var(--bg-input)',
-                        overflow: 'hidden',
-                      }}
-                    >
+            {(() => {
+              const modelsToDisplay = [
+                ...pullingModels,
+                ...Object.keys(pullErrors).filter((m) => !pullingModels.has(m)),
+              ];
+              return modelsToDisplay.map((m) => {
+                const prog = pullProgress[m];
+                const err = pullErrors[m];
+                const pct =
+                  prog?.total && prog.completed != null && prog.total > 0
+                    ? Math.round((prog.completed / prog.total) * 100)
+                    : null;
+                return (
+                  <div key={m} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div className="flex items-center justify-between">
+                      <span
+                        style={{ fontSize: '11px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
+                      >
+                        {m}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-body)',
+                          color: err ? 'var(--error-fg, #e07070)' : 'var(--text-tertiary)',
+                        }}
+                      >
+                        {err ?? (pct != null ? `${pct}%` : (prog?.status ?? ''))}
+                      </span>
+                    </div>
+                    {!err && (
                       <div
                         style={{
-                          height: '100%',
-                          width: pct != null ? `${pct}%` : '100%',
-                          backgroundColor: 'var(--accent)',
+                          height: '3px',
                           borderRadius: '2px',
-                          transition: 'width 0.2s ease',
-                          animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
+                          backgroundColor: 'var(--bg-input)',
+                          overflow: 'hidden',
                         }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                      >
+                        <div
+                          style={{
+                            height: '100%',
+                            width: pct != null ? `${pct}%` : '100%',
+                            backgroundColor: 'var(--accent)',
+                            borderRadius: '2px',
+                            transition: 'width 0.2s ease',
+                            animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
           </div>
         )}
 
