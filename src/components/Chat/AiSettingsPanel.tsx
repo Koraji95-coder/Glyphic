@@ -1,5 +1,5 @@
-import { Check, Loader2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, Loader2, RefreshCw, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -37,6 +37,23 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const [isSaving, setIsSaving] = useState(false);
   const [testResult, setTestResult] = useState<TestResult>({ kind: 'idle' });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [models, setModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
+
+  const refreshModels = useCallback(async () => {
+    setLoadingModels(true);
+    setModelsError(null);
+    try {
+      const list = await commands.aiListModels();
+      setModels(list);
+    } catch (e) {
+      setModelsError(e instanceof Error ? e.message : String(e));
+      setModels([]);
+    } finally {
+      setLoadingModels(false);
+    }
+  }, []);
 
   useEffect(() => {
     commands
@@ -44,6 +61,12 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       .then(setConfig)
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (config.provider === 'ollama') {
+      void refreshModels();
+    }
+  }, [config.provider, refreshModels]);
 
   const runTest = async () => {
     setTestResult({ kind: 'testing' });
@@ -53,19 +76,14 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
         setTestResult({ kind: 'fail', error: 'Connection check returned false.' });
         return;
       }
-      const listModels = (commands as { aiListModels?: () => Promise<string[]> }).aiListModels;
-      if (typeof listModels === 'function') {
-        try {
-          const models = await listModels();
-          setTestResult({ kind: 'ok', models });
-        } catch (e) {
-          setTestResult({
-            kind: 'fail',
-            error: `Connected but failed to list models: ${e instanceof Error ? e.message : String(e)}`,
-          });
-        }
-      } else {
-        setTestResult({ kind: 'connected_no_listing' });
+      try {
+        const modelList = await commands.aiListModels();
+        setTestResult({ kind: 'ok', models: modelList });
+      } catch (e) {
+        setTestResult({
+          kind: 'fail',
+          error: `Connected but failed to list models: ${e instanceof Error ? e.message : String(e)}`,
+        });
       }
     } catch (e) {
       setTestResult({ kind: 'fail', error: e instanceof Error ? e.message : String(e) });
@@ -114,6 +132,9 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
     borderRadius: '8px',
     border: '1px solid var(--border-subtle)',
   };
+
+  const getModelOptions = (currentValue: string): string[] =>
+    models.includes(currentValue) ? models : [currentValue, ...models].filter(Boolean);
 
   return (
     <div
@@ -326,18 +347,59 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
         {/* Model routing config */}
         <div style={sectionStyle}>
-          <span
-            style={{
-              color: 'var(--text-secondary)',
-              fontFamily: 'var(--font-display)',
-              fontSize: '11px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
-            Model Routing
-          </span>
+          <div className="flex items-center justify-between">
+            <span
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-display)',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Model Routing
+            </span>
+            {config.provider === 'ollama' && (
+              <button
+                onClick={() => void refreshModels()}
+                disabled={loadingModels}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded"
+                style={{
+                  backgroundColor: 'var(--bg-input)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'var(--font-body)',
+                  cursor: loadingModels ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {loadingModels ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
+                Refresh
+              </button>
+            )}
+          </div>
+          {config.provider === 'ollama' && modelsError && (
+            <span
+              style={{
+                color: 'var(--color-red, #f87171)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '11px',
+              }}
+            >
+              {modelsError}
+            </span>
+          )}
+          {config.provider === 'ollama' && !modelsError && models.length === 0 && !loadingModels && (
+            <span
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '11px',
+              }}
+            >
+              No Ollama models installed. Run <code>ollama pull llama3.1</code> in a terminal, then click Refresh.
+            </span>
+          )}
           {(
             [
               { key: 'chat', label: 'Chat' },
@@ -351,19 +413,39 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               <label htmlFor={`model-routing-${key}`} style={labelStyle}>
                 {label}
               </label>
-              <input
-                id={`model-routing-${key}`}
-                type="text"
-                value={config.model_routing[key]}
-                onChange={(e) =>
-                  setConfig((c) => ({
-                    ...c,
-                    model_routing: { ...c.model_routing, [key]: e.target.value },
-                  }))
-                }
-                style={inputStyle}
-                placeholder={`e.g. llama3.1`}
-              />
+              {config.provider === 'ollama' ? (
+                <select
+                  id={`model-routing-${key}`}
+                  value={config.model_routing[key]}
+                  onChange={(e) =>
+                    setConfig((c) => ({
+                      ...c,
+                      model_routing: { ...c.model_routing, [key]: e.target.value },
+                    }))
+                  }
+                  style={inputStyle}
+                >
+                  {getModelOptions(config.model_routing[key]).map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={`model-routing-${key}`}
+                  type="text"
+                  value={config.model_routing[key]}
+                  onChange={(e) =>
+                    setConfig((c) => ({
+                      ...c,
+                      model_routing: { ...c.model_routing, [key]: e.target.value },
+                    }))
+                  }
+                  style={inputStyle}
+                  placeholder="e.g. gpt-4o-mini"
+                />
+              )}
             </div>
           ))}
         </div>

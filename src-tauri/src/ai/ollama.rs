@@ -128,3 +128,27 @@ impl OllamaProvider {
         "ollama"
     }
 }
+
+/// Lists all models installed in the Ollama server by querying `/api/tags`.
+pub async fn list_models(endpoint: &str, client: &reqwest::Client) -> Result<Vec<String>, String> {
+    #[derive(serde::Deserialize)]
+    struct TagsResp {
+        models: Vec<Model>,
+    }
+    #[derive(serde::Deserialize)]
+    struct Model {
+        name: String,
+    }
+
+    let url = format!("{}/api/tags", endpoint.trim_end_matches('/'));
+    let resp = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Failed to reach Ollama at {url}: {e}"))?;
+    let body: TagsResp = resp
+        .json()
+        .await
+        .map_err(|e| format!("Invalid response from Ollama /api/tags: {e}"))?;
+    Ok(body.models.into_iter().map(|m| m.name).collect())
+}

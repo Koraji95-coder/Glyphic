@@ -99,6 +99,7 @@ pub fn run() {
             ai_commands::ai_check_connection,
             ai_commands::ai_get_config,
             ai_commands::ai_update_config,
+            ai_commands::ai_list_models,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");
