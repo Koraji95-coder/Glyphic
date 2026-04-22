@@ -1,4 +1,5 @@
 import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react';
+import DOMPurify from 'dompurify';
 import mermaid from 'mermaid';
 import { useEffect, useRef, useState } from 'react';
 
@@ -69,7 +70,13 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
       mermaid
         .render(id, source.trim())
         .then(({ svg: renderedSvg }) => {
-          setSvg(renderedSvg);
+          // Sanitize the SVG produced by Mermaid before injecting into the DOM.
+          // Mermaid already applies its own DOMPurify pass with securityLevel:'strict',
+          // but a second pass here provides defense-in-depth against any regressions.
+          const clean = DOMPurify.sanitize(renderedSvg, {
+            USE_PROFILES: { svg: true, svgFilters: true },
+          });
+          setSvg(clean);
           setRenderError(null);
         })
         .catch((err: unknown) => {
@@ -128,7 +135,7 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
         <div
           className="mermaid-svg"
           style={{ padding: '12px', background: 'var(--bg-tertiary)', overflowX: 'auto' }}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG is produced by the Mermaid library, not user-supplied HTML
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG is produced by Mermaid and sanitized by DOMPurify
           dangerouslySetInnerHTML={{ __html: svg }}
         />
       )}
