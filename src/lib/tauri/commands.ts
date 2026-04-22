@@ -82,4 +82,5 @@ export const commands = {
   aiCheckConnection: () => invoke<boolean>('ai_check_connection'),
   aiGetConfig: () => invoke<AiConfig>('ai_get_config'),
   aiUpdateConfig: (vaultPath: string, config: AiConfig) => invoke<void>('ai_update_config', { vaultPath, config }),
+  aiListModels: () => invoke<string[]>('ai_list_models'),
 };

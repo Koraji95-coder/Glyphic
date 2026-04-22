@@ -1,5 +1,5 @@
-import { Check, Loader2, Wifi, WifiOff, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, Loader2, RefreshCw, Wifi, WifiOff, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -30,6 +30,23 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [models, setModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
+
+  const refreshModels = useCallback(async () => {
+    setLoadingModels(true);
+    setModelsError(null);
+    try {
+      const list = await commands.aiListModels();
+      setModels(list);
+    } catch (e) {
+      setModelsError(e instanceof Error ? e.message : String(e));
+      setModels([]);
+    } finally {
+      setLoadingModels(false);
+    }
+  }, []);
 
   useEffect(() => {
     commands
@@ -37,6 +54,12 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       .then(setConfig)
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (config.provider === 'ollama') {
+      void refreshModels();
+    }
+  }, [config.provider, refreshModels]);
 
   const handleTestConnection = async () => {
     setIsTesting(true);
@@ -298,18 +321,59 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
         {/* Model routing config */}
         <div style={sectionStyle}>
-          <span
-            style={{
-              color: 'var(--text-secondary)',
-              fontFamily: 'var(--font-display)',
-              fontSize: '11px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
-            Model Routing
-          </span>
+          <div className="flex items-center justify-between">
+            <span
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-display)',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Model Routing
+            </span>
+            {config.provider === 'ollama' && (
+              <button
+                onClick={() => void refreshModels()}
+                disabled={loadingModels}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded"
+                style={{
+                  backgroundColor: 'var(--bg-input)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'var(--font-body)',
+                  cursor: loadingModels ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {loadingModels ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
+                Refresh
+              </button>
+            )}
+          </div>
+          {config.provider === 'ollama' && modelsError && (
+            <span
+              style={{
+                color: 'var(--color-red, #f87171)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '11px',
+              }}
+            >
+              {modelsError}
+            </span>
+          )}
+          {config.provider === 'ollama' && !modelsError && models.length === 0 && !loadingModels && (
+            <span
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '11px',
+              }}
+            >
+              No Ollama models installed. Run <code>ollama pull llama3.1</code> in a terminal, then click Refresh.
+            </span>
+          )}
           {(
             [
               { key: 'chat', label: 'Chat' },
@@ -323,19 +387,42 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               <label htmlFor={`model-routing-${key}`} style={labelStyle}>
                 {label}
               </label>
-              <input
-                id={`model-routing-${key}`}
-                type="text"
-                value={config.model_routing[key]}
-                onChange={(e) =>
-                  setConfig((c) => ({
-                    ...c,
-                    model_routing: { ...c.model_routing, [key]: e.target.value },
-                  }))
-                }
-                style={inputStyle}
-                placeholder={`e.g. llama3.1`}
-              />
+              {config.provider === 'ollama' ? (
+                <select
+                  id={`model-routing-${key}`}
+                  value={config.model_routing[key]}
+                  onChange={(e) =>
+                    setConfig((c) => ({
+                      ...c,
+                      model_routing: { ...c.model_routing, [key]: e.target.value },
+                    }))
+                  }
+                  style={inputStyle}
+                >
+                  {(models.includes(config.model_routing[key])
+                    ? models
+                    : [config.model_routing[key], ...models].filter(Boolean)
+                  ).map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={`model-routing-${key}`}
+                  type="text"
+                  value={config.model_routing[key]}
+                  onChange={(e) =>
+                    setConfig((c) => ({
+                      ...c,
+                      model_routing: { ...c.model_routing, [key]: e.target.value },
+                    }))
+                  }
+                  style={inputStyle}
+                  placeholder="e.g. gpt-4o-mini"
+                />
+              )}
             </div>
           ))}
         </div>

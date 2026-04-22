@@ -285,6 +285,15 @@ pub async fn ai_update_config(
     crate::ai::config::save(std::path::Path::new(&vault_path), &config)
 }
 
+#[tauri::command]
+pub async fn ai_list_models(state: State<'_, AiState>) -> Result<Vec<String>, String> {
+    let endpoint = {
+        let cfg = state.config.lock().map_err(|e| format!("AI config lock: {e}"))?;
+        cfg.ollama.endpoint.clone()
+    };
+    crate::ai::ollama::list_models(&endpoint, &state.client).await
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
