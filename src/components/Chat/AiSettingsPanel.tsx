@@ -40,14 +40,14 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
   const [config, setConfig] = useState<AiConfig>({
     provider: 'ollama',
-    ollama: { endpoint: 'http://localhost:11434', model: 'llama3.1' },
+    ollama: { endpoint: 'http://localhost:11434', model: 'llama3.1:8b' },
     openai: { api_key: '', model: 'gpt-4o-mini', endpoint: 'https://api.openai.com/v1' },
     model_routing: {
-      chat: 'llama3.1',
-      summarize: 'llama3.1',
-      flashcards: 'llama3.1',
-      explain: 'deepseek-r1:32b',
-      vision: 'llava:13b',
+      chat: 'llama3.1:8b',
+      summarize: 'llama3.1:8b',
+      flashcards: 'qwen2.5:7b',
+      explain: 'qwen2.5:7b',
+      vision: 'llava:7b',
     },
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -449,28 +449,94 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               Pull New Model
             </span>
 
-            {/* Quick-pick common models */}
-            <div className="flex flex-wrap gap-1">
-              {['llama3.1', 'llava', 'mistral'].map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => void handlePull(m)}
-                  disabled={pullingModels.has(m)}
-                  style={{
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    fontFamily: 'var(--font-body)',
-                    backgroundColor: 'var(--bg-tertiary, var(--bg-input))',
-                    border: '1px solid var(--border)',
-                    color: pullingModels.has(m) ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-                    cursor: pullingModels.has(m) ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {m}
-                </button>
-              ))}
+            {/* Recommended models for studying STEM coursework */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {[
+                { name: 'llama3.1:8b', size: '~4.7 GB', desc: 'General chat & writing (default)' },
+                { name: 'qwen2.5:7b', size: '~4.4 GB', desc: 'Strong at math & reasoning' },
+                { name: 'qwen2.5-coder:7b', size: '~4.4 GB', desc: 'Code (Python / MATLAB / Verilog)' },
+                { name: 'deepseek-r1:7b', size: '~4.7 GB', desc: 'Step-by-step reasoning for proofs' },
+                { name: 'mathstral:7b', size: '~4.1 GB', desc: 'Math-specialized' },
+                { name: 'llava:7b', size: '~4.7 GB', desc: 'Vision — explain screenshots & diagrams' },
+              ].map(({ name, size, desc }) => {
+                const isInstalled = models.includes(name);
+                const isPulling = pullingModels.has(name);
+                const prog = pullProgress[name];
+                const pct =
+                  prog?.total && prog.completed != null && prog.total > 0
+                    ? Math.round((prog.completed / prog.total) * 100)
+                    : null;
+                return (
+                  <div
+                    key={name}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 8px',
+                      borderRadius: '6px',
+                      backgroundColor: 'var(--bg-input)',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          fontFamily: 'var(--font-mono, monospace)',
+                          color: 'var(--text-primary)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {name}{' '}
+                        <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>{size}</span>
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>{desc}</div>
+                      {isPulling && (
+                        <div
+                          style={{
+                            marginTop: '4px',
+                            height: '3px',
+                            borderRadius: '2px',
+                            backgroundColor: 'var(--bg-app)',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: '100%',
+                              width: pct != null ? `${pct}%` : '100%',
+                              backgroundColor: 'var(--accent)',
+                              borderRadius: '2px',
+                              transition: 'width 0.2s ease',
+                              animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void handlePull(name)}
+                      disabled={isPulling || isInstalled}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '5px',
+                        fontSize: '11px',
+                        fontFamily: 'var(--font-body)',
+                        backgroundColor: isInstalled ? 'transparent' : 'var(--accent)',
+                        color: isInstalled ? 'var(--success-fg, #5ec49e)' : 'var(--bg-app)',
+                        border: isInstalled ? '1px solid var(--success-fg, #5ec49e)' : 'none',
+                        cursor: isPulling || isInstalled ? 'default' : 'pointer',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isInstalled ? '✓ Installed' : isPulling ? (pct != null ? `${pct}%` : 'Pulling…') : 'Pull'}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Custom model input */}

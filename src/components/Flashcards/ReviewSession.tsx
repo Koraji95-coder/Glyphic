@@ -269,9 +269,7 @@ export function ReviewSession() {
             )}
 
             {!isFlipped && (
-              <p style={{ fontSize: '12px', color: 'var(--text-ghost)' }}>
-                Space / click to reveal · Esc to close
-              </p>
+              <p style={{ fontSize: '12px', color: 'var(--text-ghost)' }}>Space / click to reveal · Esc to close</p>
             )}
           </>
         )}

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type OnboardingStep = 'welcome' | 'quickstart' | 'done';
+type OnboardingStep = 'welcome' | 'ai' | 'quickstart' | 'done';
 
 interface OnboardingState {
   /** When `null`, the app hasn't finished checking recent-vaults state yet. */
