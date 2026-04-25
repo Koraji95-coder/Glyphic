@@ -118,10 +118,20 @@ pub fn save_note(
     // updates the existing row instead of creating duplicates.
     if let Ok(conn) = db_state.0.lock() {
         let now = chrono::Utc::now().to_rfc3339();
-        let id = uuid::Uuid::new_v4().to_string();
+        // Re-use the existing note id (and its original created_at) when
+        // present so backlinks and any UI references stay stable across
+        // saves. Only mint a fresh UUID when this path is being indexed for
+        // the first time.
+        let (id, created_at): (String, String) = conn
+            .query_row(
+                "SELECT id, created_at FROM notes WHERE path = ?1 LIMIT 1",
+                rusqlite::params![&note_path],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap_or_else(|_| (uuid::Uuid::new_v4().to_string(), now.clone()));
         let title = index::extract_title(&content, Path::new(&note_path));
         let tags = index::extract_tags(&content);
-        let _ = index::index_note(&conn, &id, &note_path, &title, &content, &tags, &now, &now);
+        let _ = index::index_note(&conn, &id, &note_path, &title, &content, &tags, &created_at, &now);
     }
     Ok(())
 }

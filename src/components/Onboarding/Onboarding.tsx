@@ -1,5 +1,5 @@
-import { ArrowRight, Check, Folder, Keyboard, Mic, Sparkles } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowRight, Check, Cpu, Folder, Keyboard, Loader2, Mic, Sparkles, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
 import { commands } from '../../lib/tauri/commands';
 import { useOnboardingStore } from '../../stores/onboardingStore';
@@ -57,7 +57,7 @@ export function Onboarding() {
       } catch {
         // Non-fatal: state file write may fail on locked-down filesystems.
       }
-      setStep('quickstart');
+      setStep('ai');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -209,6 +209,8 @@ export function Onboarding() {
           </>
         )}
 
+        {step === 'ai' && <AiSetupStep onContinue={() => setStep('quickstart')} />}
+
         {step === 'quickstart' && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -282,5 +284,208 @@ function Tip({ icon, title, body }: { icon: React.ReactNode; title: string; body
         <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' }}>{body}</div>
       </div>
     </div>
+  );
+}
+
+type AiCheckState = { kind: 'checking' } | { kind: 'ok'; models: string[] } | { kind: 'fail'; error: string };
+
+function AiSetupStep({ onContinue }: { onContinue: () => void }) {
+  const [state, setState] = useState<AiCheckState>({ kind: 'checking' });
+
+  const runCheck = useCallback(async () => {
+    setState({ kind: 'checking' });
+    try {
+      const ok = await commands.aiCheckConnection();
+      if (!ok) {
+        setState({ kind: 'fail', error: 'Ollama is not reachable on http://localhost:11434.' });
+        return;
+      }
+      try {
+        const models = await commands.aiListModels();
+        setState({ kind: 'ok', models });
+      } catch {
+        setState({ kind: 'ok', models: [] });
+      }
+    } catch (e) {
+      setState({ kind: 'fail', error: e instanceof Error ? e.message : String(e) });
+    }
+  }, []);
+
+  useEffect(() => {
+    void runCheck();
+  }, [runCheck]);
+
+  // Detect platform for a friendlier install command.
+  const platform = typeof navigator !== 'undefined' ? navigator.platform.toLowerCase() : '';
+  const installCmd = platform.includes('mac')
+    ? 'brew install ollama'
+    : platform.includes('win')
+      ? 'winget install Ollama.Ollama'
+      : 'curl -fsSL https://ollama.com/install.sh | sh';
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Cpu size={20} style={{ color: 'var(--accent)' }} />
+        <div>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            Set up local AI
+          </h2>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-tertiary)' }}>
+            Glyphic uses Ollama to run language models on your machine — no cloud, no key.
+          </p>
+        </div>
+      </div>
+
+      {state.kind === 'checking' && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 12px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            fontSize: '12px',
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <Loader2 size={14} className="animate-spin" />
+          Checking for Ollama…
+        </div>
+      )}
+
+      {state.kind === 'ok' && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+            padding: '10px 12px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--accent-muted, var(--accent))',
+            borderRadius: '8px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: 'var(--accent)' }}>
+            <Check size={14} /> Ollama detected on http://localhost:11434
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+            {state.models.length > 0
+              ? `${state.models.length} model${state.models.length === 1 ? '' : 's'} installed: ${state.models.slice(0, 3).join(', ')}${state.models.length > 3 ? ', …' : ''}`
+              : 'No models installed yet — pull one from Settings → AI after onboarding (e.g. llama3.1:8b for chat, qwen2.5:7b for math).'}
+          </div>
+        </div>
+      )}
+
+      {state.kind === 'fail' && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            padding: '10px 12px',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+            <X size={14} /> Ollama isn't running
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            Install it from{' '}
+            <a
+              href="https://ollama.com/download"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: 'var(--accent)', textDecoration: 'underline' }}
+            >
+              ollama.com/download
+            </a>
+            , or run:
+          </div>
+          <pre
+            style={{
+              margin: 0,
+              padding: '8px 10px',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
+              fontFamily: 'var(--font-mono, monospace)',
+              fontSize: '12px',
+              color: 'var(--text-primary)',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+            }}
+          >
+            {installCmd}
+          </pre>
+          <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+            Then start Ollama and click <strong>Retry</strong>. You can also skip this and configure AI later in Settings.
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', gap: '8px' }}>
+        {state.kind === 'fail' ? (
+          <button
+            type="button"
+            onClick={() => void runCheck()}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+              padding: '8px 14px',
+              borderRadius: '7px',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        ) : (
+          <span />
+        )}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={onContinue}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+              padding: '8px 14px',
+              borderRadius: '7px',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            Skip for now
+          </button>
+          <button
+            type="button"
+            onClick={onContinue}
+            style={{
+              background: 'var(--accent)',
+              border: 'none',
+              color: '#fff',
+              padding: '8px 16px',
+              borderRadius: '7px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            Continue
+            <ArrowRight size={14} />
+          </button>
+        </div>
+      </div>
+    </>
   );
 }

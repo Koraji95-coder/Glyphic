@@ -32,12 +32,15 @@ pub struct ModelRouting {
 
 impl Default for ModelRouting {
     fn default() -> Self {
+        // Defaults are tuned for studying STEM material with locally-runnable
+        // ~7B Ollama models. `qwen2.5` punches above its weight on math/
+        // reasoning, which is why it backs `flashcards` and `explain`.
         Self {
-            chat: "llama3.1".into(),
-            summarize: "llama3.1".into(),
-            flashcards: "llama3.1".into(),
-            explain: "llama3.1".into(),
-            vision: "llava".into(),
+            chat: "llama3.1:8b".into(),
+            summarize: "llama3.1:8b".into(),
+            flashcards: "qwen2.5:7b".into(),
+            explain: "qwen2.5:7b".into(),
+            vision: "llava:7b".into(),
         }
     }
 }
@@ -56,7 +59,7 @@ impl Default for AiConfig {
             provider: AiProvider::Ollama,
             ollama: OllamaConfig {
                 endpoint: "http://localhost:11434".into(),
-                model: "llama3.1".into(),
+                model: "llama3.1:8b".into(),
             },
             openai: OpenAiConfig {
                 api_key: String::new(),
