@@ -78,7 +78,11 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       return;
     }
     try {
-      await exportNoteToPdf({ vaultPath, notePath: activeNotePath, suggestedFileName: suggestPdfFileName(activeNotePath) });
+      await exportNoteToPdf({
+        vaultPath,
+        notePath: activeNotePath,
+        suggestedFileName: suggestPdfFileName(activeNotePath),
+      });
     } catch (e) {
       console.error('PDF export failed:', e);
       setExportStatus(`PDF export failed: ${e}`);

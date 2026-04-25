@@ -1,12 +1,12 @@
 import { HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ReviewSession } from '../Flashcards/ReviewSession';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
+import { ReviewSession } from '../Flashcards/ReviewSession';
 import { FileTree } from './FileTree';
 import { SearchBar } from './SearchBar';
 import { TagsPanel } from './TagsPanel';

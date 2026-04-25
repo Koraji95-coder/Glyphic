@@ -8,17 +8,10 @@ interface ReviewCardProps {
 
 export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       aria-label={isFlipped ? 'Card answer — click to flip back' : 'Card question — click to reveal answer'}
       onClick={onFlip}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          onFlip();
-        }
-      }}
       style={{
         position: 'relative',
         width: '100%',
@@ -27,6 +20,13 @@ export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
         cursor: 'pointer',
         perspective: '1200px',
         outline: 'none',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        font: 'inherit',
+        color: 'inherit',
+        textAlign: 'inherit',
+        display: 'block',
       }}
     >
       {/* Inner container that flips */}
@@ -126,6 +126,6 @@ export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
           </p>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
