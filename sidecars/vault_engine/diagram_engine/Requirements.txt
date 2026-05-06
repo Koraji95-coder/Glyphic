@@ -8,7 +8,7 @@ schemdraw==0.19
 matplotlib==3.9.0
 
 # Required by matplotlib for image output
-Pillow==10.3.0
+Pillow==12.2.0
 
 # numpy is used by matplotlib
 numpy==1.26.4
