@@ -41,8 +41,9 @@ async fn run_vault_engine(
     request: serde_json::Value,
     emit_event: Option<&str>,
 ) -> Result<serde_json::Value, String> {
+    use std::process::Stdio;
     use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-    use tokio::process::{Command, Stdio};
+    use tokio::process::Command;
 
     let script = vault_engine_path(app)?;
 

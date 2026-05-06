@@ -7,11 +7,11 @@ interface FlashcardReviewActions {
   open: () => void;
   close: () => void;
   /** Generate and load flashcards from the given note content via the AI command. */
-  loadCards: (noteContent: string) => Promise<void>;
+  loadCards: (noteContent: string, notePath?: string) => Promise<void>;
   /** Replace cards directly (e.g. from a previous generation stored elsewhere). */
   setCards: (cards: Flashcard[]) => void;
   flipCard: () => void;
-  rateCard: (rating: CardRating) => void;
+  rateCard: (rating: CardRating, notePath?: string) => void;
   resetSession: () => void;
 }
 
@@ -31,7 +31,7 @@ export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) =
 
   close: () => set({ isOpen: false }),
 
-  loadCards: async (noteContent: string) => {
+  loadCards: async (noteContent: string, notePath?: string) => {
     set({ isLoading: true, error: null });
     try {
       const cards = await commands.aiFlashcards(noteContent);
@@ -43,6 +43,10 @@ export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) =
         sessionComplete: false,
         isLoading: false,
       });
+      // Fire-and-forget: store note path for later use when rating cards
+      if (notePath) {
+        (useFlashcardReviewStore as unknown as { _notePath: string })._notePath = notePath;
+      }
     } catch (err) {
       set({
         isLoading: false,
@@ -64,8 +68,19 @@ export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) =
 
   flipCard: () => set((s) => ({ isFlipped: !s.isFlipped })),
 
-  rateCard: (rating: CardRating) => {
+  rateCard: (rating: CardRating, notePath?: string) => {
     const { currentIndex, cards, ratings } = get();
+    const currentCard = cards[currentIndex];
+
+    // Persist rating to SQLite (fire-and-forget — do not block UI)
+    if (currentCard) {
+      const np = notePath ?? '';
+      const cardId = `${np}::${currentIndex}::${currentCard.question.slice(0, 40)}`;
+      commands
+        .recordFlashcardReview(cardId, np, currentCard.question, currentCard.answer, rating)
+        .catch((e) => console.warn('Failed to persist flashcard rating:', e));
+    }
+
     const nextRatings = { ...ratings, [currentIndex]: rating };
     const nextIndex = currentIndex + 1;
     if (nextIndex >= cards.length) {

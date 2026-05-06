@@ -2,6 +2,7 @@ import { ArrowLeft, BookOpen, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { useEditorStore } from '../../stores/editorStore';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
+import { useVaultStore } from '../../stores/vaultStore';
 import { ReviewCard } from './ReviewCard';
 
 export function ReviewSession() {
@@ -22,6 +23,7 @@ export function ReviewSession() {
   } = useFlashcardReviewStore();
 
   const noteContent = useEditorStore((s) => s.content);
+  const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const hasNote = noteContent.trim().length > 0;
 
   // Keyboard: Space/Enter to flip, 1=Again, 2=Good, 3=Easy, Escape to close
@@ -45,14 +47,14 @@ export function ReviewSession() {
         return;
       }
       if (isFlipped) {
-        if (e.key === '1') rateCard('again');
-        else if (e.key === '2') rateCard('good');
-        else if (e.key === '3') rateCard('easy');
+        if (e.key === '1') rateCard('again', activeNotePath ?? '');
+        else if (e.key === '2') rateCard('good', activeNotePath ?? '');
+        else if (e.key === '3') rateCard('easy', activeNotePath ?? '');
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, sessionComplete, cards, currentIndex, isFlipped, flipCard, rateCard, close]);
+  }, [isOpen, sessionComplete, cards, currentIndex, isFlipped, flipCard, rateCard, close, activeNotePath]);
 
   if (!isOpen) return null;
 
@@ -180,7 +182,11 @@ export function ReviewSession() {
           >
             <p style={{ fontSize: '14px', color: 'var(--error)', marginBottom: '12px' }}>{error}</p>
             {hasNote && (
-              <button type="button" onClick={() => loadCards(noteContent)} style={secondaryBtnStyle}>
+              <button
+                type="button"
+                onClick={() => loadCards(noteContent, activeNotePath ?? '')}
+                style={secondaryBtnStyle}
+              >
                 <RefreshCw size={12} />
                 Try again
               </button>
@@ -201,7 +207,11 @@ export function ReviewSession() {
                 : 'Open a note and generate flashcards from it first.'}
             </p>
             {hasNote && (
-              <button type="button" onClick={() => loadCards(noteContent)} style={primaryBtnStyle}>
+              <button
+                type="button"
+                onClick={() => loadCards(noteContent, activeNotePath ?? '')}
+                style={primaryBtnStyle}
+              >
                 <Sparkles size={13} />
                 Generate flashcards
               </button>
@@ -240,7 +250,11 @@ export function ReviewSession() {
                 Review again
               </button>
               {hasNote && (
-                <button type="button" onClick={() => loadCards(noteContent)} style={secondaryBtnStyle}>
+                <button
+                  type="button"
+                  onClick={() => loadCards(noteContent, activeNotePath ?? '')}
+                  style={secondaryBtnStyle}
+                >
                   <Sparkles size={13} />
                   Regenerate
                 </button>
@@ -257,14 +271,24 @@ export function ReviewSession() {
             {/* Rating buttons — only show after flip */}
             {isFlipped && (
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <RatingButton label="Again" sublabel="1 min · 1" color="var(--red)" onClick={() => rateCard('again')} />
+                <RatingButton
+                  label="Again"
+                  sublabel="Tomorrow · 1"
+                  color="var(--red)"
+                  onClick={() => rateCard('again', activeNotePath ?? '')}
+                />
                 <RatingButton
                   label="Good"
-                  sublabel="Next session · 2"
+                  sublabel="~3 days · 2"
                   color="var(--accent)"
-                  onClick={() => rateCard('good')}
+                  onClick={() => rateCard('good', activeNotePath ?? '')}
                 />
-                <RatingButton label="Easy" sublabel="Skip · 3" color="var(--green)" onClick={() => rateCard('easy')} />
+                <RatingButton
+                  label="Easy"
+                  sublabel="~4 days · 3"
+                  color="var(--green)"
+                  onClick={() => rateCard('easy', activeNotePath ?? '')}
+                />
               </div>
             )}
 

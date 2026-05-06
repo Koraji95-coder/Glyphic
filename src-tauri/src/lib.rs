@@ -119,6 +119,10 @@ pub fn run() {
             commands::fe_commands::get_weak_fe_topics,
             commands::fe_commands::start_fe_session,
             commands::fe_commands::complete_fe_session,
+            // Flashcard SRS
+            commands::flashcards::record_flashcard_review,
+            commands::flashcards::get_due_flashcards,
+            commands::flashcards::get_flashcard_stats,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");

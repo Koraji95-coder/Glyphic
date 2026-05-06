@@ -111,8 +111,8 @@ export function OllamaStatusBanner() {
         }}
       >
         <span>
-          Ollama is running, but model <strong style={{ color: 'var(--accent)' }}>{model}</strong> isn't installed.
-          Pull it from Settings → AI.
+          Ollama is running, but model <strong style={{ color: 'var(--accent)' }}>{model}</strong> isn't installed. Pull
+          it from Settings → AI.
         </span>
         <button
           type="button"
