@@ -79,7 +79,7 @@ export function FePrepMode() {
         sessionId,
         topicId: topic.id,
         topicName: topic.name,
-        question: `Generate an FE exam-style practice question for the topic: "${topic.name}" (category: ${topic.category}). Provide the question clearly.`,
+        question: '',
         answer: '',
         userAnswer: '',
         revealed: false,
@@ -556,11 +556,7 @@ function PracticeSession({
             </div>
           ) : (
             <p style={{ fontSize: '15px', lineHeight: 1.7, color: 'var(--text-primary)', margin: 0 }}>
-              {session.question.startsWith('Generate an FE') ? (
-                <span style={{ color: 'var(--text-ghost)' }}>Loading question…</span>
-              ) : (
-                session.question
-              )}
+              {session.question || <span style={{ color: 'var(--text-ghost)' }}>Loading questionu2026</span>}
             </p>
           )}
         </div>

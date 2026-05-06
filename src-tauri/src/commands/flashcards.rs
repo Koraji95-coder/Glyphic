@@ -64,13 +64,17 @@ fn open_conn(app: &AppHandle) -> Result<Connection, String> {
     Ok(conn)
 }
 
+/// SM-2 lite interval multipliers.
+const SM2_GOOD_MULTIPLIER: f64 = 2.5;
+const SM2_EASY_MULTIPLIER: f64 = 4.0;
+
 /// Simple SM-2 lite: compute new interval and due date from the current best
 /// interval for this card plus the new rating.
 fn compute_due(rating: &str, current_interval: i64) -> (i64, String) {
     let new_interval = match rating {
         "again" => 1,
-        "good"  => ((current_interval as f64) * 2.5).ceil() as i64,
-        "easy"  => ((current_interval as f64) * 4.0).ceil() as i64,
+        "good"  => ((current_interval as f64) * SM2_GOOD_MULTIPLIER).ceil() as i64,
+        "easy"  => ((current_interval as f64) * SM2_EASY_MULTIPLIER).ceil() as i64,
         _       => 1,
     };
     let new_interval = new_interval.max(1);

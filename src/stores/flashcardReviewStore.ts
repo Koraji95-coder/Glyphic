@@ -15,7 +15,7 @@ interface FlashcardReviewActions {
   resetSession: () => void;
 }
 
-type FlashcardReviewStore = ReviewSession & FlashcardReviewActions;
+type FlashcardReviewStore = ReviewSession & FlashcardReviewActions & { activNotePath: string };
 
 export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) => ({
   cards: [],
@@ -26,13 +26,14 @@ export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) =
   isOpen: false,
   isLoading: false,
   error: null,
+  activNotePath: '',
 
   open: () => set({ isOpen: true }),
 
   close: () => set({ isOpen: false }),
 
   loadCards: async (noteContent: string, notePath?: string) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, activNotePath: notePath ?? '' });
     try {
       const cards = await commands.aiFlashcards(noteContent);
       set({
@@ -43,10 +44,6 @@ export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) =
         sessionComplete: false,
         isLoading: false,
       });
-      // Fire-and-forget: store note path for later use when rating cards
-      if (notePath) {
-        (useFlashcardReviewStore as unknown as { _notePath: string })._notePath = notePath;
-      }
     } catch (err) {
       set({
         isLoading: false,
@@ -69,13 +66,16 @@ export const useFlashcardReviewStore = create<FlashcardReviewStore>((set, get) =
   flipCard: () => set((s) => ({ isFlipped: !s.isFlipped })),
 
   rateCard: (rating: CardRating, notePath?: string) => {
-    const { currentIndex, cards, ratings } = get();
+    const { currentIndex, cards, ratings, activNotePath } = get();
     const currentCard = cards[currentIndex];
+    const np = notePath ?? activNotePath;
 
-    // Persist rating to SQLite (fire-and-forget — do not block UI)
+    // Persist rating to SQLite (fire-and-forget — do not block UI).
+    // cardId is built from note path + index + first 40 chars of question.
+    // The '::' separator is safe because we only split on the last occurrence.
     if (currentCard) {
-      const np = notePath ?? '';
-      const cardId = `${np}::${currentIndex}::${currentCard.question.slice(0, 40)}`;
+      const sanitizedNote = np.replace(/::/g, '__');
+      const cardId = `${sanitizedNote}::${currentIndex}::${currentCard.question.slice(0, 40)}`;
       commands
         .recordFlashcardReview(cardId, np, currentCard.question, currentCard.answer, rating)
         .catch((e) => console.warn('Failed to persist flashcard rating:', e));
