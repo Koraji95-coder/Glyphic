@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ChatPanel } from './components/Chat/ChatPanel';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
+import { FePrepMode } from './components/fe-prep/FePrepMode';
 import { ShortcutHelp } from './components/Help/ShortcutHelp';
 import { OcrBanner } from './components/Layout/OcrBanner';
 import { StatusBar } from './components/Layout/StatusBar';
@@ -28,6 +29,7 @@ import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
 import { useHelpUiStore } from './stores/helpUiStore';
+import { useLayoutStore } from './stores/layoutStore';
 import { useOnboardingStore } from './stores/onboardingStore';
 import { useSettingsStore } from './stores/settingsStore';
 import { useSettingsUiStore } from './stores/settingsUiStore';
@@ -37,6 +39,7 @@ import { useVaultStore } from './stores/vaultStore';
 
 function MainLayout() {
   const toggleChatPanel = useChatStore((s) => s.togglePanel);
+  const isFePrepMode = useLayoutStore((s) => s.isFePrepMode);
 
   useGlobalShortcuts();
 
@@ -86,8 +89,8 @@ function MainLayout() {
       <div className="flex flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 flex min-w-0 overflow-hidden">
-          <EditorPaneGroup />
-          <ChatPanel />
+          {isFePrepMode ? <FePrepMode /> : <EditorPaneGroup />}
+          {!isFePrepMode && <ChatPanel />}
         </main>
       </div>
       <StatusBar />

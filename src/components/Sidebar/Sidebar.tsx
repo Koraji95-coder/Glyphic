@@ -1,6 +1,8 @@
-import { HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
+import { GraduationCap, HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useVault } from '../../hooks/useVault';
+import { commands } from '../../lib/tauri/commands';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
@@ -15,15 +17,45 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
-  const { isSidebarOpen, closeSidebar } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, openFePrep } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
+  const vaultPath = useVaultStore((s) => s.vaultPath);
+  const refreshFileTree = useVaultStore((s) => s.refreshFileTree);
+  const { createNote } = useVault();
 
   // Count notes and folders
   const { noteCount, folderCount } = countEntries(fileTree);
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
+
+  const handleNewNote = useCallback(async () => {
+    const name = window.prompt('Note name:');
+    if (name) {
+      try {
+        await createNote('', name);
+      } catch (e) {
+        console.error('Failed to create note:', e);
+      }
+    }
+  }, [createNote]);
+
+  const handleNewFolder = useCallback(async () => {
+    const name = window.prompt('Folder name:');
+    if (name && vaultPath) {
+      try {
+        await commands.createFolder(vaultPath, name);
+        await refreshFileTree();
+      } catch (e) {
+        console.error('Failed to create folder:', e);
+      }
+    }
+  }, [vaultPath, refreshFileTree]);
+
+  const handleTrash = useCallback(() => {
+    window.alert('Deleted notes are moved to your system Trash and can be restored from there.');
+  }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -98,10 +130,10 @@ export function Sidebar() {
 
         {/* Action buttons */}
         <div className="flex" style={{ gap: '4px' }}>
-          <SidebarActionButton primary onClick={() => {}}>
+          <SidebarActionButton primary onClick={handleNewNote}>
             ✚ Note
           </SidebarActionButton>
-          <SidebarActionButton onClick={() => {}}>📁 Folder</SidebarActionButton>
+          <SidebarActionButton onClick={handleNewFolder}>📁 Folder</SidebarActionButton>
         </div>
       </div>
 
@@ -127,7 +159,8 @@ export function Sidebar() {
           label="Settings"
           onClick={() => useSettingsUiStore.getState().open('general')}
         />
-        <FooterButton icon={<Trash2 size={12} />} label="Trash" />
+        <FooterButton icon={<Trash2 size={12} />} label="Trash" onClick={handleTrash} />
+        <FooterButton icon={<GraduationCap size={12} />} label="FE Prep" onClick={openFePrep} />
         <FooterButton icon={<LayoutList size={12} />} label="Review" onClick={openReview} />
         <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
       </div>

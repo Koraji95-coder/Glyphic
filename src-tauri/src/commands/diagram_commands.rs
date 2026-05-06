@@ -33,8 +33,9 @@ async fn run_diagram_engine(
     app: &AppHandle,
     request: serde_json::Value,
 ) -> Result<serde_json::Value, String> {
+    use std::process::Stdio;
     use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-    use tokio::process::{Command, Stdio};
+    use tokio::process::Command;
 
     let script = diagram_engine_path(app)?;
 

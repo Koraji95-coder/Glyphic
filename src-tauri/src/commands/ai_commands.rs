@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use tauri::State;
+use tauri::{Emitter, Manager, State};
 
 use crate::ai::config::AiConfig;
 use crate::ai::mcp_server;
@@ -339,7 +339,8 @@ struct ChatStreamEndPayload {
 /// id is no longer in the map and the call is a no-op.
 #[tauri::command]
 pub async fn cancel_chat(app: tauri::AppHandle, stream_id: String) -> Result<(), String> {
-    let mut map = app.state::<ActiveStreams>().0.lock().await;
+    let state = app.state::<ActiveStreams>();
+    let mut map = state.0.lock().await;
     if let Some(tx) = map.remove(&stream_id) {
         let _ = tx.send(());
     }

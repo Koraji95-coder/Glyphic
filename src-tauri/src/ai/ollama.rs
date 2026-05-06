@@ -1,6 +1,7 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
+use tauri::Emitter;
 
 use crate::ai::config::OllamaConfig;
 use crate::ai::provider::ChatMessage;

@@ -368,7 +368,16 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
             borderRadius: '8px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: 'var(--accent)' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--accent)',
+            }}
+          >
             <Check size={14} /> Ollama detected on http://localhost:11434
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
@@ -391,7 +400,16 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
             borderRadius: '8px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
             <X size={14} /> Ollama isn't running
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -423,12 +441,15 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
             {installCmd}
           </pre>
           <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-            Then start Ollama and click <strong>Retry</strong>. You can also skip this and configure AI later in Settings.
+            Then start Ollama and click <strong>Retry</strong>. You can also skip this and configure AI later in
+            Settings.
           </div>
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', gap: '8px' }}>
+      <div
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', gap: '8px' }}
+      >
         {state.kind === 'fail' ? (
           <button
             type="button"

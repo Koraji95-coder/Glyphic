@@ -488,8 +488,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                           fontWeight: 600,
                         }}
                       >
-                        {name}{' '}
-                        <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>{size}</span>
+                        {name} <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>{size}</span>
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>{desc}</div>
                       {isPulling && (
