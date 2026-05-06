@@ -137,7 +137,7 @@ def get_db() -> sqlite3.Connection:
 
 
 # ── Embedding ─────────────────────────────────────────────────────────────────
-def load_embedder() -> "SentenceTransformer":
+def load_embedder() -> Any:
     if SentenceTransformer is None:
         raise RuntimeError(
             "sentence-transformers is not installed — run pip install -r requirements.txt"
