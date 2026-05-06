@@ -5,6 +5,8 @@ pub mod db;
 pub mod export;
 pub mod ocr;
 pub mod vault;
+// ← Remove pub mod diagrams; and pub mod fe; from here
+//   They belong inside commands/mod.rs
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -23,8 +25,6 @@ pub struct DbState(pub Mutex<rusqlite::Connection>);
 pub struct WatcherState(pub Mutex<Option<VaultWatcher>>);
 pub struct CaptureSessionState(pub Mutex<Option<PathBuf>>);
 
-/// Tracks in-flight streaming chat requests so they can be cancelled.
-/// Maps `stream_id → oneshot::Sender<()>`.
 pub struct ActiveStreams(
     pub tokio::sync::Mutex<HashMap<String, tokio::sync::oneshot::Sender<()>>>,
 );
@@ -38,27 +38,16 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
-            // Initialise an in-memory DB as a placeholder until a vault is opened.
             let conn = rusqlite::Connection::open_in_memory()
                 .expect("failed to create placeholder database");
             app.manage(DbState(Mutex::new(conn)));
-
-            // In-memory store for repeat-last-capture
             app.manage(capture_commands::new_last_capture_store());
-
-            // In-memory store for the current capture session's temp screenshot path
             app.manage(CaptureSessionState(Mutex::new(None)));
-
-            // Holds the currently-running vault filesystem watcher (if any).
             app.manage(WatcherState(Mutex::new(None)));
-
-            // ScribeAI state (provider config + shared HTTP client)
             app.manage(AiState::new());
-
-            // Active streaming chat requests (for Stop-button cancellation)
             app.manage(ActiveStreams(tokio::sync::Mutex::new(HashMap::new())));
-
             Ok(())
+            // ← No invoke_handler inside setup — that was the syntax error
         })
         .invoke_handler(tauri::generate_handler![
             // capture
@@ -69,7 +58,7 @@ pub fn run() {
             capture_commands::get_window_list,
             capture_commands::reocr_vault,
             capture_commands::ocr_available,
-            // vault
+            // vault management (existing)
             vault_commands::create_vault,
             vault_commands::open_vault,
             vault_commands::list_vault_contents,
@@ -97,7 +86,7 @@ pub fn run() {
             // settings
             settings_commands::get_settings,
             settings_commands::update_settings,
-            // app state (recent vaults / first-launch detection)
+            // state
             state_commands::get_recent_vaults,
             state_commands::add_recent_vault,
             // ai
@@ -113,6 +102,23 @@ pub fn run() {
             ai_commands::pull_model,
             ai_commands::ai_chat_stream,
             ai_commands::cancel_chat,
+            // vault ingestion
+            commands::vault_study::ingest_document,
+            commands::vault_study::ingest_url,
+            commands::vault_study::query_vault,
+            commands::vault_study::search_vault,
+            commands::vault_study::list_vault_sources,
+            commands::vault_study::delete_vault_source,
+            commands::vault_study::generate_flashcards,
+            // diagrams
+            commands::diagram_commands::render_diagram,
+            // FE prep
+            commands::fe_commands::list_fe_topics,
+            commands::fe_commands::record_fe_attempt,
+            commands::fe_commands::get_fe_statistics,
+            commands::fe_commands::get_weak_fe_topics,
+            commands::fe_commands::start_fe_session,
+            commands::fe_commands::complete_fe_session,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");

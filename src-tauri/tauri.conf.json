@@ -10,6 +10,9 @@
     "beforeBuildCommand": "npm run build"
   },
   "bundle": {
+  "resources": [
+    "sidecars/**/*"
+  ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -7,3 +7,6 @@ pub mod settings_commands;
 pub mod state_commands;
 pub mod tag_commands;
 pub mod vault_commands;
+pub mod vault_study;
+pub mod diagram_commands;
+pub mod fe_commands;
