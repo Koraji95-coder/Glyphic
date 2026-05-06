@@ -1,0 +1,14 @@
+# Glyphic diagram engine — pinned dependencies
+# Install with: pip install -r sidecars/diagram_engine/requirements.txt
+
+# Circuit diagrams — uses matplotlib as rendering backend
+schemdraw==0.19
+
+# Phasor, polar, and general plots
+matplotlib==3.9.0
+
+# Required by matplotlib for image output
+Pillow==10.3.0
+
+# numpy is used by matplotlib
+numpy==1.26.4
