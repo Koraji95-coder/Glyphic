@@ -63,7 +63,112 @@ fn ensure_schema(conn: &Connection) -> rusqlite::Result<()> {
             correct         INTEGER,
             score_percent   REAL
         );",
-    )
+    )?;
+
+    // ── FE Prep schema migration ──────────────────────────────────────────
+    // Adds question bank, session-question linkage, mastery tracking, and
+    // user-report tables. Adds question_id to attempts and timer fields to
+    // sessions. Wrapped in a transaction so it's all-or-nothing.
+
+    // Detect existing columns before ALTERing.
+    let mut has_question_id = false;
+    {
+        let mut stmt = conn.prepare("PRAGMA table_info(attempts)")?;
+        let cols = stmt.query_map([], |row| row.get::<usize, String>(1))?;
+        for c in cols {
+            if c? == "question_id" { has_question_id = true; break; }
+        }
+    }
+    let (mut has_remaining, mut has_break) = (false, false);
+    {
+        let mut stmt = conn.prepare("PRAGMA table_info(sessions)")?;
+        let cols = stmt.query_map([], |row| row.get::<usize, String>(1))?;
+        for c in cols {
+            match c?.as_str() {
+                "remaining_seconds" => has_remaining = true,
+                "break_taken"       => has_break = true,
+                _ => {}
+            }
+        }
+    }
+
+    // Atomic migration. Explicit ROLLBACK on error so a half-applied schema
+    // doesn't get left behind on a re-run.
+    conn.execute("BEGIN", [])?;
+    let migration: rusqlite::Result<()> = (|| {
+        conn.execute_batch(
+            "CREATE TABLE IF NOT EXISTS questions (
+                id                     INTEGER PRIMARY KEY,
+                topic_id               INTEGER NOT NULL REFERENCES topics(id),
+                type                   TEXT    NOT NULL CHECK(type IN ('mc_single','mc_multi','numeric','drag_drop','hotspot')),
+                question_text          TEXT    NOT NULL,
+                choices                TEXT,
+                correct_answer         TEXT    NOT NULL,
+                explanation            TEXT,
+                difficulty             TEXT    CHECK(difficulty IN ('easy','medium','hard','')),
+                bloom_level            INTEGER,
+                estimated_time         INTEGER,
+                solvable_with_handbook INTEGER NOT NULL DEFAULT 1,
+                handbook_section_ref   TEXT,
+                needs_review           INTEGER NOT NULL DEFAULT 0,
+                created_at             TEXT,
+                updated_at             TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_questions_topic ON questions(topic_id);
+
+            CREATE TABLE IF NOT EXISTS question_tags (
+                question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+                tag         TEXT    NOT NULL,
+                PRIMARY KEY (question_id, tag)
+            );
+
+            CREATE TABLE IF NOT EXISTS session_questions (
+                id          INTEGER PRIMARY KEY,
+                session_id  INTEGER NOT NULL REFERENCES sessions(id),
+                question_id INTEGER NOT NULL REFERENCES questions(id),
+                user_answer TEXT,
+                result      TEXT    CHECK(result IN ('correct','partial','incorrect','skipped')),
+                time_taken  INTEGER,
+                answered_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_session_questions_session ON session_questions(session_id);
+
+            CREATE TABLE IF NOT EXISTS topic_mastery (
+                topic_id       INTEGER PRIMARY KEY REFERENCES topics(id),
+                ability        REAL    NOT NULL DEFAULT 0.0,
+                sm2_ease       REAL    NOT NULL DEFAULT 2.5,
+                sm2_interval   REAL    NOT NULL DEFAULT 0.0,
+                sm2_repetition INTEGER NOT NULL DEFAULT 0,
+                due_at         TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS question_reports (
+                id          INTEGER PRIMARY KEY,
+                question_id INTEGER NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+                reported_at TEXT,
+                reason      TEXT
+            );"
+        )?;
+
+        if !has_question_id {
+            conn.execute("ALTER TABLE attempts ADD COLUMN question_id INTEGER", [])?;
+        }
+        if !has_remaining {
+            conn.execute("ALTER TABLE sessions ADD COLUMN remaining_seconds INTEGER", [])?;
+        }
+        if !has_break {
+            conn.execute("ALTER TABLE sessions ADD COLUMN break_taken INTEGER NOT NULL DEFAULT 0", [])?;
+        }
+
+        Ok(())
+    })();
+
+    match migration {
+        Ok(()) => { conn.execute("COMMIT", [])?; }
+        Err(e) => { let _ = conn.execute("ROLLBACK", []); return Err(e); }
+    }
+
+    Ok(())
 }
 
 /// Seed the official NCEES FE Electrical & Computer topics.
