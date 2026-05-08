@@ -277,6 +277,29 @@ pub async fn generate_code(
     .await
 }
 
+/// Export diagram code to PNG.
+///
+/// diagram_type: "schemdraw" | "circuit" | "matplotlib" | "phasor" | "polar"
+///   (Mermaid is not supported — returns {"error": "..."})
+/// code: Python code string to execute
+///
+/// Returns:
+///   {"png_base64": "..."}  on success
+///   {"error": "..."}       on failure or unsupported diagram type
+#[tauri::command]
+pub async fn export_png(
+    app: AppHandle,
+    diagram_type: String,
+    code: String,
+) -> Result<serde_json::Value, String> {
+    let req = json!({
+        "action": "export_png",
+        "diagram_type": diagram_type,
+        "code": code,
+    });
+    run_diagram_engine(&app, req).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -323,6 +346,75 @@ mod tests {
             let err = generate_code_with_cmd(cmd, args, req, |_| Ok(()))
                 .await
                 .expect_err("expected error for non-zero exit");
+            assert!(err.contains("exited with status"));
+        });
+    }
+
+    /// Helper: run `run_diagram_engine` with a mocked Python command.
+    async fn run_engine_with_script(script: &str, req: serde_json::Value) -> Result<serde_json::Value, String> {
+        use std::process::Stdio;
+        use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+        use tokio::process::Command;
+
+        let mut child = Command::new("python3")
+            .args(["-c", script])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("failed to spawn: {e}"))?;
+
+        {
+            let mut stdin = child.stdin.take().ok_or_else(|| "no stdin".to_string())?;
+            let req_str = req.to_string() + "\n";
+            stdin.write_all(req_str.as_bytes()).await.map_err(|e| format!("write failed: {e}"))?;
+        }
+
+        let stdout = child.stdout.take().ok_or_else(|| "no stdout".to_string())?;
+        let mut lines = BufReader::new(stdout).lines();
+        let mut last_obj: Option<serde_json::Value> = None;
+
+        while let Ok(Some(line)) = lines.next_line().await {
+            let line = line.trim_end().to_string();
+            if line.is_empty() { continue; }
+            if let Ok(obj) = serde_json::from_str::<serde_json::Value>(&line) {
+                last_obj = Some(obj);
+            }
+        }
+
+        let status = child.wait().await.map_err(|e| format!("wait failed: {e}"))?;
+        if !status.success() {
+            return Err(format!("exited with status {status}"));
+        }
+        last_obj.ok_or_else(|| "no response".to_string())
+    }
+
+    #[test]
+    fn export_png_happy_path_returns_png_base64() {
+        let rt = tokio::runtime::Runtime::new().expect("runtime");
+        rt.block_on(async {
+            let script = r#"import json,sys; _=json.loads(sys.stdin.readline()); print(json.dumps({"png_base64":"abc123"})); sys.stdout.flush()"#;
+            let req = json!({
+                "action": "export_png",
+                "diagram_type": "schemdraw",
+                "code": "d = schemdraw.Drawing()"
+            });
+            let result = run_engine_with_script(script, req).await.expect("expected success");
+            assert_eq!(result.get("png_base64").and_then(|v| v.as_str()), Some("abc123"));
+        });
+    }
+
+    #[test]
+    fn export_png_non_zero_exit_returns_error() {
+        let rt = tokio::runtime::Runtime::new().expect("runtime");
+        rt.block_on(async {
+            let script = r#"import json,sys; _=json.loads(sys.stdin.readline()); sys.exit(1)"#;
+            let req = json!({
+                "action": "export_png",
+                "diagram_type": "schemdraw",
+                "code": "bad code"
+            });
+            let err = run_engine_with_script(script, req).await.expect_err("expected error");
             assert!(err.contains("exited with status"));
         });
     }

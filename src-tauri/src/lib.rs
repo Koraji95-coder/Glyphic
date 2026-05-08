@@ -114,6 +114,7 @@ pub fn run() {
             // diagrams
             commands::diagram_commands::render_diagram,
             commands::diagram_commands::generate_code,
+            commands::diagram_commands::export_png,
             // FE prep
             commands::fe_commands::list_fe_topics,
             commands::fe_commands::record_fe_attempt,

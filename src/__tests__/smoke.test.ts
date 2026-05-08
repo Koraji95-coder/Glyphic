@@ -29,6 +29,14 @@ describe('commands wrapper — Diagram', () => {
   it('renderDiagram rejects with "Not in Tauri" when not in Tauri', async () => {
     await expect(commands.renderDiagram('mermaid', 'graph TD\n  A-->B')).rejects.toBe('Not in Tauri');
   });
+
+  it('generateCode rejects with "Not in Tauri" when not in Tauri', async () => {
+    await expect(commands.generateCode('a half-wave rectifier', 'schemdraw')).rejects.toBe('Not in Tauri');
+  });
+
+  it('exportPng rejects with "Not in Tauri" when not in Tauri', async () => {
+    await expect(commands.exportPng('schemdraw', 'd = schemdraw.Drawing()')).rejects.toBe('Not in Tauri');
+  });
 });
 
 describe('commands wrapper — Vault Study', () => {
