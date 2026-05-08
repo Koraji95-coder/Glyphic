@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use serde_json::json;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 
 // ── Path resolution ───────────────────────────────────────────────────────────
 
@@ -99,8 +99,137 @@ async fn run_diagram_engine(
         }
     }
 
-    let _ = child.wait().await;
+    let status = child
+        .wait()
+        .await
+        .map_err(|e| format!("failed waiting for diagram engine: {e}"))?;
+    if !status.success() {
+        return Err(format!("diagram engine exited with status {status}"));
+    }
     last_obj.ok_or_else(|| "no response from diagram engine".to_string())
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GeneratedDiagramCode {
+    pub code: String,
+    pub language: String,
+    pub diagram_type: String,
+    pub warnings: Vec<String>,
+}
+
+fn parse_final_generated_code(final_event: &serde_json::Value) -> Result<GeneratedDiagramCode, String> {
+    let code = final_event
+        .get("code")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| "final event missing string field 'code'".to_string())?
+        .to_string();
+    let language = final_event
+        .get("language")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| "final event missing string field 'language'".to_string())?
+        .to_string();
+    let diagram_type = final_event
+        .get("diagram_type")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| "final event missing string field 'diagram_type'".to_string())?
+        .to_string();
+    let warnings = final_event
+        .get("warnings")
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|w| w.as_str().map(ToString::to_string))
+                .collect::<Vec<String>>()
+        })
+        .unwrap_or_default();
+
+    Ok(GeneratedDiagramCode {
+        code,
+        language,
+        diagram_type,
+        warnings,
+    })
+}
+
+async fn generate_code_with_cmd(
+    cmd: std::ffi::OsString,
+    extra_args: Vec<std::ffi::OsString>,
+    request: serde_json::Value,
+    mut on_progress: impl FnMut(serde_json::Value) -> Result<(), String>,
+) -> Result<GeneratedDiagramCode, String> {
+    use std::process::Stdio;
+    use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+    use tokio::process::Command;
+
+    let mut child = Command::new(&cmd)
+        .args(&extra_args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| format!("failed to spawn diagram engine: {e}"))?;
+
+    {
+        let mut stdin = child
+            .stdin
+            .take()
+            .ok_or_else(|| "failed to open diagram engine stdin".to_string())?;
+        let req_str = request.to_string() + "\n";
+        stdin
+            .write_all(req_str.as_bytes())
+            .await
+            .map_err(|e| format!("failed to write to diagram engine: {e}"))?;
+    }
+
+    let stdout = child
+        .stdout
+        .take()
+        .ok_or_else(|| "failed to open diagram engine stdout".to_string())?;
+    let mut lines = BufReader::new(stdout).lines();
+    let mut final_event: Option<serde_json::Value> = None;
+    let mut error_message: Option<String> = None;
+
+    while let Ok(Some(line)) = lines.next_line().await {
+        let line = line.trim_end().to_string();
+        if line.is_empty() {
+            continue;
+        }
+        let Ok(obj) = serde_json::from_str::<serde_json::Value>(&line) else {
+            continue;
+        };
+
+        match obj.get("event").and_then(|v| v.as_str()) {
+            Some("progress") => {
+                on_progress(obj)?;
+            }
+            Some("final") => {
+                final_event = Some(obj);
+            }
+            Some("error") => {
+                let msg = obj
+                    .get("message")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("diagram engine returned error event")
+                    .to_string();
+                error_message = Some(msg);
+            }
+            _ => {}
+        }
+    }
+
+    let status = child
+        .wait()
+        .await
+        .map_err(|e| format!("failed waiting for diagram engine: {e}"))?;
+
+    if let Some(msg) = error_message {
+        return Err(msg);
+    }
+    if !status.success() {
+        return Err(format!("diagram engine exited with status {status}"));
+    }
+    let final_event = final_event.ok_or_else(|| "diagram engine produced no final event".to_string())?;
+    parse_final_generated_code(&final_event)
 }
 
 // ── Tauri commands ────────────────────────────────────────────────────────────
@@ -126,4 +255,75 @@ pub async fn render_diagram(
         "code": code,
     });
     run_diagram_engine(&app, req).await
+}
+
+#[tauri::command]
+pub async fn generate_code(
+    description: String,
+    diagram_type: Option<String>,
+    app: AppHandle,
+) -> Result<GeneratedDiagramCode, String> {
+    let (cmd, extra_args) = diagram_python_cmd(&app);
+    let req = json!({
+        "action": "generate_code",
+        "description": description,
+        "diagram_type": diagram_type.unwrap_or_else(|| "auto".to_string()),
+    });
+
+    generate_code_with_cmd(cmd, extra_args, req, |progress_event| {
+        app.emit("diagram://generate-code/progress", progress_event)
+            .map_err(|e| format!("failed to emit diagram progress event: {e}"))
+    })
+    .await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn python_cmd(script: &str) -> (std::ffi::OsString, Vec<std::ffi::OsString>) {
+        (
+            std::ffi::OsString::from("python3"),
+            vec![std::ffi::OsString::from("-c"), std::ffi::OsString::from(script)],
+        )
+    }
+
+    #[test]
+    fn generate_code_happy_path_mermaid_final_event() {
+        let rt = tokio::runtime::Runtime::new().expect("runtime");
+        rt.block_on(async {
+            let script = r#"import json,sys; _=json.loads(sys.stdin.readline()); print(json.dumps({"event":"progress","stage":"generating"})); print(json.dumps({"event":"final","code":"flowchart TD\nA-->B","language":"mermaid","diagram_type":"mermaid","warnings":[]})); sys.stdout.flush()"#;
+            let (cmd, args) = python_cmd(script);
+            let req = json!({
+                "action": "generate_code",
+                "description": "simple login flow",
+                "diagram_type": "auto"
+            });
+
+            let result = generate_code_with_cmd(cmd, args, req, |_| Ok(())).await;
+            let result = result.expect("expected successful final event");
+            assert_eq!(result.language, "mermaid");
+            assert_eq!(result.diagram_type, "mermaid");
+            assert!(result.code.contains("flowchart TD"));
+        });
+    }
+
+    #[test]
+    fn generate_code_non_zero_exit_returns_error() {
+        let rt = tokio::runtime::Runtime::new().expect("runtime");
+        rt.block_on(async {
+            let script = r#"import json,sys; _=json.loads(sys.stdin.readline()); sys.exit(1)"#;
+            let (cmd, args) = python_cmd(script);
+            let req = json!({
+                "action": "generate_code",
+                "description": "will fail",
+                "diagram_type": "auto"
+            });
+
+            let err = generate_code_with_cmd(cmd, args, req, |_| Ok(()))
+                .await
+                .expect_err("expected error for non-zero exit");
+            assert!(err.contains("exited with status"));
+        });
+    }
 }
