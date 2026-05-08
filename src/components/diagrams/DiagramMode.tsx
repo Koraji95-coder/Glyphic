@@ -1,5 +1,5 @@
 import DOMPurify from 'dompurify';
-import { Download, GitBranch, Play, X } from 'lucide-react';
+import { Download, GitBranch, ImageDown, Play, RefreshCw, X } from 'lucide-react';
 import mermaid from 'mermaid';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { commands } from '../../lib/tauri/commands';
@@ -67,10 +67,12 @@ export function DiagramMode() {
   const [code, setCode] = useState(PLACEHOLDER.schemdraw);
   const [nlMode, setNlMode] = useState(false);
   const [nlPrompt, setNlPrompt] = useState('');
+  const [generating, setGenerating] = useState(false);
   const [rendering, setRendering] = useState(false);
   const [result, setResult] = useState<DiagramResult | null>(null);
   const [mermaidSvg, setMermaidSvg] = useState('');
   const [mermaidError, setMermaidError] = useState('');
+  const [generateError, setGenerateError] = useState('');
   const mermaidIdRef = useRef(0);
 
   const handleTypeChange = useCallback((t: DiagramType) => {
@@ -79,6 +81,7 @@ export function DiagramMode() {
     setResult(null);
     setMermaidSvg('');
     setMermaidError('');
+    setGenerateError('');
     setNlMode(false);
   }, []);
 
@@ -118,29 +121,31 @@ export function DiagramMode() {
     setResult(null);
     setMermaidSvg('');
     setMermaidError('');
+    setGenerateError('');
     try {
       let codeToRender = code;
 
-      // NL-to-code: ask AI to generate code from natural-language description
+      // NL-to-code: ask diagram engine to generate code from natural-language description
       if (nlMode && nlPrompt.trim()) {
-        const typeHint =
-          diagramType === 'mermaid'
-            ? 'Return only valid Mermaid diagram syntax, no other text.'
-            : `Return only valid Python code. For schemdraw/circuit: assign the schemdraw.Drawing() to a variable named 'd'. For matplotlib/phasor/polar: use plt (already available) to create the figure. No plt.show(). No other text or explanation.`;
-        const aiCode = await commands
-          .aiChat(`Generate a ${diagramType} diagram for: "${nlPrompt.trim()}". ${typeHint}`)
-          .catch((e: unknown) => {
-            console.error('NL-to-code AI generation failed:', e);
-            return '';
-          });
-        if (aiCode) {
-          // Strip possible markdown fences
-          const stripped = aiCode
-            .replace(/^```[a-z]*\n?/m, '')
-            .replace(/\n?```$/m, '')
-            .trim();
-          codeToRender = stripped;
-          setCode(stripped);
+        setGenerating(true);
+        try {
+          const typeHint =
+            diagramType === 'mermaid'
+              ? 'mermaid'
+              : diagramType === 'phasor' || diagramType === 'polar'
+                ? 'matplotlib'
+                : diagramType;
+          const generated = await commands.generateCode(nlPrompt.trim(), typeHint);
+          codeToRender = generated.code;
+          setCode(generated.code);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          setGenerateError(msg);
+          setRendering(false);
+          setGenerating(false);
+          return;
+        } finally {
+          setGenerating(false);
         }
       }
 
@@ -171,7 +176,36 @@ export function DiagramMode() {
     URL.revokeObjectURL(url);
   }, [result, mermaidSvg]);
 
+  const handleExportPng = useCallback(async () => {
+    if (!result?.svg_base64) return;
+    try {
+      const res = (await commands.exportPng(diagramType, code)) as { png_base64?: string; error?: string };
+      if (res.error) {
+        setResult((prev) => ({ ...prev, error: res.error }));
+        return;
+      }
+      if (res.png_base64) {
+        const byteChars = atob(res.png_base64);
+        const byteArray = new Uint8Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) {
+          byteArray[i] = byteChars.charCodeAt(i);
+        }
+        const blob = new Blob([byteArray], { type: 'image/png' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `diagram-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (e) {
+      setResult((prev) => ({ ...prev, error: String(e) }));
+    }
+  }, [result, diagramType, code]);
+
   const hasRendered = result?.svg_base64 || mermaidSvg || result?.error;
+  const canExportPng = !!result?.svg_base64 && diagramType !== 'mermaid';
+  const isBusy = rendering || generating;
 
   return (
     <div
@@ -295,10 +329,36 @@ export function DiagramMode() {
             </button>
           )}
 
+          {/* Export PNG — only for schemdraw/matplotlib; tooltip explains limitation for Mermaid */}
+          {hasRendered && (
+            <button
+              type="button"
+              onClick={diagramType === 'mermaid' ? undefined : handleExportPng}
+              disabled={!canExportPng}
+              title={diagramType === 'mermaid' ? 'PNG export not available for Mermaid yet' : 'Export as PNG'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-card)',
+                color: canExportPng ? 'var(--text-secondary)' : 'var(--text-ghost)',
+                fontSize: '11px',
+                cursor: canExportPng ? 'pointer' : 'not-allowed',
+                opacity: canExportPng ? 1 : 0.5,
+              }}
+            >
+              <ImageDown size={12} />
+              Export PNG
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleRender}
-            disabled={rendering}
+            disabled={isBusy}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -306,16 +366,16 @@ export function DiagramMode() {
               padding: '5px 14px',
               borderRadius: 'var(--radius-sm)',
               border: '1px solid transparent',
-              backgroundColor: rendering ? 'var(--bg-hover)' : 'var(--accent)',
-              color: rendering ? 'var(--text-ghost)' : '#fff',
+              backgroundColor: isBusy ? 'var(--bg-hover)' : 'var(--accent)',
+              color: isBusy ? 'var(--text-ghost)' : '#fff',
               fontSize: '12px',
               fontWeight: 600,
-              cursor: rendering ? 'not-allowed' : 'pointer',
+              cursor: isBusy ? 'not-allowed' : 'pointer',
               transition: 'background-color 0.15s',
             }}
           >
             <Play size={13} />
-            {rendering ? 'Rendering…' : 'Render'}
+            {generating ? 'Generating…' : rendering ? 'Rendering…' : 'Render'}
           </button>
         </div>
 
@@ -427,30 +487,96 @@ export function DiagramMode() {
               }}
             >
               {rendering && (
-                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', paddingTop: '40px' }}>Rendering…</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', paddingTop: '40px' }}>
+                  {generating ? 'Generating diagram code…' : 'Rendering…'}
+                </div>
               )}
 
-              {!rendering && !result && (
+              {!rendering && !result && !generateError && (
                 <div style={{ color: 'var(--text-ghost)', fontSize: '13px', paddingTop: '40px', textAlign: 'center' }}>
                   Click <strong>Render</strong> to generate the diagram.
                 </div>
               )}
 
+              {!rendering && generateError && (
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid rgba(248,113,113,0.4)',
+                      backgroundColor: 'rgba(248,113,113,0.08)',
+                      color: 'var(--red, #f87171)',
+                      fontSize: '12px',
+                      fontFamily: 'monospace',
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
+                    Generation failed: {generateError}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRender}
+                    style={{
+                      alignSelf: 'flex-start',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '5px 14px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--accent)',
+                      backgroundColor: 'var(--accent-dim)',
+                      color: 'var(--accent)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <RefreshCw size={12} />
+                    Regenerate
+                  </button>
+                </div>
+              )}
+
               {!rendering && result?.error && (
-                <div
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(248,113,113,0.4)',
-                    backgroundColor: 'rgba(248,113,113,0.08)',
-                    color: 'var(--red, #f87171)',
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {result.error}
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid rgba(248,113,113,0.4)',
+                      backgroundColor: 'rgba(248,113,113,0.08)',
+                      color: 'var(--red, #f87171)',
+                      fontSize: '12px',
+                      fontFamily: 'monospace',
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
+                    {result.error}
+                  </div>
+                  {nlMode && (
+                    <button
+                      type="button"
+                      onClick={handleRender}
+                      style={{
+                        alignSelf: 'flex-start',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '5px 14px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--accent)',
+                        backgroundColor: 'var(--accent-dim)',
+                        color: 'var(--accent)',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <RefreshCw size={12} />
+                      Regenerate
+                    </button>
+                  )}
                 </div>
               )}
 

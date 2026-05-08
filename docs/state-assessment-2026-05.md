@@ -65,7 +65,8 @@ Status key: **Present**, **Partial**, **Missing**.
 - Vault sidecar: `sidecars/vault_engine/main.py:1-515`
 - Diagram sidecar: `sidecars/diagram_engine/main.py:1-257`
 - Study sidecar: `sidecars/study_engine/main.py` — four actions: `study_ask`, `grade_math_answer`, `solve_math`, `generate_problems`
-- Diagram sidecar now also supports `generate_code` (NL → diagram code) with NDJSON progress/final/error events.
+- Diagram sidecar now also supports `generate_code` (NL → diagram code with validate/retry loop, NDJSON progress/final/error events) and `export_png` (render to PNG, Schemdraw/Matplotlib only).
+  - Three Tauri commands registered: `render_diagram`, `generate_code`, `export_png` — all in `src-tauri/src/commands/diagram_commands.rs`.
 
 ### 2.2 Rust launch/spawn path (exact files/functions)
 - Vault sidecar launch path resolution + command selection:
@@ -174,15 +175,16 @@ Status key: **Present**, **Partial**, **Missing**.
 - Representative test: `extracts_wikilinks` in `src-tauri/src/db/backlinks.rs:293-300`.
 
 ### 5.2 Python tests
-- `sidecars/*/tests/`: **7 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`, `sidecars/study_engine/tests/__init__.py`, `sidecars/study_engine/tests/conftest.py`, `sidecars/study_engine/tests/test_study_engine.py`, `sidecars/study_engine/tests/test_solve_math.py`, `sidecars/study_engine/tests/test_generate_problems.py`).
+- `sidecars/*/tests/`: **8 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`, `sidecars/diagram_engine/tests/test_export_png.py`, `sidecars/study_engine/tests/__init__.py`, `sidecars/study_engine/tests/conftest.py`, `sidecars/study_engine/tests/test_study_engine.py`, `sidecars/study_engine/tests/test_solve_math.py`, `sidecars/study_engine/tests/test_generate_problems.py`).
 
 ### 5.3 Frontend tests
-- Test files found: **4**
+- Test files found: **6**
   - `src/__tests__/frontmatter.test.ts`
   - `src/__tests__/phaseD.test.ts`
   - `src/__tests__/smoke.test.ts`
+  - `src/__tests__/shortcuts.test.tsx`
   - `src/lib/tiptap/__tests__/roundtrip.test.ts`
-- Representative test: pinned note store behavior in `src/__tests__/phaseD.test.ts:12-26`.
+  - `src/components/diagrams/__tests__/DiagramMode.test.tsx` — 11 tests covering NL generation, Export PNG, Regenerate button, and Mermaid PNG-not-available UX.
 
 ### 5.4 CI configuration
 - Workflow files: **1** (`.github/workflows/ci.yml`)

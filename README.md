@@ -2,6 +2,29 @@
 
 A local-first, AI-augmented note-taking and study platform built with Tauri v2, React 18, TipTap, and Rust.
 
+## Diagram Studio
+
+Glyphic's Diagram Studio lets you create circuit diagrams, signal plots, flowcharts, and more — without leaving your notes.
+
+### Natural-Language Generation
+Type a plain-text description like *"a half-wave rectifier with input AC source, diode, and load resistor"* and click **Render**. The local LLM (via Ollama) generates executable Schemdraw / Matplotlib / Mermaid code with an automatic validate-and-retry loop. The generated code appears in the editor and the preview renders immediately.
+
+**Supported diagram types:**
+- **Circuit (Schemdraw)** — circuit schematics
+- **Matplotlib** — general-purpose plots
+- **Phasor (Polar)** — polar/phasor diagrams
+- **Mermaid** — flowcharts, sequence diagrams, state machines, and more
+
+### Code Editor
+Switch off the **✨ Describe** toggle to enter diagram code directly. You can mix NL generation with manual editing — the generated code lands in the editor and is fully editable.
+
+### Export
+- **Export SVG** — downloads the rendered diagram as a vector SVG (all types).
+- **Export PNG** — downloads a rasterised PNG at 150 dpi (Schemdraw and Matplotlib only; Mermaid PNG export is shown as unavailable with a tooltip).
+
+### Regenerate on Failure
+If generation or rendering fails, a **Regenerate** button appears directly in the preview panel so you can retry with a new LLM attempt without leaving the view.
+
 ## Phase D UI — What's New
 
 ### Multi-note Tab Bar

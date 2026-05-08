@@ -28,9 +28,18 @@ Actions:
     On error:
       {"event":"error","message":"..."} and exits with status 1.
 
+  export_png
+    diagram_type: "schemdraw" | "circuit" | "matplotlib" | "phasor" | "polar"
+                  (Mermaid is not supported — returns an error)
+    code: Python code string to execute
+    Returns:
+      {"png_base64": "..."}  — PNG image encoded as base64
+      {"error": "..."}       — on failure or unsupported type
+
 Responses:
-  {"svg_base64": "..."}  — for schemdraw and matplotlib types
-  {"mermaid": "..."}     — for mermaid type
+  {"svg_base64": "..."}  — for schemdraw and matplotlib types (render action)
+  {"mermaid": "..."}     — for mermaid type (render action)
+  {"png_base64": "..."}  — for schemdraw and matplotlib types (export_png action)
   {"error": "..."}       — on failure
 """
 
@@ -380,6 +389,66 @@ def render_schemdraw(code: str) -> dict[str, Any]:
             return {"error": f"schemdraw executor error: {e}"}
 
 
+def _exec_schemdraw_png(code: str) -> dict[str, Any]:
+    """
+    Execute schemdraw Python code and return the drawing as PNG.
+
+    Identical contract to _exec_schemdraw except the output format is PNG
+    (dpi=150) and the returned key is ``png_base64``.
+    """
+    safety_err = _check_code_safety(code)
+    if safety_err:
+        return {"error": safety_err}
+
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import schemdraw
+        import schemdraw.elements as elm  # type: ignore
+
+        local_vars: dict[str, Any] = {
+            "schemdraw": schemdraw,
+            "elm": elm,
+            "plt": plt,
+        }
+
+        exec(code, {}, local_vars)  # noqa: S102
+
+        drawing = local_vars.get("d")
+        if drawing is None:
+            return {"error": "User code must assign the schemdraw.Drawing() to a variable named 'd'"}
+
+        drawing.draw()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        plt.close("all")
+        buf.seek(0)
+        png_b64 = base64.b64encode(buf.read()).decode("utf-8")
+        return {"png_base64": png_b64}
+
+    except Exception as e:
+        try:
+            import matplotlib.pyplot as plt
+            plt.close("all")
+        except Exception:
+            pass
+        return {"error": f"schemdraw PNG export failed: {e}\n{traceback.format_exc()}"}
+
+
+def export_png_schemdraw(code: str) -> dict[str, Any]:
+    """Run schemdraw code and export as PNG with a 10-second timeout."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_exec_schemdraw_png, code)
+        try:
+            return future.result(timeout=10)
+        except concurrent.futures.TimeoutError:
+            return {"error": "schemdraw PNG export timed out (10s limit)"}
+        except Exception as e:
+            return {"error": f"schemdraw PNG executor error: {e}"}
+
+
 # ── Matplotlib (phasor, polar, general) ───────────────────────────────────────
 def _exec_matplotlib(code: str) -> dict[str, Any]:
     """
@@ -437,6 +506,88 @@ def render_matplotlib(code: str) -> dict[str, Any]:
             return {"error": f"matplotlib executor error: {e}"}
 
 
+def _exec_matplotlib_png(code: str) -> dict[str, Any]:
+    """
+    Execute matplotlib Python code and return the figure as PNG.
+
+    Identical contract to _exec_matplotlib except the output format is PNG
+    (dpi=150) and the returned key is ``png_base64``.
+    """
+    safety_err = _check_code_safety(code)
+    if safety_err:
+        return {"error": safety_err}
+
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import numpy as np  # type: ignore
+
+        local_vars: dict[str, Any] = {"plt": plt, "np": np}
+        exec(code, {}, local_vars)  # noqa: S102
+
+        fig = plt.gcf()
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        plt.close("all")
+        buf.seek(0)
+        png_b64 = base64.b64encode(buf.read()).decode("utf-8")
+        return {"png_base64": png_b64}
+
+    except Exception as e:
+        try:
+            import matplotlib.pyplot as plt
+            plt.close("all")
+        except Exception:
+            pass
+        return {"error": f"matplotlib PNG export failed: {e}\n{traceback.format_exc()}"}
+
+
+def export_png_matplotlib(code: str) -> dict[str, Any]:
+    """Run matplotlib code and export as PNG with a 10-second timeout."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_exec_matplotlib_png, code)
+        try:
+            return future.result(timeout=10)
+        except concurrent.futures.TimeoutError:
+            return {"error": "matplotlib PNG export timed out (10s limit)"}
+        except Exception as e:
+            return {"error": f"matplotlib PNG executor error: {e}"}
+
+
+# ── Export PNG handler ────────────────────────────────────────────────────────
+def handle_export_png(req: dict[str, Any]) -> None:
+    """
+    Export diagram code to PNG.
+
+    Input:  {"action": "export_png", "diagram_type": "schemdraw"|"circuit"|"matplotlib"|"phasor"|"polar", "code": "..."}
+    Output: {"png_base64": "..."}  on success
+            {"error": "..."}       on failure or unsupported type (e.g. mermaid)
+    """
+    diagram_type = req.get("diagram_type", "").strip()
+    code = req.get("code", "")
+
+    if not diagram_type:
+        respond({"error": "diagram_type is required for export_png"})
+        return
+
+    if not str(code).strip():
+        respond({"error": "code is required for export_png"})
+        return
+
+    if diagram_type == "mermaid":
+        respond({"error": "PNG export is not available for Mermaid diagrams. Use SVG export instead."})
+        return
+
+    if diagram_type in {"schemdraw", "circuit"}:
+        respond(export_png_schemdraw(code))
+    elif diagram_type in {"matplotlib", "phasor", "polar"}:
+        respond(export_png_matplotlib(code))
+    else:
+        respond({"error": f"unknown diagram_type for export_png: {diagram_type!r}. "
+                          "Supported: schemdraw, circuit, matplotlib, phasor, polar"})
+
+
 # ── Request handler ───────────────────────────────────────────────────────────
 def handle_request(req: dict[str, Any]) -> None:
     action = req.get("action")
@@ -444,8 +595,12 @@ def handle_request(req: dict[str, Any]) -> None:
         handle_generate_code(req)
         return
 
+    if action == "export_png":
+        handle_export_png(req)
+        return
+
     if action != "render":
-        respond({"error": f"unknown action: {action!r} — supported: 'render', 'generate_code'"})
+        respond({"error": f"unknown action: {action!r} — supported: 'render', 'generate_code', 'export_png'"})
         return
 
     diagram_type = req.get("diagram_type", "").strip()

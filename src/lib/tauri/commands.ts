@@ -81,6 +81,14 @@ export interface GenerateProblemsResult {
   problems: GeneratedProblem[];
 }
 
+// ── Diagram types ─────────────────────────────────────────────────────────────
+export interface GeneratedDiagramCode {
+  code: string;
+  language: string;
+  diagram_type: string;
+  warnings: string[];
+}
+
 const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 export const commands = {
@@ -201,6 +209,12 @@ export const commands = {
   // Diagram engine
   renderDiagram: (diagramType: string, code: string) =>
     isTauri ? invoke<unknown>('render_diagram', { diagramType, code }) : Promise.reject('Not in Tauri'),
+  generateCode: (description: string, diagramType?: string) =>
+    isTauri
+      ? invoke<GeneratedDiagramCode>('generate_code', { description, diagramType: diagramType ?? null })
+      : Promise.reject('Not in Tauri'),
+  exportPng: (diagramType: string, code: string) =>
+    isTauri ? invoke<unknown>('export_png', { diagramType, code }) : Promise.reject('Not in Tauri'),
 
   // FE exam prep
   listFeTopics: () => (isTauri ? invoke<FeTopic[]>('list_fe_topics') : Promise.resolve([] as FeTopic[])),
