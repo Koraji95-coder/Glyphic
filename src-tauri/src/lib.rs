@@ -125,9 +125,11 @@ pub fn run() {
             commands::flashcards::record_flashcard_review,
             commands::flashcards::get_due_flashcards,
             commands::flashcards::get_flashcard_stats,
-            // Advanced study: grounded Q&A + math grading
+            // Advanced study: grounded Q&A + math grading + solving + problem generation
             commands::study::study_ask,
             commands::study::grade_math_answer,
+            commands::study::solve_math,
+            commands::study::generate_problems,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");

@@ -1,9 +1,12 @@
 /// study.rs — Orchestrates semantic vault search + local LLM inference in one
-/// Tauri command, and provides AI-powered math-answer grading.
+/// Tauri command, and provides AI-powered math-answer grading, step-by-step
+/// math solving, and practice problem generation.
 ///
 /// Commands exposed:
-///   • `study_ask`         — semantic search → context → Ollama answer + sources
-///   • `grade_math_answer` — AI grades a student's engineering/math answer
+///   • `study_ask`          — semantic search → context → Ollama answer + sources
+///   • `grade_math_answer`  — AI grades a student's engineering/math answer
+///   • `solve_math`         — step-by-step LaTeX solution for a math problem
+///   • `generate_problems`  — practice problem generation by topic and difficulty
 use std::path::PathBuf;
 
 use serde_json::json;
@@ -216,6 +219,53 @@ pub async fn grade_math_answer(
         "problem": problem,
         "user_answer": user_answer,
         "correct_answer": correct_answer,
+        "endpoint": endpoint,
+        "model": model,
+    });
+    run_study_engine(&app, req).await
+}
+
+/// Generates a step-by-step LaTeX solution for a math or engineering problem.
+///
+/// Returns `{ solution: String }` where the solution is typeset in LaTeX/KaTeX.
+#[tauri::command]
+pub async fn solve_math(
+    app: AppHandle,
+    problem: String,
+    model_override: Option<String>,
+    state: State<'_, AiState>,
+) -> Result<serde_json::Value, String> {
+    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override);
+    let req = json!({
+        "action": "solve_math",
+        "problem": problem,
+        "endpoint": endpoint,
+        "model": model,
+    });
+    run_study_engine(&app, req).await
+}
+
+/// Generates practice problems for a given STEM topic and difficulty level.
+///
+/// Returns `{ problems: [{ statement: String, answer: String }] }`.
+///
+/// `difficulty` defaults to `"medium"` if not provided.
+/// `count` defaults to `5` if not provided (max 20).
+#[tauri::command]
+pub async fn generate_problems(
+    app: AppHandle,
+    topic: String,
+    difficulty: Option<String>,
+    count: Option<u32>,
+    model_override: Option<String>,
+    state: State<'_, AiState>,
+) -> Result<serde_json::Value, String> {
+    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override);
+    let req = json!({
+        "action": "generate_problems",
+        "topic": topic,
+        "difficulty": difficulty.unwrap_or_else(|| "medium".to_string()),
+        "count": count.unwrap_or(5),
         "endpoint": endpoint,
         "model": model,
     });
