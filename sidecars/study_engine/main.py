@@ -86,6 +86,8 @@ SYSTEM_PROBLEM_GENERATOR = (
     '"answer": "<concise final answer with units>"}]'
 )
 
+ALLOWED_DIFFICULTIES = {"easy", "medium", "hard"}
+
 
 def respond(obj: dict[str, Any]) -> None:
     sys.stdout.write(json.dumps(obj) + "\n")
@@ -277,7 +279,7 @@ def handle_generate_problems(req: dict[str, Any]) -> None:
     if not topic:
         emit_event("error", message="generate_problems requires a non-empty topic")
         raise SystemExit(1)
-    if difficulty not in {"easy", "medium", "hard"}:
+    if difficulty not in ALLOWED_DIFFICULTIES:
         emit_event(
             "error",
             message="generate_problems difficulty must be 'easy', 'medium', or 'hard'",
@@ -311,11 +313,11 @@ def handle_generate_problems(req: dict[str, Any]) -> None:
         problems = json.loads(stripped_arr)
         if not isinstance(problems, list):
             raise ValueError("expected a JSON array")
-        # Normalise each problem entry
-        normalised = []
+        # Normalize each problem entry
+        normalized = []
         for item in problems:
             if isinstance(item, dict):
-                normalised.append(
+                normalized.append(
                     {
                         "statement": str(item.get("statement", "")).strip(),
                         "answer": str(item.get("answer", "")).strip(),
@@ -323,9 +325,9 @@ def handle_generate_problems(req: dict[str, Any]) -> None:
                 )
     except Exception:
         # Fall back: wrap raw text so the caller always receives a typed object
-        normalised = [{"statement": raw.strip(), "answer": ""}]
+        normalized = [{"statement": raw.strip(), "answer": ""}]
 
-    emit_event("final", payload={"problems": normalised})
+    emit_event("final", payload={"problems": normalized})
 
 
 def handle_request(req: dict[str, Any]) -> None:
