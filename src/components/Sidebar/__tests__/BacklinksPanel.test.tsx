@@ -32,7 +32,7 @@ describe('BacklinksPanel', () => {
       expect(invokeMock).toHaveBeenCalledWith('get_backlinks', { notePath: 'notes/current.md' });
     });
 
-    expect(await screen.findByText('No backlinks yet')).toBeTruthy();
+    await screen.findByText('No backlinks yet');
   });
 
   it('renders populated state when getBacklinks returns entries', async () => {
@@ -48,7 +48,7 @@ describe('BacklinksPanel', () => {
     render(<BacklinksPanel />);
     fireEvent.click(screen.getByRole('button', { name: /backlinks/i }));
 
-    expect(await screen.findByText('Source Note')).toBeTruthy();
+    await screen.findByText('Source Note');
     expect(screen.getByText('Mentions [[Current]] here')).toBeTruthy();
   });
 
