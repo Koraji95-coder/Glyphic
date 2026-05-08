@@ -129,7 +129,10 @@ export function DiagramMode() {
             : `Return only valid Python code. For schemdraw/circuit: assign the schemdraw.Drawing() to a variable named 'd'. For matplotlib/phasor/polar: use plt (already available) to create the figure. No plt.show(). No other text or explanation.`;
         const aiCode = await commands.aiChat(
           `Generate a ${diagramType} diagram for: "${nlPrompt.trim()}". ${typeHint}`,
-        ).catch(() => '');
+        ).catch((e: unknown) => {
+          console.error('NL-to-code AI generation failed:', e);
+          return '';
+        });
         if (aiCode) {
           // Strip possible markdown fences
           const stripped = aiCode

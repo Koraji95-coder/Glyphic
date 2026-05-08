@@ -1,8 +1,12 @@
 import { create } from 'zustand';
 
+export type ActiveMode = 'editor' | 'fePrep' | 'vault' | 'diagram';
+
 interface LayoutState {
   isSidebarOpen: boolean;
   isInkMode: boolean;
+  activeMode: ActiveMode;
+  /** Derived convenience getters */
   isFePrepMode: boolean;
   isVaultMode: boolean;
   isDiagramMode: boolean;
@@ -17,19 +21,30 @@ interface LayoutState {
   closeDiagramMode: () => void;
 }
 
-export const useLayoutStore = create<LayoutState>((set) => ({
-  isSidebarOpen: false,
-  isInkMode: false,
-  isFePrepMode: false,
-  isVaultMode: false,
-  isDiagramMode: false,
-  toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
-  closeSidebar: () => set({ isSidebarOpen: false }),
-  toggleInkMode: () => set((s) => ({ isInkMode: !s.isInkMode })),
-  openFePrep: () => set({ isFePrepMode: true, isVaultMode: false, isDiagramMode: false }),
-  closeFePrep: () => set({ isFePrepMode: false }),
-  openVaultMode: () => set({ isVaultMode: true, isFePrepMode: false, isDiagramMode: false }),
-  closeVaultMode: () => set({ isVaultMode: false }),
-  openDiagramMode: () => set({ isDiagramMode: true, isFePrepMode: false, isVaultMode: false }),
-  closeDiagramMode: () => set({ isDiagramMode: false }),
-}));
+export const useLayoutStore = create<LayoutState>((set) => {
+  const setMode = (mode: ActiveMode) =>
+    set({
+      activeMode: mode,
+      isFePrepMode: mode === 'fePrep',
+      isVaultMode: mode === 'vault',
+      isDiagramMode: mode === 'diagram',
+    });
+
+  return {
+    isSidebarOpen: false,
+    isInkMode: false,
+    activeMode: 'editor',
+    isFePrepMode: false,
+    isVaultMode: false,
+    isDiagramMode: false,
+    toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
+    closeSidebar: () => set({ isSidebarOpen: false }),
+    toggleInkMode: () => set((s) => ({ isInkMode: !s.isInkMode })),
+    openFePrep: () => setMode('fePrep'),
+    closeFePrep: () => setMode('editor'),
+    openVaultMode: () => setMode('vault'),
+    closeVaultMode: () => setMode('editor'),
+    openDiagramMode: () => setMode('diagram'),
+    closeDiagramMode: () => setMode('editor'),
+  };
+});

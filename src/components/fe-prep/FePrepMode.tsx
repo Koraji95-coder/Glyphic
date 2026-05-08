@@ -436,7 +436,7 @@ function PracticeSession({
       // Optionally prepend vault context to ground the question in study material
       let vaultContext = '';
       try {
-        const vaultResult = (await commands.queryVault(session.topicName, [], 3)) as {
+        const vaultResult = (await commands.queryVault(session.topicName, undefined, 3)) as {
           results?: Array<{ text: string; source_label: string }>;
         };
         const chunks = vaultResult?.results ?? [];

@@ -278,7 +278,7 @@ export function VaultMode() {
 
             {/* Progress indicator */}
             {ingestProgress && (
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px', margin: '8px 0 0' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>
                 {ingestProgress}
               </p>
             )}
