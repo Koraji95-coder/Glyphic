@@ -64,7 +64,7 @@ Status key: **Present**, **Partial**, **Missing**.
 ### 2.1 Python source locations
 - Vault sidecar: `sidecars/vault_engine/main.py:1-515`
 - Diagram sidecar: `sidecars/diagram_engine/main.py:1-257`
-- Study sidecar: `sidecars/study_engine/main.py`
+- Study sidecar: `sidecars/study_engine/main.py` — four actions: `study_ask`, `grade_math_answer`, `solve_math`, `generate_problems`
 - Diagram sidecar now also supports `generate_code` (NL → diagram code) with NDJSON progress/final/error events.
 
 ### 2.2 Rust launch/spawn path (exact files/functions)
@@ -174,7 +174,7 @@ Status key: **Present**, **Partial**, **Missing**.
 - Representative test: `extracts_wikilinks` in `src-tauri/src/db/backlinks.rs:293-300`.
 
 ### 5.2 Python tests
-- `sidecars/*/tests/`: **5 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`, `sidecars/study_engine/tests/__init__.py`, `sidecars/study_engine/tests/conftest.py`, `sidecars/study_engine/tests/test_study_engine.py`).
+- `sidecars/*/tests/`: **7 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`, `sidecars/study_engine/tests/__init__.py`, `sidecars/study_engine/tests/conftest.py`, `sidecars/study_engine/tests/test_study_engine.py`, `sidecars/study_engine/tests/test_solve_math.py`, `sidecars/study_engine/tests/test_generate_problems.py`).
 
 ### 5.3 Frontend tests
 - Test files found: **4**
@@ -341,7 +341,11 @@ Principle applied: each slice is vertical (sidecar/runtime + Rust command + UI s
 
 1. **Shortcut parity slice (vertical slice)** ✓ _Done — see `docs/shortcut-audit-2026-05.md`_
 
-2. **Study sidecar template extraction (`study_engine`) (vertical slice)** ✓ _Done_
+2. **Study sidecar full action set (`study_engine`) (vertical slice)** ✓ _Done_
+   - Four actions implemented: `study_ask`, `grade_math_answer`, `solve_math`, `generate_problems`.
+   - Tauri commands `solve_math` and `generate_problems` added and registered in `lib.rs`.
+   - TypeScript bindings added to `src/lib/tauri/commands.ts`.
+   - 17 Python tests across 3 test files (`test_study_engine.py`, `test_solve_math.py`, `test_generate_problems.py`).
 
 3. **FE sidecar template extraction (`fe_engine`) (vertical slice)**
    - Same launch/IPC/error model, with one initial FE workflow command and UI shell.

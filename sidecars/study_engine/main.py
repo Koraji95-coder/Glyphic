@@ -20,6 +20,20 @@ Actions:
     endpoint: Ollama base URL
     model: model name
 
+  solve_math
+    problem: str        — the math/engineering problem to solve (LaTeX ok)
+    endpoint: Ollama base URL
+    model: model name
+    Final: {"event":"final","payload":{"solution":"<step-by-step solution>"}}
+
+  generate_problems
+    topic: str          — STEM topic (e.g. "circuit analysis", "statics")
+    difficulty: str     — "easy" | "medium" | "hard"  (default "medium")
+    count: int          — number of problems to generate (default 5)
+    endpoint: Ollama base URL
+    model: model name
+    Final: {"event":"final","payload":{"problems":[{"statement":"...","answer":"..."}]}}
+
 On success:
   {"event":"final","payload":{...}}
 On error:
@@ -53,6 +67,27 @@ SYSTEM_GRADER = (
     '"feedback": "<detailed explanation; use LaTeX $...$ for inline math>"}'
 )
 
+SYSTEM_MATH_SOLVER = (
+    "You are an expert STEM tutor. Solve the given math or engineering problem with a clear, "
+    "step-by-step solution. Requirements:\n"
+    "- Show every algebraic step; do not skip steps.\n"
+    "- Typeset all math in LaTeX: inline as `$...$`, block as `$$...$$`.\n"
+    "- State the final answer on its own line, prefixed with **Answer:**.\n"
+    "- Include SI units throughout.\n"
+    "Format your response in markdown."
+)
+
+SYSTEM_PROBLEM_GENERATOR = (
+    "You are an expert STEM question writer for FE/PE exam preparation. "
+    "Generate practice problems for the requested topic and difficulty level. "
+    "Respond ONLY with a JSON array — no markdown fences, no extra commentary — "
+    "where each element matches this exact schema:\n"
+    '[{"statement": "<problem text; use LaTeX $...$ for inline math>", '
+    '"answer": "<concise final answer with units>"}]'
+)
+
+ALLOWED_DIFFICULTIES = {"easy", "medium", "hard"}
+
 
 def respond(obj: dict[str, Any]) -> None:
     sys.stdout.write(json.dumps(obj) + "\n")
@@ -77,6 +112,26 @@ def _strip_json_object(text: str) -> str:
 
     start = content.find("{")
     end = content.rfind("}")
+    if start >= 0 and end >= 0 and end >= start:
+        return content[start : end + 1]
+    return content
+
+
+def _strip_json_array(text: str) -> str:
+    """Extract the outermost JSON array from text, stripping markdown fences."""
+    trimmed = text.strip()
+    if "```json" in trimmed:
+        after = trimmed.split("```json", 1)[1]
+        content = after.split("```", 1)[0]
+    elif "```" in trimmed:
+        after = trimmed.split("```", 1)[1]
+        content = after.split("```", 1)[0]
+    else:
+        content = trimmed
+    content = content.strip()
+
+    start = content.find("[")
+    end = content.rfind("]")
     if start >= 0 and end >= 0 and end >= start:
         return content[start : end + 1]
     return content
@@ -195,6 +250,86 @@ def handle_grade_math_answer(req: dict[str, Any]) -> None:
     emit_event("final", payload=parsed)
 
 
+def handle_solve_math(req: dict[str, Any]) -> None:
+    problem = str(req.get("problem", "")).strip()
+    endpoint = str(req.get("endpoint", "")).strip()
+    model = str(req.get("model", "")).strip()
+
+    if not problem:
+        emit_event("error", message="solve_math requires a non-empty problem")
+        raise SystemExit(1)
+    if not endpoint:
+        emit_event("error", message="solve_math requires endpoint")
+        raise SystemExit(1)
+    if not model:
+        emit_event("error", message="solve_math requires model")
+        raise SystemExit(1)
+
+    solution = _ollama_chat(endpoint, model, SYSTEM_MATH_SOLVER, problem)
+    emit_event("final", payload={"solution": solution})
+
+
+def handle_generate_problems(req: dict[str, Any]) -> None:
+    topic = str(req.get("topic", "")).strip()
+    difficulty = str(req.get("difficulty", "medium")).strip().lower()
+    count_raw = req.get("count", 5)
+    endpoint = str(req.get("endpoint", "")).strip()
+    model = str(req.get("model", "")).strip()
+
+    if not topic:
+        emit_event("error", message="generate_problems requires a non-empty topic")
+        raise SystemExit(1)
+    if difficulty not in ALLOWED_DIFFICULTIES:
+        emit_event(
+            "error",
+            message="generate_problems difficulty must be 'easy', 'medium', or 'hard'",
+        )
+        raise SystemExit(1)
+    if not endpoint:
+        emit_event("error", message="generate_problems requires endpoint")
+        raise SystemExit(1)
+    if not model:
+        emit_event("error", message="generate_problems requires model")
+        raise SystemExit(1)
+
+    try:
+        count = int(count_raw)
+        if count < 1 or count > 20:
+            raise ValueError
+    except (TypeError, ValueError):
+        emit_event("error", message="generate_problems count must be an integer between 1 and 20")
+        raise SystemExit(1)
+
+    user_content = (
+        f"Topic: {topic}\nDifficulty: {difficulty}\nNumber of problems: {count}\n\n"
+        "Generate the requested practice problems now."
+    )
+    raw = _ollama_chat(endpoint, model, SYSTEM_PROBLEM_GENERATOR, user_content)
+
+    # Generator returns an array [ … ] rather than an object { … }
+    stripped_arr = _strip_json_array(raw)
+
+    try:
+        problems = json.loads(stripped_arr)
+        if not isinstance(problems, list):
+            raise ValueError("expected a JSON array")
+        # Normalize each problem entry
+        normalized = []
+        for item in problems:
+            if isinstance(item, dict):
+                normalized.append(
+                    {
+                        "statement": str(item.get("statement", "")).strip(),
+                        "answer": str(item.get("answer", "")).strip(),
+                    }
+                )
+    except Exception:
+        # Fall back: wrap raw text so the caller always receives a typed object
+        normalized = [{"statement": raw.strip(), "answer": ""}]
+
+    emit_event("final", payload={"problems": normalized})
+
+
 def handle_request(req: dict[str, Any]) -> None:
     action = req.get("action")
     if action == "study_ask":
@@ -202,6 +337,12 @@ def handle_request(req: dict[str, Any]) -> None:
         return
     if action == "grade_math_answer":
         handle_grade_math_answer(req)
+        return
+    if action == "solve_math":
+        handle_solve_math(req)
+        return
+    if action == "generate_problems":
+        handle_generate_problems(req)
         return
     emit_event("error", message=f"unknown action: {action}")
     raise SystemExit(1)

@@ -68,6 +68,19 @@ export interface MathGradeResult {
   feedback: string;
 }
 
+export interface SolveMathResult {
+  solution: string;
+}
+
+export interface GeneratedProblem {
+  statement: string;
+  answer: string;
+}
+
+export interface GenerateProblemsResult {
+  problems: GeneratedProblem[];
+}
+
 const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 export const commands = {
@@ -263,6 +276,24 @@ export const commands = {
           problem,
           userAnswer,
           correctAnswer,
+          modelOverride: modelOverride ?? null,
+        })
+      : Promise.reject('Not in Tauri'),
+
+  // Math mode: step-by-step solving + practice problem generation
+  solveMath: (problem: string, modelOverride?: string) =>
+    isTauri
+      ? invoke<SolveMathResult>('solve_math', {
+          problem,
+          modelOverride: modelOverride ?? null,
+        })
+      : Promise.reject('Not in Tauri'),
+  generateProblems: (topic: string, difficulty?: string, count?: number, modelOverride?: string) =>
+    isTauri
+      ? invoke<GenerateProblemsResult>('generate_problems', {
+          topic,
+          difficulty: difficulty ?? null,
+          count: count ?? null,
           modelOverride: modelOverride ?? null,
         })
       : Promise.reject('Not in Tauri'),
