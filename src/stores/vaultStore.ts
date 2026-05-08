@@ -9,12 +9,15 @@ interface VaultState {
   activeNoteId: string | null;
   activeNotePath: string | null;
   openNotes: string[];
+  pinnedNotes: string[];
   setVaultPath: (path: string) => void;
   setVaultConfig: (config: VaultConfig) => void;
   setFileTree: (tree: VaultEntry[]) => void;
   setActiveNote: (id: string, path: string) => void;
   addOpenNote: (path: string) => void;
   removeOpenNote: (path: string) => void;
+  pinNote: (path: string) => void;
+  unpinNote: (path: string) => void;
   refreshFileTree: () => Promise<void>;
 }
 
@@ -25,6 +28,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   activeNoteId: null,
   activeNotePath: null,
   openNotes: [],
+  pinnedNotes: [],
 
   setVaultPath: (path) => set({ vaultPath: path }),
   setVaultConfig: (config) => set({ vaultConfig: config }),
@@ -37,6 +41,14 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   removeOpenNote: (path) =>
     set((state) => ({
       openNotes: state.openNotes.filter((p) => p !== path),
+    })),
+  pinNote: (path) =>
+    set((state) => ({
+      pinnedNotes: state.pinnedNotes.includes(path) ? state.pinnedNotes : [...state.pinnedNotes, path],
+    })),
+  unpinNote: (path) =>
+    set((state) => ({
+      pinnedNotes: state.pinnedNotes.filter((p) => p !== path),
     })),
   refreshFileTree: async () => {
     const vaultPath = get().vaultPath;

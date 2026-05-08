@@ -1,4 +1,14 @@
-import { Database, GitBranch, GraduationCap, HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
+import {
+  Database,
+  GitBranch,
+  GraduationCap,
+  HelpCircle,
+  LayoutList,
+  Pin,
+  PinOff,
+  Settings,
+  Trash2,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
@@ -17,12 +27,15 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
-  const { isSidebarOpen, closeSidebar, openFePrep, openVaultMode, openDiagramMode } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, openFePrep, openVaultMode, openDiagramMode, isFocusMode } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
   const vaultPath = useVaultStore((s) => s.vaultPath);
   const refreshFileTree = useVaultStore((s) => s.refreshFileTree);
+  const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
+  const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const unpinNote = useVaultStore((s) => s.unpinNote);
   const { createNote } = useVault();
 
   // Count notes and folders
@@ -30,16 +43,29 @@ export function Sidebar() {
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
 
-  const handleNewNote = useCallback(async () => {
-    const name = window.prompt('Note name:');
-    if (name) {
-      try {
-        await createNote('', name);
-      } catch (e) {
-        console.error('Failed to create note:', e);
+  const handleNewNote = useCallback(
+    async (name?: string) => {
+      const noteName = name ?? window.prompt('Note name:');
+      if (noteName) {
+        try {
+          await createNote('', noteName);
+        } catch (e) {
+          console.error('Failed to create note:', e);
+        }
       }
-    }
-  }, [createNote]);
+    },
+    [createNote],
+  );
+
+  // Listen for the "new-note" event dispatched from TitleBar's "+" button
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const name = (e as CustomEvent<{ name: string }>).detail?.name;
+      void handleNewNote(name);
+    };
+    window.addEventListener('glyphic:new-note', handler);
+    return () => window.removeEventListener('glyphic:new-note', handler);
+  }, [handleNewNote]);
 
   const handleNewFolder = useCallback(async () => {
     const name = window.prompt('Folder name:');
@@ -130,12 +156,90 @@ export function Sidebar() {
 
         {/* Action buttons */}
         <div className="flex" style={{ gap: '4px' }}>
-          <SidebarActionButton primary onClick={handleNewNote}>
+          <SidebarActionButton primary onClick={() => handleNewNote()}>
             ✚ Note
           </SidebarActionButton>
           <SidebarActionButton onClick={handleNewFolder}>📁 Folder</SidebarActionButton>
         </div>
       </div>
+
+      {/* Pinned notes section */}
+      {pinnedNotes.length > 0 && (
+        <div style={{ padding: '4px 10px 6px' }}>
+          <div
+            style={{
+              fontSize: '9px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-ghost)',
+              padding: '4px 4px 4px',
+            }}
+          >
+            Pinned
+          </div>
+          {pinnedNotes.map((path) => {
+            const name = path.replace(/\.md$/, '').split('/').pop() || path;
+            return (
+              <div
+                key={path}
+                className="flex items-center"
+                style={{
+                  gap: '6px',
+                  padding: '4px 8px',
+                  margin: '1px 2px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  transition: 'all 0.12s',
+                }}
+                onClick={() => setActiveNote(path, path)}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--bg-hover)';
+                  (e.currentTarget as HTMLDivElement).style.color = 'var(--text-primary)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent';
+                  (e.currentTarget as HTMLDivElement).style.color = 'var(--text-secondary)';
+                }}
+              >
+                <span style={{ fontSize: '11px', flexShrink: 0 }}>📌</span>
+                <span className="flex-1 truncate">{name}</span>
+                <button
+                  type="button"
+                  title="Unpin note"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    unpinNote(path);
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px',
+                    borderRadius: '4px',
+                    color: 'var(--text-ghost)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-active)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--text-ghost)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <PinOff size={10} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Tag filter chips */}
       <TagsPanel />
@@ -169,6 +273,11 @@ export function Sidebar() {
       <ReviewSession />
     </>
   );
+
+  // In focus mode on desktop, hide the sidebar entirely
+  if (!isMobile && isFocusMode) {
+    return null;
+  }
 
   if (isMobile) {
     return (
@@ -323,3 +432,5 @@ function FooterButton({ icon, label, onClick }: { icon: React.ReactNode; label: 
     </button>
   );
 }
+
+export { Pin };

@@ -9,6 +9,8 @@ import {
   FolderOpen,
   FolderPlus,
   Pencil,
+  Pin,
+  PinOff,
   Trash2,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -30,10 +32,14 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
 
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
+  const pinNote = useVaultStore((s) => s.pinNote);
+  const unpinNote = useVaultStore((s) => s.unpinNote);
   const { createNote, deleteNote } = useVault();
 
   const isFolder = entry.entry_type === 'folder';
   const isActive = !isFolder && activeNotePath === entry.path;
+  const isPinned = !isFolder && pinnedNotes.includes(entry.path);
   const title = entry.name.replace(/\.md$/, '');
 
   const handleClick = useCallback(() => {
@@ -191,6 +197,15 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
                 onClick={() => {
                   setCtxMenu(null);
                   useSplitStore.getState().openSplit(entry.path, 'vertical');
+                }}
+              />
+              <CtxItem
+                icon={isPinned ? PinOff : Pin}
+                label={isPinned ? 'Unpin note' : 'Pin note'}
+                onClick={() => {
+                  setCtxMenu(null);
+                  if (isPinned) unpinNote(entry.path);
+                  else pinNote(entry.path);
                 }}
               />
               <CtxItem icon={Pencil} label="Rename" onClick={handleRename} />

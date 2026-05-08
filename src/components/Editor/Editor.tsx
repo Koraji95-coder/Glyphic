@@ -31,6 +31,7 @@ export function Editor({
   const activeNotePath = notePathProp !== undefined ? notePathProp : globalActivePath;
   const lectureModeActive = useEditorStore((s) => s.lectureModeActive);
   const lectureModeStartedAt = useEditorStore((s) => s.lectureModeStartedAt);
+  const setCursorPosition = useEditorStore((s) => s.setCursorPosition);
   const { handleContentChange, loadNote } = useEditor();
 
   const editor = useTiptapEditor({
@@ -71,6 +72,17 @@ export function Editor({
       if (readOnly) return;
       const markdown = serializeToMarkdown(ed.getJSON());
       handleContentChange(markdown);
+    },
+    onSelectionUpdate: ({ editor: ed }) => {
+      if (readOnly) return;
+      const { from } = ed.state.selection;
+      // Count block nodes before the cursor to derive the line number
+      let line = 1;
+      ed.state.doc.forEach((_node, offset) => {
+        if (offset < from) line++;
+      });
+      const col = ed.state.doc.resolve(from).parentOffset + 1;
+      setCursorPosition({ line, col });
     },
   });
 

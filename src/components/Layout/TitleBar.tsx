@@ -1,5 +1,5 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { Menu, MessageSquare, Search, X } from 'lucide-react';
+import { Maximize2, Menu, MessageSquare, Minimize2, Plus, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useChatStore } from '../../stores/chatStore';
@@ -13,7 +13,7 @@ export function TitleBar() {
   const addOpenNote = useVaultStore((s) => s.addOpenNote);
   const removeOpenNote = useVaultStore((s) => s.removeOpenNote);
   const { isOpen: chatOpen, togglePanel } = useChatStore();
-  const { toggleSidebar } = useLayoutStore();
+  const { toggleSidebar, isFocusMode, toggleFocusMode } = useLayoutStore();
   const [isMaximized, setIsMaximized] = useState(false);
   const isMobile = useIsMobile();
 
@@ -218,6 +218,43 @@ export function TitleBar() {
               </div>
             );
           })}
+          {/* New tab button */}
+          <button
+            type="button"
+            title="New note (prompts for name)"
+            aria-label="New note"
+            onClick={() => {
+              const name = window.prompt('Note name:');
+              if (name) {
+                // Broadcast intent so the Sidebar can pick it up without prop-drilling
+                window.dispatchEvent(new CustomEvent('glyphic:new-note', { detail: { name } }));
+              }
+            }}
+            style={{
+              width: '26px',
+              height: '26px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--text-ghost)',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: 'all 0.12s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-ghost)';
+            }}
+          >
+            <Plus size={14} />
+          </button>
         </div>
       ) : (
         /* Fallback: center breadcrumb when no tabs (mobile or empty) */
@@ -241,6 +278,27 @@ export function TitleBar() {
 
       {/* Right: actions */}
       <div className="flex items-center shrink-0" style={{ gap: '4px' }}>
+        {/* Focus mode toggle */}
+        {!isMobile && (
+          <button
+            onClick={toggleFocusMode}
+            title={isFocusMode ? 'Exit focus mode (F11)' : 'Focus mode — hide sidebar (F11)'}
+            aria-label={isFocusMode ? 'Exit focus mode' : 'Enter focus mode'}
+            className="p-1.5 rounded transition-colors"
+            style={{
+              backgroundColor: isFocusMode ? 'var(--accent-dim)' : 'transparent',
+              color: isFocusMode ? 'var(--accent)' : 'var(--text-tertiary)',
+            }}
+            onMouseEnter={(e) => {
+              if (!isFocusMode) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = isFocusMode ? 'var(--accent-dim)' : 'transparent';
+            }}
+          >
+            {isFocusMode ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </button>
+        )}
         <button
           title="Quick Switcher (⌘P)"
           className="p-1.5 rounded transition-colors"

@@ -6,6 +6,7 @@ export function StatusBar() {
   const wordCount = useEditorStore((s) => s.wordCount);
   const isDirty = useEditorStore((s) => s.isDirty);
   const isSaving = useEditorStore((s) => s.isSaving);
+  const cursorPosition = useEditorStore((s) => s.cursorPosition);
   const { lectureModeActive, getElapsedTime } = useLectureMode();
   const isMobile = useIsMobile();
 
@@ -48,6 +49,14 @@ export function StatusBar() {
           <>
             <span style={{ color: 'var(--text-ghost)' }}>|</span>
             <span>~{readTime} min read</span>
+            {cursorPosition && (
+              <>
+                <span style={{ color: 'var(--text-ghost)' }}>|</span>
+                <span>
+                  Ln {cursorPosition.line}, Col {cursorPosition.col}
+                </span>
+              </>
+            )}
           </>
         )}
       </div>
