@@ -74,6 +74,12 @@ function MainLayout() {
           useSplitStore.getState().closeSplit();
         }
       }
+      // Focus mode: F11
+      if (e.key === 'F11') {
+        e.preventDefault();
+        useLayoutStore.getState().toggleFocusMode();
+        return;
+      }
       // Settings (Ctrl+,)
       if ((e.ctrlKey || e.metaKey) && e.key === ',') {
         e.preventDefault();

@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js';
 import { Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useVault } from '../../hooks/useVault';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
 
@@ -32,9 +33,11 @@ export function QuickSwitcher() {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const fileTree = useVaultStore((s) => s.fileTree);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const { createNote } = useVault();
 
   const allNotes = useMemo(() => flattenEntries(fileTree), [fileTree]);
 
@@ -52,6 +55,12 @@ export function QuickSwitcher() {
     if (!query.trim()) return allNotes.slice(0, 15);
     return fuse.search(query).map((r) => r.item);
   }, [query, fuse, allNotes]);
+
+  /** True when the query looks like a new note name (no matching result) */
+  const canCreateNew = query.trim().length > 0 && results.length === 0;
+
+  /** Total items in the list (results + optional "Create" row) */
+  const totalItems = results.length + (canCreateNew ? 1 : 0);
 
   // Keyboard shortcut to open (Ctrl+P / Cmd+P)
   useEffect(() => {
@@ -74,6 +83,13 @@ export function QuickSwitcher() {
     }
   }, [open]);
 
+  // Scroll selected item into view
+  useEffect(() => {
+    if (!listRef.current) return;
+    const item = listRef.current.children[selectedIndex] as HTMLElement | undefined;
+    item?.scrollIntoView({ block: 'nearest' });
+  }, [selectedIndex]);
+
   const handleSelect = useCallback(
     (note: NoteOption) => {
       setActiveNote(note.path, note.path);
@@ -82,12 +98,26 @@ export function QuickSwitcher() {
     [setActiveNote],
   );
 
+  const handleCreateNew = useCallback(async () => {
+    const name = query.trim();
+    if (!name) return;
+    try {
+      const note = await createNote('', name);
+      if (note) {
+        setActiveNote(note.path, note.path);
+      }
+    } catch (e) {
+      console.error('Failed to create note:', e);
+    }
+    setOpen(false);
+  }, [query, createNote, setActiveNote]);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
+          setSelectedIndex((i) => Math.min(i + 1, totalItems - 1));
           break;
         case 'ArrowUp':
           e.preventDefault();
@@ -95,7 +125,9 @@ export function QuickSwitcher() {
           break;
         case 'Enter':
           e.preventDefault();
-          if (results[selectedIndex]) {
+          if (canCreateNew && selectedIndex === results.length) {
+            void handleCreateNew();
+          } else if (results[selectedIndex]) {
             handleSelect(results[selectedIndex]);
           }
           break;
@@ -105,7 +137,7 @@ export function QuickSwitcher() {
           break;
       }
     },
-    [results, selectedIndex, handleSelect],
+    [results, selectedIndex, totalItems, canCreateNew, handleSelect, handleCreateNew],
   );
 
   if (!open) return null;
@@ -137,54 +169,126 @@ export function QuickSwitcher() {
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search notes..."
+            placeholder="Search notes…"
             className="flex-1 bg-transparent text-sm outline-none"
             style={{ color: 'var(--text-primary)' }}
           />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '10px',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                color: 'var(--text-ghost)',
+                fontFamily: 'var(--font-mono)',
+              }}
+            >
+              clear
+            </button>
+          )}
         </div>
 
         {/* Results */}
-        <div className="max-h-72 overflow-y-auto">
-          {results.length === 0 ? (
+        <div ref={listRef} className="max-h-72 overflow-y-auto">
+          {results.length === 0 && !canCreateNew ? (
             <div className="px-4 py-6 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
               No notes found
             </div>
           ) : (
-            results.map((note, i) => {
-              const folder = note.path.split('/').slice(0, -1).join('/');
-              const modifiedLabel = note.modified_at ? formatRelativeDate(note.modified_at) : '';
-              return (
+            <>
+              {results.map((note, i) => {
+                const folder = note.path.split('/').slice(0, -1).join('/');
+                const modifiedLabel = note.modified_at ? formatRelativeDate(note.modified_at) : '';
+                return (
+                  <button
+                    type="button"
+                    key={note.path}
+                    onClick={() => handleSelect(note)}
+                    className="flex items-center justify-between w-full px-4 py-2 text-left text-sm transition-colors"
+                    style={{
+                      backgroundColor: i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
+                      color: 'var(--text-primary)',
+                    }}
+                    onMouseEnter={() => setSelectedIndex(i)}
+                  >
+                    <span className="truncate font-medium">{note.title}</span>
+                    <span className="flex items-center gap-2 ml-2 shrink-0">
+                      {modifiedLabel && (
+                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                          {modifiedLabel}
+                        </span>
+                      )}
+                      {folder && (
+                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                          {folder}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+              {/* Create new note row */}
+              {canCreateNew && (
                 <button
                   type="button"
-                  key={note.path}
-                  onClick={() => handleSelect(note)}
-                  className="flex items-center justify-between w-full px-4 py-2 text-left text-sm transition-colors"
+                  onClick={handleCreateNew}
+                  className="flex items-center w-full px-4 py-2 text-left text-sm transition-colors"
                   style={{
-                    backgroundColor: i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
-                    color: 'var(--text-primary)',
+                    backgroundColor: selectedIndex === results.length ? 'var(--accent-muted)' : 'transparent',
+                    color: 'var(--accent)',
+                    gap: '8px',
                   }}
-                  onMouseEnter={() => setSelectedIndex(i)}
+                  onMouseEnter={() => setSelectedIndex(results.length)}
                 >
-                  <span className="truncate font-medium">{note.title}</span>
-                  <span className="flex items-center gap-2 ml-2 shrink-0">
-                    {modifiedLabel && (
-                      <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                        {modifiedLabel}
-                      </span>
-                    )}
-                    {folder && (
-                      <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                        {folder}
-                      </span>
-                    )}
+                  <span style={{ fontSize: '14px' }}>✚</span>
+                  <span>
+                    Create <strong>"{query.trim()}"</strong>
                   </span>
                 </button>
-              );
-            })
+              )}
+            </>
           )}
+        </div>
+
+        {/* Keyboard hint footer */}
+        <div
+          className="flex items-center justify-between px-4 py-2"
+          style={{
+            borderTop: '1px solid var(--border)',
+            fontSize: '10px',
+            color: 'var(--text-ghost)',
+            fontFamily: 'var(--font-mono)',
+          }}
+        >
+          <span>
+            <Kbd>↑↓</Kbd> navigate · <Kbd>Enter</Kbd> open · <Kbd>Esc</Kbd> close
+          </span>
+          <span>{results.length} notes</span>
         </div>
       </div>
     </>
+  );
+}
+
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      style={{
+        padding: '1px 4px',
+        borderRadius: '3px',
+        backgroundColor: 'var(--bg-elevated)',
+        border: '1px solid var(--border)',
+        fontSize: '9px',
+        fontFamily: 'var(--font-mono)',
+      }}
+    >
+      {children}
+    </span>
   );
 }
 

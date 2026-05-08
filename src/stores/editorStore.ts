@@ -6,6 +6,8 @@ interface EditorState {
   isSaving: boolean;
   lastSavedAt: Date | null;
   wordCount: number;
+  /** Current cursor position: { line, col } — updated on selection change */
+  cursorPosition: { line: number; col: number } | null;
   lectureModeActive: boolean;
   lectureModeStartedAt: Date | null;
   /** The `ai_model` value from the active note's frontmatter, or null if unset. */
@@ -15,6 +17,7 @@ interface EditorState {
   markSaved: () => void;
   setWordCount: (count: number) => void;
   setSaving: (saving: boolean) => void;
+  setCursorPosition: (pos: { line: number; col: number } | null) => void;
   toggleLectureMode: () => void;
   setActiveNoteAiModel: (model: string | null) => void;
 }
@@ -25,6 +28,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   isSaving: false,
   lastSavedAt: null,
   wordCount: 0,
+  cursorPosition: null,
   lectureModeActive: false,
   lectureModeStartedAt: null,
   activeNoteAiModel: null,
@@ -34,6 +38,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   markSaved: () => set({ isDirty: false, lastSavedAt: new Date() }),
   setWordCount: (count) => set({ wordCount: count }),
   setSaving: (saving) => set({ isSaving: saving }),
+  setCursorPosition: (pos) => set({ cursorPosition: pos }),
   toggleLectureMode: () =>
     set((state) => ({
       lectureModeActive: !state.lectureModeActive,

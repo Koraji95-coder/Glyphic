@@ -5,6 +5,8 @@ export type ActiveMode = 'editor' | 'fePrep' | 'vault' | 'diagram';
 interface LayoutState {
   isSidebarOpen: boolean;
   isInkMode: boolean;
+  /** Distraction-free writing mode — hides sidebar and toolbar */
+  isFocusMode: boolean;
   activeMode: ActiveMode;
   /** Derived convenience getters */
   isFePrepMode: boolean;
@@ -13,6 +15,7 @@ interface LayoutState {
   toggleSidebar: () => void;
   closeSidebar: () => void;
   toggleInkMode: () => void;
+  toggleFocusMode: () => void;
   openFePrep: () => void;
   closeFePrep: () => void;
   openVaultMode: () => void;
@@ -33,6 +36,7 @@ export const useLayoutStore = create<LayoutState>((set) => {
   return {
     isSidebarOpen: false,
     isInkMode: false,
+    isFocusMode: false,
     activeMode: 'editor',
     isFePrepMode: false,
     isVaultMode: false,
@@ -40,6 +44,7 @@ export const useLayoutStore = create<LayoutState>((set) => {
     toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
     closeSidebar: () => set({ isSidebarOpen: false }),
     toggleInkMode: () => set((s) => ({ isInkMode: !s.isInkMode })),
+    toggleFocusMode: () => set((s) => ({ isFocusMode: !s.isFocusMode })),
     openFePrep: () => setMode('fePrep'),
     closeFePrep: () => setMode('editor'),
     openVaultMode: () => setMode('vault'),
