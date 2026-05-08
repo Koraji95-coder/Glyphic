@@ -30,6 +30,7 @@ import { useVault } from './hooks/useVault';
 import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
+import { useEditorStore } from './stores/editorStore';
 import { useHelpUiStore } from './stores/helpUiStore';
 import { useLayoutStore } from './stores/layoutStore';
 import { useOnboardingStore } from './stores/onboardingStore';
@@ -89,6 +90,30 @@ function MainLayout() {
       if ((e.ctrlKey || e.metaKey) && (e.key === '?' || e.key === '/')) {
         e.preventDefault();
         useHelpUiStore.getState().toggle();
+      }
+      // New note in current folder (Ctrl+N)
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'n') {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('glyphic:new-note'));
+        return;
+      }
+      // New folder (Ctrl+Shift+N)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'N') {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('glyphic:new-folder'));
+        return;
+      }
+      // Force-save current note (Ctrl+S)
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 's') {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('glyphic:force-save'));
+        return;
+      }
+      // Toggle lecture mode (Ctrl+Shift+L)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        useEditorStore.getState().toggleLectureMode();
+        return;
       }
     };
     window.addEventListener('keydown', handleKeyDown);

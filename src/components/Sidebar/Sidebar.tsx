@@ -58,6 +58,12 @@ export function Sidebar() {
     return () => window.removeEventListener('glyphic:new-note', handler);
   }, [handleNewNote]);
 
+  // Listen for the "new-folder" event dispatched from App.tsx (Ctrl+Shift+N)
+  useEffect(() => {
+    window.addEventListener('glyphic:new-folder', handleNewFolder);
+    return () => window.removeEventListener('glyphic:new-folder', handleNewFolder);
+  }, [handleNewFolder]);
+
   const handleNewFolder = useCallback(async () => {
     const name = window.prompt('Folder name:');
     if (name && vaultPath) {

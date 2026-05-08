@@ -127,12 +127,12 @@ export function DiagramMode() {
           diagramType === 'mermaid'
             ? 'Return only valid Mermaid diagram syntax, no other text.'
             : `Return only valid Python code. For schemdraw/circuit: assign the schemdraw.Drawing() to a variable named 'd'. For matplotlib/phasor/polar: use plt (already available) to create the figure. No plt.show(). No other text or explanation.`;
-        const aiCode = await commands.aiChat(
-          `Generate a ${diagramType} diagram for: "${nlPrompt.trim()}". ${typeHint}`,
-        ).catch((e: unknown) => {
-          console.error('NL-to-code AI generation failed:', e);
-          return '';
-        });
+        const aiCode = await commands
+          .aiChat(`Generate a ${diagramType} diagram for: "${nlPrompt.trim()}". ${typeHint}`)
+          .catch((e: unknown) => {
+            console.error('NL-to-code AI generation failed:', e);
+            return '';
+          });
         if (aiCode) {
           // Strip possible markdown fences
           const stripped = aiCode
@@ -202,7 +202,13 @@ export function DiagramMode() {
         <button
           type="button"
           onClick={closeDiagramMode}
-          style={{ padding: '4px', background: 'transparent', border: 'none', color: 'var(--text-ghost)', cursor: 'pointer' }}
+          style={{
+            padding: '4px',
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-ghost)',
+            cursor: 'pointer',
+          }}
         >
           <X size={16} />
         </button>
@@ -327,7 +333,9 @@ export function DiagramMode() {
               type="text"
               value={nlPrompt}
               onChange={(e) => setNlPrompt(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') void handleRender(); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void handleRender();
+              }}
               placeholder={`Describe the ${diagramType} diagram you want… (press Enter to generate)`}
               style={{
                 width: '100%',

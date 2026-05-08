@@ -141,7 +141,11 @@ export const commands = {
   aiChat: (message: string, noteContext?: string, modelOverride?: string) =>
     invoke<string>('ai_chat', { message, noteContext: noteContext ?? null, modelOverride: modelOverride ?? null }),
   aiStudyChat: (message: string, noteContext?: string, modelOverride?: string) =>
-    invoke<string>('ai_study_chat', { message, noteContext: noteContext ?? null, modelOverride: modelOverride ?? null }),
+    invoke<string>('ai_study_chat', {
+      message,
+      noteContext: noteContext ?? null,
+      modelOverride: modelOverride ?? null,
+    }),
   aiChatStream: (streamId: string, message: string, noteContext?: string, modelOverride?: string) =>
     invoke<void>('ai_chat_stream', {
       streamId,

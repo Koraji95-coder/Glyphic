@@ -303,6 +303,7 @@ export function TitleBar() {
           title="Quick Switcher (⌘P)"
           className="p-1.5 rounded transition-colors"
           style={{ color: 'var(--text-tertiary)', backgroundColor: 'transparent' }}
+          onClick={() => window.dispatchEvent(new CustomEvent('glyphic:open-quick-switcher'))}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
         >

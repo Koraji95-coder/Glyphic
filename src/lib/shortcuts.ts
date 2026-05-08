@@ -28,10 +28,7 @@ export const SHORTCUTS: ShortcutEntry[] = [
   { combo: 'Ctrl+S', description: 'Force-save current note', category: 'Editor' },
   { combo: 'Ctrl+B', description: 'Bold', category: 'Editor' },
   { combo: 'Ctrl+I', description: 'Italic', category: 'Editor' },
-  { combo: 'Ctrl+K', description: 'Insert link', category: 'Editor' },
-  { combo: 'Ctrl+Shift+K', description: 'Insert backlink', category: 'Editor' },
   { combo: 'Ctrl+E', description: 'Inline code', category: 'Editor' },
-  { combo: 'Ctrl+Shift+E', description: 'Code block', category: 'Editor' },
   { combo: 'Ctrl+Shift+L', description: 'Toggle lecture mode', category: 'Editor' },
 
   // Layout
