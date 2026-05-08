@@ -258,3 +258,47 @@ pub async fn get_flashcard_stats(app: AppHandle) -> Result<FlashcardStats, Strin
     .await
     .map_err(|e| format!("join error: {e}"))?
 }
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// SM-2 lite: "again" always resets to 1-day interval.
+    #[test]
+    fn sm2_again_resets_to_1() {
+        let (interval, _) = compute_due("again", 10);
+        assert_eq!(interval, 1);
+    }
+
+    /// SM-2 lite: "good" from interval=1 → ceil(1 * 2.5) = 3 days.
+    #[test]
+    fn sm2_good_from_1_gives_3() {
+        let (interval, _) = compute_due("good", 1);
+        assert_eq!(interval, 3);
+    }
+
+    /// SM-2 lite: "easy" from interval=1 → ceil(1 * 4.0) = 4 days.
+    #[test]
+    fn sm2_easy_from_1_gives_4() {
+        let (interval, _) = compute_due("easy", 1);
+        assert_eq!(interval, 4);
+    }
+
+    /// Interval is always at least 1 regardless of rating.
+    #[test]
+    fn sm2_interval_minimum_is_1() {
+        for rating in &["again", "good", "easy"] {
+            let (interval, _) = compute_due(rating, 0);
+            assert!(interval >= 1, "interval for '{rating}' must be >= 1");
+        }
+    }
+
+    /// Unknown rating falls back to interval=1.
+    #[test]
+    fn sm2_unknown_rating_falls_back_to_1() {
+        let (interval, _) = compute_due("unknown", 5);
+        assert_eq!(interval, 1);
+    }
+}

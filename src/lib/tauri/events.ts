@@ -25,6 +25,13 @@ export interface ChatStreamEndPayload {
   stream_id: string;
 }
 
+export interface VaultIngestProgressPayload {
+  status: 'progress';
+  message: string;
+  /** Progress fraction 0–1, if available. */
+  progress?: number;
+}
+
 export const events = {
   onScreenshotCaptured: (handler: (result: CaptureResult) => void): Promise<UnlistenFn> =>
     listen<CaptureResult>('screenshot-captured', (event) => handler(event.payload)),
@@ -48,4 +55,7 @@ export const events = {
 
   onChatStreamCancelled: (handler: (payload: ChatStreamEndPayload) => void): Promise<UnlistenFn> =>
     listen<ChatStreamEndPayload>('chat-stream-cancelled', (event) => handler(event.payload)),
+
+  onVaultIngestProgress: (handler: (payload: VaultIngestProgressPayload) => void): Promise<UnlistenFn> =>
+    listen<VaultIngestProgressPayload>('vault-ingest-progress', (event) => handler(event.payload)),
 };

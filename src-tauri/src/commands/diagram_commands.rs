@@ -26,6 +26,27 @@ fn diagram_engine_path(app: &AppHandle) -> Result<PathBuf, String> {
     }
 }
 
+/// Returns the launcher shim path if it exists, otherwise falls back to
+/// `python3 <script>`. The shim activates the venv from `sidecars/install_deps.sh`.
+fn diagram_python_cmd(app: &AppHandle) -> (std::ffi::OsString, Vec<std::ffi::OsString>) {
+    if let Ok(resource_dir) = app.path().resource_dir() {
+        let shim = resource_dir
+            .join("sidecars")
+            .join("diagram_engine_launcher");
+        if shim.exists() {
+            return (shim.into_os_string(), vec![]);
+        }
+    }
+    // Fallback: plain python3 with the script path as arg
+    if let Ok(script) = diagram_engine_path(app) {
+        return (
+            std::ffi::OsString::from("python3"),
+            vec![script.into_os_string()],
+        );
+    }
+    (std::ffi::OsString::from("python3"), vec![])
+}
+
 // ── Sidecar runner ────────────────────────────────────────────────────────────
 
 /// Spawn the diagram engine, send one request on stdin and return the response.
@@ -37,10 +58,10 @@ async fn run_diagram_engine(
     use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
     use tokio::process::Command;
 
-    let script = diagram_engine_path(app)?;
+    let (cmd, extra_args) = diagram_python_cmd(app);
 
-    let mut child = Command::new("python3")
-        .arg(&script)
+    let mut child = Command::new(&cmd)
+        .args(&extra_args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())

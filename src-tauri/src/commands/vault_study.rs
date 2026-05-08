@@ -26,6 +26,27 @@ fn vault_engine_path(app: &AppHandle) -> Result<PathBuf, String> {
     }
 }
 
+/// Returns the launcher shim path if it exists, otherwise falls back to bare
+/// `python3`. The shim activates the venv created by `sidecars/install_deps.sh`.
+fn vault_python_cmd(app: &AppHandle) -> (std::ffi::OsString, Vec<std::ffi::OsString>) {
+    if let Ok(resource_dir) = app.path().resource_dir() {
+        let shim = resource_dir
+            .join("sidecars")
+            .join("vault_engine_launcher");
+        if shim.exists() {
+            return (shim.into_os_string(), vec![]);
+        }
+    }
+    // Fallback: plain python3 with the script path as arg
+    if let Ok(script) = vault_engine_path(app) {
+        return (
+            std::ffi::OsString::from("python3"),
+            vec![script.into_os_string()],
+        );
+    }
+    (std::ffi::OsString::from("python3"), vec![])
+}
+
 // ── Sidecar runner ────────────────────────────────────────────────────────────
 
 /// Spawn the vault engine sidecar, send one JSON request on stdin and collect
@@ -45,10 +66,10 @@ async fn run_vault_engine(
     use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
     use tokio::process::Command;
 
-    let script = vault_engine_path(app)?;
+    let (cmd, extra_args) = vault_python_cmd(app);
 
-    let mut child = Command::new("python3")
-        .arg(&script)
+    let mut child = Command::new(&cmd)
+        .args(&extra_args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())

@@ -44,6 +44,16 @@
         "skipTaskbar": true,
         "visible": false,
         "resizable": false
+      },
+      {
+        "label": "print-preview",
+        "title": "Glyphic — Print Preview",
+        "url": "/print-preview",
+        "width": 900,
+        "height": 1100,
+        "decorations": true,
+        "visible": false,
+        "resizable": true
       }
     ],
     "security": {

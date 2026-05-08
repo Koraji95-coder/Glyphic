@@ -610,3 +610,52 @@ fn extract_json_array(text: &str) -> String {
 
     content.to_string()
 }
+
+// ---------------------------------------------------------------------------
+// Local-only study chat (enforces Ollama regardless of global provider setting)
+// ---------------------------------------------------------------------------
+
+const SYSTEM_STUDY: &str = "You are ScribeAI, a study assistant for STEM students \
+preparing for professional engineering exams (FE/PE). Your goal is to generate \
+high-quality, exam-relevant practice questions and provide clear, step-by-step \
+answers. \
+- Always typeset math in LaTeX inside `$...$` (inline) or `$$...$$` (block). \
+- Include units in all answers and intermediate steps. \
+- For derivations, show step-by-step work; don't skip algebra. \
+Format your responses with markdown.";
+
+/// Like `ai_chat` but always routes to the local Ollama provider, ignoring
+/// any cloud-provider configuration.  Used by FE Prep and Study mode so that
+/// practice sessions never send exam content to external services.
+#[tauri::command]
+pub async fn ai_study_chat(
+    message: String,
+    note_context: Option<String>,
+    model_override: Option<String>,
+    state: State<'_, AiState>,
+) -> Result<String, String> {
+    let (endpoint, model) = {
+        let config = state.config.lock().unwrap();
+        let endpoint = config.ollama.endpoint.clone();
+        let model = model_override.unwrap_or_else(|| config.model_routing.chat.clone());
+        (endpoint, model)
+    };
+
+    let ollama_cfg = crate::ai::config::OllamaConfig { endpoint, model: model.clone() };
+    let provider = crate::ai::ollama::OllamaProvider::new(ollama_cfg, state.client.clone());
+
+    let mut system = SYSTEM_STUDY.to_string();
+    if let Some(ctx) = &note_context {
+        if !ctx.is_empty() {
+            system.push_str("\n\nRelevant study material:\n");
+            system.push_str(ctx);
+        }
+    }
+
+    let messages = vec![ChatMessage {
+        role: "user".into(),
+        content: message,
+    }];
+
+    provider.chat(messages, Some(system), Some(model)).await
+}

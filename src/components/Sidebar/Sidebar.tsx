@@ -1,4 +1,4 @@
-import { GraduationCap, HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
+import { Database, GitBranch, GraduationCap, HelpCircle, LayoutList, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
@@ -17,7 +17,7 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
-  const { isSidebarOpen, closeSidebar, openFePrep } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, openFePrep, openVaultMode, openDiagramMode } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
@@ -160,6 +160,8 @@ export function Sidebar() {
           onClick={() => useSettingsUiStore.getState().open('general')}
         />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" onClick={handleTrash} />
+        <FooterButton icon={<Database size={12} />} label="Vault" onClick={openVaultMode} />
+        <FooterButton icon={<GitBranch size={12} />} label="Diagrams" onClick={openDiagramMode} />
         <FooterButton icon={<GraduationCap size={12} />} label="FE Prep" onClick={openFePrep} />
         <FooterButton icon={<LayoutList size={12} />} label="Review" onClick={openReview} />
         <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
