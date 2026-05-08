@@ -331,29 +331,26 @@ Status key: **Present**, **Partial**, **Missing**.
 
 Principle applied: each slice is vertical (sidecar/runtime + Rust command + UI shell + test) before parallelization.
 
-1. **Backlink panel completion (vertical slice)**
-   - Add UI panel bound to existing `get_backlinks` command, include frontend tests and one Rust/API integration assertion.
-
-2. **Shortcut parity slice (vertical slice)**
+1. **Shortcut parity slice (vertical slice)**
    - Align documented shortcuts with real handlers (or trim docs list), including Quick Switcher button click wiring and tests for key bindings.
 
-3. **Study sidecar template extraction (`study_engine`) (vertical slice)**
+2. **Study sidecar template extraction (`study_engine`) (vertical slice)**
    - Reuse current sidecar launch/IPC conventions (`vault_study.rs`/`diagram_commands.rs`), ship one end-to-end command + UI stub + tests.
 
-4. **FE sidecar template extraction (`fe_engine`) (vertical slice)**
+3. **FE sidecar template extraction (`fe_engine`) (vertical slice)**
    - Same launch/IPC/error model, with one initial FE workflow command and UI shell.
 
-5. **Python sidecar test surface slice**
+4. **Python sidecar test surface slice**
    - Add `sidecars/*/tests` coverage for NDJSON protocol handling, action dispatch, and error payload contracts.
 
-6. **Governance hardening slice**
+5. **Governance hardening slice**
    - Add `.github/copilot-instructions.md` and `.github/prompts/` templates; decide/implement branch protection for `main`; update README governance/AI-constraint statements.
 
 ## Baseline command checks run for this assessment (read-only)
 
 - `npm install` → success (engine warning + one moderate audit advisory)
 - `npm run build` → success
-- `npm test` → success (4 files, 39 tests with 3 skipped)
+- `npm test` → success (5 files, 42 tests with 3 skipped)
 - `npm run lint` → fails due existing Biome diagnostics (pre-existing, not changed here)
 - `cargo test` in `src-tauri` → fails in this environment due missing system libs (`glib-2.0`, `gio-2.0`, `gobject-2.0`)
 
