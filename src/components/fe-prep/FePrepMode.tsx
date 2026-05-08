@@ -1,7 +1,7 @@
 import { AlertTriangle, BarChart2, BookOpen, CheckCircle, ChevronRight, SkipForward, XCircle } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import type { FeTopic, FeTopicStats, FeWeakTopic } from '../../lib/tauri/commands';
+import type { FeTopic, FeTopicStats, FeWeakTopic, MathGradeResult } from '../../lib/tauri/commands';
 import { commands } from '../../lib/tauri/commands';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -425,38 +425,44 @@ function PracticeSession({
 }) {
   const [generating, setGenerating] = useState(false);
   const [modelAnswer, setModelAnswer] = useState('');
+  const [grading, setGrading] = useState(false);
+  const [grade, setGrade] = useState<MathGradeResult | null>(null);
 
-  // Auto-generate a question via local-only AI when session starts or after each question
+  // Auto-generate a question via local-only AI (studyAsk grounds the prompt in
+  // vault context server-side, so a single round-trip replaces the old
+  // queryVault + aiStudyChat two-step pattern).
   useEffect(() => {
     if (session.revealed) return;
     setGenerating(true);
     setModelAnswer('');
+    setGrade(null);
 
     const generate = async () => {
-      // Optionally prepend vault context to ground the question in study material
-      let vaultContext = '';
-      try {
-        const vaultResult = (await commands.queryVault(session.topicName, undefined, 3)) as {
-          results?: Array<{ text: string; source_label: string }>;
-        };
-        const chunks = vaultResult?.results ?? [];
-        if (chunks.length > 0) {
-          vaultContext = chunks.map((c) => `[${c.source_label}]: ${c.text}`).join('\n\n');
-        }
-      } catch {
-        // Vault sidecar not running — proceed without context
-      }
-
       const prompt = `You are an FE exam tutor. Generate one multiple-choice or short-answer FE exam practice question for the topic: "${session.topicName}". Format: first write the question, then on a new line starting with "ANSWER:" provide the correct answer and a brief explanation.`;
 
-      const response = await commands.aiStudyChat(prompt, vaultContext || undefined);
-      const parts = response.split(/\nANSWER:/i);
-      if (parts.length >= 2) {
-        onQuestionGenerated(parts[0].trim());
-        setModelAnswer(parts.slice(1).join('\nANSWER:').trim());
-      } else {
-        onQuestionGenerated(response.trim());
-        setModelAnswer('');
+      try {
+        // studyAsk orchestrates vault semantic search + Ollama in one command
+        const result = await commands.studyAsk(prompt, [session.topicName], 3);
+        const response = result.answer;
+        const parts = response.split(/\nANSWER:/i);
+        if (parts.length >= 2) {
+          onQuestionGenerated(parts[0].trim());
+          setModelAnswer(parts.slice(1).join('\nANSWER:').trim());
+        } else {
+          onQuestionGenerated(response.trim());
+          setModelAnswer('');
+        }
+      } catch {
+        // studyAsk not available (dev mode) — fall back to aiStudyChat
+        const response = await commands.aiStudyChat(prompt);
+        const parts = response.split(/\nANSWER:/i);
+        if (parts.length >= 2) {
+          onQuestionGenerated(parts[0].trim());
+          setModelAnswer(parts.slice(1).join('\nANSWER:').trim());
+        } else {
+          onQuestionGenerated(response.trim());
+          setModelAnswer('');
+        }
       }
     };
 
@@ -471,6 +477,15 @@ function PracticeSession({
 
   const handleReveal = () => {
     onReveal(modelAnswer);
+    // Grade the user's answer asynchronously after reveal
+    if (session.userAnswer.trim() && modelAnswer.trim()) {
+      setGrading(true);
+      commands
+        .gradeMathAnswer(session.question, session.userAnswer, modelAnswer)
+        .then((result) => setGrade(result))
+        .catch(() => setGrade(null))
+        .finally(() => setGrading(false));
+    }
   };
 
   return (
@@ -680,6 +695,99 @@ function PracticeSession({
                 {session.answer}
               </p>
             </div>
+
+            {/* AI grade feedback */}
+            {(grading || grade) && (
+              <div
+                style={{
+                  padding: '16px 20px',
+                  borderRadius: 'var(--radius-lg)',
+                  border: `1px solid ${
+                    grading
+                      ? 'var(--border)'
+                      : grade?.verdict === 'correct'
+                        ? 'var(--green, #4ade80)44'
+                        : grade?.verdict === 'partial'
+                          ? '#facc1544'
+                          : '#f8717144'
+                  }`,
+                  backgroundColor: grading
+                    ? 'var(--bg-card)'
+                    : grade?.verdict === 'correct'
+                      ? 'rgba(74,222,128,0.07)'
+                      : grade?.verdict === 'partial'
+                        ? 'rgba(250,204,21,0.07)'
+                        : 'rgba(248,113,113,0.07)',
+                }}
+              >
+                {grading ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: '14px',
+                        height: '14px',
+                        border: '2px solid var(--border)',
+                        borderTopColor: 'var(--accent)',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                      }}
+                    />
+                    Grading your answer…
+                  </div>
+                ) : grade ? (
+                  <>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginBottom: '10px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor:
+                            grade.verdict === 'correct'
+                              ? 'rgba(74,222,128,0.18)'
+                              : grade.verdict === 'partial'
+                                ? 'rgba(250,204,21,0.18)'
+                                : 'rgba(248,113,113,0.18)',
+                          color:
+                            grade.verdict === 'correct'
+                              ? 'var(--green, #4ade80)'
+                              : grade.verdict === 'partial'
+                                ? '#facc15'
+                                : 'var(--red, #f87171)',
+                        }}
+                      >
+                        {grade.verdict === 'correct' ? '✓ Correct' : grade.verdict === 'partial' ? '~ Partial' : '✗ Incorrect'}
+                      </span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        Score: {grade.score}/100
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        fontSize: '13px',
+                        lineHeight: 1.65,
+                        color: 'var(--text-primary)',
+                        margin: 0,
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {grade.feedback}
+                    </p>
+                  </>
+                ) : null}
+              </div>
+            )}
 
             {/* Rating buttons */}
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>

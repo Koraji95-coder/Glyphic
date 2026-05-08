@@ -6,6 +6,7 @@ pub mod flashcards;
 pub mod search_commands;
 pub mod settings_commands;
 pub mod state_commands;
+pub mod study;
 pub mod tag_commands;
 pub mod vault_commands;
 pub mod vault_study;
