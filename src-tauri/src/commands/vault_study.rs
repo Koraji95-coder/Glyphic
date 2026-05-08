@@ -57,7 +57,7 @@ fn vault_python_cmd(app: &AppHandle) -> (std::ffi::OsString, Vec<std::ffi::OsStr
 /// is returned as the final result.
 ///
 /// In Tauri 2.0, `app.emit()` replaces `app.emit_all()`.
-async fn run_vault_engine(
+pub(super) async fn run_vault_engine(
     app: &AppHandle,
     request: serde_json::Value,
     emit_event: Option<&str>,

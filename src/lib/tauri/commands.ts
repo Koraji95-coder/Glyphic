@@ -49,6 +49,25 @@ export interface FlashcardStats {
   mastered: number;
 }
 
+// ── Study-mode types ──────────────────────────────────────────────────────────
+
+export interface StudySource {
+  text: string;
+  source_label: string;
+  [key: string]: unknown;
+}
+
+export interface StudyAskResult {
+  answer: string;
+  sources: StudySource[];
+}
+
+export interface MathGradeResult {
+  verdict: 'correct' | 'partial' | 'incorrect' | 'unknown';
+  score: number;
+  feedback: string;
+}
+
 const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 export const commands = {
@@ -223,4 +242,24 @@ export const commands = {
     isTauri
       ? invoke<FlashcardStats>('get_flashcard_stats')
       : Promise.resolve({ total_cards: 0, due_today: 0, due_this_week: 0, mastered: 0 } as FlashcardStats),
+
+  // Advanced study: grounded Q&A + math grading
+  studyAsk: (question: string, topicFilter?: string[], nResults?: number, modelOverride?: string) =>
+    isTauri
+      ? invoke<StudyAskResult>('study_ask', {
+          question,
+          topicFilter: topicFilter ?? null,
+          nResults: nResults ?? null,
+          modelOverride: modelOverride ?? null,
+        })
+      : Promise.reject('Not in Tauri'),
+  gradeMathAnswer: (problem: string, userAnswer: string, correctAnswer: string, modelOverride?: string) =>
+    isTauri
+      ? invoke<MathGradeResult>('grade_math_answer', {
+          problem,
+          userAnswer,
+          correctAnswer,
+          modelOverride: modelOverride ?? null,
+        })
+      : Promise.reject('Not in Tauri'),
 };
