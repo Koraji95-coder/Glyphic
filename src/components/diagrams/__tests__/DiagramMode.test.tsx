@@ -43,7 +43,7 @@ import { DiagramMode } from '../DiagramMode';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function clickButton(label) {
+function clickButton(label: string | RegExp) {
   fireEvent.click(screen.getByRole('button', { name: label }));
 }
 
