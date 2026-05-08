@@ -71,6 +71,6 @@ cargo check
 | A4 | Markdown export with attachments | ✅ Implemented (EditorToolbar → Export → Markdown) |
 | A5 | PDF export via print-preview | ✅ Implemented (EditorToolbar → Export → PDF) |
 | B5 | Backlink detection (`[[Note]]` wikilinks) | ✅ Stable — wikilinks parsed and stored in DB |
-| B6 | Backlink UI panel (see linked notes) | ✅ Visible in sidebar tag chips and cross-reference in DB |
+| B6 | Backlink UI panel (see linked notes) | ✅ Visible in the Sidebar Backlinks panel (below Tags) and cross-reference in DB |
 | E2 | Ollama integration status indicator | ✅ AI settings panel shows provider/model; Ollama ping on settings open |
 | E3 | Ollama model pull with progress | ✅ Settings → AI → pull model shows real-time % progress |
