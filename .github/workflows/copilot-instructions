@@ -1,0 +1,91 @@
+# Glyphic — Copilot Instructions
+
+Glyphic is a Tauri 2 desktop app providing a local-first, AI-augmented study environment. Local AI (Ollama) is the default; cloud AI (OpenAI) is supported as an explicit user opt-in via the AI Settings panel (`src/components/Chat/AiSettingsPanel.tsx:290-307`).
+
+**Read these before changing anything:**
+- This file (the rules)
+- `AGENTS.md` (task patterns and the pre-flight checklist)
+- `docs/state-assessment-2026-05.md` (current repo state and known gaps)
+- The relevant prompt template under `.github/prompts/`
+
+## Architecture (non-negotiable)
+
+- Frontend: React 19 + TypeScript in `src/`
+- Backend: Rust in `src-tauri/`, organized by domain in `src-tauri/src/commands/<domain>.rs`
+- AI inference: Python sidecars in `sidecars/<engine>/`
+- IPC: NDJSON over sidecar stdin/stdout
+- Persistence: SQLite via `rusqlite`, schema in `src-tauri/src/db/`
+- Math rendering: KaTeX (frontend, `package.json:44`)
+- Test runners: Vitest (frontend), `cargo test` (Rust), pytest (sidecars)
+
+## AI provider rules
+
+- MUST: treat Ollama as the default provider. New code paths assume Ollama unless provider routing is explicitly involved.
+- MUST: gate any OpenAI call behind the AI Settings opt-in. Code may call OpenAI only when the user has configured an API key in the AI Settings panel and explicitly selected OpenAI as the provider.
+- NEVER: hardcode an OpenAI API key, embed one in test fixtures, or read one from sources other than the AI Settings store.
+- NEVER: add new cloud LLM providers (Anthropic, Google, Mistral cloud, etc.) without an explicit roadmap issue and a maintainer's sign-off.
+
+## Sidecar rules
+
+- MUST: every new LLM-calling feature ships as a Python sidecar under `sidecars/<engine>/`.
+- MUST: each sidecar has `main.py`, `Requirements.txt` (all versions pinned), and a `tests/` directory with at least one pytest per action.
+- MUST: sidecars communicate via NDJSON over stdout. Each line is one event. Errors emit `{"event":"error","message":"..."}` then exit code 1.
+- MUST: sidecar entry point dispatches on a single `action` field in the input JSON.
+- MUST: `print(..., flush=True)` after every event line so the Rust reader sees streaming progress, not buffered batches.
+- Reference implementations: `sidecars/vault_engine/main.py:1-515`, `sidecars/diagram_engine/main.py:1-257`.
+- NEVER: call LLM APIs from Rust directly in new code. When you touch existing Rust that does this, plan the extraction (see `.github/prompts/extract-llm-to-sidecar.prompt.md`).
+
+## Rust command rules
+
+- MUST: every new Tauri command lives under `src-tauri/src/commands/<domain>.rs` and is registered in `main.rs`.
+- MUST: commands that wrap a sidecar follow the spawn-and-stream pattern from `src-tauri/src/commands/vault_study.rs:60-128` (path resolver, python command resolver, BufReader::lines NDJSON parsing).
+- MUST: every command has at least one `#[cfg(test)]` unit test covering at least one happy path and one failure path. Reference: `src-tauri/src/commands/study.rs:193`.
+- MUST: commands return `Result<T, String>` with the error path returning a stable, human-readable message.
+- NEVER: panic in command handlers. Map all errors to `Err(String)`.
+
+## React component rules
+
+- MUST: new components live under `src/components/<area>/<ComponentName>.tsx`.
+- MUST: every new component has a Vitest test under `src/components/<area>/__tests__/<ComponentName>.test.tsx` covering at least one render assertion and one state transition. Reference: `src/__tests__/phaseD.test.ts:12-26`.
+- MUST: components that invoke Tauri commands import from `src/lib/tauri/commands.ts`. Do not call `invoke` directly except inside that wrapper file.
+- MUST: math output renders via KaTeX. Never inject raw LaTeX into innerHTML.
+
+## Test discipline
+
+- Rust commands: ≥ 1 unit test per command path (success + at least one failure).
+- Python sidecars: ≥ 1 pytest per action (success + malformed input + LLM-unavailable).
+- React components: ≥ 1 Vitest test per new component.
+- A PR adding code without the appropriate test coverage MUST be flagged in review.
+- Existing inline `#[cfg(test)]` modules at `src-tauri/src/commands/study.rs:193`, `src-tauri/src/commands/fe_commands.rs:359`, and `src-tauri/src/commands/flashcards.rs:264` are the reference style for Rust test placement.
+
+## State persistence rules
+
+- MUST: schema migrations live in the existing migration mechanism under `src-tauri/src/db/`.
+- MUST: every new table has a documented version and migration path forward.
+- NEVER: rely on schema-less JSON blobs in SQLite for new feature data. Use typed columns.
+
+## Spaced repetition
+
+- Glyphic uses SM-2, implemented in `src-tauri/src/commands/flashcards.rs:264`.
+- Any change to scheduler logic MUST update or create `docs/spaced-repetition.md` with the formula and rationale.
+- Use named constants for SM-2 parameters (already established by `flashcards.rs`).
+
+## What never lives in this repo
+
+- Hardcoded API keys of any kind, even in tests
+- Real user notes, vaults, or PDFs (test fixtures: short, synthetic snippets only)
+- Cloud LLM client code outside the AI Settings opt-in path
+- Unpinned Python dependencies in any `Requirements.txt`
+- Direct LLM HTTP calls from Rust outside sidecar wrappers (in NEW code; legacy is being migrated)
+- Bypasses of the Tauri command wrapper layer in `src/lib/tauri/commands.ts`
+
+## Vertical slice pattern (the discipline)
+
+When adding a new feature with all four layers (sidecar action + Rust command + UI + tests), follow `.github/prompts/add-vertical-slice.prompt.md`. Don't ship single-layer PRs unless explicitly justified in the PR description (e.g., "this is the architectural extraction; UI follows in #N").
+
+## Pull request hygiene
+
+- Title format: `<type>(<area>): <imperative summary>` (e.g., `feat(math): solve_math end-to-end`, `refactor(study): extract Ollama into sidecar`).
+- Body MUST list: scope, what's deferred to follow-up slices, manual verification notes.
+- Don't push automatically — open as draft if the work is exploratory, ready-for-review otherwise.
+- If CI is failing on `main` for unrelated reasons, do not paper over it; either fix it in the same PR or file a separate issue and reference it in your PR description.
