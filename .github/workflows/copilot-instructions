@@ -6,7 +6,7 @@ Glyphic is a Tauri 2 desktop app providing a local-first, AI-augmented study env
 - This file (the rules)
 - `AGENTS.md` (task patterns and the pre-flight checklist)
 - `docs/state-assessment-2026-05.md` (current repo state and known gaps)
-- The relevant prompt template under `.github/prompts/`
+- The relevant skill under `skills/<name>/SKILL.md` (read whichever skill matches the task at hand)
 
 ## Architecture (non-negotiable)
 
@@ -33,7 +33,7 @@ Glyphic is a Tauri 2 desktop app providing a local-first, AI-augmented study env
 - MUST: sidecar entry point dispatches on a single `action` field in the input JSON.
 - MUST: `print(..., flush=True)` after every event line so the Rust reader sees streaming progress, not buffered batches.
 - Reference implementations: `sidecars/vault_engine/main.py:1-515`, `sidecars/diagram_engine/main.py:1-257`.
-- NEVER: call LLM APIs from Rust directly in new code. When you touch existing Rust that does this, plan the extraction (see `.github/prompts/extract-llm-to-sidecar.prompt.md`).
+- NEVER: call LLM APIs from Rust directly in new code. When you touch existing Rust that does this, plan the extraction (see the `extract-llm-to-sidecar` skill at `skills/extract-llm-to-sidecar/SKILL.md`).
 
 ## Rust command rules
 
@@ -81,7 +81,18 @@ Glyphic is a Tauri 2 desktop app providing a local-first, AI-augmented study env
 
 ## Vertical slice pattern (the discipline)
 
-When adding a new feature with all four layers (sidecar action + Rust command + UI + tests), follow `.github/prompts/add-vertical-slice.prompt.md`. Don't ship single-layer PRs unless explicitly justified in the PR description (e.g., "this is the architectural extraction; UI follows in #N").
+When adding a new feature with all four layers (sidecar action + Rust command + UI + tests), follow the `add-vertical-slice` skill at `skills/add-vertical-slice/SKILL.md`. Don't ship single-layer PRs unless explicitly justified in the PR description (e.g., "this is the architectural extraction; UI follows in #N").
+
+## Skills directory
+
+Recurring task patterns are encoded as skills under `skills/`:
+
+- `skills/add-sidecar-action/SKILL.md` — extending an existing sidecar with a new action
+- `skills/extract-llm-to-sidecar/SKILL.md` — refactoring direct Rust→LLM calls into the sidecar pattern
+- `skills/add-vertical-slice/SKILL.md` — full new feature spanning all four layers
+- `skills/backfill-sidecar-tests/SKILL.md` — adding pytest coverage to an existing sidecar
+
+The location is tool-neutral on purpose. No agent auto-discovers `skills/` (Claude Code auto-discovers `.claude/skills/`, Copilot has no skill auto-discovery), so each skill is loaded by being explicitly referenced from this file or `AGENTS.md`. Any agent reading either of those (Copilot, Claude Code, Cursor, Aider) will be routed to the right `SKILL.md` for the task.
 
 ## Pull request hygiene
 
