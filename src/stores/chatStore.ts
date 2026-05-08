@@ -30,12 +30,30 @@ interface ChatState {
   includeNoteContext: boolean;
   /** ID of the currently in-flight streaming request, or null. */
   currentStreamId: string | null;
+  /** Cached AI provider name (lowercase), e.g. "ollama" or "openai". */
+  aiProvider: string;
+  /** Ollama endpoint URL. */
+  aiEndpoint: string;
+  /** Configured Ollama model name. */
+  aiOllamaModel: string;
+  /** Whether the configured model is installed locally (null = unknown). */
+  aiModelInstalled: boolean | null;
+  /** List of locally available model names. */
+  models: string[];
   sendMessage: (content: string, noteContext?: string, modelOverride?: string) => Promise<void>;
   /** Cancel the in-flight stream. Safe to call when no stream is active. */
   cancelStream: () => Promise<void>;
   togglePanel: () => void;
   clearChat: () => void;
+  /**
+   * Single combined refresh: fetches config + checks connectivity + lists models.
+   * All AI status state is written atomically. Prefer this over calling
+   * checkConnection/fetchConfig separately to avoid redundant round-trips.
+   */
+  refreshAiStatus: () => Promise<void>;
+  /** @deprecated Use refreshAiStatus instead. */
   checkConnection: () => Promise<void>;
+  /** @deprecated Use refreshAiStatus instead. */
   fetchConfig: () => Promise<void>;
   updateConfig: (vaultPath: string, config: AiConfig) => Promise<void>;
   setIncludeNoteContext: (v: boolean) => void;
@@ -52,6 +70,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
   activeTools: [],
   includeNoteContext: true,
   currentStreamId: null,
+  aiProvider: '',
+  aiEndpoint: '',
+  aiOllamaModel: '',
+  aiModelInstalled: null,
+  models: [],
 
   sendMessage: async (content: string, noteContext?: string, modelOverride?: string) => {
     const userMsg: ChatMessage = {
@@ -113,33 +136,62 @@ export const useChatStore = create<ChatState>((set, get) => ({
     // close over the variable reference.  The actual value is set once all
     // three unlisten handles are available.
     // eslint-disable-next-line prefer-const
+    let finalized = false;
     let finalizeAll = () => {};
 
     // Subscribe to streaming events BEFORE invoking the command so no chunks
     // are missed.
-    const unlistenChunk = await events.onChatStreamChunk((payload) => {
-      if (payload.stream_id !== streamId) return;
+    // Collect listeners so partial registration can be rolled back on error.
+    const listeners: Array<() => void> = [];
+    try {
+      listeners.push(
+        await events.onChatStreamChunk((payload) => {
+          if (payload.stream_id !== streamId) return;
+          set((s) => ({
+            messages: s.messages.map((m) =>
+              m.id === assistantMsgId ? { ...m, content: m.content + payload.content } : m,
+            ),
+          }));
+        }),
+      );
+
+      listeners.push(
+        await events.onChatStreamDone((payload) => {
+          if (payload.stream_id !== streamId) return;
+          finalizeAll();
+        }),
+      );
+
+      listeners.push(
+        await events.onChatStreamCancelled((payload) => {
+          if (payload.stream_id !== streamId) return;
+          // Preserve the partial message — just stop loading.
+          finalizeAll();
+        }),
+      );
+    } catch (listenerErr) {
+      // At least one listener registration failed — clean up any that succeeded.
+      for (const fn of listeners) fn();
+      const errorContent =
+        typeof listenerErr === 'string'
+          ? listenerErr
+          : 'ScribeAI: Failed to register stream listeners.';
       set((s) => ({
-        messages: s.messages.map((m) => (m.id === assistantMsgId ? { ...m, content: m.content + payload.content } : m)),
+        messages: s.messages.map((m) => (m.id === assistantMsgId ? { ...m, content: errorContent } : m)),
+        isLoading: false,
+        activeTools: [],
+        currentStreamId: null,
       }));
-    });
-
-    const unlistenDone = await events.onChatStreamDone((payload) => {
-      if (payload.stream_id !== streamId) return;
-      finalizeAll();
-    });
-
-    const unlistenCancelled = await events.onChatStreamCancelled((payload) => {
-      if (payload.stream_id !== streamId) return;
-      // Preserve the partial message — just stop loading.
-      finalizeAll();
-    });
+      return;
+    }
 
     // Now that all handles are available, wire up the real finalizer.
+    // Guard flag prevents double-call when both the command promise resolves
+    // and the stream-done event fire in quick succession.
     finalizeAll = () => {
-      unlistenChunk();
-      unlistenDone();
-      unlistenCancelled();
+      if (finalized) return;
+      finalized = true;
+      for (const fn of listeners) fn();
       set({ isLoading: false, activeTools: [], currentStreamId: null });
     };
 
@@ -175,23 +227,54 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setIncludeNoteContext: (v) => set({ includeNoteContext: v }),
 
-  checkConnection: async () => {
+  refreshAiStatus: async () => {
     try {
-      const connected = await commands.aiCheckConnection();
-      set({ isConnected: connected });
+      const config = await commands.aiGetConfig();
+      const provider = (config.provider ?? '').toLowerCase();
+      const endpoint = config.ollama?.endpoint ?? '';
+      const ollamaModel = config.ollama?.model ?? '';
+      const chatModel = config.model_routing?.chat ?? '';
+
+      let isConnected = false;
+      let aiModelInstalled: boolean | null = null;
+      let models: string[] = [];
+
+      if (provider === 'ollama') {
+        try {
+          isConnected = await commands.aiCheckConnection();
+          if (isConnected) {
+            models = await commands.aiListModels();
+            const base = ollamaModel.toLowerCase();
+            aiModelInstalled = models.some((m) => m.toLowerCase().startsWith(base));
+          }
+        } catch {
+          isConnected = false;
+        }
+      } else {
+        // Non-Ollama providers (OpenAI, etc.) don't need a local connectivity probe.
+        isConnected = true;
+      }
+
+      set({
+        model: chatModel || provider,
+        isConnected,
+        aiProvider: provider,
+        aiEndpoint: endpoint,
+        aiOllamaModel: ollamaModel,
+        aiModelInstalled,
+        models,
+      });
     } catch {
       set({ isConnected: false });
     }
   },
 
+  checkConnection: async () => {
+    await get().refreshAiStatus();
+  },
+
   fetchConfig: async () => {
-    try {
-      const config = await commands.aiGetConfig();
-      const modelName = config.model_routing.chat;
-      set({ model: modelName });
-    } catch {
-      // Keep the current model label if fetching fails.
-    }
+    await get().refreshAiStatus();
   },
 
   updateConfig: async (vaultPath: string, config: AiConfig) => {

@@ -94,6 +94,17 @@ pub(super) async fn run_vault_engine(
         .stdout
         .take()
         .ok_or_else(|| "failed to open sidecar stdout".to_string())?;
+
+    // Drain stderr in the background so the pipe buffer never fills and blocks
+    // the sidecar process (64 KB OS limit on Windows).
+    if let Some(stderr) = child.stderr.take() {
+        tokio::spawn(async move {
+            use tokio::io::{AsyncBufReadExt, BufReader};
+            let mut lines = BufReader::new(stderr).lines();
+            while let Ok(Some(_)) = lines.next_line().await {}
+        });
+    }
+
     let mut lines = BufReader::new(stdout).lines();
     let mut last_obj: Option<serde_json::Value> = None;
 

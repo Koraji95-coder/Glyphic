@@ -1,5 +1,6 @@
-import { Camera, Cog, Keyboard, Mic, PenTool, Sparkles, X } from 'lucide-react';
+import { Camera, Cog, Folder, Keyboard, Mic, PenTool, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useVault } from '../../hooks/useVault';
 import { commands } from '../../lib/tauri/commands';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { type SettingsSection, useSettingsUiStore } from '../../stores/settingsUiStore';
@@ -276,10 +277,114 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 function GeneralSection({ draft, onChange, vaultPath }: SectionProps & { vaultPath: string | null }) {
+  const { openVault, createVault } = useVault();
+  const [pendingPath, setPendingPath] = useState(vaultPath ?? '');
+  const [switching, setSwitching] = useState(false);
+  const [switchError, setSwitchError] = useState<string | null>(null);
+  const [switchDone, setSwitchDone] = useState(false);
+
+  const handleBrowse = async () => {
+    try {
+      const { open } = await import('@tauri-apps/plugin-dialog');
+      const result = await open({ directory: true, multiple: false, title: 'Choose vault folder' });
+      if (typeof result === 'string') {
+        setPendingPath(result);
+        setSwitchError(null);
+        setSwitchDone(false);
+      }
+    } catch (e) {
+      console.warn('Folder picker unavailable:', e);
+    }
+  };
+
+  const handleSwitch = async () => {
+    if (!pendingPath.trim() || pendingPath === vaultPath) return;
+    setSwitching(true);
+    setSwitchError(null);
+    setSwitchDone(false);
+    try {
+      try {
+        await openVault(pendingPath);
+      } catch {
+        await createVault(pendingPath, 'Glyphic');
+      }
+      await commands.addRecentVault(pendingPath);
+      setSwitchDone(true);
+    } catch (e) {
+      setSwitchError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSwitching(false);
+    }
+  };
+
+  const pathChanged = pendingPath.trim() !== '' && pendingPath !== vaultPath;
+
   return (
     <div>
       <Field label="Vault location">
-        <input type="text" readOnly value={vaultPath ?? '(none)'} style={{ ...inputStyle, opacity: 0.7 }} />
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <input
+            type="text"
+            value={pendingPath}
+            onChange={(e) => {
+              setPendingPath(e.target.value);
+              setSwitchError(null);
+              setSwitchDone(false);
+            }}
+            style={{ ...inputStyle, flex: 1 }}
+          />
+          <button
+            type="button"
+            onClick={handleBrowse}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
+              color: 'var(--text-secondary)',
+              fontSize: '12px',
+              padding: '0 10px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              flexShrink: 0,
+            }}
+          >
+            <Folder size={12} />
+            Browse…
+          </button>
+        </div>
+        {pathChanged && (
+          <button
+            type="button"
+            disabled={switching}
+            onClick={handleSwitch}
+            style={{
+              marginTop: '6px',
+              background: 'var(--accent)',
+              border: 'none',
+              color: '#fff',
+              padding: '6px 14px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: switching ? 'wait' : 'pointer',
+              opacity: switching ? 0.6 : 1,
+            }}
+          >
+            {switching ? 'Switching…' : 'Switch to this vault'}
+          </button>
+        )}
+        {switchDone && (
+          <span style={{ fontSize: '11px', color: 'var(--accent)', marginTop: '4px', display: 'block' }}>
+            Vault switched successfully.
+          </span>
+        )}
+        {switchError && (
+          <span style={{ fontSize: '11px', color: 'var(--red, #f87171)', marginTop: '4px', display: 'block' }}>
+            {switchError}
+          </span>
+        )}
       </Field>
       <Field label="Vault name">
         <input

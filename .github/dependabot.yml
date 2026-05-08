@@ -1,0 +1,117 @@
+# Place at: .github/dependabot.yml
+#
+# Covers:
+#  - Cargo (Rust backend in src-tauri/)
+#  - npm (React frontend at repo root)
+#  - pip (Python sidecars: study_engine, diagram_engine, vault_engine)
+#  - GitHub Actions (workflow definitions)
+#
+# All ecosystems run weekly on Monday. Minor + patch updates are grouped to
+# cut PR noise; majors come through as individual PRs so you can review them.
+#
+# IMPORTANT: adjust the pip directory paths if your sidecars live somewhere
+# other than src-tauri/binaries/. Dependabot will silently skip a directory
+# that has no requirements.txt — but it'll error if the path itself is wrong.
+
+version: 2
+updates:
+
+  # ── Rust / Cargo ──────────────────────────────────────────────────────
+  - package-ecosystem: "cargo"
+    directory: "/src-tauri"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      rust-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+      - "rust"
+    commit-message:
+      prefix: "chore(cargo)"
+
+  # ── npm / React frontend ──────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      react-ecosystem:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      tiptap:
+        patterns:
+          - "@tiptap/*"
+      tauri-js:
+        patterns:
+          - "@tauri-apps/*"
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "chore(npm)"
+
+  # ── Python sidecar: study_engine ──────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/src-tauri/binaries/study_engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(study_engine)"
+
+  # ── Python sidecar: diagram_engine ────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/src-tauri/binaries/diagram_engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(diagram_engine)"
+
+  # ── Python sidecar: vault_engine ──────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/src-tauri/binaries/vault_engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(vault_engine)"
+
+  # ── GitHub Actions ────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(actions)"

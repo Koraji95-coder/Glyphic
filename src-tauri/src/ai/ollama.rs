@@ -237,6 +237,12 @@ impl OllamaProvider {
                         Some(Ok(bytes)) => {
                             line_buf.push_str(&String::from_utf8_lossy(&bytes));
 
+                            // Accumulate all deltas from this byte chunk, then emit once.
+                            // This batches per HTTP chunk rather than per token, dramatically
+                            // reducing PostMessage frequency.
+                            let mut chunk_delta = String::new();
+                            let mut done_flag = false;
+
                             // Process every complete newline-delimited JSON line.
                             while let Some(nl) = line_buf.find('\n') {
                                 let line: String = line_buf[..nl].trim().to_string();
@@ -253,36 +259,35 @@ impl OllamaProvider {
 
                                 let delta = parsed.message.content.clone();
                                 accumulated.push_str(&delta);
+                                chunk_delta.push_str(&delta);
 
-                                // On the first non-empty content decide whether to emit.
+                                if parsed.done {
+                                    done_flag = true;
+                                    break;
+                                }
+                            }
+
+                            // Emit at most once per HTTP byte chunk.
+                            if !chunk_delta.is_empty() {
                                 if !detected_start && !accumulated.trim().is_empty() {
                                     detected_start = true;
                                     // Responses that start with '{' are potential tool-calls
                                     // and are buffered silently.
                                     emitting = !accumulated.trim().starts_with('{');
-                                    if emitting {
-                                        // Emit everything accumulated up to this point.
-                                        let _ = app.emit(
-                                            "chat-stream-chunk",
-                                            ChatStreamChunkPayload {
-                                                stream_id: stream_id.to_string(),
-                                                content: accumulated.clone(),
-                                            },
-                                        );
-                                    }
-                                } else if emitting && !delta.is_empty() {
+                                }
+                                if emitting {
                                     let _ = app.emit(
                                         "chat-stream-chunk",
                                         ChatStreamChunkPayload {
                                             stream_id: stream_id.to_string(),
-                                            content: delta,
+                                            content: chunk_delta,
                                         },
                                     );
                                 }
+                            }
 
-                                if parsed.done {
-                                    return Ok(ChatStreamOutcome::Complete { accumulated });
-                                }
+                            if done_flag {
+                                return Ok(ChatStreamOutcome::Complete { accumulated });
                             }
                         }
                         Some(Err(e)) => {

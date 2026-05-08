@@ -1,8 +1,9 @@
-import { AlertTriangle, BarChart2, BookOpen, CheckCircle, ChevronRight, SkipForward, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, BarChart2, BookOpen, CheckCircle, ChevronRight, SkipForward, XCircle } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { FeTopic, FeTopicStats, FeWeakTopic, MathGradeResult } from '../../lib/tauri/commands';
 import { commands } from '../../lib/tauri/commands';
+import { useLayoutStore } from '../../stores/layoutStore';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -41,6 +42,7 @@ function groupByCategory(topics: FeTopic[]): Record<string, FeTopic[]> {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function FePrepMode() {
+  const closeFePrep = useLayoutStore((s) => s.closeFePrep);
   const [view, setView] = useState<View>('browser');
   const [topics, setTopics] = useState<FeTopic[]>([]);
   const [stats, setStats] = useState<FeTopicStats[]>([]);
@@ -153,12 +155,13 @@ export function FePrepMode() {
         onUserAnswerChange={(val) => setSession((s) => (s ? { ...s, userAnswer: val } : null))}
         onRecord={recordAttempt}
         onEnd={endSession}
+        onExit={closeFePrep}
       />
     );
   }
 
   if (view === 'dashboard') {
-    return <ProgressDashboard stats={stats} topics={topics} onBack={() => setView('browser')} />;
+    return <ProgressDashboard stats={stats} topics={topics} onBack={() => setView('browser')} onExit={closeFePrep} />;
   }
 
   // Default: Topic Browser
@@ -169,6 +172,7 @@ export function FePrepMode() {
       weakTopics={weakTopics}
       onStartSession={startSession}
       onViewDashboard={() => setView('dashboard')}
+      onExit={closeFePrep}
     />
   );
 }
@@ -181,12 +185,14 @@ function TopicBrowser({
   weakTopics,
   onStartSession,
   onViewDashboard,
+  onExit,
 }: {
   topics: FeTopic[];
   statsMap: Map<number, FeTopicStats>;
   weakTopics: FeWeakTopic[];
   onStartSession: (topic: FeTopic) => void;
   onViewDashboard: () => void;
+  onExit: () => void;
 }) {
   const grouped = groupByCategory(topics);
 
@@ -208,25 +214,46 @@ function TopicBrowser({
           <BookOpen size={18} style={{ color: 'var(--accent)' }} />
           <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>FE Exam Prep</span>
         </div>
-        <button
-          type="button"
-          onClick={onViewDashboard}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 12px',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border)',
-            backgroundColor: 'var(--bg-card)',
-            color: 'var(--text-secondary)',
-            fontSize: '12px',
-            cursor: 'pointer',
-          }}
-        >
-          <BarChart2 size={13} />
-          Progress
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={onViewDashboard}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-secondary)',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <BarChart2 size={13} />
+            Progress
+          </button>
+          <button
+            type="button"
+            onClick={onExit}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              backgroundColor: 'transparent',
+              color: 'var(--text-secondary)',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft size={13} />
+            Back To Notes
+          </button>
+        </div>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
@@ -414,6 +441,7 @@ function PracticeSession({
   onUserAnswerChange,
   onRecord,
   onEnd,
+  onExit,
 }: {
   session: SessionState;
   answerRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -422,6 +450,7 @@ function PracticeSession({
   onUserAnswerChange: (val: string) => void;
   onRecord: (result: 'correct' | 'incorrect' | 'skipped') => void;
   onEnd: () => void;
+  onExit: () => void;
 }) {
   const [generating, setGenerating] = useState(false);
   const [modelAnswer, setModelAnswer] = useState('');
@@ -473,7 +502,7 @@ function PracticeSession({
         setModelAnswer('');
       })
       .finally(() => setGenerating(false));
-  }, [session.topicName, session.questionCount, session.revealed, onQuestionGenerated]);
+  }, [session.topicName, session.revealed, onQuestionGenerated]);
 
   const handleReveal = () => {
     onReveal(modelAnswer);
@@ -507,6 +536,21 @@ function PracticeSession({
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             {session.questionCount > 0 && `${session.correctCount}/${session.questionCount} correct`}
           </span>
+          <button
+            type="button"
+            onClick={onExit}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              backgroundColor: 'transparent',
+              color: 'var(--text-secondary)',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            Back To Notes
+          </button>
           <button
             type="button"
             onClick={onEnd}
@@ -870,10 +914,12 @@ function ProgressDashboard({
   stats,
   topics,
   onBack,
+  onExit,
 }: {
   stats: FeTopicStats[];
   topics: FeTopic[];
   onBack: () => void;
+  onExit: () => void;
 }) {
   const topicMap = new Map(topics.map((t) => [t.id, t]));
 
@@ -899,6 +945,21 @@ function ProgressDashboard({
           flexShrink: 0,
         }}
       >
+        <button
+          type="button"
+          onClick={onExit}
+          style={{
+            padding: '5px 10px',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border)',
+            backgroundColor: 'transparent',
+            color: 'var(--text-secondary)',
+            fontSize: '12px',
+            cursor: 'pointer',
+          }}
+        >
+          <ArrowLeft size={13} />
+        </button>
         <button
           type="button"
           onClick={onBack}

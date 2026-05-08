@@ -132,6 +132,13 @@ pub fn run() {
             commands::study::solve_math,
             commands::study::generate_problems,
         ])
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::Destroyed = event {
+                if window.label() == "main" {
+                    std::process::exit(0);
+                }
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running Glyphic");
 }

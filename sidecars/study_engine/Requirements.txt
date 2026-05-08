@@ -1,2 +1,3 @@
 # Glyphic study engine — pinned dependencies
 # Install with: pip install -r sidecars/study_engine/Requirements.txt
+sympy>=1.13

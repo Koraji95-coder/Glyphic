@@ -67,18 +67,17 @@ impl VaultWatcher {
                     Err(mpsc::RecvTimeoutError::Timeout) => {
                         if let Some(d) = deadline {
                             if Instant::now() >= d {
-                                // Drain and emit one event per unique path.
-                                for path_str in pending.drain() {
-                                    // event_type is "changed" for all coalesced events:
-                                    // a single path may have gone through Create+Modify+Modify
-                                    // in the same window, so no single kind is accurate.
-                                    // The frontend onVaultChanged handler uses this only as a
-                                    // "refresh tree" trigger and does not inspect event_type.
+                                if !pending.is_empty() {
+                                    // The frontend treats this event purely as a generic
+                                    // "refresh tree" signal, so emitting once per burst avoids
+                                    // flooding the webview message queue during large file changes.
+                                    let sample_path = pending.iter().next().cloned().unwrap_or_default();
+                                    pending.clear();
                                     let _ = app_handle.emit(
                                         "vault-changed",
                                         VaultChangedPayload {
                                             event_type: "changed".to_string(),
-                                            path: path_str,
+                                            path: sample_path,
                                         },
                                     );
                                 }

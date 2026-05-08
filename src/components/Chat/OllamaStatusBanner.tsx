@@ -1,54 +1,37 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { commands } from '../../lib/tauri/commands';
+import { useChatStore } from '../../stores/chatStore';
 
 const POLL_MS = 30_000;
 
 export function OllamaStatusBanner() {
-  const [connected, setConnected] = useState<boolean | null>(null);
-  const [provider, setProvider] = useState<string>('');
-  const [endpoint, setEndpoint] = useState<string>('');
-  const [model, setModel] = useState<string>('');
-  const [modelInstalled, setModelInstalled] = useState<boolean | null>(null);
+  // Read all AI status from the shared chatStore — avoids duplicate Ollama calls
+  // that ChatPanel already triggers via refreshAiStatus() when the panel opens.
+  const refreshAiStatus = useChatStore((s) => s.refreshAiStatus);
+  const provider = useChatStore((s) => s.aiProvider);
+  const endpoint = useChatStore((s) => s.aiEndpoint);
+  const model = useChatStore((s) => s.aiOllamaModel);
+  const connected = useChatStore((s) => s.isConnected);
+  const modelInstalled = useChatStore((s) => s.aiModelInstalled);
+
   const [checking, setChecking] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const mountedRef = useRef(true);
 
   const checkNow = useCallback(async () => {
+    if (!mountedRef.current) return;
     setChecking(true);
     try {
-      const cfg = await commands.aiGetConfig();
-      const providerLower = (cfg.provider ?? '').toLowerCase();
-      setProvider(providerLower);
-      setEndpoint(cfg.ollama?.endpoint ?? '');
-      setModel(cfg.ollama?.model ?? '');
-      // Only probe connectivity when on Ollama.
-      if (providerLower === 'ollama') {
-        const ok = await commands.aiCheckConnection();
-        setConnected(ok);
-        if (ok) {
-          try {
-            const installed = await commands.aiListModels();
-            // A model is considered installed if any installed name starts with
-            // the configured base name (handles `llama3.1` matching `llama3.1:8b`).
-            const base = (cfg.ollama?.model ?? '').toLowerCase();
-            setModelInstalled(installed.some((m) => m.toLowerCase().startsWith(base)));
-          } catch {
-            setModelInstalled(null);
-          }
-        }
-      } else {
-        setConnected(true);
-      }
-    } catch {
-      setConnected(null);
+      await refreshAiStatus();
     } finally {
-      setChecking(false);
+      if (mountedRef.current) setChecking(false);
     }
-  }, []);
+  }, [refreshAiStatus]);
 
   useEffect(() => {
-    void checkNow();
+    mountedRef.current = true;
     intervalRef.current = setInterval(checkNow, POLL_MS);
     return () => {
+      mountedRef.current = false;
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [checkNow]);

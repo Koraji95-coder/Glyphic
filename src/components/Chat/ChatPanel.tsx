@@ -1,7 +1,6 @@
 import { ArrowLeft, Pin, PinOff, Send, Settings, Square, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { commands } from '../../lib/tauri/commands';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
@@ -21,8 +20,8 @@ export function ChatPanel() {
     cancelStream,
     togglePanel,
     clearChat,
-    checkConnection,
-    fetchConfig,
+    refreshAiStatus,
+    models: availableModelsFromStore,
     includeNoteContext,
     setIncludeNoteContext,
     pinModelToNote,
@@ -33,7 +32,8 @@ export function ChatPanel() {
   const activeNoteTitle = activeNotePath ? (activeNotePath.split('/').pop()?.replace(/\.md$/, '') ?? null) : null;
   const [input, setInput] = useState('');
   const [showPinMenu, setShowPinMenu] = useState(false);
-  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  // Available models come from the store (populated by refreshAiStatus).
+  const availableModels = availableModelsFromStore;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pinMenuRef = useRef<HTMLDivElement>(null);
@@ -45,15 +45,14 @@ export function ChatPanel() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+  }, []);
 
-  // Fetch config and check connection when the panel opens.
+  // Single combined refresh when the panel opens — avoids duplicate Ollama calls.
   useEffect(() => {
     if (isOpen) {
-      fetchConfig();
-      checkConnection();
+      void refreshAiStatus();
     }
-  }, [isOpen, fetchConfig, checkConnection]);
+  }, [isOpen, refreshAiStatus]);
 
   // Close pin menu on outside click.
   useEffect(() => {
@@ -67,17 +66,9 @@ export function ChatPanel() {
     return () => document.removeEventListener('mousedown', handler);
   }, [showPinMenu]);
 
-  const openPinMenu = useCallback(async () => {
-    if (!showPinMenu) {
-      try {
-        const list = await commands.aiListModels();
-        setAvailableModels(list);
-      } catch {
-        setAvailableModels([]);
-      }
-    }
+  const openPinMenu = useCallback(() => {
     setShowPinMenu((v) => !v);
-  }, [showPinMenu]);
+  }, []);
 
   const handlePinModel = useCallback(
     async (selectedModel: string | null) => {
@@ -339,6 +330,7 @@ export function ChatPanel() {
             <Settings size={13} />
           </button>
           <button
+            type="button"
             onClick={clearChat}
             title="Clear chat"
             className="touch-target p-1 rounded text-xs"
@@ -349,6 +341,7 @@ export function ChatPanel() {
             Clear
           </button>
           <button
+            type="button"
             onClick={togglePanel}
             title="Close chat"
             className="touch-target p-1.5 rounded"
@@ -645,6 +638,7 @@ export function ChatPanel() {
           {isLoading ? (
             /* Stop button — visible while a stream is in flight */
             <button
+              type="button"
               onClick={cancelStream}
               title="Stop generation (Esc)"
               className="shrink-0"
@@ -666,6 +660,7 @@ export function ChatPanel() {
             </button>
           ) : (
             <button
+              type="button"
               onClick={handleSend}
               disabled={!input.trim()}
               className="shrink-0"
@@ -777,6 +772,7 @@ function QuickActionCard({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="flex flex-col shrink-0"
       style={{
