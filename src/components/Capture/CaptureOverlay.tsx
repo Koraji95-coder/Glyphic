@@ -135,7 +135,7 @@ export function CaptureOverlay() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999]"
+      className="fixed inset-0 z-9999"
       style={{
         cursor: 'crosshair',
         backgroundImage: screenshotBg ? `url(${screenshotBg})` : undefined,

@@ -370,3 +370,297 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Step 2a — Validator functions
+# These are pure library functions; they do NOT add new sidecar actions and
+# do NOT modify any existing function above.
+# ─────────────────────────────────────────────────────────────────────────────
+
+import re as _re
+
+# Topics/keywords that indicate a question is outside SymPy's verification scope.
+_OUT_OF_SCOPE_KEYWORDS: list[str] = [
+    "phasor",
+    "bode",
+    "bode plot",
+    "convolution",
+    "laplace transform",
+    "z-transform",
+    "z transform",
+    "root locus",
+    "step response",
+    "control system",
+    "cylindrical coord",
+    "spherical coord",
+    "fourier transform",
+    "transfer function",
+    "nyquist",
+    "magnitude response",
+    "frequency response",
+    "h(s)",
+    "h(j",
+    "numerical pde",
+]
+
+
+def _is_in_scope(question: str) -> bool:
+    q = question.lower()
+    return not any(kw in q for kw in _OUT_OF_SCOPE_KEYWORDS)
+
+
+def _preprocess_expr(expr: str) -> str:
+    """Normalise a math string for SymPy: ^ → ** and implicit multiply (2x → 2*x)."""
+    expr = expr.replace("^", "**")
+    expr = _re.sub(r"(\d)([a-zA-Z])", r"\1*\2", expr)
+    return expr
+
+
+def _openai_chat(
+    api_key: str,
+    model: str,
+    endpoint: str,
+    system_prompt: str,
+    user_content: str,
+) -> str:
+    """Call an OpenAI-compatible /chat/completions endpoint via stdlib urllib."""
+    parsed = urllib.parse.urlparse(endpoint)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise RuntimeError("endpoint must be a valid http(s) URL")
+
+    url = endpoint.rstrip("/") + "/chat/completions"
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content},
+        ],
+        "temperature": 0,
+    }
+    body = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=body,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:  # noqa: S310
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"OpenAI request failed: {e}") from e
+    except TimeoutError as e:
+        raise RuntimeError(f"OpenAI request timed out: {e}") from e
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Invalid OpenAI JSON response: {e}") from e
+
+    choices = data.get("choices") or []
+    if not choices:
+        raise RuntimeError("OpenAI returned no choices")
+    content = choices[0].get("message", {}).get("content")
+    if not isinstance(content, str) or not content.strip():
+        raise RuntimeError("OpenAI returned empty content")
+    return content
+
+
+_VERIFIER_SYSTEM = (
+    "You are a senior FE Electrical and Computer exam reviewer. I will give you a "
+    "multiple-choice question and an answer key. Verify the following:\n"
+    "1. Is the technical content factually correct?\n"
+    "2. Is the marked correct answer actually the best answer among the choices?\n"
+    "3. Are the distractors plausible and not obviously wrong for trivial reasons?\n"
+    "4. Is the question solvable using only the NCEES FE Reference Handbook?\n\n"
+    "Question:\n{question}\n\n"
+    "Choices:\n{choices_formatted}\n\n"
+    "Marked correct: {correct}\n\n"
+    'Reply with exactly "PASS" on the first line if all four checks pass. '
+    'Otherwise, on the first line write "FAIL", then list the specific issues '
+    "on subsequent lines, one per line."
+)
+
+
+def verify_numeric_question(question: str, answer: str) -> dict:
+    """
+    Symbolic/numeric verification of a generated FE practice question.
+    Uses SymPy to attempt to derive the answer from the question text and
+    compare against the proposed answer.
+
+    Returns:
+        {"verified": bool, "reason": str, "in_scope": bool}
+        - verified: True if SymPy's derivation matches the proposed answer
+        - reason: human-readable explanation of pass/fail
+        - in_scope: True if the topic is one SymPy can handle, False otherwise
+    """
+    try:
+        import sympy  # noqa: PLC0415
+    except ImportError:
+        return {"verified": False, "reason": "sympy is not installed", "in_scope": False}
+
+    if not _is_in_scope(question):
+        return {
+            "verified": False,
+            "reason": "question topic is outside SymPy verification scope",
+            "in_scope": False,
+        }
+
+    q = question.strip()
+
+    try:
+        a_norm = _preprocess_expr(answer.strip())
+
+        # ── Derivative detection ──────────────────────────────────────────────
+        deriv_match = _re.search(
+            r"(?:compute|find|calculate)?\s*(?:the\s+)?(?:derivative|differentiate)\s+(?:of\s+)?(.+?)"
+            r"(?:\s+with\s+respect\s+to\s+([a-zA-Z]))?[.?]?\s*$",
+            q,
+            _re.IGNORECASE,
+        )
+        if deriv_match:
+            expr_str = _preprocess_expr(deriv_match.group(1).strip())
+            var_str = deriv_match.group(2) or "x"
+            var = sympy.Symbol(var_str)
+            result = sympy.diff(sympy.sympify(expr_str), var)
+            user_ans = sympy.sympify(a_norm)
+            match = sympy.simplify(result - user_ans) == 0
+            return {
+                "verified": bool(match),
+                "reason": (
+                    f"d/d{var_str}({expr_str}) = {result}; proposed = {user_ans}"
+                    + (" ✓" if match else " ✗")
+                ),
+                "in_scope": True,
+            }
+
+        # ── Integral detection ────────────────────────────────────────────────
+        integ_match = _re.search(
+            r"(?:compute|find|calculate|evaluate)?\s*(?:the\s+)?(?:integral|integrate)\s+(?:of\s+)?(.+?)"
+            r"(?:\s+with\s+respect\s+to\s+([a-zA-Z]))?[.?]?\s*$",
+            q,
+            _re.IGNORECASE,
+        )
+        if integ_match:
+            expr_str = _preprocess_expr(integ_match.group(1).strip())
+            var_str = integ_match.group(2) or "x"
+            var = sympy.Symbol(var_str)
+            result = sympy.integrate(sympy.sympify(expr_str), var)
+            user_ans = sympy.sympify(a_norm)
+            # Integration constants: the difference should have no free symbols
+            diff_expr = sympy.simplify(result - user_ans)
+            match = diff_expr.free_symbols == set()
+            return {
+                "verified": bool(match),
+                "reason": (
+                    f"∫{expr_str} d{var_str} = {result} + C; proposed = {user_ans}"
+                    + (" ✓" if match else " ✗")
+                ),
+                "in_scope": True,
+            }
+
+        # ── Algebraic equation detection ──────────────────────────────────────
+        solve_match = _re.search(
+            r"(?:solve|find)\s+(.+?)\s+for\s+([a-zA-Z])",
+            q,
+            _re.IGNORECASE,
+        )
+        if solve_match:
+            eq_str = _preprocess_expr(solve_match.group(1).strip())
+            var_str = solve_match.group(2)
+            var = sympy.Symbol(var_str)
+            if "=" in eq_str:
+                lhs_s, rhs_s = eq_str.split("=", 1)
+                eq = sympy.Eq(sympy.sympify(lhs_s), sympy.sympify(rhs_s))
+            else:
+                eq = sympy.Eq(sympy.sympify(eq_str), 0)
+            solutions = sympy.solve(eq, var)
+            if not solutions:
+                return {"verified": False, "reason": "no solutions found", "in_scope": True}
+            user_ans = sympy.sympify(a_norm)
+            match = any(sympy.simplify(sol - user_ans) == 0 for sol in solutions)
+            return {
+                "verified": bool(match),
+                "reason": (
+                    f"solutions = {solutions}; proposed = {user_ans}"
+                    + (" ✓" if match else " ✗")
+                ),
+                "in_scope": True,
+            }
+
+        # ── Fallback: unrecognised structure ──────────────────────────────────
+        return {
+            "verified": False,
+            "reason": "could not parse question structure for symbolic verification",
+            "in_scope": False,
+        }
+
+    except Exception as exc:  # noqa: BLE001
+        return {"verified": False, "reason": f"sympy error: {exc}", "in_scope": False}
+
+
+def validate_mc_question(
+    question: str,
+    choices: list[str],
+    correct: str,
+    generation_provider: str,
+    *,
+    ollama_endpoint: str = "http://localhost:11434",
+    ollama_model: str = "llama3.1:8b",
+    openai_api_key: str = "",
+    openai_model: str = "gpt-4o-mini",
+    openai_endpoint: str = "https://api.openai.com/v1",
+) -> dict:
+    """
+    Cross-model verification of an MCQ. Routes the verification to a
+    DIFFERENT LLM provider family than the one used to generate the
+    question, to catch self-confirming hallucinations.
+
+    Args:
+        generation_provider: "openai" or "ollama" — the provider that
+            generated the question.
+
+    Returns:
+        {"verified": bool, "issues": list[str], "validator": str}
+    """
+    choices_formatted = "\n".join(f"  {ch}" for ch in choices)
+    user_content = (
+        f"Question:\n{question}\n\n"
+        f"Choices:\n{choices_formatted}\n\n"
+        f"Marked correct: {correct}"
+    )
+
+    def _parse_response(raw: str) -> dict:
+        lines = raw.strip().splitlines()
+        verdict = lines[0].strip().upper() if lines else "FAIL"
+        issues = [ln.strip() for ln in lines[1:] if ln.strip()]
+        return {"verified": verdict == "PASS", "issues": issues}
+
+    provider_lower = (generation_provider or "").lower()
+
+    if provider_lower == "openai":
+        # Validate with Ollama (opposite provider).
+        if not ollama_endpoint or not ollama_model:
+            return {"verified": False, "issues": ["no cross-model validator available"], "validator": "none"}
+        try:
+            raw = _ollama_chat(ollama_endpoint, ollama_model, _VERIFIER_SYSTEM, user_content)
+            result = _parse_response(raw)
+            result["validator"] = "ollama"
+            return result
+        except Exception as exc:  # noqa: BLE001
+            return {"verified": False, "issues": [str(exc)], "validator": "ollama"}
+
+    if provider_lower == "ollama":
+        # Validate with OpenAI (opposite provider).
+        if not openai_api_key:
+            return {"verified": False, "issues": ["no cross-model validator available"], "validator": "none"}
+        try:
+            raw = _openai_chat(openai_api_key, openai_model, openai_endpoint, _VERIFIER_SYSTEM, user_content)
+            result = _parse_response(raw)
+            result["validator"] = "openai"
+            return result
+        except Exception as exc:  # noqa: BLE001
+            return {"verified": False, "issues": [str(exc)], "validator": "openai"}
+
+    # Unknown or unconfigured provider.
+    return {"verified": False, "issues": ["no cross-model validator available"], "validator": "none"}

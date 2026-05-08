@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { create } from 'zustand';
 import type { VaultConfig, VaultEntry } from '../types/vault';
+import { useLayoutStore } from './layoutStore';
 
 interface VaultState {
   vaultPath: string | null;
@@ -33,7 +34,13 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   setVaultPath: (path) => set({ vaultPath: path }),
   setVaultConfig: (config) => set({ vaultConfig: config }),
   setFileTree: (tree) => set({ fileTree: tree }),
-  setActiveNote: (id, path) => set({ activeNoteId: id, activeNotePath: path }),
+  setActiveNote: (id, path) => {
+    const layout = useLayoutStore.getState();
+    layout.closeFePrep();
+    layout.closeVaultMode();
+    layout.closeDiagramMode();
+    set({ activeNoteId: id, activeNotePath: path });
+  },
   addOpenNote: (path) =>
     set((state) => ({
       openNotes: state.openNotes.includes(path) ? state.openNotes : [...state.openNotes, path],

@@ -86,6 +86,16 @@ async fn run_diagram_engine(
         .stdout
         .take()
         .ok_or_else(|| "failed to open diagram engine stdout".to_string())?;
+
+    // Drain stderr in the background so the pipe buffer never fills.
+    if let Some(stderr) = child.stderr.take() {
+        tokio::spawn(async move {
+            use tokio::io::{AsyncBufReadExt, BufReader};
+            let mut lines = BufReader::new(stderr).lines();
+            while let Ok(Some(_)) = lines.next_line().await {}
+        });
+    }
+
     let mut lines = BufReader::new(stdout).lines();
     let mut last_obj: Option<serde_json::Value> = None;
 
@@ -185,6 +195,16 @@ async fn generate_code_with_cmd(
         .stdout
         .take()
         .ok_or_else(|| "failed to open diagram engine stdout".to_string())?;
+
+    // Drain stderr in the background so the pipe buffer never fills.
+    if let Some(stderr) = child.stderr.take() {
+        tokio::spawn(async move {
+            use tokio::io::{AsyncBufReadExt, BufReader};
+            let mut lines = BufReader::new(stderr).lines();
+            while let Ok(Some(_)) = lines.next_line().await {}
+        });
+    }
+
     let mut lines = BufReader::new(stdout).lines();
     let mut final_event: Option<serde_json::Value> = None;
     let mut error_message: Option<String> = None;

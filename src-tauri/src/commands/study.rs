@@ -81,6 +81,16 @@ async fn run_study_engine(app: &AppHandle, request: serde_json::Value) -> Result
         .stdout
         .take()
         .ok_or_else(|| "failed to open study engine stdout".to_string())?;
+
+    // Drain stderr in the background so the pipe buffer never fills.
+    if let Some(stderr) = child.stderr.take() {
+        tokio::spawn(async move {
+            use tokio::io::{AsyncBufReadExt, BufReader};
+            let mut lines = BufReader::new(stderr).lines();
+            while let Ok(Some(_)) = lines.next_line().await {}
+        });
+    }
+
     let mut lines = BufReader::new(stdout).lines();
     let mut last_obj: Option<serde_json::Value> = None;
     let mut error_message: Option<String> = None;
@@ -276,6 +286,7 @@ pub async fn generate_problems(
 
 /// Remove markdown code fences and return a slice pointing at the JSON object
 /// content.  Falls back to the full trimmed string if no braces are found.
+#[cfg(test)]
 fn strip_json_object(text: &str) -> &str {
     let trimmed = text.trim();
     // Strip ``` … ``` fences

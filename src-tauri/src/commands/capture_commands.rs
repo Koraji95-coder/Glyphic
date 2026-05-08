@@ -53,16 +53,22 @@ pub fn new_last_capture_store() -> LastCaptureStore {
 }
 
 #[tauri::command]
-pub fn start_capture(
+pub async fn start_capture(
     app: tauri::AppHandle,
     session: tauri::State<'_, CaptureSessionState>,
 ) -> Result<(), String> {
-    // Capture fullscreen BEFORE showing the overlay so the overlay is not in the shot.
-    let screenshot = screen::capture_fullscreen()?;
-    let tmp = std::env::temp_dir().join(format!("glyphic-capture-{}.png", Uuid::new_v4()));
-    screenshot
-        .save(&tmp)
-        .map_err(|e| format!("Failed to save temp capture: {e}"))?;
+    // Capturing + encoding a full-screen PNG can be expensive on Windows.
+    // Run it off the command thread to avoid UI/global-shortcut stalls.
+    let tmp = tauri::async_runtime::spawn_blocking(move || -> Result<std::path::PathBuf, String> {
+        let screenshot = screen::capture_fullscreen()?;
+        let tmp = std::env::temp_dir().join(format!("glyphic-capture-{}.png", Uuid::new_v4()));
+        screenshot
+            .save(&tmp)
+            .map_err(|e| format!("Failed to save temp capture: {e}"))?;
+        Ok(tmp)
+    })
+    .await
+    .map_err(|e| format!("Capture task failed: {e}"))??;
 
     // Store the path so finish_capture / cancel_capture can clean up.
     if let Ok(mut guard) = session.0.lock() {
