@@ -149,6 +149,7 @@ export function FePrepMode() {
         session={session}
         answerRef={answerRef}
         onReveal={(answer) => setSession((s) => (s ? { ...s, answer, revealed: true } : null))}
+        onQuestionGenerated={(question) => setSession((s) => (s ? { ...s, question } : null))}
         onUserAnswerChange={(val) => setSession((s) => (s ? { ...s, userAnswer: val } : null))}
         onRecord={recordAttempt}
         onEnd={endSession}
@@ -409,6 +410,7 @@ function PracticeSession({
   session,
   answerRef,
   onReveal,
+  onQuestionGenerated,
   onUserAnswerChange,
   onRecord,
   onEnd,
@@ -416,6 +418,7 @@ function PracticeSession({
   session: SessionState;
   answerRef: React.RefObject<HTMLTextAreaElement | null>;
   onReveal: (answer: string) => void;
+  onQuestionGenerated: (question: string) => void;
   onUserAnswerChange: (val: string) => void;
   onRecord: (result: 'correct' | 'incorrect' | 'skipped') => void;
   onEnd: () => void;
@@ -423,30 +426,48 @@ function PracticeSession({
   const [generating, setGenerating] = useState(false);
   const [modelAnswer, setModelAnswer] = useState('');
 
-  // Auto-generate a question via AI when session starts or after each question
+  // Auto-generate a question via local-only AI when session starts or after each question
   useEffect(() => {
     if (session.revealed) return;
     setGenerating(true);
     setModelAnswer('');
-    commands
-      .aiChat(
-        `You are an FE exam tutor. Generate one multiple-choice or short-answer FE exam practice question for the topic: "${session.topicName}". Format: first write the question, then on a new line starting with "ANSWER:" provide the correct answer and a brief explanation.`,
-        undefined,
-      )
-      .then((response) => {
-        const parts = response.split(/\nANSWER:/i);
-        if (parts.length >= 2) {
-          setModelAnswer(parts.slice(1).join('\nANSWER:').trim());
-        } else {
-          setModelAnswer(response);
+
+    const generate = async () => {
+      // Optionally prepend vault context to ground the question in study material
+      let vaultContext = '';
+      try {
+        const vaultResult = (await commands.queryVault(session.topicName, undefined, 3)) as {
+          results?: Array<{ text: string; source_label: string }>;
+        };
+        const chunks = vaultResult?.results ?? [];
+        if (chunks.length > 0) {
+          vaultContext = chunks.map((c) => `[${c.source_label}]: ${c.text}`).join('\n\n');
         }
-      })
+      } catch {
+        // Vault sidecar not running — proceed without context
+      }
+
+      const prompt = `You are an FE exam tutor. Generate one multiple-choice or short-answer FE exam practice question for the topic: "${session.topicName}". Format: first write the question, then on a new line starting with "ANSWER:" provide the correct answer and a brief explanation.`;
+
+      const response = await commands.aiStudyChat(prompt, vaultContext || undefined);
+      const parts = response.split(/\nANSWER:/i);
+      if (parts.length >= 2) {
+        onQuestionGenerated(parts[0].trim());
+        setModelAnswer(parts.slice(1).join('\nANSWER:').trim());
+      } else {
+        onQuestionGenerated(response.trim());
+        setModelAnswer('');
+      }
+    };
+
+    generate()
       .catch((e) => {
         console.error('AI question generation failed:', e);
-        setModelAnswer('Could not generate question. Please check your AI connection in Settings.');
+        onQuestionGenerated('Could not generate question. Please check your AI connection in Settings.');
+        setModelAnswer('');
       })
       .finally(() => setGenerating(false));
-  }, [session.topicName, session.questionCount, session.revealed]);
+  }, [session.topicName, session.questionCount, session.revealed, onQuestionGenerated]);
 
   const handleReveal = () => {
     onReveal(modelAnswer);
@@ -556,7 +577,7 @@ function PracticeSession({
             </div>
           ) : (
             <p style={{ fontSize: '15px', lineHeight: 1.7, color: 'var(--text-primary)', margin: 0 }}>
-              {session.question || <span style={{ color: 'var(--text-ghost)' }}>Loading questionu2026</span>}
+              {session.question || <span style={{ color: 'var(--text-ghost)' }}>Loading…</span>}
             </p>
           )}
         </div>

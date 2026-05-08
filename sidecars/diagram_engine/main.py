@@ -30,6 +30,50 @@ import sys
 import traceback
 from typing import Any
 
+# ── Security blocklist ────────────────────────────────────────────────────────
+# Defence-in-depth: reject code that contains known dangerous patterns before
+# passing it to exec().  This is NOT a complete sandbox — a proper solution
+# would use RestrictedPython or a subprocess with OS-level resource limits
+# (e.g. seccomp, nsjail, or Docker).  This blocklist stops accidental or
+# naive misuse and makes the attack surface explicit.
+_BLOCKED_PATTERNS = [
+    "import os",
+    "import subprocess",
+    "import sys",
+    "import socket",
+    "import shutil",
+    "import pathlib",
+    "import tempfile",
+    "import threading",
+    "import multiprocessing",
+    "import ctypes",
+    "import importlib",
+    "__import__",
+    "__builtins__",
+    "open(",
+    "exec(",
+    "eval(",
+    "compile(",
+    "globals(",
+    "locals(",
+    "getattr(",
+    "setattr(",
+    "delattr(",
+    "vars(",
+]
+
+
+def _check_code_safety(code: str) -> str | None:
+    """Return an error message if the code contains a blocked pattern, else None."""
+    lower = code.lower()
+    for pattern in _BLOCKED_PATTERNS:
+        if pattern.lower() in lower:
+            return (
+                f"Code contains a blocked pattern: '{pattern}'. "
+                "Only matplotlib, schemdraw, and numpy imports are permitted."
+            )
+    return None
+
 
 def respond(obj: dict[str, Any]) -> None:
     """Write one JSON object to stdout and flush immediately."""
@@ -56,6 +100,10 @@ def _exec_schemdraw(code: str) -> dict[str, Any]:
     the figure to a BytesIO buffer after the drawing has been rendered.
     draw_svg() does NOT exist in 0.16 — use matplotlib.savefig() instead.
     """
+    safety_err = _check_code_safety(code)
+    if safety_err:
+        return {"error": safety_err}
+
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -118,6 +166,10 @@ def _exec_matplotlib(code: str) -> dict[str, Any]:
                     arrowprops=dict(arrowstyle='->', color='blue', lw=2))
         ax.set_title('Phasor V')
     """
+    safety_err = _check_code_safety(code)
+    if safety_err:
+        return {"error": safety_err}
+
     try:
         import matplotlib
         matplotlib.use("Agg")

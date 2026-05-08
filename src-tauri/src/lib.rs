@@ -102,6 +102,7 @@ pub fn run() {
             ai_commands::pull_model,
             ai_commands::ai_chat_stream,
             ai_commands::cancel_chat,
+            ai_commands::ai_study_chat,
             // vault ingestion
             commands::vault_study::ingest_document,
             commands::vault_study::ingest_url,

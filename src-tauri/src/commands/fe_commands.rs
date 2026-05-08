@@ -66,6 +66,53 @@ fn ensure_schema(conn: &Connection) -> rusqlite::Result<()> {
     )
 }
 
+/// Seed the official NCEES FE Electrical & Computer topics.
+/// Uses INSERT OR IGNORE so it is safe to call on every startup.
+fn seed_fe_topics(conn: &Connection) -> rusqlite::Result<()> {
+    // (name, category, subcategory, description)
+    let topics: &[(&str, &str, &str, &str)] = &[
+        // Mathematics
+        ("Linear Algebra", "Mathematics", "Mathematics", "Matrices, eigenvalues, vector spaces, and linear transformations."),
+        ("Differential Equations", "Mathematics", "Mathematics", "Ordinary and partial differential equations; initial and boundary value problems."),
+        ("Complex Numbers", "Mathematics", "Mathematics", "Arithmetic, polar form, Euler's formula, and phasors."),
+        ("Probability & Statistics", "Mathematics", "Mathematics", "Probability distributions, mean, variance, hypothesis testing, and reliability."),
+        ("Numerical Methods", "Mathematics", "Mathematics", "Root finding, numerical integration, interpolation, and error analysis."),
+        // Circuit Analysis
+        ("DC Circuits", "Circuit Analysis", "Circuit Analysis", "KVL, KCL, Thevenin/Norton equivalents, nodal and mesh analysis."),
+        ("AC Circuits", "Circuit Analysis", "Circuit Analysis", "Phasors, impedance, power factor, resonance, and AC power."),
+        ("Transient Response", "Circuit Analysis", "Circuit Analysis", "RL, RC, and RLC transient analysis; time constants."),
+        ("Three-Phase Circuits", "Circuit Analysis", "Circuit Analysis", "Balanced and unbalanced three-phase systems; delta and wye configurations."),
+        // Electronics
+        ("Diodes", "Electronics", "Electronics", "PN junction, rectifiers, clippers, clampers, and Zener diodes."),
+        ("BJT Amplifiers", "Electronics", "Electronics", "Biasing, small-signal models, common-emitter/base/collector configurations."),
+        ("Op-Amps", "Electronics", "Electronics", "Ideal op-amp analysis, inverting/non-inverting amplifiers, integrators, and comparators."),
+        ("Digital Logic", "Electronics", "Electronics", "Boolean algebra, logic gates, combinational and sequential circuits, Karnaugh maps."),
+        // Signal Processing
+        ("Fourier Series", "Signal Processing", "Signal Processing", "Harmonic analysis, Fourier coefficients, and spectrum of periodic signals."),
+        ("Laplace Transforms", "Signal Processing", "Signal Processing", "Transform pairs, inverse Laplace, transfer functions, and stability analysis."),
+        ("Z-Transforms", "Signal Processing", "Signal Processing", "Discrete-time signals, Z-transform pairs, and digital filter analysis."),
+        ("Filters", "Signal Processing", "Signal Processing", "Passive and active low/high/band-pass filters; Bode plots and frequency response."),
+        // Electromagnetics
+        ("Maxwell's Equations", "Electromagnetics", "Electromagnetics", "Gauss, Faraday, Ampere laws; divergence and curl; wave equations."),
+        ("Transmission Lines", "Electromagnetics", "Electromagnetics", "Characteristic impedance, reflections, standing waves, and Smith chart."),
+        ("Antennas", "Electromagnetics", "Electromagnetics", "Radiation patterns, gain, directivity, and Friis transmission equation."),
+        // Communications
+        ("Modulation", "Communications", "Communications", "AM, FM, PM, ASK, FSK, PSK, and QAM modulation schemes."),
+        // Computer Systems
+        ("Microprocessors", "Computer Systems", "Computer Systems", "CPU architecture, instruction sets, memory hierarchy, and I/O interfaces."),
+        ("Embedded Systems", "Computer Systems", "Computer Systems", "Real-time constraints, peripherals, interrupts, and firmware design patterns."),
+    ];
+
+    for (name, category, subcategory, description) in topics {
+        conn.execute(
+            "INSERT OR IGNORE INTO topics (name, category, subcategory, description) \
+             VALUES (?1, ?2, ?3, ?4)",
+            params![name, category, subcategory, description],
+        )?;
+    }
+    Ok(())
+}
+
 // ── Data types ────────────────────────────────────────────────────────────────
 
 #[derive(Serialize, Deserialize)]
@@ -100,6 +147,7 @@ fn open_conn(app: &AppHandle) -> Result<Connection, String> {
     let path = fe_db_path(app)?;
     let conn = Connection::open(path).map_err(|e| e.to_string())?;
     ensure_schema(&conn).map_err(|e| e.to_string())?;
+    seed_fe_topics(&conn).map_err(|e| e.to_string())?;
     Ok(conn)
 }
 
@@ -304,4 +352,62 @@ pub async fn complete_fe_session(
     })
     .await
     .map_err(|e| format!("join error: {e}"))?
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn in_memory_conn() -> Connection {
+        let conn = Connection::open_in_memory().expect("in-memory db");
+        ensure_schema(&conn).expect("schema");
+        conn
+    }
+
+    #[test]
+    fn seed_inserts_23_topics() {
+        let conn = in_memory_conn();
+        seed_fe_topics(&conn).expect("seed");
+        let count: i64 = conn
+            .query_row("SELECT COUNT(*) FROM topics", [], |r| r.get(0))
+            .expect("count");
+        assert_eq!(count, 23, "expected 23 FE E&C topics after seeding");
+    }
+
+    #[test]
+    fn seed_is_idempotent() {
+        let conn = in_memory_conn();
+        seed_fe_topics(&conn).expect("first seed");
+        seed_fe_topics(&conn).expect("second seed");
+        let count: i64 = conn
+            .query_row("SELECT COUNT(*) FROM topics", [], |r| r.get(0))
+            .expect("count");
+        assert_eq!(count, 23, "seeding twice must not duplicate rows");
+    }
+
+    #[test]
+    fn all_required_categories_present() {
+        let conn = in_memory_conn();
+        seed_fe_topics(&conn).expect("seed");
+        for cat in &[
+            "Mathematics",
+            "Circuit Analysis",
+            "Electronics",
+            "Signal Processing",
+            "Electromagnetics",
+            "Communications",
+            "Computer Systems",
+        ] {
+            let n: i64 = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM topics WHERE category = ?1",
+                    params![cat],
+                    |r| r.get(0),
+                )
+                .expect("count");
+            assert!(n > 0, "category '{cat}' missing after seed");
+        }
+    }
 }

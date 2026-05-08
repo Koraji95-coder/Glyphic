@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ChatPanel } from './components/Chat/ChatPanel';
+import { DiagramMode } from './components/diagrams/DiagramMode';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { FePrepMode } from './components/fe-prep/FePrepMode';
 import { ShortcutHelp } from './components/Help/ShortcutHelp';
@@ -12,6 +13,7 @@ import { Onboarding } from './components/Onboarding/Onboarding';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { Sidebar } from './components/Sidebar/Sidebar';
+import { VaultMode } from './components/vault/VaultMode';
 
 // Aux routes that only run inside their own webview windows are lazy-loaded
 // so they don't bloat the main bundle.
@@ -40,6 +42,11 @@ import { useVaultStore } from './stores/vaultStore';
 function MainLayout() {
   const toggleChatPanel = useChatStore((s) => s.togglePanel);
   const isFePrepMode = useLayoutStore((s) => s.isFePrepMode);
+  const isVaultMode = useLayoutStore((s) => s.isVaultMode);
+  const isDiagramMode = useLayoutStore((s) => s.isDiagramMode);
+
+  // True when any full-screen mode is active (hides editor + chat)
+  const isFullScreenMode = isFePrepMode || isVaultMode || isDiagramMode;
 
   useGlobalShortcuts();
 
@@ -89,8 +96,11 @@ function MainLayout() {
       <div className="flex flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 flex min-w-0 overflow-hidden">
-          {isFePrepMode ? <FePrepMode /> : <EditorPaneGroup />}
-          {!isFePrepMode && <ChatPanel />}
+          {isFePrepMode && <FePrepMode />}
+          {isVaultMode && <VaultMode />}
+          {isDiagramMode && <DiagramMode />}
+          {!isFullScreenMode && <EditorPaneGroup />}
+          {!isFullScreenMode && <ChatPanel />}
         </main>
       </div>
       <StatusBar />
