@@ -44,6 +44,7 @@ import sys
 import traceback
 import urllib.error
 import urllib.request
+import urllib.parse
 from typing import Any
 
 # ── Security blocklist ────────────────────────────────────────────────────────
@@ -77,6 +78,8 @@ _BLOCKED_PATTERNS = [
     "delattr(",
     "vars(",
 ]
+
+MAX_GENERATION_ATTEMPTS = 2
 
 
 def _check_code_safety(code: str) -> str | None:
@@ -147,6 +150,9 @@ def _build_generate_prompt(description: str, diagram_type: str, feedback: str | 
 
 def _ollama_generate(prompt: str) -> str:
     url = os.environ.get("GLYPHIC_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise RuntimeError("GLYPHIC_OLLAMA_URL must be a valid http(s) URL")
     model = os.environ.get("GLYPHIC_DIAGRAM_MODEL", "llama3.1:8b")
     payload = json.dumps({"model": model, "prompt": prompt, "stream": False}).encode("utf-8")
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
@@ -272,7 +278,7 @@ def handle_generate_code(req: dict[str, Any]) -> None:
     warnings: list[str] = []
     validation_error: str | None = None
 
-    for attempt in range(2):
+    for attempt in range(MAX_GENERATION_ATTEMPTS):
         emit_event("progress", stage="prompting")
         prompt = _build_generate_prompt(description, requested_type, validation_error)
         emit_event("progress", stage="generating")
@@ -297,7 +303,7 @@ def handle_generate_code(req: dict[str, Any]) -> None:
             raise
         except Exception as e:
             validation_error = str(e)
-            if attempt == 0:
+            if attempt < MAX_GENERATION_ATTEMPTS - 1:
                 warnings.append(f"first attempt failed validation or generation: {validation_error}")
                 continue
             emit_event("error", message=validation_error)
