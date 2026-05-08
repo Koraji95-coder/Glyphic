@@ -9,7 +9,7 @@ Before changing any code, read in order:
 1. `.github/copilot-instructions.md` — the rules (non-negotiable)
 2. This file — task patterns and dispatch
 3. `docs/state-assessment-2026-05.md` — current repo state and known gaps
-4. The relevant skill under `skills/<name>/SKILL.md` (load whichever skill matches the task)
+4. The relevant skill under `skills/<name>.md` (load whichever skill matches the task)
 
 ## Architecture summary
 
@@ -50,13 +50,13 @@ A PR that lands only one or two layers MUST state explicitly why (e.g., "this is
 
 | Intent | Skill |
 |---|---|
-| Add a new action to an existing sidecar | `skills/add-sidecar-action/SKILL.md` |
-| Migrate a direct Rust→LLM call to a sidecar | `skills/extract-llm-to-sidecar/SKILL.md` |
-| Build a new feature top-to-bottom | `skills/add-vertical-slice/SKILL.md` |
-| Backfill sidecar pytest coverage | `skills/backfill-sidecar-tests/SKILL.md` |
+| Add a new action to an existing sidecar | `skills/add-sidecar-action.md` |
+| Migrate a direct Rust→LLM call to a sidecar | `skills/extract-llm-to-sidecar.md` |
+| Build a new feature top-to-bottom | `skills/add-vertical-slice.md` |
+| Backfill sidecar pytest coverage | `skills/backfill-sidecar-tests.md` |
 | Fix a failing CI job | Inspect `.github/workflows/ci.yml` and the failing step output; reproduce locally before changing code |
 
-The `skills/` location is tool-neutral on purpose. Every agent reads `AGENTS.md` (or `.github/copilot-instructions.md`) on session start; from there it gets routed to the relevant `SKILL.md`. No special tool-specific auto-discovery is assumed.
+The `skills/` location is tool-neutral on purpose. Every agent reads `AGENTS.md` (or `.github/copilot-instructions.md`) on session start; from there it gets routed to the relevant skill `.md` file. No special tool-specific auto-discovery is assumed.
 
 ## Dispatch by intent
 
