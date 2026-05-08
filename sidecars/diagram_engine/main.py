@@ -11,10 +11,22 @@ Supported diagram types:
   matplotlib / phasor / polar — polar/phasor plots via matplotlib
   mermaid               — returned as-is for frontend rendering via Mermaid JS
 
-Each request must have:
-  action: "render"
-  diagram_type: one of the types above
-  code: Python code string (schemdraw/matplotlib) or Mermaid syntax string
+Actions:
+  render
+    diagram_type: one of the types above
+    code: Python code string (schemdraw/matplotlib) or Mermaid syntax string
+
+  generate_code
+    description: natural-language request for the desired diagram
+    diagram_type: "mermaid" | "schemdraw" | "matplotlib" | "auto" (default: "auto")
+    Emits NDJSON events:
+      {"event":"progress","stage":"prompting"}
+      {"event":"progress","stage":"generating"}
+      {"event":"progress","stage":"validating"}
+      {"event":"final","code":"...","language":"mermaid|python",
+       "diagram_type":"mermaid|schemdraw|matplotlib","warnings":[]}
+    On error:
+      {"event":"error","message":"..."} and exits with status 1.
 
 Responses:
   {"svg_base64": "..."}  — for schemdraw and matplotlib types
@@ -26,8 +38,12 @@ import base64
 import concurrent.futures
 import io
 import json
+import os
+import re
 import sys
 import traceback
+import urllib.error
+import urllib.request
 from typing import Any
 
 # ── Security blocklist ────────────────────────────────────────────────────────
@@ -79,6 +95,213 @@ def respond(obj: dict[str, Any]) -> None:
     """Write one JSON object to stdout and flush immediately."""
     sys.stdout.write(json.dumps(obj) + "\n")
     sys.stdout.flush()
+
+
+def emit_event(event: str, **payload: Any) -> None:
+    respond({"event": event, **payload})
+
+
+def _canonical_generate_diagram_type(diagram_type: str) -> str:
+    normalized = (diagram_type or "auto").strip().lower()
+    if normalized in {"", "auto"}:
+        return "auto"
+    if normalized in {"schemdraw", "circuit"}:
+        return "schemdraw"
+    if normalized in {"matplotlib", "phasor", "polar"}:
+        return "matplotlib"
+    if normalized == "mermaid":
+        return "mermaid"
+    raise ValueError(
+        f"unsupported diagram_type: {diagram_type!r}. Supported: auto, mermaid, schemdraw, matplotlib"
+    )
+
+
+def _build_generate_prompt(description: str, diagram_type: str, feedback: str | None = None) -> str:
+    if diagram_type == "mermaid":
+        type_hint = "Return only valid Mermaid diagram syntax, no other text."
+    elif diagram_type in {"schemdraw", "matplotlib"}:
+        type_hint = (
+            "Return only valid Python code. For schemdraw: assign the schemdraw.Drawing() "
+            "to a variable named 'd'. For matplotlib plots: use plt (already available) to create "
+            "the figure. No plt.show(). No other text or explanation."
+        )
+    else:
+        type_hint = (
+            "Choose the best diagram format for the request and output JSON only with keys "
+            '{"diagram_type","language","code"} where diagram_type is one of '
+            '["mermaid","schemdraw","matplotlib"] and language is "mermaid" or "python". '
+            "Use Mermaid for flowcharts/sequence/state diagrams, Schemdraw for circuit diagrams, "
+            "and Matplotlib for plots/phasors."
+        )
+
+    prompt = (
+        "You are Glyphic's diagram code generator.\n"
+        f"User request: {description}\n"
+        f"Requested diagram_type: {diagram_type}\n"
+        f"{type_hint}"
+    )
+    if feedback:
+        prompt += f"\nPrevious output failed validation with: {feedback}\nReturn corrected output only."
+    return prompt
+
+
+def _ollama_generate(prompt: str) -> str:
+    url = os.environ.get("GLYPHIC_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
+    model = os.environ.get("GLYPHIC_DIAGRAM_MODEL", "llama3.1:8b")
+    payload = json.dumps({"model": model, "prompt": prompt, "stream": False}).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:  # noqa: S310
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"Ollama request failed: {e}") from e
+    except TimeoutError as e:
+        raise RuntimeError(f"Ollama request timed out: {e}") from e
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Invalid Ollama JSON response: {e}") from e
+
+    response = data.get("response")
+    if not isinstance(response, str) or not response.strip():
+        raise RuntimeError("Ollama returned an empty response")
+    return response.strip()
+
+
+def _strip_fences(text: str) -> tuple[str, bool]:
+    stripped = text.strip()
+    changed = False
+    fence_match = re.fullmatch(r"```[a-zA-Z0-9_-]*\n?(.*?)\n?```", stripped, flags=re.DOTALL)
+    if fence_match:
+        stripped = fence_match.group(1).strip()
+        changed = True
+    return stripped, changed
+
+
+def _normalize_generated_payload(raw: str, requested_type: str) -> tuple[str, str, str, list[str]]:
+    warnings: list[str] = []
+    code_text = raw.strip()
+    diagram_type = requested_type
+    language = "python"
+
+    try:
+        obj = json.loads(code_text)
+        if isinstance(obj, dict) and isinstance(obj.get("code"), str):
+            code_text = obj["code"].strip()
+            if isinstance(obj.get("diagram_type"), str):
+                diagram_type = _canonical_generate_diagram_type(obj["diagram_type"])
+            if isinstance(obj.get("language"), str):
+                language = obj["language"].strip().lower()
+        else:
+            code_text = raw.strip()
+    except json.JSONDecodeError:
+        pass
+
+    code_text, stripped_fence = _strip_fences(code_text)
+    if stripped_fence:
+        warnings.append("stripped markdown code fences from LLM output")
+
+    if requested_type == "auto":
+        lowered = code_text.lower()
+        if diagram_type == "auto":
+            if any(
+                keyword in lowered
+                for keyword in (
+                    "flowchart",
+                    "graph ",
+                    "sequencediagram",
+                    "statediagram",
+                    "erdiagram",
+                    "classdiagram",
+                )
+            ):
+                diagram_type = "mermaid"
+            elif "schemdraw" in lowered or "elm." in lowered:
+                diagram_type = "schemdraw"
+            else:
+                diagram_type = "matplotlib"
+
+    if diagram_type == "auto":
+        diagram_type = "matplotlib"
+
+    if diagram_type == "mermaid":
+        language = "mermaid"
+    else:
+        language = "python"
+    return code_text, language, diagram_type, warnings
+
+
+def _validate_generated_code(code: str, diagram_type: str) -> None:
+    if not code.strip():
+        raise ValueError("generated code is empty")
+    if diagram_type == "mermaid":
+        lowered = code.lower()
+        known_keywords = (
+            "flowchart",
+            "graph ",
+            "sequencediagram",
+            "statediagram",
+            "classdiagram",
+            "erdiagram",
+            "journey",
+            "gantt",
+            "pie",
+            "mindmap",
+            "timeline",
+            "gitgraph",
+            "quadrantchart",
+            "requirementdiagram",
+            "block-beta",
+        )
+        if not any(keyword in lowered for keyword in known_keywords):
+            raise ValueError("mermaid validation failed: no known diagram keyword found")
+        return
+    compile(code, "", "exec")
+
+
+def handle_generate_code(req: dict[str, Any]) -> None:
+    description = str(req.get("description", "")).strip()
+    if not description:
+        emit_event("error", message="description is required")
+        raise SystemExit(1)
+
+    try:
+        requested_type = _canonical_generate_diagram_type(str(req.get("diagram_type", "auto")))
+    except ValueError as e:
+        emit_event("error", message=str(e))
+        raise SystemExit(1) from e
+
+    warnings: list[str] = []
+    validation_error: str | None = None
+
+    for attempt in range(2):
+        emit_event("progress", stage="prompting")
+        prompt = _build_generate_prompt(description, requested_type, validation_error)
+        emit_event("progress", stage="generating")
+
+        try:
+            raw_output = _ollama_generate(prompt)
+            code, language, diagram_type, parse_warnings = _normalize_generated_payload(
+                raw_output, requested_type
+            )
+            warnings.extend(parse_warnings)
+            emit_event("progress", stage="validating")
+            _validate_generated_code(code, diagram_type)
+            emit_event(
+                "final",
+                code=code,
+                language=language,
+                diagram_type=diagram_type,
+                warnings=warnings,
+            )
+            return
+        except SystemExit:
+            raise
+        except Exception as e:
+            validation_error = str(e)
+            if attempt == 0:
+                warnings.append(f"first attempt failed validation or generation: {validation_error}")
+                continue
+            emit_event("error", message=validation_error)
+            raise SystemExit(1) from e
 
 
 # ── Schemdraw ─────────────────────────────────────────────────────────────────
@@ -211,8 +434,12 @@ def render_matplotlib(code: str) -> dict[str, Any]:
 # ── Request handler ───────────────────────────────────────────────────────────
 def handle_request(req: dict[str, Any]) -> None:
     action = req.get("action")
+    if action == "generate_code":
+        handle_generate_code(req)
+        return
+
     if action != "render":
-        respond({"error": f"unknown action: {action!r} — only 'render' is supported"})
+        respond({"error": f"unknown action: {action!r} — supported: 'render', 'generate_code'"})
         return
 
     diagram_type = req.get("diagram_type", "").strip()
@@ -249,7 +476,13 @@ def main() -> None:
         except json.JSONDecodeError:
             respond({"error": "invalid JSON — each request must be a single JSON object"})
             continue
-        handle_request(req)
+        try:
+            handle_request(req)
+        except SystemExit:
+            raise
+        except Exception as e:
+            emit_event("error", message=f"unexpected diagram engine failure: {e}")
+            raise SystemExit(1) from e
 
 
 if __name__ == "__main__":

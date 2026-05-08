@@ -64,6 +64,7 @@ Status key: **Present**, **Partial**, **Missing**.
 ### 2.1 Python source locations
 - Vault sidecar: `sidecars/vault_engine/main.py:1-515`
 - Diagram sidecar: `sidecars/diagram_engine/main.py:1-257`
+- Diagram sidecar now also supports `generate_code` (NL → diagram code) with NDJSON progress/final/error events.
 
 ### 2.2 Rust launch/spawn path (exact files/functions)
 - Vault sidecar launch path resolution + command selection:
@@ -168,7 +169,7 @@ Status key: **Present**, **Partial**, **Missing**.
 - Representative test: `extracts_wikilinks` in `src-tauri/src/db/backlinks.rs:293-300`.
 
 ### 5.2 Python tests
-- `sidecars/*/tests/`: **0 Python test files found**.
+- `sidecars/*/tests/`: **2 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`).
 
 ### 5.3 Frontend tests
 - Test files found: **4**

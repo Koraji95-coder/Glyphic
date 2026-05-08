@@ -113,6 +113,7 @@ pub fn run() {
             commands::vault_study::generate_flashcards,
             // diagrams
             commands::diagram_commands::render_diagram,
+            commands::diagram_commands::generate_code,
             // FE prep
             commands::fe_commands::list_fe_topics,
             commands::fe_commands::record_fe_attempt,
