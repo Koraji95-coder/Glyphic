@@ -721,7 +721,15 @@ function PracticeSession({
                 }}
               >
                 {grading ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: 'var(--text-secondary)',
+                      fontSize: '13px',
+                    }}
+                  >
                     <span
                       style={{
                         display: 'inline-block',
@@ -767,11 +775,13 @@ function PracticeSession({
                                 : 'var(--red, #f87171)',
                         }}
                       >
-                        {grade.verdict === 'correct' ? '✓ Correct' : grade.verdict === 'partial' ? '~ Partial' : '✗ Incorrect'}
+                        {grade.verdict === 'correct'
+                          ? '✓ Correct'
+                          : grade.verdict === 'partial'
+                            ? '~ Partial'
+                            : '✗ Incorrect'}
                       </span>
-                      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                        Score: {grade.score}/100
-                      </span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Score: {grade.score}/100</span>
                     </div>
                     <p
                       style={{

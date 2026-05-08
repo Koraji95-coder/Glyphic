@@ -134,18 +134,15 @@ export function VaultMode() {
     }
   }, [urlInput, loadSources]);
 
-  const handleDelete = useCallback(
-    async (sourceId: string) => {
-      try {
-        await commands.deleteVaultSource(sourceId);
-        setSources((prev) => prev.filter((s) => s.id !== sourceId));
-        setQueryResults([]);
-      } catch (e) {
-        console.error('Failed to delete source:', e);
-      }
-    },
-    [],
-  );
+  const handleDelete = useCallback(async (sourceId: string) => {
+    try {
+      await commands.deleteVaultSource(sourceId);
+      setSources((prev) => prev.filter((s) => s.id !== sourceId));
+      setQueryResults([]);
+    } catch (e) {
+      console.error('Failed to delete source:', e);
+    }
+  }, []);
 
   const handleQuery = useCallback(async () => {
     if (!query.trim()) return;
@@ -216,14 +213,16 @@ export function VaultMode() {
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
           {/* Ingest panel */}
           <section>
             <SectionTitle>Add to Vault</SectionTitle>
 
             {/* Drag-and-drop zone */}
             <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
@@ -238,7 +237,10 @@ export function VaultMode() {
                 marginBottom: '12px',
               }}
             >
-              <Upload size={28} style={{ color: dragOver ? 'var(--accent)' : 'var(--text-ghost)', margin: '0 auto 10px' }} />
+              <Upload
+                size={28}
+                style={{ color: dragOver ? 'var(--accent)' : 'var(--text-ghost)', margin: '0 auto 10px' }}
+              />
               <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 4px' }}>
                 Drop PDF, Word, or image file here
               </p>
@@ -259,7 +261,9 @@ export function VaultMode() {
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 placeholder="https://… (paste a URL to ingest)"
-                onKeyDown={(e) => { if (e.key === 'Enter') void handleIngestUrl(); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void handleIngestUrl();
+                }}
                 style={{
                   flex: 1,
                   padding: '8px 12px',
@@ -278,9 +282,7 @@ export function VaultMode() {
 
             {/* Progress indicator */}
             {ingestProgress && (
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                {ingestProgress}
-              </p>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>{ingestProgress}</p>
             )}
           </section>
 
@@ -293,7 +295,9 @@ export function VaultMode() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ask a question or enter keywords…"
-                onKeyDown={(e) => { if (e.key === 'Enter') void handleQuery(); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void handleQuery();
+                }}
                 style={{
                   flex: 1,
                   padding: '8px 12px',
@@ -311,7 +315,9 @@ export function VaultMode() {
               </PrimaryButton>
             </div>
 
-            {searching && <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>Searching…</p>}
+            {searching && (
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>Searching…</p>
+            )}
 
             {queryResults.length > 0 && (
               <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -325,7 +331,16 @@ export function VaultMode() {
                       backgroundColor: 'var(--bg-card)',
                     }}
                   >
-                    <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--accent)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: 'var(--accent)',
+                        marginBottom: '6px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                      }}
+                    >
                       {chunk.source_label}
                       {chunk.distance !== undefined && (
                         <span style={{ marginLeft: '8px', color: 'var(--text-ghost)', fontWeight: 400 }}>
@@ -333,14 +348,18 @@ export function VaultMode() {
                         </span>
                       )}
                     </div>
-                    <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-primary)', margin: 0 }}>{chunk.text}</p>
+                    <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-primary)', margin: 0 }}>
+                      {chunk.text}
+                    </p>
                   </div>
                 ))}
               </div>
             )}
 
             {!searching && query && queryResults.length === 0 && (
-              <p style={{ fontSize: '12px', color: 'var(--text-ghost)', marginTop: '8px' }}>No results. Try a different query or ingest more documents.</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-ghost)', marginTop: '8px' }}>
+                No results. Try a different query or ingest more documents.
+              </p>
             )}
           </section>
 
@@ -368,7 +387,16 @@ export function VaultMode() {
                     }}
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          color: 'var(--text-primary)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {src.label}
                       </div>
                       {src.chunks !== undefined && (
@@ -424,7 +452,9 @@ export function VaultMode() {
           {/* Flashcard result panel */}
           {flashcardResult && flashcardResult.cards.length > 0 && (
             <section>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}
+              >
                 <SectionTitle style={{ margin: 0 }}>Generated Flashcards ({flashcardResult.cards.length})</SectionTitle>
                 <button
                   type="button"
@@ -448,7 +478,9 @@ export function VaultMode() {
                     <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 6px' }}>
                       Q: {card.question ?? '—'}
                     </p>
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>A: {card.answer ?? '—'}</p>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+                      A: {card.answer ?? '—'}
+                    </p>
                   </div>
                 ))}
               </div>

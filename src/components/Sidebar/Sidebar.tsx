@@ -70,6 +70,12 @@ export function Sidebar() {
     }
   }, [vaultPath, refreshFileTree]);
 
+  // Listen for the "new-folder" event dispatched from App.tsx (Ctrl+Shift+N)
+  useEffect(() => {
+    window.addEventListener('glyphic:new-folder', handleNewFolder);
+    return () => window.removeEventListener('glyphic:new-folder', handleNewFolder);
+  }, [handleNewFolder]);
+
   const handleTrash = useCallback(() => {
     window.alert('Deleted notes are moved to your system Trash and can be restored from there.');
   }, []);

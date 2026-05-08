@@ -25,18 +25,20 @@ Status key: **Present**, **Partial**, **Missing**.
 5. **Tags browser — Present**
    - Tag browser/chips panel in `src/components/Sidebar/TagsPanel.tsx:5-103`.
 
-6. **Quick Switcher improvements — Present (with one UX gap)**
+6. **Quick Switcher improvements — Present**
    - Fuse-based search, create-when-no-match, keyboard nav hints, scroll-into-view in `src/components/QuickSwitcher/QuickSwitcher.tsx:44-91,101-141,235-272`.
-   - Gap: title-bar search icon has no click handler (`src/components/Layout/TitleBar.tsx:302-310`), so shortcut (`Ctrl/Cmd+P`) is the reliable opener (`src/components/QuickSwitcher/QuickSwitcher.tsx:65-75`).
+   - Title-bar search icon now wired — clicking it dispatches `glyphic:open-quick-switcher`; `QuickSwitcher.tsx` listens for that event in addition to `Ctrl/Cmd+P`.
 
 7. **Vault header with live statistics — Present**
    - Runtime counts from file tree via `countEntries` in `src/components/Sidebar/Sidebar.tsx:40-43,343-360`.
    - Header display (`{noteCount} notes · {folderCount} folders`) in `src/components/Sidebar/Sidebar.tsx:119-151`.
 
-8. **Keyboard shortcuts — Partial**
-   - Shortcut registry exists in `src/lib/shortcuts.ts:15-47` and help modal in `src/components/Help/ShortcutHelp.tsx:7-10,73-94`.
-   - Core handlers exist for chat/split/focus/settings/help in `src/App.tsx:53-96` and quick switcher in `src/components/QuickSwitcher/QuickSwitcher.tsx:65-75`.
-   - But some documented shortcuts (e.g., `Ctrl+N`, `Ctrl+Shift+N`) are listed without matching handlers in current frontend search (`src/lib/shortcuts.ts:23-24`).
+8. **Keyboard shortcuts — Present**
+   - Shortcut registry in `src/lib/shortcuts.ts` (3 removed catalog entries that had no handlers; see `docs/shortcut-audit-2026-05.md`).
+   - Help modal renders live registry via `src/components/Help/ShortcutHelp.tsx`.
+   - All listed shortcuts now have handlers: capture in `useGlobalShortcuts.ts`, quick-switcher in `QuickSwitcher.tsx`, note management / force-save / lecture-mode / layout / AI in `src/App.tsx`, TipTap built-ins (Bold/Italic/Code) via `StarterKit`.
+   - Title-bar search icon wired to `glyphic:open-quick-switcher` event (`src/components/Layout/TitleBar.tsx:302-311`).
+   - Quick Switcher listens to both `Ctrl+P` keydown and `glyphic:open-quick-switcher` event.
 
 9. **Markdown export with attachments — Present**
    - Toolbar wiring in `src/components/Editor/EditorToolbar.tsx:48-71,352-373`.
@@ -325,14 +327,13 @@ Status key: **Present**, **Partial**, **Missing**.
 
 | Wrong claim | Correct finding |
 |---|---|
-| “Keyboard shortcuts” are comprehensively implemented as listed. | Shortcut catalog is broad (`src/lib/shortcuts.ts:15-47`), but runtime handlers currently cover a subset (`src/App.tsx:53-96`, `src/components/QuickSwitcher/QuickSwitcher.tsx:65-75`); e.g., listed `Ctrl+N`/`Ctrl+Shift+N` do not have matching handlers in current search. |
+| “Keyboard shortcuts” are comprehensively implemented as listed. | Resolved — shortcut catalog trimmed to only wired shortcuts, all remaining entries have handlers, title-bar search icon wired. See `docs/shortcut-audit-2026-05.md`. |
 
 ## 8) Recommended slice order (next 4–6 PRs)
 
 Principle applied: each slice is vertical (sidecar/runtime + Rust command + UI shell + test) before parallelization.
 
-1. **Shortcut parity slice (vertical slice)**
-   - Align documented shortcuts with real handlers (or trim docs list), including Quick Switcher button click wiring and tests for key bindings.
+1. **Shortcut parity slice (vertical slice)** ✓ _Done — see `docs/shortcut-audit-2026-05.md`_
 
 2. **Study sidecar template extraction (`study_engine`) (vertical slice)**
    - Reuse current sidecar launch/IPC conventions (`vault_study.rs`/`diagram_commands.rs`), ship one end-to-end command + UI stub + tests.

@@ -2,7 +2,7 @@
  * Phase D UI feature tests — validate store-level logic that backs the
  * new UI components added in the Phase D redesign.
  */
-import { describe, expect, it, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useEditorStore } from '../stores/editorStore';
 import { useLayoutStore } from '../stores/layoutStore';
 import { useVaultStore } from '../stores/vaultStore';

@@ -74,6 +74,13 @@ export function QuickSwitcher() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Custom event to open — used by the title-bar search icon
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener('glyphic:open-quick-switcher', handler);
+    return () => window.removeEventListener('glyphic:open-quick-switcher', handler);
+  }, []);
+
   // Focus input when opened
   useEffect(() => {
     if (open) {

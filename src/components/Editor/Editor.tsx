@@ -32,7 +32,7 @@ export function Editor({
   const lectureModeActive = useEditorStore((s) => s.lectureModeActive);
   const lectureModeStartedAt = useEditorStore((s) => s.lectureModeStartedAt);
   const setCursorPosition = useEditorStore((s) => s.setCursorPosition);
-  const { handleContentChange, loadNote } = useEditor();
+  const { handleContentChange, loadNote, forceSave } = useEditor();
 
   const editor = useTiptapEditor({
     extensions: getEditorExtensions(),
@@ -147,6 +147,16 @@ export function Editor({
     }
     return () => cleanup?.();
   }, [insertImage]);
+
+  // Listen for force-save requests dispatched by Ctrl+S handler in App.tsx
+  useEffect(() => {
+    if (readOnly) return;
+    const handler = () => {
+      void forceSave();
+    };
+    window.addEventListener('glyphic:force-save', handler);
+    return () => window.removeEventListener('glyphic:force-save', handler);
+  }, [readOnly, forceSave]);
 
   if (!activeNotePath) {
     return (
