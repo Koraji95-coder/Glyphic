@@ -1,13 +1,4 @@
-import {
-  Database,
-  GitBranch,
-  GraduationCap,
-  HelpCircle,
-  LayoutList,
-  PinOff,
-  Settings,
-  Trash2,
-} from 'lucide-react';
+import { Database, GitBranch, GraduationCap, HelpCircle, LayoutList, PinOff, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
@@ -18,6 +9,7 @@ import { useLayoutStore } from '../../stores/layoutStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { ReviewSession } from '../Flashcards/ReviewSession';
+import { BacklinksPanel } from './BacklinksPanel';
 import { FileTree } from './FileTree';
 import { SearchBar } from './SearchBar';
 import { TagsPanel } from './TagsPanel';
@@ -242,6 +234,9 @@ export function Sidebar() {
 
       {/* Tag filter chips */}
       <TagsPanel />
+
+      {/* Backlinks */}
+      <BacklinksPanel />
 
       {/* File tree */}
       <div className="flex-1 overflow-y-auto" style={{ padding: '4px 0' }}>

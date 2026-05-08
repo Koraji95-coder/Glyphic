@@ -47,10 +47,10 @@ Status key: **Present**, **Partial**, **Missing**.
     - Print-preview window command in `src-tauri/src/commands/export_commands.rs:4-48`.
     - Frontend wrapper documents OS print flow in `src/lib/export/pdfExport.ts:25-36`.
 
-11. **Wikilinks parsing + backlink panel — Partial**
+11. **Wikilinks parsing + backlink panel — Present**
     - Wikilink parsing and backlink persistence are implemented in backend: `src-tauri/src/db/backlinks.rs:7-17,98-119,253-287`.
     - Tauri command exists: `src-tauri/src/commands/search_commands.rs:34-40`; frontend invoke exists: `src/lib/tauri/commands.ts:118`.
-    - **Backlink panel UI is not found in current frontend** (closest existing file: backlink API surface only in `src/lib/tauri/commands.ts:118`; backlink type in `src/types/editor.ts:23-28`).
+    - Backlink panel UI is present in the sidebar (`src/components/Sidebar/BacklinksPanel.tsx`) and renders backlink source + context.
 
 12. **Ollama integration with progress streaming — Present**
     - Pull-model progress streaming emitted from Rust in `src-tauri/src/ai/ollama.rs:327-394` and command entry in `src-tauri/src/commands/ai_commands.rs:314-324`.
@@ -325,9 +325,7 @@ Status key: **Present**, **Partial**, **Missing**.
 
 | Wrong claim | Correct finding |
 |---|---|
-| “Wikilinks parsing + backlink panel” is fully complete. | Wikilink parsing/backlink DB plumbing is present, but a dedicated backlink panel in current frontend is not found. Evidence: backend parser `src-tauri/src/db/backlinks.rs:7-17,98-119`; command exposed in `src/lib/tauri/commands.ts:118`; no panel component found using this API. |
 | “Keyboard shortcuts” are comprehensively implemented as listed. | Shortcut catalog is broad (`src/lib/shortcuts.ts:15-47`), but runtime handlers currently cover a subset (`src/App.tsx:53-96`, `src/components/QuickSwitcher/QuickSwitcher.tsx:65-75`); e.g., listed `Ctrl+N`/`Ctrl+Shift+N` do not have matching handlers in current search. |
-| README roadmap says backlink UI panel is “Visible in sidebar tag chips and cross-reference in DB.” (`README.md:74`) | Tags panel exists (`src/components/Sidebar/TagsPanel.tsx:5-103`), but this is not a backlink panel and does not display backlink query results from `get_backlinks`. |
 
 ## 8) Recommended slice order (next 4–6 PRs)
 
