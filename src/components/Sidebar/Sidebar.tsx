@@ -4,7 +4,6 @@ import {
   GraduationCap,
   HelpCircle,
   LayoutList,
-  Pin,
   PinOff,
   Settings,
   Trash2,
@@ -432,5 +431,3 @@ function FooterButton({ icon, label, onClick }: { icon: React.ReactNode; label: 
     </button>
   );
 }
-
-export { Pin };

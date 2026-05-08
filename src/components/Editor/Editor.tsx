@@ -76,12 +76,13 @@ export function Editor({
     onSelectionUpdate: ({ editor: ed }) => {
       if (readOnly) return;
       const { from } = ed.state.selection;
-      // Count block nodes before the cursor to derive the line number
-      let line = 1;
-      ed.state.doc.forEach((_node, offset) => {
-        if (offset < from) line++;
-      });
-      const col = ed.state.doc.resolve(from).parentOffset + 1;
+      // Compute line/col by counting newlines in the text before the cursor.
+      // textBetween(0, pos, '\n') inserts a '\n' between every block boundary,
+      // giving an accurate position for a markdown (flat-ish) document.
+      const textBefore = ed.state.doc.textBetween(0, from, '\n');
+      const lines = textBefore.split('\n');
+      const line = lines.length;
+      const col = (lines[lines.length - 1]?.length ?? 0) + 1;
       setCursorPosition({ line, col });
     },
   });
