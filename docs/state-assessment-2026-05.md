@@ -59,11 +59,12 @@ Status key: **Present**, **Partial**, **Missing**.
     - Frontend listener + progress state in `src/components/Chat/AiSettingsPanel.tsx:96-157`.
     - Chat token streaming also present via `chat-stream-*` events (`src-tauri/src/commands/ai_commands.rs:350-365`; `src/lib/tauri/events.ts:50-57`).
 
-## 2) Existing sidecar pattern (`vault_engine`, `diagram_engine`)
+## 2) Existing sidecar pattern (`vault_engine`, `diagram_engine`, `study_engine`)
 
 ### 2.1 Python source locations
 - Vault sidecar: `sidecars/vault_engine/main.py:1-515`
 - Diagram sidecar: `sidecars/diagram_engine/main.py:1-257`
+- Study sidecar: `sidecars/study_engine/main.py`
 - Diagram sidecar now also supports `generate_code` (NL → diagram code) with NDJSON progress/final/error events.
 
 ### 2.2 Rust launch/spawn path (exact files/functions)
@@ -75,6 +76,10 @@ Status key: **Present**, **Partial**, **Missing**.
   - `src-tauri/src/commands/diagram_commands.rs:10-48` (`diagram_engine_path`, `diagram_python_cmd`)
 - Diagram spawn + stdio wiring:
   - `src-tauri/src/commands/diagram_commands.rs:53-104` (`run_diagram_engine`)
+- Study sidecar launch path resolution + command selection:
+  - `src-tauri/src/commands/study.rs` (`study_engine_path`, `study_python_cmd`)
+- Study spawn + stdio wiring:
+  - `src-tauri/src/commands/study.rs` (`run_study_engine`)
 
 ### 2.3 IPC convention
 - Both sidecars are newline-delimited JSON over stdin/stdout:
@@ -169,7 +174,7 @@ Status key: **Present**, **Partial**, **Missing**.
 - Representative test: `extracts_wikilinks` in `src-tauri/src/db/backlinks.rs:293-300`.
 
 ### 5.2 Python tests
-- `sidecars/*/tests/`: **2 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`).
+- `sidecars/*/tests/`: **5 Python test files found** (`sidecars/diagram_engine/tests/conftest.py`, `sidecars/diagram_engine/tests/test_generate_code.py`, `sidecars/study_engine/tests/__init__.py`, `sidecars/study_engine/tests/conftest.py`, `sidecars/study_engine/tests/test_study_engine.py`).
 
 ### 5.3 Frontend tests
 - Test files found: **4**
@@ -336,8 +341,7 @@ Principle applied: each slice is vertical (sidecar/runtime + Rust command + UI s
 
 1. **Shortcut parity slice (vertical slice)** ✓ _Done — see `docs/shortcut-audit-2026-05.md`_
 
-2. **Study sidecar template extraction (`study_engine`) (vertical slice)**
-   - Reuse current sidecar launch/IPC conventions (`vault_study.rs`/`diagram_commands.rs`), ship one end-to-end command + UI stub + tests.
+2. **Study sidecar template extraction (`study_engine`) (vertical slice)** ✓ _Done_
 
 3. **FE sidecar template extraction (`fe_engine`) (vertical slice)**
    - Same launch/IPC/error model, with one initial FE workflow command and UI shell.
