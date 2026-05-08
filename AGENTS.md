@@ -9,7 +9,7 @@ Before changing any code, read in order:
 1. `.github/copilot-instructions.md` — the rules (non-negotiable)
 2. This file — task patterns and dispatch
 3. `docs/state-assessment-2026-05.md` — current repo state and known gaps
-4. The relevant prompt template under `.github/prompts/`
+4. The relevant skill under `skills/<name>/SKILL.md` (load whichever skill matches the task)
 
 ## Architecture summary
 
@@ -42,28 +42,30 @@ When you add a feature, the complete PR has four layers:
 1. **Sidecar action** (Python) — implements the LLM/processing logic, ships with at least one pytest covering happy path + at least one failure path
 2. **Rust command** (Tauri) — spawns the sidecar, parses NDJSON, returns typed result, registered in `main.rs`, ships with at least one unit test
 3. **React UI shell** (React + TypeScript) — invokes the command via `src/lib/tauri/commands.ts`, renders results, ships with at least one Vitest test
-4. **Documentation** — README feature list update, state assessment update, any prompt template changes
+4. **Documentation** — README feature list update, state assessment update, any skill changes if conventions evolved
 
 A PR that lands only one or two layers MUST state explicitly why (e.g., "this is the architectural extraction; UI follows in #N"). Never claim completeness for partial work.
 
 ## Common tasks
 
-| Intent | Prompt template |
+| Intent | Skill |
 |---|---|
-| Add a new action to an existing sidecar | `.github/prompts/add-sidecar-action.prompt.md` |
-| Migrate a direct Rust→LLM call to a sidecar | `.github/prompts/extract-llm-to-sidecar.prompt.md` |
-| Build a new feature top-to-bottom | `.github/prompts/add-vertical-slice.prompt.md` |
-| Backfill sidecar pytest coverage | `.github/prompts/backfill-sidecar-tests.prompt.md` |
+| Add a new action to an existing sidecar | `skills/add-sidecar-action/SKILL.md` |
+| Migrate a direct Rust→LLM call to a sidecar | `skills/extract-llm-to-sidecar/SKILL.md` |
+| Build a new feature top-to-bottom | `skills/add-vertical-slice/SKILL.md` |
+| Backfill sidecar pytest coverage | `skills/backfill-sidecar-tests/SKILL.md` |
 | Fix a failing CI job | Inspect `.github/workflows/ci.yml` and the failing step output; reproduce locally before changing code |
+
+The `skills/` location is tool-neutral on purpose. Every agent reads `AGENTS.md` (or `.github/copilot-instructions.md`) on session start; from there it gets routed to the relevant `SKILL.md`. No special tool-specific auto-discovery is assumed.
 
 ## Dispatch by intent
 
-- **"add a feature"** → vertical slice template
-- **"add an action to <engine>"** → add-sidecar-action template
-- **"refactor existing code"** → if it's a direct-LLM-call extraction use the extract template; otherwise open a draft PR with `needs-discussion`
+- **"add a feature"** → `add-vertical-slice` skill
+- **"add an action to <engine>"** → `add-sidecar-action` skill
+- **"refactor existing code"** → if it's a direct-LLM-call extraction use `extract-llm-to-sidecar`; otherwise open a draft PR with `needs-discussion`
 - **"fix a bug"** → reproduce first, write a failing test, then fix
-- **"improve coverage"** → backfill template
-- **"update docs"** → no template needed; just keep documentation honest
+- **"improve coverage"** → `backfill-sidecar-tests` skill
+- **"update docs"** → no skill needed; just keep documentation honest
 
 ## What you cannot do
 
