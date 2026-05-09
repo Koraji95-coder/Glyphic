@@ -41,10 +41,11 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
 
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const setSelectedFolderPath = useVaultStore((s) => s.setSelectedFolderPath);
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const pinNote = useVaultStore((s) => s.pinNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
-  const { createNote, deleteNote } = useVault();
+  const { createNote, deleteNote, deleteFolder } = useVault();
 
   const isFolder = entry.entry_type === 'folder';
   const isActive = !isFolder && activeNotePath === entry.path;
@@ -56,11 +57,14 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
 
   const handleClick = useCallback(() => {
     if (isFolder) {
+      setSelectedFolderPath(entry.path);
       setExpanded((prev) => !prev);
     } else {
+      const parentFolder = entry.path.split('/').slice(0, -1).join('/');
+      setSelectedFolderPath(parentFolder);
       setActiveNote(entry.path, entry.path);
     }
-  }, [isFolder, entry.path, setActiveNote]);
+  }, [isFolder, entry.path, setActiveNote, setSelectedFolderPath]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -144,7 +148,11 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     setCtxMenu(null);
     if (window.confirm(`Delete "${title}"?`)) {
       try {
-        await deleteNote(entry.path);
+        if (isFolder) {
+          await deleteFolder(entry.path);
+        } else {
+          await deleteNote(entry.path);
+        }
       } catch (e) {
         reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
       }
@@ -257,9 +265,9 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
                 }}
               />
               <CtxItem icon={Pencil} label="Rename" onClick={handleRename} />
-              <CtxItem icon={Trash2} label="Delete" onClick={handleDelete} danger />
             </>
           )}
+          <CtxItem icon={Trash2} label="Delete" onClick={handleDelete} danger />
         </div>
       )}
     </>

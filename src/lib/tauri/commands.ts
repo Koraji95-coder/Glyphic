@@ -182,6 +182,7 @@ export const commands = {
   renameNote: (vaultPath: string, oldPath: string, newName: string) =>
     invoke<NoteFile>('rename_note', { vaultPath, oldPath, newName }),
   createFolder: (vaultPath: string, relativePath: string) => invoke<void>('create_folder', { vaultPath, relativePath }),
+  deleteFolder: (vaultPath: string, relativePath: string) => invoke<void>('delete_folder', { vaultPath, relativePath }),
 
   // Capture
   startCapture: () => invoke<void>('start_capture'),

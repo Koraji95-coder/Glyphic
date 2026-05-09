@@ -38,6 +38,7 @@ export function Sidebar() {
   const fileTree = useVaultStore((s) => s.fileTree);
   const vaultPath = useVaultStore((s) => s.vaultPath);
   const refreshFileTree = useVaultStore((s) => s.refreshFileTree);
+  const selectedFolderPath = useVaultStore((s) => s.selectedFolderPath);
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
@@ -53,13 +54,13 @@ export function Sidebar() {
       const noteName = name ?? window.prompt('Note name:');
       if (noteName) {
         try {
-          await createNote('', noteName);
+          await createNote(selectedFolderPath, noteName);
         } catch (e) {
           reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
         }
       }
     },
-    [createNote],
+    [createNote, selectedFolderPath],
   );
 
   // Listen for the "new-note" event dispatched from TitleBar's "+" button
@@ -76,13 +77,14 @@ export function Sidebar() {
     const name = window.prompt('Folder name:');
     if (name && vaultPath) {
       try {
-        await commands.createFolder(vaultPath, name);
+        const base = selectedFolderPath ? `${selectedFolderPath}/${name}` : name;
+        await commands.createFolder(vaultPath, base);
         await refreshFileTree();
       } catch (e) {
         reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e });
       }
     }
-  }, [vaultPath, refreshFileTree]);
+  }, [vaultPath, refreshFileTree, selectedFolderPath]);
 
   // Listen for the "new-folder" event dispatched from App.tsx (Ctrl+Shift+N)
   useEffect(() => {

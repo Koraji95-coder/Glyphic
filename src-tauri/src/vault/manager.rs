@@ -79,11 +79,41 @@ pub fn create_folder(vault_path: &str, relative_path: &str) -> Result<(), String
 pub fn create_note(vault_path: &str, folder: &str, title: &str) -> Result<NoteFile, String> {
     let now = Utc::now();
     let id = Uuid::new_v4().to_string();
-    let file_name = sanitize_filename(title);
-    let rel_path = Path::new(folder)
-        .join("notes")
-        .join(format!("{file_name}.md"));
-    let full_path = Path::new(vault_path).join(&rel_path);
+    let mut file_name = sanitize_filename(title);
+    if file_name.trim().is_empty() {
+        file_name = "untitled".to_string();
+    }
+
+    // Folder selections can point at a "notes" container itself.
+    // Normalize so we don't create nested "notes/notes" paths.
+    let normalized_folder = folder.trim().trim_matches('/').trim_matches('\\');
+    let base_folder = if normalized_folder.ends_with("/notes") || normalized_folder.ends_with("\\notes") {
+        Path::new(normalized_folder)
+            .parent()
+            .map(|p| p.to_string_lossy().to_string())
+            .unwrap_or_default()
+    } else {
+        normalized_folder.to_string()
+    };
+
+    let notes_dir = Path::new(&base_folder).join("notes");
+    let mut rel_path = notes_dir.join(format!("{file_name}.md"));
+    let mut full_path = Path::new(vault_path).join(&rel_path);
+
+    // Never clobber an existing note; append -2, -3, ... when needed.
+    if full_path.exists() {
+        let mut idx = 2usize;
+        loop {
+            let candidate = notes_dir.join(format!("{file_name}-{idx}.md"));
+            let candidate_full = Path::new(vault_path).join(&candidate);
+            if !candidate_full.exists() {
+                rel_path = candidate;
+                full_path = candidate_full;
+                break;
+            }
+            idx += 1;
+        }
+    }
 
     if let Some(parent) = full_path.parent() {
         std::fs::create_dir_all(parent)
@@ -122,6 +152,18 @@ pub fn save_note(vault_path: &str, note_path: &str, content: &str) -> Result<(),
 pub fn delete_note(vault_path: &str, note_path: &str) -> Result<(), String> {
     let full_path = Path::new(vault_path).join(note_path);
     trash::delete(&full_path).map_err(|e| format!("Failed to move to trash: {e}"))
+}
+
+pub fn delete_folder(vault_path: &str, relative_path: &str) -> Result<(), String> {
+    let rel = relative_path.trim().trim_matches('/').trim_matches('\\');
+    if rel.is_empty() || rel == ".glyphic" {
+        return Err("Refusing to delete protected vault path".to_string());
+    }
+    let full_path = Path::new(vault_path).join(rel);
+    if !full_path.exists() {
+        return Err("Folder does not exist".to_string());
+    }
+    trash::delete(&full_path).map_err(|e| format!("Failed to move folder to trash: {e}"))
 }
 
 pub fn rename_note(vault_path: &str, old_path: &str, new_name: &str) -> Result<NoteFile, String> {

@@ -35,5 +35,12 @@ export function useVault() {
     await store.refreshFileTree();
   }, []);
 
-  return { openVault, createVault, createNote, deleteNote };
+  const deleteFolder = useCallback(async (relativePath: string) => {
+    const store = useVaultStore.getState();
+    if (!store.vaultPath) return;
+    await commands.deleteFolder(store.vaultPath, relativePath);
+    await store.refreshFileTree();
+  }, []);
+
+  return { openVault, createVault, createNote, deleteNote, deleteFolder };
 }

@@ -9,12 +9,14 @@ interface VaultState {
   fileTree: VaultEntry[];
   activeNoteId: string | null;
   activeNotePath: string | null;
+  selectedFolderPath: string;
   openNotes: string[];
   pinnedNotes: string[];
   setVaultPath: (path: string) => void;
   setVaultConfig: (config: VaultConfig) => void;
   setFileTree: (tree: VaultEntry[]) => void;
   setActiveNote: (id: string, path: string) => void;
+  setSelectedFolderPath: (path: string) => void;
   addOpenNote: (path: string) => void;
   removeOpenNote: (path: string) => void;
   pinNote: (path: string) => void;
@@ -28,6 +30,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   fileTree: [],
   activeNoteId: null,
   activeNotePath: null,
+  selectedFolderPath: '',
   openNotes: [],
   pinnedNotes: [],
 
@@ -41,6 +44,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
     layout.closeDiagramMode();
     set({ activeNoteId: id, activeNotePath: path });
   },
+  setSelectedFolderPath: (path) => set({ selectedFolderPath: path }),
   addOpenNote: (path) =>
     set((state) => ({
       openNotes: state.openNotes.includes(path) ? state.openNotes : [...state.openNotes, path],

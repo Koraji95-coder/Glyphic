@@ -193,3 +193,8 @@ pub fn rename_note(
 pub fn create_folder(vault_path: String, relative_path: String) -> Result<(), String> {
     manager::create_folder(&vault_path, &relative_path)
 }
+
+#[tauri::command]
+pub fn delete_folder(vault_path: String, relative_path: String) -> Result<(), String> {
+    manager::delete_folder(&vault_path, &relative_path)
+}

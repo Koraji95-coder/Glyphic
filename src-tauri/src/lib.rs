@@ -68,6 +68,7 @@ pub fn run() {
             vault_commands::delete_note,
             vault_commands::rename_note,
             vault_commands::create_folder,
+            vault_commands::delete_folder,
             // search
             search_commands::search_notes,
             search_commands::search_all,
