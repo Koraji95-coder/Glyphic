@@ -16,7 +16,7 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@tauri-apps/api": "2.10.1",
+    "@tauri-apps/api": "2.11.0",
     "@tauri-apps/plugin-clipboard-manager": "^2",
     "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-fs": "^2",
@@ -51,10 +51,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
-    "@tauri-apps/cli": "2.10.0",
+    "@tauri-apps/cli": "2.11.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/dompurify": "^3.0.5",
+    "@types/dompurify": "^3.2.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6",
