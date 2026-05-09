@@ -12,6 +12,7 @@ import { useAnnotationStore } from '../../stores/annotationStore';
 import { useEditorActionStore } from '../../stores/editorActionStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useVaultStore } from '../../stores/vaultStore';
+import { Dashboard } from '../../modes/dashboard/Dashboard';
 import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
 import { EditorToolbar } from './EditorToolbar';
 import { NoteTagChips } from './NoteTagChips';
@@ -187,100 +188,7 @@ export function Editor({
   }, [readOnly, forceSave]);
 
   if (!activeNotePath) {
-    return (
-      <div className="flex-1 flex items-center justify-center" style={{ padding: '40px 20px' }}>
-        <div
-          style={{
-            width: 'min(420px, 100%)',
-            borderRadius: '24px',
-            padding: '28px 26px',
-            background:
-              'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), var(--glass-surface)',
-            border: '1px solid var(--glass-border)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            boxShadow: '0 28px 80px rgba(0,0,0,0.34), 0 0 0 1px rgba(255,255,255,0.03) inset',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            gap: '16px',
-          }}
-        >
-          <div
-            style={{
-              width: '70px',
-              height: '70px',
-              borderRadius: '22px',
-              background: 'var(--accent-gradient)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '30px',
-              boxShadow: '0 0 44px rgba(163,116,247,0.3)',
-            }}
-          >
-            ✦
-          </div>
-          <div>
-            <p
-              style={{
-                fontSize: '20px',
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-display)',
-                marginBottom: '8px',
-              }}
-            >
-              Open a note and start writing
-            </p>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: '280px' }}>
-              Select a note from the sidebar or press{' '}
-              <kbd
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: '6px',
-                  padding: '2px 6px',
-                  fontSize: '10px',
-                  fontFamily: 'var(--font-mono)',
-                  color: 'var(--accent)',
-                }}
-              >
-                ⌘P
-              </kbd>{' '}
-              to quick-switch into your vault.
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span
-              style={{
-                padding: '5px 10px',
-                borderRadius: '999px',
-                fontSize: '10px',
-                color: 'var(--accent)',
-                background: 'rgba(163,116,247,0.14)',
-                border: '1px solid rgba(163,116,247,0.22)',
-              }}
-            >
-              Aurora glass workspace
-            </span>
-            <span
-              style={{
-                padding: '5px 10px',
-                borderRadius: '999px',
-                fontSize: '10px',
-                color: 'var(--accent-warm)',
-                background: 'rgba(249,118,85,0.12)',
-                border: '1px solid rgba(249,118,85,0.18)',
-              }}
-            >
-              Sunset neon accents
-            </span>
-          </div>
-        </div>
-      </div>
-    );
+    return <Dashboard />;
   }
 
   // Build breadcrumb parts from the note path

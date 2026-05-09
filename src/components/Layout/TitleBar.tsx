@@ -1,9 +1,13 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { FileText, GraduationCap, Grid2X2, Maximize2, Menu, MessageSquare, Minimize2, Plus, Search, Workflow, X } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { frontmatterRegistry } from '../../lib/frontmatterRegistry';
 import { reportError } from '../../lib/errorReporter';
+import { commands } from '../../lib/tauri/commands';
+import { composeNote } from '../../lib/tiptap/markdownParser';
 import { useChatStore } from '../../stores/chatStore';
+import { useEditorStore } from '../../stores/editorStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
 
@@ -13,6 +17,11 @@ export function TitleBar() {
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const addOpenNote = useVaultStore((s) => s.addOpenNote);
   const removeOpenNote = useVaultStore((s) => s.removeOpenNote);
+  const vaultPath = useVaultStore((s) => s.vaultPath);
+  const content = useEditorStore((s) => s.content);
+  const isDirty = useEditorStore((s) => s.isDirty);
+  const setSaving = useEditorStore((s) => s.setSaving);
+  const markSaved = useEditorStore((s) => s.markSaved);
   const { isOpen: chatOpen, togglePanel } = useChatStore();
   const {
     toggleSidebar,
@@ -99,9 +108,31 @@ export function TitleBar() {
     }
   }, [appWindow]);
 
-  const handleCloseTab = useCallback(
-    (path: string, e: React.MouseEvent) => {
-      e.stopPropagation();
+  const saveActiveNoteNow = useCallback(async () => {
+    if (!vaultPath || !activeNotePath || !isDirty) return;
+    try {
+      setSaving(true);
+      await commands.saveNote(
+        vaultPath,
+        activeNotePath,
+        composeNote({
+          body: content,
+          frontmatter: frontmatterRegistry.get(activeNotePath),
+        }),
+      );
+      markSaved();
+    } catch (error) {
+      reportError({ context: 'Title bar close tab save', message: 'Failed to save before closing tab', error });
+    } finally {
+      setSaving(false);
+    }
+  }, [activeNotePath, content, isDirty, markSaved, setSaving, vaultPath]);
+
+  const closeTab = useCallback(
+    async (path: string) => {
+      if (path === activeNotePath) {
+        await saveActiveNoteNow();
+      }
       removeOpenNote(path);
       if (path === activeNotePath) {
         const remaining = openNotes.filter((item) => item !== path);
@@ -110,7 +141,15 @@ export function TitleBar() {
         }
       }
     },
-    [activeNotePath, openNotes, removeOpenNote, setActiveNote],
+    [activeNotePath, openNotes, removeOpenNote, saveActiveNoteNow, setActiveNote],
+  );
+
+  const handleCloseTab = useCallback(
+    (path: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      void closeTab(path);
+    },
+    [closeTab],
   );
 
   const handleTabClick = useCallback(
@@ -132,12 +171,42 @@ export function TitleBar() {
         ? 'study'
         : 'dashboard';
 
-  const workspaceItems = [
-    { key: 'dashboard' as const, label: 'Dashboard', icon: Grid2X2, onClick: openEditorMode },
-    { key: 'vault' as const, label: 'Vault', icon: FileText, onClick: openVaultMode },
-    { key: 'diagram' as const, label: 'Diagrams', icon: Workflow, onClick: openDiagramMode },
-    { key: 'study' as const, label: 'FE Prep', icon: GraduationCap, onClick: openFePrep },
-  ];
+  const workspaceItems = useMemo(
+    () => [
+      { key: 'dashboard' as const, label: 'Dashboard', icon: Grid2X2, onClick: openEditorMode },
+      { key: 'vault' as const, label: 'Vault', icon: FileText, onClick: openVaultMode },
+      { key: 'diagram' as const, label: 'Diagrams', icon: Workflow, onClick: openDiagramMode },
+      { key: 'study' as const, label: 'FE Prep', icon: GraduationCap, onClick: openFePrep },
+    ],
+    [openDiagramMode, openEditorMode, openFePrep, openVaultMode],
+  );
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement?.getAttribute('contenteditable') === 'true'
+      ) {
+        return;
+      }
+
+      const index = workspaceItems.findIndex((item) => item.key === activeWorkspace);
+      if (index < 0) return;
+
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 1 : -1;
+      const nextIndex = (index + delta + workspaceItems.length) % workspaceItems.length;
+      workspaceItems[nextIndex].onClick();
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [activeWorkspace, workspaceItems]);
 
   return (
     <div
@@ -391,6 +460,13 @@ export function TitleBar() {
                 <div
                   key={path}
                   onClick={() => handleTabClick(path)}
+                  onAuxClick={(e) => {
+                    if (e.button === 1) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void closeTab(path);
+                    }
+                  }}
                   className="flex items-center shrink-0 cursor-pointer"
                   style={{
                     gap: '5px',
@@ -411,12 +487,15 @@ export function TitleBar() {
                   <span className="truncate" style={{ maxWidth: '120px' }}>
                     {name}
                   </span>
-                  <span
+                  <button
+                    type="button"
                     onClick={(e) => handleCloseTab(path, e)}
+                    aria-label={`Close ${name}`}
+                    title="Close tab"
                     style={{
-                      width: '14px',
-                      height: '14px',
-                      borderRadius: '3px',
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '5px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -424,10 +503,12 @@ export function TitleBar() {
                       color: 'var(--text-ghost)',
                       marginLeft: '2px',
                       cursor: 'pointer',
+                      border: 'none',
+                      background: 'transparent',
                     }}
                   >
                     <X size={9} />
-                  </span>
+                  </button>
                 </div>
               );
             })}

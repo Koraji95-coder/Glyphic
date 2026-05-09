@@ -1,16 +1,12 @@
 import {
-  Database,
   FileText,
   FolderOpen,
-  GraduationCap,
-  Grid2X2,
   HelpCircle,
   LayoutList,
   PinOff,
   Plus,
   Settings,
   Trash2,
-  Workflow,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -35,14 +31,7 @@ export function Sidebar() {
   const {
     isSidebarOpen,
     closeSidebar,
-    openFePrep,
-    openVaultMode,
-    openDiagramMode,
     isFocusMode,
-    isFePrepMode,
-    isVaultMode,
-    isDiagramMode,
-    closeFePrep,
   } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
@@ -58,13 +47,6 @@ export function Sidebar() {
   const { noteCount, folderCount } = countEntries(fileTree);
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
-  const activeWorkspace: 'dashboard' | 'vault' | 'diagram' | 'study' = isVaultMode
-    ? 'vault'
-    : isDiagramMode
-      ? 'diagram'
-      : isFePrepMode
-        ? 'study'
-        : 'dashboard';
 
   const handleNewNote = useCallback(
     async (name?: string) => {
@@ -111,13 +93,6 @@ export function Sidebar() {
   const handleTrash = useCallback(() => {
     window.alert('Deleted notes are moved to your system Trash and can be restored from there.');
   }, []);
-
-  const workspaceCards = [
-    { key: 'dashboard' as const, label: 'Dashboard', icon: Grid2X2, onClick: closeFePrep },
-    { key: 'vault' as const, label: 'Vault Tools', icon: Database, onClick: openVaultMode },
-    { key: 'diagram' as const, label: 'Diagrams', icon: Workflow, onClick: openDiagramMode },
-    { key: 'study' as const, label: 'FE Prep', icon: GraduationCap, onClick: openFePrep },
-  ];
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -190,55 +165,6 @@ export function Sidebar() {
         </div>
 
         <SearchBar />
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <SectionLabel>Workspace</SectionLabel>
-          <div className="grid grid-cols-2" style={{ gap: '6px' }}>
-            {workspaceCards.map((item) => {
-              const Icon = item.icon;
-              const active = activeWorkspace === item.key;
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={item.onClick}
-                  className="flex items-center"
-                  style={{
-                    gap: '8px',
-                    padding: '10px 10px',
-                    borderRadius: '12px',
-                    border: active ? '1px solid rgba(163,116,247,0.22)' : '1px solid var(--glass-border)',
-                    background: active
-                      ? 'linear-gradient(135deg, rgba(163,116,247,0.18), rgba(249,118,85,0.08))'
-                      : 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    boxShadow: active ? '0 14px 28px rgba(163,116,247,0.12)' : 'inset 0 1px 0 rgba(255,255,255,0.04)',
-                    cursor: 'pointer',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                  }}
-                >
-                  <span
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: active ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon size={14} />
-                  </span>
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <SectionLabel>Quick actions</SectionLabel>

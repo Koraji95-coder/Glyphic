@@ -181,67 +181,75 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         paddingLeft: '12px',
         paddingRight: '12px',
         gap: '5px',
-        overflowX: 'auto',
-        overscrollBehavior: 'contain',
+        overflow: 'hidden',
       }}
     >
-      {/* Button groups — pill-style groups */}
-      {groups.map((group) => (
-        <div
-          key={`group-${group[0]?.label}`}
-          className="flex items-center shrink-0"
-          style={{
-            gap: '1px',
-            padding: '2px',
-            borderRadius: '10px',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid var(--glass-border)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-          }}
-        >
-          {group.map((btn) => {
-            const active = btn.isActive?.() ?? false;
-            const Icon = btn.icon;
-            return (
-              <button
-                type="button"
-                key={btn.label}
-                onClick={btn.action}
-                title={btn.label}
-                className="rounded transition-colors text-xs font-medium"
-                style={{
-                  background: active
-                    ? 'linear-gradient(135deg, rgba(163,116,247,0.2), rgba(249,118,85,0.08))'
-                    : 'transparent',
-                  color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  width: isMobile ? '44px' : '28px',
-                  height: isMobile ? '44px' : '28px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0',
-                  flexShrink: 0,
-                  borderRadius: '6px',
-                  border: 'none',
-                  boxShadow: active ? '0 8px 20px rgba(163,116,247,0.14)' : 'none',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = active ? 'var(--accent-dim)' : 'transparent';
-                }}
-              >
-                <Icon size={iconSize} />
-              </button>
-            );
-          })}
-        </div>
-      ))}
+      <div
+        className="flex items-center flex-1 min-w-0"
+        style={{
+          gap: '5px',
+          overflowX: 'auto',
+          overscrollBehavior: 'contain',
+          paddingBottom: '1px',
+        }}
+      >
+        {/* Button groups — pill-style groups */}
+        {groups.map((group) => (
+          <div
+            key={`group-${group[0]?.label}`}
+            className="flex items-center shrink-0"
+            style={{
+              gap: '1px',
+              padding: '2px',
+              borderRadius: '10px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--glass-border)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            }}
+          >
+            {group.map((btn) => {
+              const active = btn.isActive?.() ?? false;
+              const Icon = btn.icon;
+              return (
+                <button
+                  type="button"
+                  key={btn.label}
+                  onClick={btn.action}
+                  title={btn.label}
+                  className="rounded transition-colors text-xs font-medium"
+                  style={{
+                    background: active
+                      ? 'linear-gradient(135deg, rgba(163,116,247,0.2), rgba(249,118,85,0.08))'
+                      : 'transparent',
+                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    width: isMobile ? '44px' : '28px',
+                    height: isMobile ? '44px' : '28px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0',
+                    flexShrink: 0,
+                    borderRadius: '6px',
+                    border: 'none',
+                    boxShadow: active ? '0 8px 20px rgba(163,116,247,0.14)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = active ? 'var(--accent-dim)' : 'transparent';
+                  }}
+                >
+                  <Icon size={iconSize} />
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
 
-      {/* Spacer */}
-      <div className="flex-1 shrink-0" style={{ minWidth: '8px' }} />
+      <div className="flex items-center shrink-0" style={{ gap: '5px', paddingLeft: '8px' }}>
 
       {/* Draw / Ink mode toggle — hero button style */}
       <button
@@ -469,6 +477,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         Capture
         {!isMobile && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', opacity: 0.6 }}>⌘⇧S</span>}
       </button>
+      </div>
     </div>
   );
 }

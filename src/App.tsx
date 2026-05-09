@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { ChatPanel } from './components/Chat/ChatPanel';
+import { AiDrawer } from './components/Chat/AiDrawer';
 import { ErrorToast } from './components/common/ErrorToast';
 import { DiagramMode } from './components/diagrams/DiagramMode';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
@@ -46,7 +46,6 @@ import { useTagsStore } from './stores/tagsStore';
 import { useVaultStore } from './stores/vaultStore';
 
 function MainLayout() {
-  const isChatOpen = useChatStore((s) => s.isOpen);
   const isFePrepMode = useLayoutStore((s) => s.isFePrepMode);
   const isVaultMode = useLayoutStore((s) => s.isVaultMode);
   const isDiagramMode = useLayoutStore((s) => s.isDiagramMode);
@@ -154,12 +153,12 @@ function MainLayout() {
       <OcrBanner />
       <div className="flex flex-1 min-h-0">
         <Sidebar />
-        <div className="flex-1 flex min-w-0 overflow-hidden">
+        <div className="flex-1 flex min-w-0 overflow-hidden relative">
           {isFePrepMode && <FePrepMode />}
           {isVaultMode && <VaultMode />}
           {isDiagramMode && <DiagramMode />}
           {!isFullScreenMode && <EditorPaneGroup />}
-          {!isFullScreenMode && isChatOpen && <ChatPanel />}
+          {!isFullScreenMode && <AiDrawer />}
         </div>
       </div>
       <StatusBar />

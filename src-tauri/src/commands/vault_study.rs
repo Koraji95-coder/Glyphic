@@ -67,6 +67,15 @@ pub(super) async fn run_vault_engine(
     use tokio::process::Command;
 
     let (cmd, extra_args) = vault_python_cmd(app);
+    if cfg!(target_os = "windows") {
+        let cmd_name = cmd.to_string_lossy().to_ascii_lowercase();
+        if cmd_name == "python3" || cmd_name == "python" || cmd_name == "py" {
+            return Err(
+                "Python sidecar runtime is not configured. Run sidecars/install_deps.sh (or provide launcher shims)."
+                    .to_string(),
+            );
+        }
+    }
 
     let mut child = Command::new(&cmd)
         .args(&extra_args)
