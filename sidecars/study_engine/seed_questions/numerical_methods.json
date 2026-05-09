@@ -1,0 +1,406 @@
+{
+  "topic": "Numerical Methods",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "Newton-Raphson iteration for finding roots of f(x)=0 uses the update:",
+      "choices": [
+        "A. x_{n+1} = x_n − f(x_n)/f'(x_n)",
+        "B. x_{n+1} = x_n + f(x_n)/f'(x_n)",
+        "C. x_{n+1} = x_n × f(x_n)",
+        "D. x_{n+1} = f(x_n)/f'(x_n)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Newton-Raphson: x_{n+1} = x_n − f(x_n)/f'(x_n). Quadratically convergent near simple roots.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The bisection method for root-finding brackets a root in [a,b] and:",
+      "choices": [
+        "A. Evaluates f at x = (a+b)/2 and replaces the endpoint with matching sign",
+        "B. Finds the root using derivatives",
+        "C. Converges quadratically",
+        "D. Uses two previous iterates to interpolate"
+      ],
+      "correct_answer": "A",
+      "explanation": "Bisection: evaluate midpoint c = (a+b)/2; if f(c) has same sign as f(a), replace a with c; else replace b. Linearly convergent.",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The trapezoidal rule for numerical integration of f(x) on [a,b] with one interval is:",
+      "choices": [
+        "A. (b−a) × f((a+b)/2)",
+        "B. (b−a)/2 × [f(a) + f(b)]",
+        "C. (b−a)/6 × [f(a) + 4f((a+b)/2) + f(b)]",
+        "D. (b−a) × f(a)"
+      ],
+      "correct_answer": "B",
+      "explanation": "Trapezoidal: ∫f dx ≈ (b−a)/2 × [f(a) + f(b)]. Accurate to O(h³) per interval.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Simpson's 1/3 rule for numerical integration requires a number of intervals that is:",
+      "choices": ["A. Any positive integer", "B. Odd", "C. Even", "D. Prime"],
+      "correct_answer": "C",
+      "explanation": "Simpson's 1/3 rule groups intervals in pairs; it requires an even number of subintervals (odd number of nodes).",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Forward difference approximation of f'(x) is:",
+      "choices": [
+        "A. [f(x+h) − f(x−h)] / (2h)",
+        "B. [f(x+h) − f(x)] / h",
+        "C. [f(x) − f(x−h)] / h",
+        "D. [f(x+h) − 2f(x) + f(x−h)] / h²"
+      ],
+      "correct_answer": "B",
+      "explanation": "Forward difference: f'(x) ≈ [f(x+h) − f(x)] / h. First-order accurate O(h).",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The central difference approximation for f''(x) is:",
+      "choices": [
+        "A. [f(x+h) + f(x−h)] / h²",
+        "B. [f(x+h) − 2f(x) + f(x−h)] / h²",
+        "C. [f(x+h) − f(x−h)] / (2h)",
+        "D. [f(x+h) − f(x)] / h²"
+      ],
+      "correct_answer": "B",
+      "explanation": "Second central difference: f''(x) ≈ [f(x+h) − 2f(x) + f(x−h)] / h². Second-order accurate O(h²).",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Using the trapezoidal rule with one interval, estimate ∫₀² x² dx.",
+      "choices": null,
+      "correct_answer": "4",
+      "unit": "",
+      "tolerance": 0.01,
+      "explanation": "∫₀²x²dx ≈ (2−0)/2 × [0² + 2²] = 1 × 4 = 4. (Exact = 8/3 ≈ 2.67, showing trapezoidal error.)",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The secant method for root-finding is similar to Newton-Raphson but:",
+      "choices": [
+        "A. Uses three points instead of two",
+        "B. Approximates f'(x) using a finite difference of two previous iterates",
+        "C. Converges cubically",
+        "D. Requires the second derivative"
+      ],
+      "correct_answer": "B",
+      "explanation": "Secant method: x_{n+1} = x_n − f(x_n)(x_n − x_{n−1})/(f(x_n) − f(x_{n−1})). Avoids computing f'.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Relative error in numerical computation is defined as:",
+      "choices": [
+        "A. |true − approx|",
+        "B. |true − approx| / |true|",
+        "C. |true − approx|²",
+        "D. |approx| / |true|"
+      ],
+      "correct_answer": "B",
+      "explanation": "Relative error = |true − approx| / |true|. Absolute error omits the denominator.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Runge-Kutta 4th order (RK4) for ODEs computes the solution as:",
+      "choices": [
+        "A. A single weighted average of four slope estimates",
+        "B. A single Euler step",
+        "C. The average of two trapezoidal steps",
+        "D. A polynomial fit through four points"
+      ],
+      "correct_answer": "A",
+      "explanation": "RK4: y_{n+1} = y_n + h/6(k₁+2k₂+2k₃+k₄), a weighted average of four slope estimates k₁–k₄.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Linear interpolation between (x₀, y₀) and (x₁, y₁) at x gives y = ?",
+      "choices": [
+        "A. y₀ + (y₁−y₀)/(x₁−x₀) × (x−x₀)",
+        "B. (y₀ + y₁) / 2",
+        "C. y₀ × (x−x₀)",
+        "D. (x−x₀)/(x₁−x₀)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Linear interpolation: y = y₀ + (y₁−y₀)/(x₁−x₀) × (x−x₀). Uses slope of the connecting line.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Round-off error in floating-point computation is primarily caused by:",
+      "choices": [
+        "A. The use of iterative methods",
+        "B. Finite precision representation of real numbers",
+        "C. Slow convergence of the algorithm",
+        "D. An incorrect mathematical formula"
+      ],
+      "correct_answer": "B",
+      "explanation": "Round-off error arises because computers represent real numbers with finite bits; not all decimals are exactly representable.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which methods can be used to find a root of f(x) = 0 numerically? (Select ALL that apply.)",
+      "choices": [
+        "A. Bisection method",
+        "B. Newton-Raphson",
+        "C. Secant method",
+        "D. Gaussian elimination"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Bisection, Newton-Raphson, and secant are root-finding methods. Gaussian elimination solves linear systems (Ax = b).",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Starting from x₀ = 2, one Newton-Raphson step for f(x) = x² − 4 gives x₁ = ?",
+      "choices": null,
+      "correct_answer": "2",
+      "unit": "",
+      "tolerance": 0.001,
+      "explanation": "f(2)=0; the root is exactly x=2. x₁ = 2 − 0/(2×2) = 2. (Already at root.)",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Simpson's 1/3 rule formula for integration over [a, b] with midpoint m = (a+b)/2 is:",
+      "choices": [
+        "A. (b−a)/3 × [f(a) + f(b)]",
+        "B. (b−a)/6 × [f(a) + 4f(m) + f(b)]",
+        "C. (b−a)/4 × [f(a) + 2f(m) + f(b)]",
+        "D. (b−a) × [f(a) + 4f(m) + f(b)]"
+      ],
+      "correct_answer": "B",
+      "explanation": "Simpson's 1/3: ∫f dx ≈ (b−a)/6 × [f(a) + 4f(m) + f(b)]. Fourth-order accurate O(h⁵) per panel.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Gauss-Seidel iteration for solving Ax = b converges if:",
+      "choices": [
+        "A. A is upper triangular",
+        "B. A is strictly diagonally dominant",
+        "C. A has all positive entries",
+        "D. det(A) > 0"
+      ],
+      "correct_answer": "B",
+      "explanation": "Gauss-Seidel is guaranteed to converge when A is strictly diagonally dominant: |a_{ii}| > Σ_{j≠i}|a_{ij}|.",
+      "difficulty": "hard",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Truncation error in numerical methods arises from:",
+      "choices": [
+        "A. Finite precision of floating-point numbers",
+        "B. Truncating the infinite series or continuous process (approximation of the mathematical operation)",
+        "C. Rounding the final answer",
+        "D. Using incorrect boundary conditions"
+      ],
+      "correct_answer": "B",
+      "explanation": "Truncation error results from approximating an infinite process (e.g., Taylor series) with a finite number of terms.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Spline interpolation uses piecewise polynomials with continuity enforced at the knot points. Natural cubic splines have ______ conditions.",
+      "choices": [
+        "A. Zero first derivatives at endpoints",
+        "B. Zero second derivatives at endpoints",
+        "C. Zero function values at endpoints",
+        "D. Matching function values only (no derivative conditions)"
+      ],
+      "correct_answer": "B",
+      "explanation": "Natural cubic splines: the second derivative (curvature) is set to zero at the two end points.",
+      "difficulty": "hard",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The order of convergence of Newton-Raphson for a simple root is approximately:",
+      "choices": ["A. Linear (order 1)", "B. Quadratic (order 2)", "C. Cubic (order 3)", "D. Logarithmic"],
+      "correct_answer": "B",
+      "explanation": "Newton-Raphson converges quadratically near a simple root: the number of correct digits roughly doubles each iteration.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Least-squares curve fitting minimizes the sum of:",
+      "choices": [
+        "A. Absolute errors",
+        "B. Squared residuals (differences between measured and fitted values)",
+        "C. Relative errors",
+        "D. The number of data points"
+      ],
+      "correct_answer": "B",
+      "explanation": "Least-squares minimizes Σ(y_i − ŷ_i)². This yields a closed-form linear system for linear regression.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Starting from x₀ = 1, one Newton-Raphson step for f(x) = x² − 2 gives x₁ = ?",
+      "choices": null,
+      "correct_answer": "1.5",
+      "unit": "",
+      "tolerance": 0.001,
+      "explanation": "f(1)=−1; f'(1)=2. x₁ = 1 − (−1)/2 = 1 + 0.5 = 1.5.",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "When using finite difference methods to solve PDEs, the grid spacing h affects accuracy; halving h in central difference schemes changes truncation error by factor:",
+      "choices": ["A. 1/2 (error halves)", "B. 1/4 (error quarters)", "C. 2 (error doubles)", "D. h has no effect"],
+      "correct_answer": "B",
+      "explanation": "Central difference is O(h²). If h → h/2, error scales as (h/2)² = h²/4 — a 4× improvement.",
+      "difficulty": "hard",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Numerical instability in an ODE solver typically manifests as:",
+      "choices": [
+        "A. Solutions that oscillate or grow unboundedly despite a stable physical problem",
+        "B. Very slow convergence",
+        "C. Division by zero only",
+        "D. Exact reproduction of the true solution"
+      ],
+      "correct_answer": "A",
+      "explanation": "Numerical instability: the computed solution deviates from the true solution, often showing spurious oscillations or exponential growth.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The regula falsi (false position) method improves on bisection by:",
+      "choices": [
+        "A. Using the function values to linearly interpolate the root location instead of always halving",
+        "B. Requiring derivatives",
+        "C. Converging quadratically",
+        "D. Using three bracket points"
+      ],
+      "correct_answer": "A",
+      "explanation": "Regula falsi uses linear interpolation between bracket endpoints: x = a − f(a)(b−a)/(f(b)−f(a)), which typically converges faster than bisection.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Gaussian quadrature achieves high accuracy because it:",
+      "choices": [
+        "A. Uses equally spaced points",
+        "B. Optimally selects both node locations and weights to maximize the degree of polynomial exactness",
+        "C. Requires the second derivative",
+        "D. Uses only two points always"
+      ],
+      "correct_answer": "B",
+      "explanation": "Gaussian quadrature chooses optimal nodes (roots of orthogonal polynomials) and weights, giving (2n−1) degree exactness with n points.",
+      "difficulty": "hard",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    }
+  ]
+}

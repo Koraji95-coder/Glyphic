@@ -1,0 +1,340 @@
+{
+  "topic": "Microprocessors",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The CPU instruction cycle consists of which basic phases?",
+      "choices": [
+        "A. Fetch → Decode → Execute",
+        "B. Load → Compute → Store",
+        "C. Input → Process → Output",
+        "D. Clock → ALU → Register"
+      ],
+      "correct_answer": "A",
+      "explanation": "Basic instruction cycle: Fetch (read instruction from memory), Decode (interpret opcode), Execute (perform operation). Write-back may also be included.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Program Counter (PC) register holds:",
+      "choices": [
+        "A. The result of the current arithmetic operation",
+        "B. The address of the next instruction to be fetched",
+        "C. The stack pointer",
+        "D. The current instruction being decoded"
+      ],
+      "correct_answer": "B",
+      "explanation": "PC (Program Counter): holds the address of the next instruction. Automatically incremented after each fetch; modified by jumps/branches.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Immediate addressing mode means the operand is:",
+      "choices": [
+        "A. In a register",
+        "B. Encoded directly in the instruction itself",
+        "C. At the address contained in a register",
+        "D. On the stack"
+      ],
+      "correct_answer": "B",
+      "explanation": "Immediate: operand = literal value in the instruction (e.g., ADD R0, #5 → adds 5 directly). No memory access needed for operand.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Register indirect addressing mode means the operand is:",
+      "choices": [
+        "A. A literal in the instruction",
+        "B. In a register directly",
+        "C. At the memory address stored in the specified register",
+        "D. At an absolute fixed address"
+      ],
+      "correct_answer": "C",
+      "explanation": "Register indirect: the register holds a pointer to the operand's memory address. E.g., LDR R1, [R0] → load from address in R0.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The difference between RISC and CISC architectures is primarily:",
+      "choices": [
+        "A. RISC: complex instructions in hardware; CISC: simple instructions only",
+        "B. RISC: simple fixed-length instructions, load-store architecture; CISC: complex multi-cycle instructions",
+        "C. RISC uses more memory; CISC uses less",
+        "D. CISC uses pipelining; RISC does not"
+      ],
+      "correct_answer": "B",
+      "explanation": "RISC: simple, fixed-length instructions, many registers, load/store memory model (ARM, MIPS). CISC: complex instructions, variable length (x86). RISC easier to pipeline.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Pipelining in a CPU increases performance by:",
+      "choices": [
+        "A. Running one instruction at a time faster",
+        "B. Overlapping execution of multiple instructions across pipeline stages",
+        "C. Adding more registers",
+        "D. Increasing clock frequency only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Pipeline: multiple instructions in different stages simultaneously (fetch stage 1 while decode stage 2 while execute stage 3). Ideal throughput: 1 instruction per clock cycle.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A pipeline hazard (stall) occurs when:",
+      "choices": [
+        "A. The CPU runs too fast",
+        "B. A later instruction depends on the result of an earlier one not yet completed (data hazard), or a branch changes the flow (control hazard)",
+        "C. Cache miss occurs",
+        "D. The bus is idle"
+      ],
+      "correct_answer": "B",
+      "explanation": "Data hazard: read-after-write dependency → stall. Control hazard: branch target unknown → stall or speculative execution. Structural hazard: resource conflict.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Cache memory improves CPU performance by:",
+      "choices": [
+        "A. Increasing main memory size",
+        "B. Storing frequently-used data/instructions in fast memory close to the CPU",
+        "C. Replacing registers",
+        "D. Running at lower voltage"
+      ],
+      "correct_answer": "B",
+      "explanation": "Cache: small, fast SRAM between CPU and main DRAM. Exploits locality of reference. L1 (fastest/smallest) → L2 → L3 → main memory hierarchy.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The stack data structure used by CPUs operates as:",
+      "choices": [
+        "A. First-in, first-out (FIFO)",
+        "B. Last-in, first-out (LIFO) — PUSH adds to top, POP removes from top",
+        "C. Random access",
+        "D. First-in, last-out only for subroutines"
+      ],
+      "correct_answer": "B",
+      "explanation": "Stack: LIFO. PUSH decrements SP, stores data. POP loads data, increments SP. Used for subroutine return addresses and local variables.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An interrupt service routine (ISR) is invoked when:",
+      "choices": [
+        "A. The program executes a JUMP instruction",
+        "B. A hardware or software event triggers an interrupt, pausing normal execution",
+        "C. A cache miss occurs",
+        "D. The CPU is reset"
+      ],
+      "correct_answer": "B",
+      "explanation": "Interrupt: hardware/software event → CPU saves PC and status, jumps to ISR → services interrupt → restores context → resumes normal code.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a memory-mapped I/O scheme, peripheral devices are accessed using:",
+      "choices": [
+        "A. Special I/O instructions (IN, OUT)",
+        "B. The same address space as memory — ordinary load/store instructions",
+        "C. DMA only",
+        "D. Interrupt vectors"
+      ],
+      "correct_answer": "B",
+      "explanation": "Memory-mapped I/O: peripherals appear at specific memory addresses → CPU uses standard MOV/LDR/STR to access them (ARM, most modern CPUs).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "DMA (Direct Memory Access) is used to:",
+      "choices": [
+        "A. Allow peripherals to transfer data directly to/from memory without CPU involvement",
+        "B. Increase CPU clock speed",
+        "C. Manage virtual memory",
+        "D. Execute floating-point operations"
+      ],
+      "correct_answer": "A",
+      "explanation": "DMA: DMA controller handles data transfers (e.g., ADC → RAM, disk → RAM) freeing CPU for other tasks. CPU sets up transfer then yields bus.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The 2's complement representation of −5 in 8-bit binary is:",
+      "choices": [
+        "A. 11111010",
+        "B. 10000101",
+        "C. 11111011",
+        "D. 00000101"
+      ],
+      "correct_answer": "C",
+      "explanation": "+5 = 00000101. Invert: 11111010. Add 1: 11111011. Check: 11111011 = 128+64+32+16+8+2+1 = 251 → 251−256 = −5. ✓",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A 16-bit address bus can directly address how many unique memory locations?",
+      "choices": ["A. 16 kB", "B. 32 kB", "C. 64 kB", "D. 128 kB"],
+      "correct_answer": "C",
+      "explanation": "2¹⁶ = 65,536 locations = 64 K addresses. An 8-bit data bus means 64 KB addressable memory.",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The function of the ALU (Arithmetic Logic Unit) is:",
+      "choices": [
+        "A. Store program instructions",
+        "B. Perform arithmetic (add, subtract) and logical (AND, OR, XOR) operations",
+        "C. Manage cache memory",
+        "D. Control the instruction pipeline"
+      ],
+      "correct_answer": "B",
+      "explanation": "ALU: performs integer arithmetic and bitwise logic. Combined with FPU for floating-point. Core component of every CPU.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which types of RAM are volatile (lose data when power is removed)? (Select ALL that apply.)",
+      "choices": ["A. SRAM (Static RAM)", "B. DRAM (Dynamic RAM)", "C. Flash memory", "D. EEPROM"],
+      "correct_answer": "A,B",
+      "explanation": "SRAM and DRAM: volatile. Flash and EEPROM: non-volatile (retain data without power). DRAM needs refresh; SRAM does not.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A subroutine call typically involves:",
+      "choices": [
+        "A. Saving the return address on the stack, then jumping to the subroutine",
+        "B. Loading registers only",
+        "C. Stopping the CPU",
+        "D. Writing to ROM"
+      ],
+      "correct_answer": "A",
+      "explanation": "CALL: push return address (PC+1) onto stack → jump to subroutine. RET: pop return address → resume. Stack-based call mechanism.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Big-endian vs. little-endian refers to:",
+      "choices": [
+        "A. CPU speed",
+        "B. Byte order in multi-byte values — big-endian: MSB at lowest address; little-endian: LSB at lowest address",
+        "C. Instruction length",
+        "D. Cache organization"
+      ],
+      "correct_answer": "B",
+      "explanation": "Big-endian (Motorola, network byte order): MSB first. Little-endian (Intel x86, ARM default): LSB at lowest address. Important for data interoperability.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The purpose of an instruction register (IR) is to:",
+      "choices": [
+        "A. Count instructions executed",
+        "B. Hold the currently-fetched instruction while it is being decoded",
+        "C. Store the return address",
+        "D. Buffer data from memory"
+      ],
+      "correct_answer": "B",
+      "explanation": "IR: holds the fetched instruction for decoding. The control unit reads the IR to determine what operation to perform.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Indexed addressing mode computes the effective address as:",
+      "choices": [
+        "A. Base register + offset (displacement)",
+        "B. Register × offset",
+        "C. Contents of address only",
+        "D. PC + offset × 2"
+      ],
+      "correct_answer": "A",
+      "explanation": "Indexed: EA = base_reg + displacement. Useful for array access: base = start of array, offset = index × element_size.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A branch prediction unit in a CPU is designed to:",
+      "choices": [
+        "A. Calculate loop counts",
+        "B. Reduce pipeline stalls by guessing the outcome of conditional branches",
+        "C. Increase cache size",
+        "D. Handle floating-point overflow"
+      ],
+      "correct_answer": "B",
+      "explanation": "Branch predictor: guesses taken/not-taken for conditional branches → pre-loads predicted path → avoids stall if prediction correct. Misprediction penalty = pipeline flush.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "What is the hexadecimal representation of the decimal number 255?",
+      "choices": ["A. 0xFE", "B. 0xFF", "C. 0xEF", "D. 0x100"],
+      "correct_answer": "B",
+      "explanation": "255 = 256−1 = 0xFF = 1111 1111 binary. 0x100 = 256. 0xFE = 254.",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Virtual memory allows a process to:",
+      "choices": [
+        "A. Access more address space than physical RAM by using disk as backing store",
+        "B. Run without a CPU",
+        "C. Bypass cache entirely",
+        "D. Use ROM as a working memory"
+      ],
+      "correct_answer": "A",
+      "explanation": "Virtual memory: OS maps virtual addresses to physical pages; pages not in RAM stored on disk (page fault → swap in). Enables process isolation and large address spaces.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Amdahl's law implies that overall speedup is limited by:",
+      "choices": [
+        "A. Clock frequency only",
+        "B. The fraction of program execution time that cannot be improved or parallelized",
+        "C. Cache size only",
+        "D. Number of instructions in the ISA"
+      ],
+      "correct_answer": "B",
+      "explanation": "Amdahl: Speedup = 1/((1-p)+p/s). Even infinite speedup on fraction p leaves the serial fraction (1-p) as the bottleneck.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 40,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a direct-mapped cache, each main-memory block maps to:",
+      "choices": [
+        "A. Any cache line",
+        "B. Exactly one cache line determined by index bits",
+        "C. Two cache lines only",
+        "D. A line selected by replacement policy only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Direct-mapped cache has one possible location per memory block. Fast and simple but prone to conflict misses.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 25,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.1", "review_status": "ai_draft"
+    }
+  ]
+}

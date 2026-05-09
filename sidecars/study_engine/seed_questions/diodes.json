@@ -1,0 +1,293 @@
+{
+  "topic": "Diodes",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "An ideal diode acts as:",
+      "choices": [
+        "A. A short circuit when forward-biased, open circuit when reverse-biased",
+        "B. A constant 0.7 V drop always",
+        "C. A resistor",
+        "D. An open circuit when forward-biased"
+      ],
+      "correct_answer": "A",
+      "explanation": "Ideal diode: short (0 V drop) when V_D > 0; open when V_D < 0. Real Si diodes have ~0.7 V forward drop.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A silicon PN junction diode is forward-biased when:",
+      "choices": [
+        "A. The anode is more positive than the cathode",
+        "B. The cathode is more positive than the anode",
+        "C. Both terminals are at the same potential",
+        "D. Reverse voltage exceeds breakdown"
+      ],
+      "correct_answer": "A",
+      "explanation": "Forward bias: anode (+) > cathode (−). Current flows from anode to cathode through the diode.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Shockley diode equation I = I_s(e^(V/V_T) − 1) at room temperature has thermal voltage V_T ≈",
+      "choices": ["A. 0.7 V", "B. 26 mV", "C. 1.1 V", "D. 0.5 V"],
+      "correct_answer": "B",
+      "explanation": "V_T = kT/q ≈ 26 mV at 300 K (room temperature). This sets the scale of the diode I-V curve.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A half-wave rectifier with a silicon diode and V_s = 10 V peak produces a peak output of approximately:",
+      "choices": ["A. 10 V", "B. 9.3 V", "C. 5 V", "D. 20 V"],
+      "correct_answer": "B",
+      "explanation": "V_out_peak = V_s − V_D = 10 − 0.7 = 9.3 V. One diode drop in the conduction path.",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A full-wave bridge rectifier uses ___ diodes and the peak output is:",
+      "choices": [
+        "A. 2 diodes; V_pk − 0.7",
+        "B. 4 diodes; V_pk − 1.4",
+        "C. 4 diodes; V_pk − 0.7",
+        "D. 2 diodes; V_pk − 1.4"
+      ],
+      "correct_answer": "B",
+      "explanation": "Bridge rectifier: 4 diodes, 2 conduct per half cycle → V_out_pk = V_pk − 2×0.7 = V_pk − 1.4 V.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Zener diode is specifically designed to operate in:",
+      "choices": [
+        "A. Forward active region",
+        "B. The reverse breakdown region as a voltage regulator",
+        "C. The saturation region",
+        "D. Cut-off"
+      ],
+      "correct_answer": "B",
+      "explanation": "Zener diode maintains a nearly constant voltage V_Z in reverse breakdown; used for voltage regulation and reference.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a Zener voltage regulator, the Zener diode is connected:",
+      "choices": [
+        "A. In series with the load",
+        "B. In parallel (shunt) with the load, cathode toward V+",
+        "C. In parallel with the series resistor",
+        "D. In series, anode toward V+"
+      ],
+      "correct_answer": "B",
+      "explanation": "Zener shunt regulator: Zener in parallel with load, cathode at top (V+). Current through series R; excess current through Zener.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A Zener regulator: V_s = 12 V, V_Z = 5.1 V, R_s = 100 Ω, load R_L = 1 kΩ. Approximately what current flows through R_s?",
+      "choices": null, "correct_answer": "68.9", "unit": "mA", "tolerance": 2,
+      "explanation": "V_out = V_Z = 5.1 V; I_R = (V_s − V_Z)/R_s = (12−5.1)/100 = 6.9/100 = 69 mA. I_L = 5.1/1000 = 5.1 mA; I_Z = 69 − 5.1 ≈ 63.9 mA. I_Rs = 69 mA",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A clipper circuit (with a diode) is used to:",
+      "choices": [
+        "A. Filter AC ripple",
+        "B. Clip (remove) a portion of the input waveform above or below a reference level",
+        "C. Shift the DC level of a signal",
+        "D. Amplify small signals"
+      ],
+      "correct_answer": "B",
+      "explanation": "Clipper: diode clips the signal above (or below) a threshold. Clamper: shifts the DC level.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A clamper (DC restorer) circuit uses a diode and capacitor to:",
+      "choices": [
+        "A. Limit signal amplitude",
+        "B. Shift the entire waveform up or down so a peak touches a reference level",
+        "C. Full-wave rectify the input",
+        "D. Regulate output voltage"
+      ],
+      "correct_answer": "B",
+      "explanation": "Clamper shifts DC level without distorting shape; capacitor charges to set the clamp level.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The average (DC) output voltage of a half-wave rectifier with peak V_m is:",
+      "choices": ["A. V_m/π", "B. V_m/2", "C. 2V_m/π", "D. V_m/√2"],
+      "correct_answer": "A",
+      "explanation": "Half-wave rectifier: V_dc = V_m/π ≈ 0.318 V_m. Full-wave: V_dc = 2V_m/π ≈ 0.637 V_m.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A p-n junction diode in reverse bias has:",
+      "choices": [
+        "A. Large forward current",
+        "B. A very small reverse saturation current I_s",
+        "C. Zero voltage across it",
+        "D. Breakdown at 0.7 V"
+      ],
+      "correct_answer": "B",
+      "explanation": "Reverse bias: depletion region widens; only small reverse saturation current I_s (~nA for Si) flows.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The dynamic (small-signal) resistance of a diode at operating current I_D is:",
+      "choices": [
+        "A. r_d = V_T / I_D",
+        "B. r_d = I_D / V_T",
+        "C. r_d = V_D / I_D",
+        "D. r_d = 0.7 / I_D"
+      ],
+      "correct_answer": "A",
+      "explanation": "r_d = dV/dI = V_T/I_D from the Shockley equation at forward bias. At I_D=1 mA: r_d = 26 mV/1 mA = 26 Ω.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An LED (light-emitting diode) emits light because:",
+      "choices": [
+        "A. Resistive heating",
+        "B. Electron-hole recombination releases photons",
+        "C. Reverse breakdown",
+        "D. Piezoelectric effect"
+      ],
+      "correct_answer": "B",
+      "explanation": "LED: forward-biased junction → electrons recombine with holes, releasing energy as photons (electroluminescence).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Schottky diode differs from a standard p-n diode in that:",
+      "choices": [
+        "A. It has a higher forward voltage (~1.5 V)",
+        "B. It has lower forward voltage (~0.3 V) and very fast switching (no minority carrier storage)",
+        "C. It can only operate at RF frequencies",
+        "D. It conducts in both directions"
+      ],
+      "correct_answer": "B",
+      "explanation": "Schottky: metal-semiconductor junction, V_F ≈ 0.3 V, no minority carrier diffusion → extremely fast switching.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which types of diodes are designed for specific applications beyond simple rectification? (Select ALL that apply.)",
+      "choices": [
+        "A. Zener diode",
+        "B. Varactor (varicap) diode",
+        "C. Tunnel diode",
+        "D. Standard rectifier"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Zener: voltage reference; Varactor: voltage-tuned capacitor; Tunnel diode: quantum tunneling for negative resistance. Standard rectifiers are the baseline.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The ripple factor (r) of a half-wave rectifier is approximately:",
+      "choices": ["A. 0.48", "B. 1.21", "C. 0", "D. 2.0"],
+      "correct_answer": "B",
+      "explanation": "Half-wave rectifier ripple factor r ≈ 1.21. Full-wave rectifier: r ≈ 0.48. Lower is better.",
+      "difficulty": "hard", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The peak inverse voltage (PIV) across a diode in a half-wave rectifier is:",
+      "choices": ["A. V_m/2", "B. V_m", "C. 2V_m", "D. √2 × V_m"],
+      "correct_answer": "B",
+      "explanation": "Half-wave rectifier PIV = V_m (peak of source). Bridge rectifier PIV = V_m (each diode sees one V_m minus one diode drop).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Forward-biasing a PN junction _____ the depletion region width.",
+      "choices": ["A. Increases", "B. Decreases", "C. Doubles", "D. Has no effect on"],
+      "correct_answer": "B",
+      "explanation": "Forward bias opposes the built-in potential → narrows the depletion region → allows significant current flow.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The diode equation I = I_s(e^(V/ηV_T) − 1) ideality factor η is typically:",
+      "choices": ["A. 0 to 0.5", "B. 1 to 2", "C. 5 to 10", "D. 50 to 100"],
+      "correct_answer": "B",
+      "explanation": "η (ideality factor) = 1 for pure diffusion current; 2 for recombination-dominated current. Typical: 1–2.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A voltage doubler circuit uses capacitors and diodes to produce approximately:",
+      "choices": ["A. Half the peak input", "B. Twice the peak input voltage", "C. The RMS voltage", "D. The peak with polarity reversed"],
+      "correct_answer": "B",
+      "explanation": "Voltage doubler: capacitor-diode stages charge to V_m in successive half cycles, outputting ~2V_m DC.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The small-signal equivalent circuit of a forward-biased diode consists of:",
+      "choices": [
+        "A. A resistance r_d only",
+        "B. A resistance r_d in parallel with a diffusion capacitance C_d",
+        "C. A voltage source 0.7 V",
+        "D. Only a capacitor"
+      ],
+      "correct_answer": "B",
+      "explanation": "Diode small-signal model: dynamic resistance r_d = V_T/I_D, plus diffusion capacitance C_d (from stored charge).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A diode circuit has V_s = 5 V, R = 1 kΩ, and the diode drop V_D = 0.7 V. What is the diode current I_D in mA?",
+      "choices": null, "correct_answer": "4.3", "unit": "mA", "tolerance": 0.1,
+      "explanation": "I_D = (V_s − V_D) / R = (5 − 0.7) / 1000 = 4.3 mA",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The average output of a full-wave rectifier (peak V_m) is:",
+      "choices": ["A. V_m/π", "B. 2V_m/π", "C. V_m/2", "D. V_m/√2"],
+      "correct_answer": "B",
+      "explanation": "Full-wave rectifier: V_dc = 2V_m/π ≈ 0.637 V_m. (Half-wave: V_m/π ≈ 0.318 V_m.)",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Temperature increase in a silicon diode _____ the forward voltage drop.",
+      "choices": ["A. Increases", "B. Decreases (approximately −2 mV/°C)", "C. Has no effect on", "D. Doubles"],
+      "correct_answer": "B",
+      "explanation": "Si diode: V_F decreases ~2 mV per °C rise. This negative temperature coefficient is important for thermal runaway concerns.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.2", "review_status": "ai_draft"
+    }
+  ]
+}

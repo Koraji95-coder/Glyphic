@@ -1,0 +1,304 @@
+{
+  "topic": "Z-Transforms",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of a discrete sequence x[n] is defined as:",
+      "choices": [
+        "A. X(z) = Σ x[n] z^n (sum from 0 to ∞)",
+        "B. X(z) = Σ x[n] z^(−n) (sum from −∞ to ∞)",
+        "C. X(z) = ∫ x(t) z^(−t) dt",
+        "D. X(z) = x(0) only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Bilateral Z-transform: X(z) = Σ_{n=−∞}^∞ x[n] z^(−n). Unilateral: n from 0 to ∞.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of the unit impulse δ[n] is:",
+      "choices": ["A. 1/z", "B. 1", "C. z", "D. 1/(z−1)"],
+      "correct_answer": "B",
+      "explanation": "Z{δ[n]} = 1 (only n=0 contributes: δ[0]·z⁰ = 1).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of the unit step u[n] is:",
+      "choices": ["A. 1/(z−1)", "B. z/(z−1)", "C. 1/z", "D. z"],
+      "correct_answer": "B",
+      "explanation": "Z{u[n]} = z/(z−1) = 1/(1−z^(−1)) for |z| > 1.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of aⁿ u[n] is:",
+      "choices": ["A. z/(z+a)", "B. z/(z−a)", "C. 1/(z−a)", "D. a/(z−a)"],
+      "correct_answer": "B",
+      "explanation": "Z{aⁿu[n]} = z/(z−a) for |z| > |a|.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of a delayed sequence x[n−k] is:",
+      "choices": ["A. z^k X(z)", "B. z^(−k) X(z)", "C. X(z−k)", "D. X(z)/k"],
+      "correct_answer": "B",
+      "explanation": "Time delay: Z{x[n−k]} = z^(−k) X(z) (with zero initial conditions). Delay in discrete time ↔ multiply by z^(−k).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The final value theorem for Z-transforms gives x[∞] = ?",
+      "choices": [
+        "A. lim_{z→∞} X(z)",
+        "B. lim_{z→1} (z−1) X(z)",
+        "C. lim_{z→0} X(z)",
+        "D. X(1)"
+      ],
+      "correct_answer": "B",
+      "explanation": "FVT for Z: x[∞] = lim_{z→1} (z−1)X(z), valid when all poles of (z−1)X(z) are inside the unit circle.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a causal discrete-time LTI system, BIBO stability requires that all poles of H(z) lie:",
+      "choices": [
+        "A. Outside the unit circle |z| > 1",
+        "B. Inside the unit circle |z| < 1",
+        "C. On the unit circle |z| = 1",
+        "D. In the left half of the z-plane"
+      ],
+      "correct_answer": "B",
+      "explanation": "Discrete stability: all poles inside the unit circle |z| < 1. Analogous to left-half s-plane for continuous systems.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The relationship between the Z-transform and the discrete-time Fourier transform (DTFT) is:",
+      "choices": [
+        "A. DTFT is Z evaluated on the unit circle: X(e^(jω)) = X(z)|_{z=e^(jω)}",
+        "B. Z-transform is DTFT with z = e^(−jω)",
+        "C. They are unrelated",
+        "D. DTFT uses z^n while Z uses e^(−jωn)"
+      ],
+      "correct_answer": "A",
+      "explanation": "DTFT = Z-transform evaluated on the unit circle z = e^(jω). The Z-transform generalizes the DTFT to complex z.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A first-order IIR filter has difference equation y[n] = ay[n−1] + bx[n]. Its transfer function H(z) = ?",
+      "choices": [
+        "A. H(z) = b(z−a)",
+        "B. H(z) = bz/(z−a)",
+        "C. H(z) = b/(1−az^(−1)) = bz/(z−a)",
+        "D. H(z) = az/(z+b)"
+      ],
+      "correct_answer": "C",
+      "explanation": "Taking Z-transform: Y(z) = az^(−1)Y(z) + bX(z) → H(z) = b/(1−az^(−1)) = bz/(z−a).",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Convolution in discrete time corresponds to _____ in the Z-domain.",
+      "choices": ["A. Addition", "B. Multiplication", "C. Division", "D. Differentiation"],
+      "correct_answer": "B",
+      "explanation": "Convolution theorem: Z{x[n]*h[n]} = X(z)·H(z). Same as Laplace for continuous systems.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The region of convergence (ROC) for the Z-transform of a causal (right-sided) signal is:",
+      "choices": [
+        "A. Inside a circle: |z| < r",
+        "B. Outside a circle: |z| > r",
+        "C. On the unit circle only",
+        "D. The entire z-plane"
+      ],
+      "correct_answer": "B",
+      "explanation": "Causal (right-sided) sequence: ROC is |z| > r (exterior of a circle). Anti-causal: ROC is |z| < r.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of n·u[n] (discrete ramp) is:",
+      "choices": ["A. z/(z−1)²", "B. 1/(z−1)²", "C. z²/(z−1)", "D. 1/(z−1)"],
+      "correct_answer": "A",
+      "explanation": "Z{n·u[n]} = z/(z−1)². Analogous to L{t} = 1/s².",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Partial fraction expansion of X(z)/z (rather than X(z)) is used to:",
+      "choices": [
+        "A. Make it easier to find inverse Z-transforms using standard tables",
+        "B. Find the poles only",
+        "C. Compute the ROC",
+        "D. Convert from continuous to discrete time"
+      ],
+      "correct_answer": "A",
+      "explanation": "Expand X(z)/z, then multiply result by z. This avoids having residues involving z in the numerator and simplifies table lookup.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The bilinear transform (Tustin's method) maps the s-plane to the z-plane via:",
+      "choices": [
+        "A. z = e^(sT)",
+        "B. s = (2/T)(z−1)/(z+1)",
+        "C. s = z/T",
+        "D. z = 1 + sT"
+      ],
+      "correct_answer": "B",
+      "explanation": "Bilinear (Tustin): s = (2/T)(z−1)/(z+1). Maps the jω axis to the unit circle exactly; used to design digital filters from analog prototypes.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An FIR (finite impulse response) filter differs from an IIR filter in that it:",
+      "choices": [
+        "A. Has feedback (poles)",
+        "B. Has no feedback; all poles at z = 0; always stable",
+        "C. Has infinite memory",
+        "D. Cannot be designed from an analog prototype"
+      ],
+      "correct_answer": "B",
+      "explanation": "FIR: no recursive (feedback) terms → all poles at origin → always stable. IIR: has poles (recursive), potentially unstable.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The initial value theorem for Z-transforms gives x[0] = ?",
+      "choices": ["A. lim_{z→1} X(z)", "B. lim_{z→∞} X(z)", "C. X(0)", "D. lim_{z→0} X(z)"],
+      "correct_answer": "B",
+      "explanation": "IVT for Z: x[0] = lim_{z→∞} X(z).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The sampling theorem (Nyquist) states that to reconstruct a signal of bandwidth B, the sampling rate must be:",
+      "choices": ["A. f_s > B", "B. f_s > 2B", "C. f_s > B/2", "D. f_s = B"],
+      "correct_answer": "B",
+      "explanation": "Nyquist–Shannon: f_s > 2B (Nyquist rate). Sampling below this causes aliasing.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which are valid methods to compute the inverse Z-transform? (Select ALL that apply.)",
+      "choices": [
+        "A. Partial fraction expansion",
+        "B. Long division (power series)",
+        "C. Contour integration (residue method)",
+        "D. Direct table lookup"
+      ],
+      "correct_answer": "A,B,C,D",
+      "explanation": "All four methods are valid for inverse Z-transform. Partial fractions and tables are most common in engineering practice.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Aliasing in discrete-time systems occurs when:",
+      "choices": [
+        "A. The signal bandwidth exceeds f_s/2",
+        "B. f_s > 2B",
+        "C. The system is IIR",
+        "D. The filter is linear phase"
+      ],
+      "correct_answer": "A",
+      "explanation": "Aliasing: frequency content above f_s/2 (Nyquist frequency) folds back into the baseband, distorting the sampled signal.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Z-transform of cos(ω₀n)u[n] is:",
+      "choices": [
+        "A. z sin(ω₀)/(z²−2z cos(ω₀)+1)",
+        "B. z(z−cos(ω₀))/(z²−2z cos(ω₀)+1)",
+        "C. 1/(z−e^(jω₀))",
+        "D. z/(z−cos(ω₀))"
+      ],
+      "correct_answer": "B",
+      "explanation": "Z{cos(ω₀n)u[n]} = z(z−cos ω₀)/(z²−2z cos ω₀+1). Z{sin(ω₀n)u[n]} = z sin ω₀/(z²−2z cos ω₀+1).",
+      "difficulty": "hard", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A causal sequence has Z-transform X(z) = 5z/(z−0.5). Using the final value theorem, x[∞] = ?",
+      "choices": null, "correct_answer": "0", "unit": "", "tolerance": 0.001,
+      "explanation": "FVT: x[∞] = lim_{z→1}(z−1)X(z) = lim_{z→1}(z−1)·5z/(z−0.5) = (1−1)·5/0.5 = 0. The signal decays to zero (|pole| = 0.5 < 1).",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The DFT (Discrete Fourier Transform) evaluates the Z-transform at:",
+      "choices": [
+        "A. N equally spaced points on the unit circle",
+        "B. All points inside the unit circle",
+        "C. The origin z = 0",
+        "D. The real axis only"
+      ],
+      "correct_answer": "A",
+      "explanation": "DFT: X[k] = X(z)|_{z=e^(j2πk/N)}, k=0,…,N−1. N equally-spaced points on the unit circle.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The FFT (Fast Fourier Transform) reduces DFT computation complexity from O(N²) to:",
+      "choices": ["A. O(N)", "B. O(N log N)", "C. O(N log² N)", "D. O(√N)"],
+      "correct_answer": "B",
+      "explanation": "FFT (Cooley-Tukey): O(N log₂ N) for N = power of 2. Dramatic speedup over direct DFT for large N.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A digital filter has poles at z = 0.9e^(±jπ/4). This filter is:",
+      "choices": [
+        "A. Unstable",
+        "B. Stable — poles are inside the unit circle",
+        "C. Marginally stable",
+        "D. An FIR filter"
+      ],
+      "correct_answer": "B",
+      "explanation": "|z| = 0.9 < 1 → poles inside unit circle → stable. The complex conjugate pair gives a bandpass characteristic near ω = π/4.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "If X(z) = z/(z-0.8) for a causal sequence, the corresponding time-domain sequence is:",
+      "choices": [
+        "A. 0.8^n u[n]",
+        "B. n(0.8)^n u[n]",
+        "C. (0.8)^(n-1)u[n-1]",
+        "D. delta[n]-0.8u[n]"
+      ],
+      "correct_answer": "A",
+      "explanation": "Standard pair: Z{a^n u[n]} = z/(z-a). Here a=0.8, so x[n]=0.8^n u[n].",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    }
+  ]
+}

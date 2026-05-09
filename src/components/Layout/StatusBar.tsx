@@ -21,41 +21,40 @@ export function StatusBar() {
       className="flex items-center justify-between shrink-0"
       style={{
         height: isMobile ? '34px' : 'var(--statusbar-height)',
-        backgroundColor: 'var(--bg-sidebar)',
-        borderTop: '1px solid var(--border)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%), var(--glass-surface)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        borderTop: '1px solid var(--glass-border)',
         paddingLeft: '14px',
         paddingRight: '14px',
         fontSize: '10px',
-        color: 'var(--text-tertiary)',
+        color: 'var(--text-secondary)',
         fontFamily: 'var(--font-mono)',
       }}
     >
       <div className="flex items-center" style={{ gap: '8px' }}>
-        {/* Save status */}
-        <span
-          style={{
-            width: '5px',
-            height: '5px',
-            borderRadius: '50%',
-            backgroundColor: dotColor,
-            display: 'inline-block',
-            flexShrink: 0,
-          }}
-        />
-        <span>{saveLabel}</span>
-        <span style={{ color: 'var(--text-ghost)' }}>|</span>
-        <span>{wordCount} words</span>
+        <StatusPill>
+          <span
+            style={{
+              width: '5px',
+              height: '5px',
+              borderRadius: '50%',
+              backgroundColor: dotColor,
+              display: 'inline-block',
+              flexShrink: 0,
+            }}
+          />
+          {saveLabel}
+        </StatusPill>
+        <StatusPill>{wordCount} words</StatusPill>
         {!isMobile && (
           <>
-            <span style={{ color: 'var(--text-ghost)' }}>|</span>
-            <span>~{readTime} min read</span>
+            <StatusPill>~{readTime} min read</StatusPill>
             {cursorPosition && (
-              <>
-                <span style={{ color: 'var(--text-ghost)' }}>|</span>
-                <span>
-                  Ln {cursorPosition.line}, Col {cursorPosition.col}
-                </span>
-              </>
+              <StatusPill>
+                Ln {cursorPosition.line}, Col {cursorPosition.col}
+              </StatusPill>
             )}
           </>
         )}
@@ -63,13 +62,30 @@ export function StatusBar() {
 
       <div className="flex items-center" style={{ gap: '8px' }}>
         {lectureModeActive && (
-          <>
-            <span style={{ color: 'var(--green)' }}>● Lecture {getElapsedTime()}</span>
-            <span style={{ color: 'var(--text-ghost)' }}>|</span>
-          </>
+          <StatusPill style={{ color: 'var(--green)' }}>● Lecture {getElapsedTime()}</StatusPill>
         )}
-        {!isMobile && <span>Glyphic v1.0</span>}
+        {!isMobile && <StatusPill>Glyphic v1.0</StatusPill>}
       </div>
     </div>
+  );
+}
+
+function StatusPill({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '4px 8px',
+        borderRadius: '999px',
+        border: '1px solid var(--glass-border)',
+        background: 'rgba(255,255,255,0.03)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+        ...style,
+      }}
+    >
+      {children}
+    </span>
   );
 }

@@ -84,10 +84,12 @@ export function Onboarding() {
         style={{
           width: 'min(520px, 92vw)',
           maxHeight: '88vh',
-          backgroundColor: 'var(--bg-app)',
-          border: '1px solid var(--border)',
-          borderRadius: '12px',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+          backgroundColor: 'var(--glass-surface)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '20px',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
           padding: '32px 28px 24px',
           display: 'flex',
           flexDirection: 'column',
@@ -289,19 +291,47 @@ function Tip({ icon, title, body }: { icon: React.ReactNode; title: string; body
 
 type AiCheckState = { kind: 'checking' } | { kind: 'ok'; models: string[] } | { kind: 'fail'; error: string };
 
+const AI_CHECK_TIMEOUT_MS = 8000;
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+  return await new Promise<T>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      reject(new Error(timeoutMessage));
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        window.clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
+
 function AiSetupStep({ onContinue }: { onContinue: () => void }) {
   const [state, setState] = useState<AiCheckState>({ kind: 'checking' });
 
   const runCheck = useCallback(async () => {
     setState({ kind: 'checking' });
     try {
-      const ok = await commands.aiCheckConnection();
+      const ok = await withTimeout(
+        commands.aiCheckConnection(),
+        AI_CHECK_TIMEOUT_MS,
+        'Timed out while checking Ollama connection.',
+      );
       if (!ok) {
         setState({ kind: 'fail', error: 'Ollama is not reachable on http://localhost:11434.' });
         return;
       }
       try {
-        const models = await commands.aiListModels();
+        const models = await withTimeout(
+          commands.aiListModels(),
+          AI_CHECK_TIMEOUT_MS,
+          'Timed out while listing Ollama models.',
+        );
         setState({ kind: 'ok', models });
       } catch {
         setState({ kind: 'ok', models: [] });

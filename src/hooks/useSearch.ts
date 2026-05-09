@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { reportError } from '../lib/errorReporter';
 import { commands } from '../lib/tauri/commands';
 import { debounce } from '../lib/utils/debounce';
 import type { SearchResult } from '../types/editor';
@@ -20,7 +21,7 @@ export function useSearch() {
         const res = await commands.searchAll(q);
         setResults(res);
       } catch (e) {
-        console.error('Search error:', e);
+        reportError({ context: 'Search', message: 'Search error', error: e });
       } finally {
         setIsSearching(false);
       }

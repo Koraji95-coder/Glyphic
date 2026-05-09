@@ -1,8 +1,10 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { ChatPanel } from './components/Chat/ChatPanel';
+import { AiDrawer } from './components/Chat/AiDrawer';
+import { ErrorToast } from './components/common/ErrorToast';
 import { DiagramMode } from './components/diagrams/DiagramMode';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
+import { ReferenceModal } from './components/Editor/ReferenceModal';
 import { FePrepMode } from './components/fe-prep/FePrepMode';
 import { ShortcutHelp } from './components/Help/ShortcutHelp';
 import { OcrBanner } from './components/Layout/OcrBanner';
@@ -27,9 +29,12 @@ const PrintPreview = lazy(() =>
 import { useGlobalShortcuts } from './hooks/useGlobalShortcuts';
 import { useTheme } from './hooks/useTheme';
 import { useVault } from './hooks/useVault';
+import { reportError } from './lib/errorReporter';
 import { commands } from './lib/tauri/commands';
 import { events } from './lib/tauri/events';
 import { useChatStore } from './stores/chatStore';
+import { useEditorActionStore } from './stores/editorActionStore';
+import { useEditorModalStore } from './stores/editorModalStore';
 import { useEditorStore } from './stores/editorStore';
 import { useHelpUiStore } from './stores/helpUiStore';
 import { useLayoutStore } from './stores/layoutStore';
@@ -41,10 +46,10 @@ import { useTagsStore } from './stores/tagsStore';
 import { useVaultStore } from './stores/vaultStore';
 
 function MainLayout() {
-  const toggleChatPanel = useChatStore((s) => s.togglePanel);
   const isFePrepMode = useLayoutStore((s) => s.isFePrepMode);
   const isVaultMode = useLayoutStore((s) => s.isVaultMode);
   const isDiagramMode = useLayoutStore((s) => s.isDiagramMode);
+  const referenceModalOpen = useEditorModalStore((s) => s.referenceModalOpen);
 
   // True when any full-screen mode is active (hides editor + chat)
   const isFullScreenMode = isFePrepMode || isVaultMode || isDiagramMode;
@@ -55,7 +60,7 @@ function MainLayout() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
         e.preventDefault();
-        toggleChatPanel();
+        useChatStore.getState().togglePanel();
         return;
       }
       // Split pane: Ctrl+\ → split right, Ctrl+Shift+\ → split down, Ctrl+W → close
@@ -115,24 +120,46 @@ function MainLayout() {
         useEditorStore.getState().toggleLectureMode();
         return;
       }
+      // Insert link (Ctrl+K)
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        useEditorModalStore.getState().openReferenceModal('link');
+        return;
+      }
+      // Insert backlink (Ctrl+Shift+K)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'K') {
+        e.preventDefault();
+        useEditorModalStore.getState().openReferenceModal('backlink');
+        return;
+      }
+      // Toggle code block (Ctrl+Shift+E)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
+        e.preventDefault();
+        try {
+          useEditorActionStore.getState().onToggleCodeBlock();
+        } catch (error) {
+          reportError({ context: 'Editor code block shortcut', message: 'Unable to toggle code block', error });
+        }
+        return;
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleChatPanel]);
+  }, []);
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-app)' }}>
+    <div className="flex flex-col h-screen w-screen overflow-hidden" style={{ background: 'transparent' }}>
       <TitleBar />
       <OcrBanner />
       <div className="flex flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 flex min-w-0 overflow-hidden">
+        <div className="flex-1 flex min-w-0 overflow-hidden relative">
           {isFePrepMode && <FePrepMode />}
           {isVaultMode && <VaultMode />}
           {isDiagramMode && <DiagramMode />}
           {!isFullScreenMode && <EditorPaneGroup />}
-          {!isFullScreenMode && <ChatPanel />}
-        </main>
+          {!isFullScreenMode && <AiDrawer />}
+        </div>
       </div>
       <StatusBar />
       <QuickSwitcher />
@@ -140,6 +167,8 @@ function MainLayout() {
       <ShortcutHelp />
       <Lightbox />
       <Onboarding />
+      {referenceModalOpen && <ReferenceModal />}
+      <ErrorToast />
     </div>
   );
 }
@@ -183,14 +212,18 @@ export default function App() {
             return;
           } catch (e) {
             // Stored vault is gone or unreadable — fall through to onboarding.
-            console.warn('Stored vault could not be opened, showing onboarding:', e);
+            reportError({
+              context: 'Vault initialization',
+              message: 'Stored vault could not be opened; showing onboarding instead',
+              error: e,
+            });
           }
         }
         // No vault chosen yet (or last one missing): show first-run UX.
         useOnboardingStore.getState().open();
       } catch (e) {
         // Not running in Tauri (e.g., dev browser) — skip vault init.
-        console.warn('Vault init skipped (not in Tauri):', e);
+        reportError({ context: 'Vault initialization', message: 'Vault init skipped (not in Tauri)', error: e });
         useOnboardingStore.setState({ isOpen: false });
       }
     };
@@ -209,7 +242,7 @@ export default function App() {
         void useTagsStore.getState().refreshTags();
       })
       .catch((e) => {
-        console.warn('Reindex failed (non-critical):', e);
+        reportError({ context: 'Vault reindex', message: 'Reindex failed (non-critical)', error: e });
       });
   }, [vaultPath, isAuxRoute]);
 
@@ -226,7 +259,9 @@ export default function App() {
         // Coalesce bursts of FS events into a single tree refresh.
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
-          refresh().catch((e) => console.warn('refreshFileTree failed:', e));
+          refresh().catch((e) =>
+            reportError({ context: 'Vault refresh file tree', message: 'Failed to refresh file tree', error: e }),
+          );
           // Tags may have changed too (frontmatter edits, new files, etc.).
           void useTagsStore.getState().refreshTags();
         }, 250);
@@ -250,11 +285,28 @@ export default function App() {
 
   return (
     <Suspense fallback={null}>
-      <Routes>
-        <Route path="/" element={<MainLayout />} />
-        <Route path="/capture" element={<CaptureOverlay />} />
-        <Route path="/print-preview" element={<PrintPreview />} />
-      </Routes>
+      <main style={{ minHeight: '100vh' }}>
+        <h1
+          style={{
+            position: 'absolute',
+            width: '1px',
+            height: '1px',
+            padding: 0,
+            margin: '-1px',
+            overflow: 'hidden',
+            clip: 'rect(0, 0, 0, 0)',
+            whiteSpace: 'nowrap',
+            border: 0,
+          }}
+        >
+          Glyphic
+        </h1>
+        <Routes>
+          <Route path="/" element={<MainLayout />} />
+          <Route path="/capture" element={<CaptureOverlay />} />
+          <Route path="/print-preview" element={<PrintPreview />} />
+        </Routes>
+      </main>
     </Suspense>
   );
 }

@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useCaptureStore } from '../../stores/captureStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -62,7 +63,7 @@ export function RegionSelector() {
           window.history.back();
         }
       } catch (err) {
-        console.error('Capture failed:', err);
+        reportError({ context: 'Capture region', message: 'Capture failed', error: err });
       }
     },
     [isDragging, region, captureMode, vaultPath, setLastRegion, addToQueue],

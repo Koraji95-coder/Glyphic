@@ -1,0 +1,298 @@
+{
+  "topic": "BJT Amplifiers",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "A BJT in the active (forward-active) region has:",
+      "choices": [
+        "A. Both junctions reverse-biased",
+        "B. B-E forward-biased, B-C reverse-biased",
+        "C. Both junctions forward-biased",
+        "D. B-E reverse-biased, B-C forward-biased"
+      ],
+      "correct_answer": "B",
+      "explanation": "Active region (normal amplifier operation): E-B forward biased (~0.7 V), B-C reverse biased.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The DC current gain β of a BJT is defined as:",
+      "choices": ["A. I_C / I_B", "B. I_B / I_C", "C. I_E / I_B", "D. I_C / I_E"],
+      "correct_answer": "A",
+      "explanation": "β (h_FE) = I_C / I_B. Typical values: 50–500. Also α = I_C / I_E = β/(β+1).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The small-signal transconductance g_m of a BJT is:",
+      "choices": ["A. I_C / V_T", "B. V_T / I_C", "C. I_B / V_BE", "D. β / r_π"],
+      "correct_answer": "A",
+      "explanation": "g_m = I_C / V_T where V_T = kT/q ≈ 26 mV. At I_C = 1 mA: g_m = 1 mA / 26 mV ≈ 38.5 mA/V.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The small-signal input resistance r_π of a BJT is:",
+      "choices": ["A. β / g_m", "B. g_m / β", "C. β × V_T / I_C", "D. Both A and C"],
+      "correct_answer": "D",
+      "explanation": "r_π = β/g_m = β V_T / I_C. Both are equivalent. Also written as h_ie in h-parameters.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The common-emitter (CE) amplifier configuration has:",
+      "choices": [
+        "A. High voltage gain, high current gain, 180° phase inversion",
+        "B. Unity voltage gain, high current gain",
+        "C. High voltage gain, no phase inversion",
+        "D. Low input impedance, high voltage gain"
+      ],
+      "correct_answer": "A",
+      "explanation": "CE: A_v = −g_m R_C (inverting), high A_i = β, moderate R_in = r_π, moderate R_out.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The common-collector (emitter follower) configuration has:",
+      "choices": [
+        "A. Voltage gain ≈ 1, high current gain, no phase inversion",
+        "B. Large voltage gain and 180° phase inversion",
+        "C. Very low input impedance",
+        "D. Voltage gain > 100"
+      ],
+      "correct_answer": "A",
+      "explanation": "Emitter follower (CC): A_v ≈ 1 (slightly less), high input impedance, low output impedance—ideal buffer.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The common-base (CB) configuration has:",
+      "choices": [
+        "A. High voltage gain, current gain < 1 (α), no phase inversion",
+        "B. Current gain > 100",
+        "C. Very high input impedance",
+        "D. 180° phase inversion"
+      ],
+      "correct_answer": "A",
+      "explanation": "CB: A_i = α ≈ 1 (but < 1), high voltage gain, low input impedance, no phase inversion. Used at high frequencies.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a CE amplifier with R_C = 5 kΩ and I_C_Q = 1 mA, the small-signal voltage gain |A_v| = g_m × R_C is:",
+      "choices": ["A. 5", "B. 50", "C. 192", "D. 500"],
+      "correct_answer": "C",
+      "explanation": "g_m = I_C/V_T = 1 mA/26 mV = 38.5 mA/V; |A_v| = g_m × R_C = 38.5 × 5000/1000 = 192.3 ≈ 192",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "DC biasing for a BJT amplifier must set the Q-point in the ______ for linear amplification.",
+      "choices": [
+        "A. Saturation region",
+        "B. Cut-off region",
+        "C. Active (linear) region",
+        "D. Breakdown region"
+      ],
+      "correct_answer": "C",
+      "explanation": "The Q-point (quiescent operating point) must be in the active region for linear (undistorted) amplification.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A voltage-divider bias circuit uses two resistors R1 and R2 to set V_B. The Thevenin base voltage is:",
+      "choices": [
+        "A. V_TH = V_CC × R2 / (R1 + R2)",
+        "B. V_TH = V_CC × R1 / (R1 + R2)",
+        "C. V_TH = V_CC / 2 always",
+        "D. V_TH = V_CC × R1 × R2"
+      ],
+      "correct_answer": "A",
+      "explanation": "Voltage divider: V_B = V_TH = V_CC × R2/(R1+R2) (R2 connected from base to ground).",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "BJT saturation (for a switch) requires:",
+      "choices": [
+        "A. I_B > I_C / β",
+        "B. I_B < I_C / β",
+        "C. V_BE = 0",
+        "D. Both junctions reverse-biased"
+      ],
+      "correct_answer": "A",
+      "explanation": "Saturation: both junctions forward-biased; I_B must exceed I_C(sat)/β = V_CC/(β R_C) to force the transistor fully ON.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Early effect in a BJT refers to:",
+      "choices": [
+        "A. Increased I_C with increasing V_CE at constant V_BE",
+        "B. Decreased β at high temperatures",
+        "C. Gate oxide breakdown",
+        "D. Reverse recovery time"
+      ],
+      "correct_answer": "A",
+      "explanation": "Early effect (base width modulation): I_C increases slightly with V_CE because the depletion region narrows the base. Modeled by Early voltage V_A.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Adding an emitter bypass capacitor C_E in a CE amplifier:",
+      "choices": [
+        "A. Decreases the voltage gain",
+        "B. Increases the AC voltage gain by removing R_E from the gain formula",
+        "C. Reduces the Q-point stability",
+        "D. Introduces 90° phase shift"
+      ],
+      "correct_answer": "B",
+      "explanation": "C_E bypasses R_E at AC: A_v increases from −g_m(R_C‖R_E) to −g_m R_C. DC bias stability maintained by R_E.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The output resistance r_o of a BJT (due to Early effect) is approximately:",
+      "choices": ["A. V_A / I_C", "B. I_C / V_A", "C. β / g_m", "D. V_T / I_C"],
+      "correct_answer": "A",
+      "explanation": "r_o = V_A / I_C where V_A is the Early voltage (typically 50–200 V). High r_o → more ideal current source behavior.",
+      "difficulty": "hard", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The relationship between α and β of a BJT is:",
+      "choices": ["A. α = β/(β+1)", "B. β = α/(α+1)", "C. α = β−1", "D. α = 1/β"],
+      "correct_answer": "A",
+      "explanation": "α = I_C/I_E = β/(β+1). For β = 100: α = 100/101 ≈ 0.99.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which BJT bias configurations provide good Q-point stability against β variation? (Select ALL that apply.)",
+      "choices": [
+        "A. Voltage-divider bias with emitter resistor R_E",
+        "B. Fixed bias (single base resistor only)",
+        "C. Collector-feedback bias",
+        "D. Emitter-feedback bias"
+      ],
+      "correct_answer": "A,C,D",
+      "explanation": "Fixed bias depends heavily on β. VD bias, collector-feedback, and emitter-feedback all provide negative feedback to stabilize the Q-point.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In the hybrid-π model of a BJT, the current source is:",
+      "choices": ["A. g_m v_π", "B. β i_b", "C. v_π / r_π", "D. All are equivalent representations"],
+      "correct_answer": "D",
+      "explanation": "Hybrid-π: g_m v_π = β i_b = (v_π/r_π) × β = g_m v_π. All are equivalent for AC small-signal analysis.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Miller effect in a CE amplifier causes the effective input capacitance to be:",
+      "choices": [
+        "A. C_bc / |A_v|",
+        "B. C_bc × (1 + |A_v|)",
+        "C. C_bc only",
+        "D. Zero"
+      ],
+      "correct_answer": "B",
+      "explanation": "Miller effect: C_in = C_μ(1 + g_m R_C) = C_bc(1 + |A_v|). This greatly limits high-frequency response.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A BJT biased with I_C_Q = 2 mA. The transconductance g_m in mA/V is approximately:",
+      "choices": null, "correct_answer": "76.9", "unit": "mA/V", "tolerance": 2,
+      "explanation": "g_m = I_C / V_T = 2 mA / 0.026 V ≈ 76.9 mA/V",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The unity-gain bandwidth f_T of a BJT is defined as the frequency at which |β(jf)| = 1. It equals approximately:",
+      "choices": ["A. g_m / (2π C_total)", "B. 1 / (2π g_m)", "C. β × f_3dB", "D. Both A and C"],
+      "correct_answer": "D",
+      "explanation": "f_T = g_m/(2π(C_π + C_μ)) = β f_β where f_β is the −3 dB frequency of β. Both forms are correct.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A pnp transistor in active mode has conventional current flowing:",
+      "choices": [
+        "A. Into collector and base, out of emitter",
+        "B. Out of collector, into emitter; emitter current is largest",
+        "C. Same direction as npn",
+        "D. Only from emitter to base"
+      ],
+      "correct_answer": "B",
+      "explanation": "pnp: conventional current flows from emitter (P) to collector (N). I_E = I_C + I_B; I_E > I_C > I_B.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Coupling capacitors in multi-stage BJT amplifiers serve to:",
+      "choices": [
+        "A. Block AC signals between stages",
+        "B. Pass AC signals while blocking DC bias levels from one stage to another",
+        "C. Set the operating frequency",
+        "D. Increase voltage gain"
+      ],
+      "correct_answer": "B",
+      "explanation": "Coupling capacitors: low impedance at signal frequencies → pass AC; block DC → each stage sets its own Q-point independently.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The thermal stability factor S = ΔI_C / ΔI_CO for a BJT bias circuit: smaller S means:",
+      "choices": [
+        "A. More Q-point drift with temperature",
+        "B. More stable Q-point against temperature changes",
+        "C. Higher voltage gain",
+        "D. Higher β"
+      ],
+      "correct_answer": "B",
+      "explanation": "S = ΔI_C/ΔI_CO. Smaller S → more stable. S = 1 is ideal. Voltage-divider bias achieves low S.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A BJT circuit: V_CC = 12 V, R_B = 470 kΩ, R_C = 4.7 kΩ, β = 100. Fixed-bias I_C_Q ≈ ? (V_BE = 0.7 V)",
+      "choices": null, "correct_answer": "2.41", "unit": "mA", "tolerance": 0.1,
+      "explanation": "I_B = (V_CC − V_BE)/R_B = (12−0.7)/470k = 24.04 μA; I_C = β I_B = 100 × 24.04 μA = 2.404 mA",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "When a BJT is used as a digital switch, it operates between:",
+      "choices": ["A. Active and cut-off regions", "B. Saturation and cut-off regions", "C. Active and saturation only", "D. Breakdown and active regions"],
+      "correct_answer": "B",
+      "explanation": "Digital switch: OFF = cut-off (I_B = 0, V_CE ≈ V_CC); ON = saturation (V_CE(sat) ≈ 0.2 V).",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.3", "review_status": "ai_draft"
+    }
+  ]
+}

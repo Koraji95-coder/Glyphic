@@ -1,0 +1,399 @@
+{
+  "topic": "Differential Equations",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The general solution of dy/dx = 3y is:",
+      "choices": ["A. y = 3e^x", "B. y = Ce^(3x)", "C. y = 3x + C", "D. y = Ce^(x/3)"],
+      "correct_answer": "B",
+      "explanation": "Separating variables: dy/y = 3dx → ln|y| = 3x + const → y = Ce^(3x).",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The order of a differential equation is determined by:",
+      "choices": [
+        "A. The highest power of the dependent variable",
+        "B. The highest order derivative present",
+        "C. The number of initial conditions",
+        "D. The number of independent variables"
+      ],
+      "correct_answer": "B",
+      "explanation": "The order equals the order of the highest derivative. E.g., d²y/dx² is order 2.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A first-order linear ODE has the standard form:",
+      "choices": [
+        "A. dy/dx + P(x)y = Q(x)",
+        "B. d²y/dx² + ay = 0",
+        "C. (dy/dx)² = y",
+        "D. y dy/dx = Q(x)"
+      ],
+      "correct_answer": "A",
+      "explanation": "First-order linear: dy/dx + P(x)y = Q(x), solved via integrating factor μ = e^(∫P dx).",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The characteristic equation of y'' − 5y' + 6y = 0 is:",
+      "choices": [
+        "A. r² − 5r + 6 = 0",
+        "B. r² + 5r + 6 = 0",
+        "C. r² − 5r − 6 = 0",
+        "D. r + 6 = 0"
+      ],
+      "correct_answer": "A",
+      "explanation": "Substituting y = e^(rx): r² − 5r + 6 = 0. Roots r = 2, 3 give y = C₁e^(2x) + C₂e^(3x).",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For the ODE y'' + 4y = 0, the general solution is:",
+      "choices": [
+        "A. y = C₁e^(2x) + C₂e^(-2x)",
+        "B. y = C₁cos(2x) + C₂sin(2x)",
+        "C. y = (C₁ + C₂x)e^(2x)",
+        "D. y = C₁cos(4x) + C₂sin(4x)"
+      ],
+      "correct_answer": "B",
+      "explanation": "Characteristic roots r² + 4 = 0 → r = ±2i (pure imaginary). Solution: y = A cos(2x) + B sin(2x).",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An ODE is linear if:",
+      "choices": [
+        "A. It contains only constant coefficients",
+        "B. The dependent variable and its derivatives appear only to the first power (no products or nonlinear functions of y)",
+        "C. It has no forcing function",
+        "D. It can be solved by separation of variables"
+      ],
+      "correct_answer": "B",
+      "explanation": "Linearity requires y and its derivatives to be of degree 1 with no products between them.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The integrating factor for dy/dx + (2/x)y = x² is:",
+      "choices": ["A. e^(2x)", "B. x²", "C. e^(x²)", "D. 1/x²"],
+      "correct_answer": "B",
+      "explanation": "μ = e^(∫P(x)dx) = e^(∫2/x dx) = e^(2 ln x) = x².",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 75,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a critically damped second-order system (repeated roots r = −a, −a), the solution is:",
+      "choices": [
+        "A. y = (C₁ + C₂t)e^(−at)",
+        "B. y = C₁e^(−at) + C₂e^(at)",
+        "C. y = e^(−at)[C₁cos(ωt) + C₂sin(ωt)]",
+        "D. y = C₁cos(at) + C₂sin(at)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Repeated real roots r = −a (double root) give y = (C₁ + C₂t)e^(−at) via reduction of order.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A particular solution of y'' + y = cos(x) cannot be assumed as y_p = A cos(x) because:",
+      "choices": [
+        "A. cos(x) is not a valid function",
+        "B. cos(x) is a solution of the homogeneous equation (resonance condition)",
+        "C. The equation is nonlinear",
+        "D. The particular solution is always zero"
+      ],
+      "correct_answer": "B",
+      "explanation": "cos(x) solves the homogeneous y'' + y = 0; this resonance requires multiplying by x: y_p = x(A cos x + B sin x).",
+      "difficulty": "hard",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The general solution of a nonhomogeneous ODE is:",
+      "choices": [
+        "A. Only the particular solution",
+        "B. Only the homogeneous (complementary) solution",
+        "C. The homogeneous solution plus a particular solution",
+        "D. The product of homogeneous and particular solutions"
+      ],
+      "correct_answer": "C",
+      "explanation": "y_general = y_homogeneous + y_particular. The homogeneous part handles initial conditions; y_p handles the forcing.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "For y' = 2y with y(0) = 3, what is y(1)?",
+      "choices": null,
+      "correct_answer": "22.17",
+      "unit": "",
+      "tolerance": 0.1,
+      "explanation": "y = Ce^(2x); y(0) = C = 3. y(1) = 3e² ≈ 3 × 7.389 ≈ 22.17",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 75,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Euler's method for numerical ODE integration uses the update:",
+      "choices": [
+        "A. y_{n+1} = y_n − h × f(x_n, y_n)",
+        "B. y_{n+1} = y_n + h × f(x_n, y_n)",
+        "C. y_{n+1} = y_n × e^(h×f)",
+        "D. y_{n+1} = y_n + h²/2 × f'(x_n, y_n)"
+      ],
+      "correct_answer": "B",
+      "explanation": "Euler forward step: y_{n+1} = y_n + h × f(x_n, y_n), first-order accurate in step size h.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.5",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Wronskian W(y₁, y₂) = y₁y₂' − y₂y₁'. If W ≠ 0, it means:",
+      "choices": [
+        "A. y₁ and y₂ are linearly dependent",
+        "B. y₁ and y₂ are linearly independent solutions",
+        "C. y₁ = y₂",
+        "D. The equation has no solution"
+      ],
+      "correct_answer": "B",
+      "explanation": "W ≠ 0 guarantees {y₁, y₂} form a fundamental set of solutions (linearly independent).",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a separable ODE of the form dy/dx = g(x)h(y), the solution method is:",
+      "choices": [
+        "A. Find integrating factor",
+        "B. Separate variables: dy/h(y) = g(x)dx, then integrate both sides",
+        "C. Use the Laplace transform",
+        "D. Apply undetermined coefficients"
+      ],
+      "correct_answer": "B",
+      "explanation": "For separable ODEs, rearrange to isolate y on one side and x on the other, then integrate independently.",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform approach converts an ODE to:",
+      "choices": [
+        "A. A higher-order ODE",
+        "B. An algebraic equation in s-domain",
+        "C. A partial differential equation",
+        "D. A difference equation"
+      ],
+      "correct_answer": "B",
+      "explanation": "Laplace transforms convert derivatives to multiplication by s, turning the ODE into an algebraic equation in s.",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which methods can be used to find the particular solution of a nonhomogeneous ODE? (Select ALL that apply.)",
+      "choices": [
+        "A. Method of undetermined coefficients",
+        "B. Variation of parameters",
+        "C. Laplace transform",
+        "D. Separation of variables"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Undetermined coefficients and variation of parameters are classical methods; Laplace transforms also yield particular solutions. Separation of variables is for homogeneous separable ODEs.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The general solution of y'' − y = 0 is:",
+      "choices": [
+        "A. y = C₁e^x + C₂e^(-x)",
+        "B. y = C₁cos(x) + C₂sin(x)",
+        "C. y = (C₁ + C₂x)e^x",
+        "D. y = C₁e^(x²)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Characteristic equation r² − 1 = 0 → r = ±1 (real distinct roots) → y = C₁eˣ + C₂e⁻ˣ.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A second-order ODE requires how many initial conditions for a unique solution?",
+      "choices": ["A. One", "B. Two", "C. Three", "D. Zero"],
+      "correct_answer": "B",
+      "explanation": "An nth-order ODE needs n initial conditions. Second-order needs y(x₀) and y'(x₀).",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The steady-state (particular) solution of y' + 2y = 10 is:",
+      "choices": ["A. y = 5", "B. y = 2", "C. y = 10", "D. y = 0"],
+      "correct_answer": "A",
+      "explanation": "For y' + 2y = 10, assume y_p = A (constant). Then 0 + 2A = 10 → A = 5.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A boundary value problem (BVP) differs from an initial value problem (IVP) in that:",
+      "choices": [
+        "A. A BVP specifies conditions at two different points, while IVP specifies all at one point",
+        "B. A BVP has no solution",
+        "C. A BVP is always nonlinear",
+        "D. An IVP specifies conditions at two points"
+      ],
+      "correct_answer": "A",
+      "explanation": "IVP: all conditions at x₀. BVP: conditions split between x = a and x = b (e.g., beam deflection, heat conduction).",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a damped oscillator y'' + 2ζω_n y' + ω_n²y = 0, the system is underdamped when:",
+      "choices": [
+        "A. ζ > 1",
+        "B. ζ = 1",
+        "C. 0 < ζ < 1",
+        "D. ζ = 0"
+      ],
+      "correct_answer": "C",
+      "explanation": "ζ < 1: underdamped (oscillatory with decaying envelope); ζ = 1: critically damped; ζ > 1: overdamped.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "What is the time constant τ (seconds) for the ODE dv/dt + 5v = 0?",
+      "choices": null,
+      "correct_answer": "0.2",
+      "unit": "s",
+      "tolerance": 0.005,
+      "explanation": "dv/dt + (1/τ)v = 0 → 1/τ = 5 → τ = 1/5 = 0.2 s",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The particular solution by undetermined coefficients for y'' + y = e^(2x) is y_p = ?",
+      "choices": ["A. Ae^(2x)", "B. Axe^(2x)", "C. Ae^x", "D. A cos(2x)"],
+      "correct_answer": "A",
+      "explanation": "The right-hand side e^(2x) is not a homogeneous solution (roots are ±i), so try y_p = Ae^(2x).",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A heat equation ∂u/∂t = α ∂²u/∂x² is an example of a:",
+      "choices": [
+        "A. Ordinary differential equation",
+        "B. Partial differential equation",
+        "C. Algebraic equation",
+        "D. Difference equation"
+      ],
+      "correct_answer": "B",
+      "explanation": "The heat equation involves partial derivatives with respect to both t and x, making it a PDE.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The method of variation of parameters for y'' + p(x)y' + q(x)y = g(x) gives a particular solution y_p = u₁y₁ + u₂y₂ where u₁' and u₂' are found from:",
+      "choices": [
+        "A. A system of two equations involving the Wronskian W",
+        "B. Integration of g(x) twice",
+        "C. The characteristic equation",
+        "D. Substituting g(x) directly as a trial solution"
+      ],
+      "correct_answer": "A",
+      "explanation": "Variation of parameters: solve [y₁, y₂; y₁', y₂'][u₁'; u₂'] = [0; g] using Cramer's rule with Wronskian W.",
+      "difficulty": "hard",
+      "bloom_level": 3,
+      "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.3",
+      "review_status": "ai_draft"
+    }
+  ]
+}

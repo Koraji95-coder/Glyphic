@@ -29,6 +29,83 @@ export interface FeWeakTopic {
   attempts: number;
 }
 
+export interface FeQuestion {
+  id: number;
+  topic_id: number;
+  type: string;
+  question_text: string;
+  choices: string[] | null;
+  correct_answer: string;
+  explanation: string | null;
+  difficulty: string | null;
+  bloom_level: number | null;
+  estimated_time: number | null;
+  handbook_section_ref: string | null;
+}
+
+export interface FeSessionTick {
+  remaining_seconds: number;
+  expired: boolean;
+}
+
+// ── Question Bank types ───────────────────────────────────────────────────────
+
+export interface QuestionListItem {
+  id: number;
+  prompt_truncated: string;
+  q_type: string;
+  difficulty: string | null;
+  needs_review: number;
+  last_attempted: string | null;
+  success_rate: number;
+}
+
+export interface QuestionDetail {
+  id: number;
+  topic_id: number;
+  question_text: string;
+  choices: string[] | null;
+  correct_answer: string;
+  explanation: string | null;
+  q_type: string;
+  difficulty: string | null;
+  bloom_level: number | null;
+  estimated_time: number | null;
+  handbook_section_ref: string | null;
+  needs_review: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface TopicWithQuestionCount {
+  id: number;
+  name: string;
+  question_count: number;
+  needs_review_count: number;
+}
+
+// ── FE reference engine types ─────────────────────────────────────────────────
+
+export interface FormulaResult {
+  id: string;
+  name: string;
+  formula_latex: string;
+  variables: Record<string, string>;
+  description: string;
+  topic: string;
+  handbook_page: number;
+}
+
+export interface UnitConversionResult {
+  value: number;
+  unit: string;
+}
+
+export interface HandbookQAResult {
+  answer: string;
+  citations: string[];
+}
+
 // ── Flashcard SRS types ───────────────────────────────────────────────────────
 export interface FlashcardReview {
   id: number;
@@ -89,7 +166,7 @@ export interface GeneratedDiagramCode {
   warnings: string[];
 }
 
-const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 export const commands = {
   // Vault
@@ -222,6 +299,7 @@ export const commands = {
     topicId: number,
     result: string,
     timeTakenSeconds: number,
+    questionId?: number | null,
     difficulty?: string,
     problemText?: string,
     myAnswer?: string,
@@ -233,6 +311,7 @@ export const commands = {
           topicId,
           result,
           timeTakenSeconds,
+          questionId: questionId ?? null,
           difficulty: difficulty ?? null,
           problemText: problemText ?? null,
           myAnswer: myAnswer ?? null,
@@ -249,10 +328,81 @@ export const commands = {
           minAttempts: minAttempts ?? null,
         })
       : Promise.resolve([] as FeWeakTopic[]),
-  startFeSession: (sessionType: string, topicsCovered: string[]) =>
-    isTauri ? invoke<number>('start_fe_session', { sessionType, topicsCovered }) : Promise.resolve(0),
+  startFeSession: (sessionType: string, topicsCovered: string[], durationSeconds?: number) =>
+    isTauri
+      ? invoke<number>('start_fe_session', {
+          sessionType,
+          topicsCovered,
+          durationSeconds: durationSeconds ?? null,
+        })
+      : Promise.resolve(0),
   completeFeSession: (sessionId: number, totalQuestions: number, correct: number) =>
     isTauri ? invoke<void>('complete_fe_session', { sessionId, totalQuestions, correct }) : Promise.resolve(),
+  tickSession: (sessionId: number) =>
+    isTauri
+      ? invoke<FeSessionTick>('tick_session', { sessionId })
+      : Promise.resolve({ remaining_seconds: 0, expired: false }),
+  takeBreak: (sessionId: number) =>
+    isTauri ? invoke<FeSessionTick>('take_break', { sessionId }) : Promise.reject('Not in Tauri'),
+  seedQuestionBank: () => (isTauri ? invoke<number>('seed_question_bank') : Promise.resolve(0)),
+  getQuestionForSession: (topicId: number, excludeRecentIds: number[]) =>
+    isTauri
+      ? invoke<FeQuestion | null>('get_question_for_session', { topicId, excludeRecentIds })
+      : Promise.resolve(null),
+
+  // Question Bank management
+  listTopicsWithQuestionCounts: () =>
+    isTauri
+      ? invoke<TopicWithQuestionCount[]>('list_topics_with_question_counts')
+      : Promise.resolve([] as TopicWithQuestionCount[]),
+  listQuestionsByTopic: (topicId: number) =>
+    isTauri ? invoke<QuestionListItem[]>('list_questions_by_topic', { topicId }) : Promise.resolve([]),
+  getQuestionDetail: (questionId: number) =>
+    isTauri ? invoke<QuestionDetail>('get_question_detail', { questionId }) : Promise.reject('Not in Tauri'),
+  addFeQuestion: (
+    topicId: number,
+    questionText: string,
+    correctAnswer: string,
+    explanation?: string,
+    qType?: string,
+    difficulty?: string,
+    handbookSectionRef?: string,
+    choices?: string[],
+  ) =>
+    isTauri
+      ? invoke<number>('add_fe_question', {
+          topicId,
+          questionText,
+          correctAnswer,
+          explanation: explanation ?? null,
+          qType: qType ?? 'numeric',
+          difficulty: difficulty ?? null,
+          handbookSectionRef: handbookSectionRef ?? null,
+          choices: choices ?? null,
+        })
+      : Promise.reject('Not in Tauri'),
+  updateFeQuestion: (
+    questionId: number,
+    questionText?: string,
+    correctAnswer?: string,
+    explanation?: string,
+    difficulty?: string,
+    handbookSectionRef?: string,
+  ) =>
+    isTauri
+      ? invoke<void>('update_fe_question', {
+          questionId,
+          questionText: questionText ?? null,
+          correctAnswer: correctAnswer ?? null,
+          explanation: explanation ?? null,
+          difficulty: difficulty ?? null,
+          handbookSectionRef: handbookSectionRef ?? null,
+        })
+      : Promise.reject('Not in Tauri'),
+  flagQuestion: (questionId: number, reason: string) =>
+    isTauri ? invoke<void>('flag_question', { questionId, reason }) : Promise.reject('Not in Tauri'),
+  markQuestionReviewed: (questionId: number) =>
+    isTauri ? invoke<void>('mark_question_reviewed', { questionId }) : Promise.reject('Not in Tauri'),
 
   // Flashcard SRS (persistence)
   recordFlashcardReview: (
@@ -311,4 +461,16 @@ export const commands = {
           modelOverride: modelOverride ?? null,
         })
       : Promise.reject('Not in Tauri'),
+
+  // FE reference materials (formulas, unit conversion, handbook Q&A)
+  feFormulaLookup: (query: string, topic?: string) =>
+    isTauri
+      ? invoke<FormulaResult[]>('fe_formula_lookup', { query, topic: topic ?? null })
+      : Promise.reject('Not in Tauri'),
+  feUnitConvert: (value: number, fromUnit: string, toUnit: string) =>
+    isTauri
+      ? invoke<UnitConversionResult>('fe_unit_convert', { value, fromUnit, toUnit })
+      : Promise.reject('Not in Tauri'),
+  feHandbookQA: (question: string) =>
+    isTauri ? invoke<HandbookQAResult>('fe_handbook_qa', { question }) : Promise.reject('Not in Tauri'),
 };

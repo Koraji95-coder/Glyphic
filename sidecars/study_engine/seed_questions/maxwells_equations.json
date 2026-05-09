@@ -1,0 +1,339 @@
+{
+  "topic": "Maxwell's Equations",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "Gauss's Law for electric fields states:",
+      "choices": [
+        "A. ∮ B·dA = 0",
+        "B. ∮ E·dA = Q_enc/ε₀",
+        "C. ∇ × E = −∂B/∂t",
+        "D. ∮ H·dl = I_enc"
+      ],
+      "correct_answer": "B",
+      "explanation": "Gauss's Law: ∮ E·dA = Q_enc/ε₀. The total electric flux through a closed surface equals the enclosed charge divided by ε₀.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Gauss's Law for magnetic fields states:",
+      "choices": [
+        "A. ∮ B·dA = μ₀ I_enc",
+        "B. ∮ B·dA = 0 (no magnetic monopoles)",
+        "C. ∇ × B = ε₀ ∂E/∂t",
+        "D. ∮ B·dl = 0"
+      ],
+      "correct_answer": "B",
+      "explanation": "Gauss's Law for magnetism: ∮ B·dA = 0. Magnetic monopoles do not exist; field lines close on themselves.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Faraday's Law of electromagnetic induction states:",
+      "choices": [
+        "A. ∮ E·dl = −d(∫B·dA)/dt",
+        "B. ∮ E·dA = ρ/ε₀",
+        "C. ∮ H·dl = I_enc + ε₀ ∂E/∂t",
+        "D. ∇ · B = 0"
+      ],
+      "correct_answer": "A",
+      "explanation": "Faraday: ∮ E·dl = −dΦ_B/dt. A changing magnetic flux induces an EMF (electric field circulation).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Ampere's Law (with Maxwell's displacement current term) states:",
+      "choices": [
+        "A. ∮ H·dl = I_enc",
+        "B. ∮ H·dl = I_enc + ε₀ d(∫E·dA)/dt",
+        "C. ∮ B·dA = μ₀ I_enc",
+        "D. ∇ × H = J only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Ampere-Maxwell: ∮ H·dl = I_enc + ε₀ dΦ_E/dt. Maxwell added the displacement current term to allow EM wave propagation.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The speed of electromagnetic waves in free space c is:",
+      "choices": [
+        "A. c = √(μ₀/ε₀)",
+        "B. c = 1/√(μ₀ε₀) ≈ 3×10⁸ m/s",
+        "C. c = μ₀ε₀",
+        "D. c = ε₀/μ₀"
+      ],
+      "correct_answer": "B",
+      "explanation": "c = 1/√(μ₀ε₀) ≈ 3×10⁸ m/s. Maxwell derived this from his equations, predicting EM wave propagation.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The electric field E due to an infinite line charge with linear charge density λ at distance r is:",
+      "choices": [
+        "A. E = λ/(2πε₀r²)",
+        "B. E = λ/(2πε₀r)",
+        "C. E = λr/(2πε₀)",
+        "D. E = λ/(4πε₀r)"
+      ],
+      "correct_answer": "B",
+      "explanation": "By Gauss's Law (cylindrical symmetry): E = λ/(2πε₀r). Points radially outward from the line.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Poynting vector S = E × H represents:",
+      "choices": [
+        "A. Force on a charge",
+        "B. Power flow density (W/m²) of an electromagnetic wave",
+        "C. Electric energy density",
+        "D. Magnetic flux density"
+      ],
+      "correct_answer": "B",
+      "explanation": "Poynting vector: S = E × H (W/m²). It gives the direction and magnitude of EM power flow per unit area.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The boundary condition for the normal component of B at an interface is:",
+      "choices": [
+        "A. B₁n = −B₂n",
+        "B. B₁n = B₂n (normal B is continuous)",
+        "C. B₁n = μ₁/μ₂ × B₂n",
+        "D. B₁n = 0"
+      ],
+      "correct_answer": "B",
+      "explanation": "From ∇·B = 0: normal component of B is continuous across any interface: B₁n = B₂n.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Lenz's Law states that the induced EMF drives current in a direction that:",
+      "choices": [
+        "A. Aids the changing flux",
+        "B. Opposes the change in magnetic flux",
+        "C. Doubles the flux",
+        "D. Is parallel to the flux"
+      ],
+      "correct_answer": "B",
+      "explanation": "Lenz's Law (consequence of Faraday): induced current opposes the change in flux—a consequence of energy conservation.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The intrinsic impedance of free space η₀ is approximately:",
+      "choices": ["A. 50 Ω", "B. 377 Ω", "C. 120 Ω", "D. 75 Ω"],
+      "correct_answer": "B",
+      "explanation": "η₀ = √(μ₀/ε₀) = μ₀c ≈ 377 Ω. The ratio |E|/|H| for a plane wave in free space.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The wave equation for the electric field in a source-free lossless medium is:",
+      "choices": [
+        "A. ∇²E = με ∂²E/∂t²",
+        "B. ∇²E = E/c²",
+        "C. ∇E = −με ∂E/∂t",
+        "D. ∇·E = 0"
+      ],
+      "correct_answer": "A",
+      "explanation": "Wave equation: ∇²E = με ∂²E/∂t². The propagation speed is v = 1/√(με); in free space v = c.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The divergence theorem (Gauss's divergence theorem) converts:",
+      "choices": [
+        "A. A line integral to a surface integral",
+        "B. A volume integral of ∇·F to a surface integral of F·dA",
+        "C. A surface integral to a line integral",
+        "D. A curl to a divergence"
+      ],
+      "correct_answer": "B",
+      "explanation": "Divergence theorem: ∫∫∫ ∇·F dV = ∯ F·dA. Used to derive Gauss's law in differential form.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Stokes' theorem converts:",
+      "choices": [
+        "A. A surface integral of ∇×F to a line integral of F·dl",
+        "B. A volume integral to a surface integral",
+        "C. A line integral to a volume integral",
+        "D. Divergence to curl"
+      ],
+      "correct_answer": "A",
+      "explanation": "Stokes': ∫∫ (∇×F)·dA = ∮ F·dl. Used to derive Faraday's and Ampere's laws in differential form.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a conductor at electrostatic equilibrium, the electric field inside is:",
+      "choices": ["A. Maximum", "B. Zero", "C. Equal to the surface field", "D. ρ/ε₀"],
+      "correct_answer": "B",
+      "explanation": "Perfect conductor at equilibrium: E = 0 inside; all charge resides on the surface; potential is constant throughout.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Maxwell's four equations in differential form include: (Select ALL that apply.)",
+      "choices": [
+        "A. ∇·D = ρ_v (Gauss's law, electric)",
+        "B. ∇·B = 0 (Gauss's law, magnetic)",
+        "C. ∇×E = −∂B/∂t (Faraday's law)",
+        "D. ∇×H = J + ∂D/∂t (Ampere-Maxwell)"
+      ],
+      "correct_answer": "A,B,C,D",
+      "explanation": "All four are Maxwell's equations in differential form. Together they completely describe classical electromagnetism.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The electric field of a point charge Q at distance r is:",
+      "choices": [
+        "A. E = Q/(4πε₀r²) r̂",
+        "B. E = Q/(2πε₀r) r̂",
+        "C. E = Qr/(4πε₀)",
+        "D. E = Q/(ε₀r²)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Coulomb's law: E = Q/(4πε₀r²) r̂. This follows from Gauss's law with spherical symmetry.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Displacement current density J_d = ε₀ ∂E/∂t was added by Maxwell to:",
+      "choices": [
+        "A. Correct Ampere's Law for time-varying fields and predict EM wave propagation",
+        "B. Explain magnetic monopoles",
+        "C. Describe current in conductors",
+        "D. Replace Faraday's Law"
+      ],
+      "correct_answer": "A",
+      "explanation": "Maxwell's displacement current ensures charge continuity and allows EM waves to propagate in vacuum (no conduction current).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The skin depth δ for a conductor with conductivity σ at frequency f is:",
+      "choices": [
+        "A. δ = √(2/(ωμσ)) = 1/√(πfμσ)",
+        "B. δ = 2/(ωμσ)",
+        "C. δ = ωμσ",
+        "D. δ = √(ωμσ)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Skin depth: δ = √(2/(ωμσ)) = 1/√(πfμσ). Current concentrates within δ of the surface at high frequencies.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In free space, for a plane EM wave, the relationship between E and H fields is:",
+      "choices": [
+        "A. |E| = η₀ |H| where η₀ ≈ 377 Ω",
+        "B. |E| = |H|",
+        "C. |E| = c|H|",
+        "D. |E| = |H|/η₀"
+      ],
+      "correct_answer": "A",
+      "explanation": "|E|/|H| = η₀ = √(μ₀/ε₀) ≈ 377 Ω (wave impedance of free space).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "The force on a charge q = 1 μC at distance r = 1 m from a point charge Q = 10 μC in free space (Coulomb force) in mN is approximately:",
+      "choices": null, "correct_answer": "89.9", "unit": "mN", "tolerance": 2,
+      "explanation": "F = kQq/r² = (9×10⁹)(10⁻⁵)(10⁻⁶)/1² = 9×10⁻² N = 90 mN. Wait: Q=10μC=10⁻⁵ C, q=1μC=10⁻⁶ C; F=9×10⁹×10⁻⁵×10⁻⁶=0.09 N=90 mN",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The relative permittivity (dielectric constant) ε_r of a material affects the wave speed as:",
+      "choices": [
+        "A. v = c/√(ε_r μ_r)",
+        "B. v = c × ε_r",
+        "C. v = c/ε_r",
+        "D. v = c × √(ε_r)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Phase velocity in medium: v = c/√(ε_r μ_r). For non-magnetic material (μ_r=1): v = c/√ε_r.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Snell's Law for EM refraction at a dielectric boundary states:",
+      "choices": [
+        "A. θ₁ = θ₂",
+        "B. n₁ sin θ₁ = n₂ sin θ₂",
+        "C. n₁ cos θ₁ = n₂ cos θ₂",
+        "D. n₁/sin θ₁ = n₂/sin θ₂"
+      ],
+      "correct_answer": "B",
+      "explanation": "Snell's Law: n₁ sin θ₁ = n₂ sin θ₂ where n = √(ε_r μ_r) is the index of refraction.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The magnetic flux density B and field intensity H in a linear medium are related by:",
+      "choices": [
+        "A. B = ε H",
+        "B. B = μ H",
+        "C. B = H/μ",
+        "D. B = σ H"
+      ],
+      "correct_answer": "B",
+      "explanation": "B = μH = μ₀ μ_r H. Similarly, D = εE = ε₀ε_r E.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "At the boundary between two dielectrics (no free surface charge), the normal component of electric flux density D satisfies:",
+      "choices": [
+        "A. D1n = D2n",
+        "B. E1n = E2n",
+        "C. H1t = H2t",
+        "D. B1n = 0"
+      ],
+      "correct_answer": "A",
+      "explanation": "Boundary condition from Gauss's law: D2n - D1n = rho_s. With no free surface charge (rho_s=0), D1n = D2n.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 25,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In differential form, Faraday's law is:",
+      "choices": [
+        "A. ∇·D = rho_v",
+        "B. ∇·B = 0",
+        "C. ∇×E = -∂B/∂t",
+        "D. ∇×H = J"
+      ],
+      "correct_answer": "C",
+      "explanation": "Faraday's law in differential form is ∇×E = -∂B/∂t, relating time-varying magnetic fields to induced electric circulation.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.1", "review_status": "ai_draft"
+    }
+  ]
+}

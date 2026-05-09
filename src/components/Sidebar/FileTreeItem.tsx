@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useSplitStore } from '../../stores/splitStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -25,8 +26,16 @@ interface FileTreeItemProps {
   depth: number;
 }
 
+const INITIAL_CHILDREN_BATCH = 150;
+const CHILDREN_BATCH_STEP = 150;
+
 export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
-  const [expanded, setExpanded] = useState(depth === 0);
+  const [expanded, setExpanded] = useState(() => {
+    if (depth !== 0) return false;
+    const childCount = entry.children?.length ?? 0;
+    return childCount > 0 && childCount <= 25;
+  });
+  const [visibleChildrenCount, setVisibleChildrenCount] = useState(INITIAL_CHILDREN_BATCH);
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
   const ctxRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +50,9 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   const isActive = !isFolder && activeNotePath === entry.path;
   const isPinned = !isFolder && pinnedNotes.includes(entry.path);
   const title = entry.name.replace(/\.md$/, '');
+  const totalChildren = entry.children?.length ?? 0;
+  const visibleChildren = entry.children?.slice(0, visibleChildrenCount) ?? [];
+  const remainingChildren = Math.max(0, totalChildren - visibleChildren.length);
 
   const handleClick = useCallback(() => {
     if (isFolder) {
@@ -67,6 +79,16 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     return () => document.removeEventListener('mousedown', close);
   }, [ctxMenu]);
 
+  // Reset incremental rendering window when collapsing/expanding or changing folders.
+  useEffect(() => {
+    if (!isFolder) return;
+    if (!expanded) {
+      setVisibleChildrenCount(INITIAL_CHILDREN_BATCH);
+      return;
+    }
+    setVisibleChildrenCount(INITIAL_CHILDREN_BATCH);
+  }, [expanded, isFolder]);
+
   const handleNewNote = async () => {
     setCtxMenu(null);
     const folder = isFolder ? entry.path : entry.path.split('/').slice(0, -1).join('/');
@@ -78,7 +100,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           setActiveNote(note.id, note.path);
         }
       } catch (e) {
-        console.error('Failed to create note:', e);
+        reportError({ context: 'File tree create note', message: 'Failed to create note', error: e });
       }
     }
   };
@@ -97,7 +119,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           await useVaultStore.getState().refreshFileTree();
         }
       } catch (e) {
-        console.error('Failed to create folder:', e);
+        reportError({ context: 'File tree create folder', message: 'Failed to create folder', error: e });
       }
     }
   };
@@ -113,7 +135,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           await useVaultStore.getState().refreshFileTree();
         }
       } catch (e) {
-        console.error('Failed to rename:', e);
+        reportError({ context: 'File tree rename', message: 'Failed to rename', error: e });
       }
     }
   };
@@ -124,7 +146,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       try {
         await deleteNote(entry.path);
       } catch (e) {
-        console.error('Failed to delete:', e);
+        reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
       }
     }
   };
@@ -137,14 +159,18 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
         className="flex items-center gap-1 py-0.5 px-2 rounded cursor-pointer text-sm select-none group"
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
-          backgroundColor: isActive ? 'var(--accent-muted)' : 'transparent',
+          backgroundColor: isActive ? 'rgba(163,116,247,0.18)' : 'transparent',
           color: isActive ? 'var(--accent)' : 'var(--text-primary)',
+          borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
+          transition: 'background-color 0.12s, border-color 0.12s',
         }}
         onMouseEnter={(e) => {
-          if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+          if (!isActive) {
+            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isActive ? 'var(--accent-muted)' : 'transparent';
+          e.currentTarget.style.backgroundColor = isActive ? 'rgba(163,116,247,0.18)' : 'transparent';
         }}
       >
         {/* Expand chevron or spacer */}
@@ -168,9 +194,31 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       {/* Children */}
       {isFolder && expanded && entry.children && (
         <div>
-          {entry.children.map((child) => (
+          {visibleChildren.map((child) => (
             <FileTreeItem key={child.path} entry={child} depth={depth + 1} />
           ))}
+          {remainingChildren > 0 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setVisibleChildrenCount((prev) => Math.min(prev + CHILDREN_BATCH_STEP, totalChildren));
+              }}
+              style={{
+                marginLeft: `${(depth + 1) * 16 + 8}px`,
+                marginTop: '2px',
+                background: 'transparent',
+                border: '1px solid var(--border)',
+                borderRadius: '6px',
+                color: 'var(--text-tertiary)',
+                fontSize: '11px',
+                padding: '2px 8px',
+                cursor: 'pointer',
+              }}
+            >
+              Show {Math.min(CHILDREN_BATCH_STEP, remainingChildren)} more ({remainingChildren} remaining)
+            </button>
+          )}
         </div>
       )}
 
@@ -231,6 +279,7 @@ function CtxItem({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-left transition-colors"
       style={{ color: danger ? 'var(--error)' : 'var(--text-primary)' }}

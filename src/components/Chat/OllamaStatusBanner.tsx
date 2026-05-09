@@ -29,13 +29,20 @@ export function OllamaStatusBanner() {
 
   useEffect(() => {
     mountedRef.current = true;
-    intervalRef.current = setInterval(checkNow, POLL_MS);
+    // Only set up the interval if we're actually going to render the banner
+    if (provider === 'ollama') {
+      intervalRef.current = setInterval(checkNow, POLL_MS);
+    }
     return () => {
       mountedRef.current = false;
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [checkNow]);
+  }, [checkNow, provider]);
 
+  // Don't render if not using Ollama provider
   if (provider !== 'ollama') return null;
 
   // Disconnected — warning banner.

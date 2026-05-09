@@ -1,0 +1,366 @@
+{
+  "topic": "DC Circuits",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "Two resistors, 12 Ω and 6 Ω, are connected in parallel. What is the equivalent resistance?",
+      "choices": ["A. 18 Ω", "B. 9 Ω", "C. 4 Ω", "D. 8 Ω"],
+      "correct_answer": "C",
+      "explanation": "1/R_eq = 1/12 + 1/6 = 1/12 + 2/12 = 3/12 → R_eq = 4 Ω",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A 24 V source drives a series circuit with a 4 Ω and an 8 Ω resistor. What is the current through the circuit in amperes?",
+      "choices": null,
+      "correct_answer": "2",
+      "unit": "A",
+      "tolerance": 0.05,
+      "explanation": "I = V/R_total = 24/(4+8) = 24/12 = 2 A",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "According to KVL, which statement is correct?",
+      "choices": [
+        "A. The sum of all currents entering a node equals zero.",
+        "B. The algebraic sum of all voltages around a closed loop equals zero.",
+        "C. Power delivered equals power absorbed in a resistor.",
+        "D. Resistance is proportional to voltage."
+      ],
+      "correct_answer": "B",
+      "explanation": "KVL: ΣV = 0 around any closed loop. KCL states that currents at a node sum to zero.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A resistor dissipates 50 W when 5 A flows through it. What is its resistance?",
+      "choices": ["A. 10 Ω", "B. 2 Ω", "C. 0.5 Ω", "D. 250 Ω"],
+      "correct_answer": "B",
+      "explanation": "P = I²R → R = P/I² = 50/25 = 2 Ω",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In the voltage divider circuit with V_s = 20 V, R1 = 3 Ω, and R2 = 7 Ω in series, what is the voltage across R2?",
+      "choices": ["A. 6 V", "B. 14 V", "C. 10 V", "D. 8 V"],
+      "correct_answer": "B",
+      "explanation": "V_R2 = V_s × R2/(R1+R2) = 20 × 7/10 = 14 V",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A circuit has a 10 V source and a Thevenin equivalent resistance of 5 Ω. When a 15 Ω load is connected, the load voltage is:",
+      "choices": ["A. 10 V", "B. 7.5 V", "C. 5 V", "D. 3.33 V"],
+      "correct_answer": "B",
+      "explanation": "V_L = V_th × R_L/(R_th + R_L) = 10 × 15/20 = 7.5 V",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In nodal analysis, a supernode is formed when:",
+      "choices": [
+        "A. Two current sources share the same branch.",
+        "B. A voltage source (dependent or independent) connects two non-reference nodes.",
+        "C. A resistor connects a node directly to the reference.",
+        "D. Two nodes have the same potential."
+      ],
+      "correct_answer": "B",
+      "explanation": "A supernode is created when a voltage source connects two non-reference nodes, requiring the nodes to be treated as a single entity in KCL.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 75,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "What is the Norton current I_N of a circuit with V_th = 6 V and R_th = 3 Ω?",
+      "choices": ["A. 18 A", "B. 0.5 A", "C. 2 A", "D. 3 A"],
+      "correct_answer": "C",
+      "explanation": "I_N = V_th / R_th = 6/3 = 2 A",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Maximum power transfer to a load R_L occurs when:",
+      "choices": [
+        "A. R_L = 0 (short circuit)",
+        "B. R_L = ∞ (open circuit)",
+        "C. R_L = R_th (source Thevenin resistance)",
+        "D. R_L = 2 × R_th"
+      ],
+      "correct_answer": "C",
+      "explanation": "Max power transfer theorem: P_max occurs when R_L equals R_th. P_max = V_th²/(4R_th).",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Mesh analysis is most convenient when a circuit has:",
+      "choices": [
+        "A. More mesh equations than node equations",
+        "B. Many current sources",
+        "C. Fewer meshes than nodes, minimizing simultaneous equations",
+        "D. Only voltage sources"
+      ],
+      "correct_answer": "C",
+      "explanation": "Choose mesh analysis when (meshes) < (nodes − 1), reducing the number of simultaneous equations to solve.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Three resistors of 6 Ω each are connected in parallel. What is the equivalent resistance in ohms?",
+      "choices": null,
+      "correct_answer": "2",
+      "unit": "Ω",
+      "tolerance": 0.05,
+      "explanation": "For n equal resistors in parallel: R_eq = R/n = 6/3 = 2 Ω",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The superposition principle applies to circuits that are:",
+      "choices": [
+        "A. Nonlinear with multiple sources",
+        "B. Linear with multiple independent sources",
+        "C. Purely resistive with a single source",
+        "D. RLC circuits with no sources"
+      ],
+      "correct_answer": "B",
+      "explanation": "Superposition applies to linear circuits: each independent source is considered alone (others replaced by their internal impedance) and results are summed.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A 12 V battery with 2 Ω internal resistance drives an external 10 Ω load. What is the terminal voltage?",
+      "choices": ["A. 12 V", "B. 10 V", "C. 11 V", "D. 2 V"],
+      "correct_answer": "B",
+      "explanation": "I = 12/(2+10) = 1 A; V_terminal = V_s − I×R_int = 12 − 1×2 = 10 V",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a wye (Y) resistor network, each arm is 9 Ω. The equivalent delta (Δ) resistance for each arm is:",
+      "choices": ["A. 3 Ω", "B. 27 Ω", "C. 9 Ω", "D. 81 Ω"],
+      "correct_answer": "B",
+      "explanation": "Y-to-Δ: R_Δ = 3 × R_Y = 3 × 9 = 27 Ω (for balanced equal networks).",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Which is the correct expression for power delivered by a source?",
+      "choices": ["A. P = V²R", "B. P = I²/R", "C. P = VI", "D. P = V/I"],
+      "correct_answer": "C",
+      "explanation": "P = VI. For a resistor, substituting V=IR gives P = I²R, or V=IR gives P = V²/R.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "KCL states that at any node in a circuit:",
+      "choices": [
+        "A. ΣV = 0 for all branches",
+        "B. ΣI_in = ΣI_out (sum of currents entering = sum leaving)",
+        "C. Power consumed equals power dissipated",
+        "D. Voltage is the same at each node"
+      ],
+      "correct_answer": "B",
+      "explanation": "Kirchhoff's Current Law: algebraic sum of currents at a node is zero; equivalently ΣI_in = ΣI_out.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which of the following are valid methods for solving a DC circuit? (Select ALL that apply.)",
+      "choices": [
+        "A. Nodal analysis",
+        "B. Mesh (loop) analysis",
+        "C. Superposition",
+        "D. Thevenin equivalent"
+      ],
+      "correct_answer": "A,B,C,D",
+      "explanation": "All four are standard circuit analysis techniques: nodal, mesh, superposition, and Thevenin/Norton equivalents.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An ideal voltage source has:",
+      "choices": [
+        "A. Infinite internal resistance",
+        "B. Zero internal resistance",
+        "C. Resistance equal to the load",
+        "D. Variable internal resistance"
+      ],
+      "correct_answer": "B",
+      "explanation": "An ideal voltage source maintains a constant terminal voltage regardless of load current, implying zero internal resistance.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a circuit, two voltage sources V1 = 12 V and V2 = 8 V oppose each other in series with R = 4 Ω. What is the current?",
+      "choices": ["A. 5 A", "B. 1 A", "C. 3 A", "D. 0.5 A"],
+      "correct_answer": "B",
+      "explanation": "Net voltage = V1 − V2 = 12 − 8 = 4 V; I = V_net/R = 4/4 = 1 A",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 75,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A dependent current source has its current controlled by:",
+      "choices": [
+        "A. Its own terminal voltage only",
+        "B. An independent voltage source elsewhere in the circuit",
+        "C. A voltage or current at another element in the circuit",
+        "D. The supply frequency"
+      ],
+      "correct_answer": "C",
+      "explanation": "A dependent (controlled) source is governed by a voltage or current at some other element in the network.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A 100 Ω resistor has 5 V across it. How much power (in mW) does it dissipate?",
+      "choices": null,
+      "correct_answer": "250",
+      "unit": "mW",
+      "tolerance": 1,
+      "explanation": "P = V²/R = 25/100 = 0.25 W = 250 mW",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In the delta-to-wye (Δ-to-Y) conversion, the Y-arm resistor R_a (connected to node a) is:",
+      "choices": [
+        "A. R_a = R_AB × R_CA / (R_AB + R_BC + R_CA)",
+        "B. R_a = R_AB + R_BC + R_CA",
+        "C. R_a = (R_AB + R_CA) / R_BC",
+        "D. R_a = R_BC × R_CA / (R_AB + R_BC + R_CA)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Δ-to-Y: R_a = (product of Δ resistors adjacent to node a) / (sum of all Δ resistors). R_a = R_AB × R_CA / (R_AB + R_BC + R_CA).",
+      "difficulty": "hard",
+      "bloom_level": 3,
+      "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.3",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Ohm's Law relates voltage, current, and resistance as:",
+      "choices": ["A. V = IR", "B. V = I/R", "C. V = I + R", "D. V = I² R"],
+      "correct_answer": "A",
+      "explanation": "V = IR is Ohm's Law. For nonlinear elements, this relationship does not hold in general.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "To find the Thevenin resistance R_th of a circuit, you should:",
+      "choices": [
+        "A. Measure voltage across open-circuit terminals",
+        "B. Deactivate all independent sources and find the resistance seen from the terminals",
+        "C. Short-circuit the terminals and measure current",
+        "D. Replace all resistors with capacitors"
+      ],
+      "correct_answer": "B",
+      "explanation": "R_th is found by deactivating independent sources (voltage sources → short, current sources → open) and computing the equivalent resistance at the terminals.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A current divider with two parallel resistors R1 = 2 Ω and R2 = 8 Ω carries a total current of 10 A. The current through R1 is:",
+      "choices": ["A. 8 A", "B. 2 A", "C. 5 A", "D. 4 A"],
+      "correct_answer": "A",
+      "explanation": "I1 = I_total × R2/(R1+R2) = 10 × 8/10 = 8 A. (Current splits inversely proportional to resistance.)",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 75,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.1",
+      "review_status": "ai_draft"
+    }
+  ]
+}

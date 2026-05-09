@@ -1,0 +1,274 @@
+{
+  "topic": "Laplace Transforms",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of f(t) is defined as:",
+      "choices": [
+        "A. F(s) = ∫₀^∞ f(t) e^(−st) dt",
+        "B. F(s) = ∫₋∞^∞ f(t) e^(jωt) dt",
+        "C. F(s) = ∑ f(n) z^(−n)",
+        "D. F(s) = d/dt[f(t)]"
+      ],
+      "correct_answer": "A",
+      "explanation": "Unilateral Laplace: F(s) = ∫₀^∞ f(t)e^(−st)dt. Converts ODEs to algebraic equations.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of the unit step u(t) is:",
+      "choices": ["A. 1", "B. 1/s", "C. 1/s²", "D. s"],
+      "correct_answer": "B",
+      "explanation": "L{u(t)} = 1/s.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of the impulse function δ(t) is:",
+      "choices": ["A. 1/s", "B. 1", "C. s", "D. e^(−s)"],
+      "correct_answer": "B",
+      "explanation": "L{δ(t)} = 1. The impulse is the identity element for convolution.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of e^(−at) u(t) is:",
+      "choices": ["A. 1/(s+a)", "B. 1/(s−a)", "C. a/(s+a)", "D. s/(s+a)"],
+      "correct_answer": "A",
+      "explanation": "L{e^(−at)u(t)} = 1/(s+a) for Re(s) > −a.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of df/dt (with zero initial conditions) is:",
+      "choices": ["A. F(s)/s", "B. sF(s)", "C. sF(s) − f(0)", "D. F(s) − f(0)/s"],
+      "correct_answer": "C",
+      "explanation": "L{f'(t)} = sF(s) − f(0⁻). With zero ICs: L{f'} = sF(s).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of ∫₀ᵗ f(τ)dτ is:",
+      "choices": ["A. sF(s)", "B. F(s)/s", "C. F(s) + f(0)/s", "D. F(s)·s"],
+      "correct_answer": "B",
+      "explanation": "L{∫₀ᵗ f(τ)dτ} = F(s)/s. Integration in time ↔ dividing by s in frequency domain.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The final value theorem states: lim_{t→∞} f(t) = ?",
+      "choices": ["A. lim_{s→∞} sF(s)", "B. lim_{s→0} sF(s)", "C. F(0)", "D. lim_{s→0} F(s)"],
+      "correct_answer": "B",
+      "explanation": "Final value: lim_{t→∞}f(t) = lim_{s→0} sF(s), valid when all poles of sF(s) are in left half-plane.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The initial value theorem states: f(0⁺) = ?",
+      "choices": ["A. lim_{s→0} F(s)", "B. lim_{s→∞} sF(s)", "C. lim_{s→0} sF(s)", "D. F(∞)"],
+      "correct_answer": "B",
+      "explanation": "Initial value: f(0⁺) = lim_{s→∞} sF(s). Valid when F(s) is strictly proper (more poles than zeros).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A second-order transfer function H(s) = ω_n²/(s² + 2ζω_n s + ω_n²). The system is stable when:",
+      "choices": [
+        "A. ζ > 0 (positive damping ratio)",
+        "B. ζ < 0",
+        "C. ω_n = 0",
+        "D. s has positive real poles"
+      ],
+      "correct_answer": "A",
+      "explanation": "Stable if all poles in left half-plane, which requires ζ > 0 and ω_n > 0.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The inverse Laplace transform of 1/(s + 3) is:",
+      "choices": ["A. e^(3t)u(t)", "B. e^(−3t)u(t)", "C. 3e^(−3t)u(t)", "D. δ(t) − 3e^(−3t)"],
+      "correct_answer": "B",
+      "explanation": "L⁻¹{1/(s+a)} = e^(−at)u(t). For a=3: e^(−3t)u(t).",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Partial fraction expansion is used to:",
+      "choices": [
+        "A. Factor polynomials",
+        "B. Decompose a complex rational F(s) into simpler terms for inverse Laplace",
+        "C. Find the Laplace transform of products",
+        "D. Compute definite integrals"
+      ],
+      "correct_answer": "B",
+      "explanation": "Partial fractions: decompose F(s) = N(s)/D(s) into A/(s+p₁) + B/(s+p₂) + … to find the inverse transform term by term.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The poles of a transfer function H(s) determine the system's:",
+      "choices": [
+        "A. Input type",
+        "B. Natural frequencies and transient response shape",
+        "C. DC gain only",
+        "D. The zeros of the output"
+      ],
+      "correct_answer": "B",
+      "explanation": "Poles → natural modes of the system (exponentials, sinusoids). Zeros affect residues/magnitudes but not the pole frequencies.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For BIBO stability, all poles of H(s) must be:",
+      "choices": [
+        "A. On the imaginary axis",
+        "B. In the right half of the s-plane",
+        "C. In the left half of the s-plane (negative real parts)",
+        "D. At the origin"
+      ],
+      "correct_answer": "C",
+      "explanation": "BIBO stable: all poles have Re(s) < 0 (left half-plane). Poles on jω axis or in RHP → unstable or marginally stable.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The convolution theorem for Laplace transforms states:",
+      "choices": [
+        "A. L{f*g} = F(s) · G(s)",
+        "B. L{f·g} = F(s) * G(s)",
+        "C. L{f+g} = F(s) · G(s)",
+        "D. L{f*g} = F(s) + G(s)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Convolution theorem: convolution in time ↔ multiplication in s-domain: L{f*g} = F(s)·G(s).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The time-shift property of Laplace: L{f(t−a)u(t−a)} = ?",
+      "choices": ["A. F(s+a)", "B. e^(−as) F(s)", "C. F(s)/a", "D. e^(as) F(s)"],
+      "correct_answer": "B",
+      "explanation": "L{f(t−a)u(t−a)} = e^(−as)F(s). Delay in time domain → multiply by e^(−as) in s-domain.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of t·u(t) (ramp function) is:",
+      "choices": ["A. 1/s", "B. 1/s²", "C. 2/s³", "D. s"],
+      "correct_answer": "B",
+      "explanation": "L{t·u(t)} = 1/s². L{tⁿu(t)} = n!/s^(n+1). L{t} = 1/s².",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of cos(ω₀t)u(t) is:",
+      "choices": ["A. ω₀/(s²+ω₀²)", "B. s/(s²+ω₀²)", "C. 1/(s²+ω₀²)", "D. s/(s²−ω₀²)"],
+      "correct_answer": "B",
+      "explanation": "L{cos(ω₀t)u(t)} = s/(s²+ω₀²). L{sin(ω₀t)u(t)} = ω₀/(s²+ω₀²).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Solving the ODE ẏ + 2y = u(t), y(0) = 0 using Laplace gives Y(s) = ?",
+      "choices": ["A. 1/(s+2)", "B. 1/[s(s+2)]", "C. s/(s+2)", "D. 2/(s+2)"],
+      "correct_answer": "B",
+      "explanation": "sY(s) + 2Y(s) = 1/s → Y(s)(s+2) = 1/s → Y(s) = 1/[s(s+2)]",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which properties are valid for the unilateral Laplace transform? (Select ALL that apply.)",
+      "choices": [
+        "A. Linearity: L{af+bg} = aF+bG",
+        "B. Frequency shift: L{e^(at)f(t)} = F(s−a)",
+        "C. Differentiation: L{f'} = sF(s)−f(0)",
+        "D. Time reversal: L{f(−t)} = F(−s)"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Linearity, frequency shift, and differentiation are valid unilateral LT properties. Time reversal applies to bilateral LT (not unilateral, as f must be causal).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A system with transfer function H(s) = (s+2)/[(s+1)(s+3)] has DC gain H(0) = ?",
+      "choices": ["A. 1/3", "B. 2/3", "C. 2", "D. 6"],
+      "correct_answer": "B",
+      "explanation": "H(0) = (0+2)/[(0+1)(0+3)] = 2/3",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An s-domain circuit analysis replaces an inductor L with impedance:",
+      "choices": ["A. R", "B. sL", "C. L/s", "D. 1/(sL)"],
+      "correct_answer": "B",
+      "explanation": "Inductor: Z_L = sL (in s-domain). Capacitor: Z_C = 1/(sC). Resistor: unchanged R.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The transfer function H(s) = Y(s)/X(s) is defined with:",
+      "choices": [
+        "A. Nonzero initial conditions",
+        "B. Zero initial conditions",
+        "C. Any initial conditions",
+        "D. Only for stable systems"
+      ],
+      "correct_answer": "B",
+      "explanation": "Transfer function definition assumes zero initial conditions. It describes the zero-state response (forced response only).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The inverse Laplace of F(s) = s/(s²+4) is:",
+      "choices": ["A. sin(2t)u(t)", "B. cos(2t)u(t)", "C. e^(−2t)u(t)", "D. 2cos(2t)u(t)"],
+      "correct_answer": "B",
+      "explanation": "L⁻¹{s/(s²+ω₀²)} = cos(ω₀t)u(t). With ω₀=2: cos(2t)u(t).",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Using final value theorem, find the steady-state value of y(t) if Y(s) = 5/[s(s+5)].",
+      "choices": null, "correct_answer": "1", "unit": "", "tolerance": 0.01,
+      "explanation": "FVT: lim_{s→0} s·Y(s) = lim_{s→0} s·5/[s(s+5)] = 5/5 = 1",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of sin(ω0 t)u(t) is:",
+      "choices": [
+        "A. s/(s^2+ω0^2)",
+        "B. ω0/(s^2+ω0^2)",
+        "C. 1/(s+ω0)",
+        "D. ω0/(s+ω0)"
+      ],
+      "correct_answer": "B",
+      "explanation": "Standard pair: L{sin(ω0 t)u(t)} = ω0/(s^2 + ω0^2).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    }
+  ]
+}

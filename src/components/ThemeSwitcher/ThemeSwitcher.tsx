@@ -38,6 +38,7 @@ export function ThemeSwitcher() {
         const isActive = theme === opt.value || (opt.value === 'indigo' && (theme === 'dark' || theme === 'system'));
         return (
           <button
+            type="button"
             key={opt.value}
             onClick={() => handleThemeChange(opt.value)}
             title={opt.label}

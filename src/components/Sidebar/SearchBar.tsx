@@ -53,17 +53,35 @@ export function SearchBar() {
     <div className="relative">
       {/* Input container */}
       <div
-        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+        className="flex items-center gap-2 px-2.5 py-2 rounded-md transition-all"
         style={{
-          backgroundColor: 'var(--bg-input)',
-          border: '1px solid var(--border)',
-          transition: 'all 0.15s',
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.04)',
+          border: '1px solid var(--glass-border)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+          transition: 'all 0.2s',
           cursor: 'text',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background =
+            'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%), rgba(255,255,255,0.06)';
+          e.currentTarget.style.borderColor = 'rgba(163,116,247,0.35)';
+          e.currentTarget.style.boxShadow = '0 0 0 4px rgba(163,116,247,0.08)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background =
+            'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.04)';
+          e.currentTarget.style.borderColor = 'var(--glass-border)';
+          e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.04)';
         }}
       >
         <Search size={14} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
         <input
           ref={inputRef}
+          id="sidebar-search-input"
+          name="sidebarSearch"
           type="text"
           value={query}
           onChange={(e) => {
@@ -73,7 +91,7 @@ export function SearchBar() {
           onKeyDown={handleKeyDown}
           placeholder="Search notes..."
           className="flex-1 bg-transparent text-sm outline-none"
-          style={{ color: 'var(--text-primary)' }}
+          style={{ color: 'var(--text-primary)', border: 'none', boxShadow: 'none' }}
         />
         {query && (
           <button
@@ -96,9 +114,12 @@ export function SearchBar() {
         <div
           className="absolute left-3 right-3 mt-1 rounded-md max-h-72 overflow-y-auto z-40"
           style={{
-            backgroundColor: 'var(--bg-secondary)',
-            border: '1px solid var(--border)',
-            boxShadow: 'var(--shadow-md)',
+            backgroundColor: 'rgba(14,11,26,0.88)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid var(--glass-border)',
+            boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+            padding: '4px',
           }}
         >
           {isSearching ? (
@@ -119,7 +140,8 @@ export function SearchBar() {
                   onClick={() => handleOpenResult(result.id, result.path)}
                   className="flex flex-col w-full px-3 py-2 text-left transition-colors"
                   style={{
-                    backgroundColor: i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
+                    background: i === selectedIndex ? 'linear-gradient(135deg, rgba(163,116,247,0.14), rgba(249,118,85,0.06))' : 'transparent',
+                    borderRadius: '10px',
                   }}
                   onMouseEnter={() => setSelectedIndex(i)}
                 >

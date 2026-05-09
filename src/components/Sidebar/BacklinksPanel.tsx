@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronRight, Link2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { Backlink } from '../../types/editor';
@@ -28,7 +29,7 @@ export function BacklinksPanel() {
         setBacklinks(results);
       })
       .catch((error) => {
-        console.error('Failed to load backlinks:', error);
+        reportError({ context: 'Backlinks load', message: 'Failed to load backlinks', error });
         if (cancelled) return;
         setBacklinks([]);
       })

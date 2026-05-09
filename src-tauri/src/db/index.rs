@@ -70,9 +70,8 @@ pub fn reindex_vault(conn: &Connection, vault_path: &str) -> Result<usize, Strin
     let base = Path::new(vault_path);
     let mut count: usize = 0;
 
-    // First pass: insert all notes so target lookups during link extraction
-    // can resolve forward references.
-    let mut staged: Vec<(String, String)> = Vec::new(); // (path, content)
+    // First pass: insert all notes WITHOUT holding all content in memory.
+    // Process each file immediately to keep memory usage constant.
     for entry in WalkDir::new(base)
         .into_iter()
         .filter_map(|e| e.ok())
@@ -106,19 +105,19 @@ pub fn reindex_vault(conn: &Connection, vault_path: &str) -> Result<usize, Strin
             params![id, &rel_path, title, &content, tags, &now, &now],
         )
         .map_err(|e| format!("Failed to index note: {e}"))?;
-        staged.push((rel_path, content));
-        count += 1;
-    }
 
-    // Second pass: extract backlinks now that every note id is known.
-    for (path, content) in &staged {
+        // Immediately extract backlinks while content is still in memory.
+        // This keeps memory usage constant (one note at a time) instead of
+        // accumulating all note content in a Vec.
         if let Ok(sid) = conn.query_row(
             "SELECT id FROM notes WHERE path = ?1 LIMIT 1",
-            params![path],
+            params![&rel_path],
             |row| row.get::<_, String>(0),
         ) {
-            let _ = super::backlinks::reindex_note_links(conn, &sid, content);
+            let _ = super::backlinks::reindex_note_links(conn, &sid, &content);
         }
+
+        count += 1;
     }
 
     Ok(count)

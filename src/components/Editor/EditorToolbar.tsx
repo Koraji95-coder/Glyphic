@@ -18,6 +18,7 @@ import {
 import { useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLectureMode } from '../../hooks/useLectureMode';
+import { reportError } from '../../lib/errorReporter';
 import { exportNoteToPdf, suggestPdfFileName } from '../../lib/export/pdfExport';
 import { commands } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
@@ -64,7 +65,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       setExportStatus('Exported');
       setTimeout(() => setExportStatus(null), 2000);
     } catch (e) {
-      console.error('Markdown export failed:', e);
+      reportError({ context: 'Markdown export', message: 'Export failed', error: e });
       setExportStatus(`Export failed: ${e}`);
       setTimeout(() => setExportStatus(null), 4000);
     }
@@ -84,7 +85,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         suggestedFileName: suggestPdfFileName(activeNotePath),
       });
     } catch (e) {
-      console.error('PDF export failed:', e);
+      reportError({ context: 'PDF export', message: 'Export failed', error: e });
       setExportStatus(`PDF export failed: ${e}`);
       setTimeout(() => setExportStatus(null), 4000);
     }
@@ -171,83 +172,104 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       className="flex items-center shrink-0"
       style={{
         height: isMobile ? '52px' : 'var(--toolbar-height)',
-        backgroundColor: 'var(--bg-editor)',
-        borderBottom: '1px solid var(--border)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%), var(--glass-surface)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        borderBottom: '1px solid var(--glass-border)',
+        boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
         paddingLeft: '12px',
         paddingRight: '12px',
         gap: '5px',
-        overflowX: 'auto',
-        overscrollBehavior: 'contain',
+        overflow: 'hidden',
       }}
     >
-      {/* Button groups — pill-style groups */}
-      {groups.map((group) => (
-        <div
-          key={`group-${group[0]?.label}`}
-          className="flex items-center shrink-0"
-          style={{
-            gap: '1px',
-            padding: '2px',
-            borderRadius: '8px',
-            backgroundColor: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
-          }}
-        >
-          {group.map((btn) => {
-            const active = btn.isActive?.() ?? false;
-            const Icon = btn.icon;
-            return (
-              <button
-                key={btn.label}
-                onClick={btn.action}
-                title={btn.label}
-                className="rounded transition-colors text-xs font-medium"
-                style={{
-                  backgroundColor: active ? 'var(--accent-dim)' : 'transparent',
-                  color: active ? 'var(--accent)' : 'var(--text-secondary)',
-                  width: isMobile ? '44px' : '28px',
-                  height: isMobile ? '44px' : '28px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0',
-                  flexShrink: 0,
-                  borderRadius: '6px',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = active ? 'var(--accent-dim)' : 'transparent';
-                }}
-              >
-                <Icon size={iconSize} />
-              </button>
-            );
-          })}
-        </div>
-      ))}
+      <div
+        className="flex items-center flex-1 min-w-0"
+        style={{
+          gap: '5px',
+          overflowX: 'auto',
+          overscrollBehavior: 'contain',
+          paddingBottom: '1px',
+        }}
+      >
+        {/* Button groups — pill-style groups */}
+        {groups.map((group) => (
+          <div
+            key={`group-${group[0]?.label}`}
+            className="flex items-center shrink-0"
+            style={{
+              gap: '1px',
+              padding: '2px',
+              borderRadius: '10px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--glass-border)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            }}
+          >
+            {group.map((btn) => {
+              const active = btn.isActive?.() ?? false;
+              const Icon = btn.icon;
+              return (
+                <button
+                  type="button"
+                  key={btn.label}
+                  onClick={btn.action}
+                  title={btn.label}
+                  className="rounded transition-colors text-xs font-medium"
+                  style={{
+                    background: active
+                      ? 'linear-gradient(135deg, rgba(163,116,247,0.2), rgba(249,118,85,0.08))'
+                      : 'transparent',
+                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    width: isMobile ? '44px' : '28px',
+                    height: isMobile ? '44px' : '28px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0',
+                    flexShrink: 0,
+                    borderRadius: '6px',
+                    border: 'none',
+                    boxShadow: active ? '0 8px 20px rgba(163,116,247,0.14)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = active ? 'var(--accent-dim)' : 'transparent';
+                  }}
+                >
+                  <Icon size={iconSize} />
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
 
-      {/* Spacer */}
-      <div className="flex-1 shrink-0" style={{ minWidth: '8px' }} />
+      <div className="flex items-center shrink-0" style={{ gap: '5px', paddingLeft: '8px' }}>
 
       {/* Draw / Ink mode toggle — hero button style */}
       <button
+        type="button"
         onClick={toggleInkMode}
         title="Draw Mode"
         className="flex items-center shrink-0 transition-colors"
         style={{
           gap: '5px',
           padding: '5px 10px',
-          borderRadius: '8px',
+          borderRadius: '999px',
           fontSize: '11px',
           fontWeight: 600,
           cursor: 'pointer',
-          border: '1px solid rgba(91, 141, 240, 0.12)',
-          backgroundColor: isInkMode ? 'rgba(91, 141, 240, 0.18)' : 'var(--blue-dim)',
+          border: '1px solid rgba(96,165,250,0.18)',
+          background: isInkMode
+            ? 'linear-gradient(135deg, rgba(96,165,250,0.24), rgba(163,116,247,0.12))'
+            : 'rgba(96,165,250,0.12)',
           color: 'var(--blue)',
+          boxShadow: isInkMode ? '0 12px 26px rgba(96,165,250,0.16)' : 'none',
           minHeight: btnSize,
         }}
         onMouseEnter={(e) => {
@@ -265,19 +287,23 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       {/* Lecture mode toggle — hero button style */}
       <button
+        type="button"
         onClick={toggleLectureMode}
         title="Lecture Mode"
         className="flex items-center shrink-0 transition-colors"
         style={{
           gap: '5px',
           padding: '5px 10px',
-          borderRadius: '8px',
+          borderRadius: '999px',
           fontSize: '11px',
           fontWeight: 600,
           cursor: 'pointer',
-          backgroundColor: lectureModeActive ? 'var(--green-dim)' : 'var(--green-dim)',
+          background: lectureModeActive
+            ? 'linear-gradient(135deg, rgba(52,211,153,0.22), rgba(45,212,191,0.12))'
+            : 'rgba(52,211,153,0.12)',
           color: 'var(--green)',
           border: '1px solid rgba(94, 196, 158, 0.15)',
+          boxShadow: lectureModeActive ? '0 12px 26px rgba(52,211,153,0.16)' : 'none',
           minHeight: btnSize,
         }}
       >
@@ -306,12 +332,12 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           style={{
             gap: '5px',
             padding: '5px 10px',
-            borderRadius: '8px',
+            borderRadius: '999px',
             fontSize: '11px',
             fontWeight: 600,
             cursor: 'pointer',
             border: '1px solid var(--border-subtle)',
-            backgroundColor: exportMenuOpen ? 'var(--bg-hover)' : 'transparent',
+            background: exportMenuOpen ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
             color: 'var(--text-secondary)',
             minHeight: btnSize,
           }}
@@ -342,10 +368,12 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 right: 0,
                 minWidth: '180px',
                 padding: '4px',
-                borderRadius: '8px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                boxShadow: '0 8px 20px rgba(0,0,0,0.25)',
+                borderRadius: '12px',
+                background: 'rgba(14,11,26,0.88)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid var(--glass-border)',
+                boxShadow: '0 18px 36px rgba(0,0,0,0.35)',
                 zIndex: 50,
               }}
             >
@@ -421,19 +449,25 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       {/* Capture button — gradient hero */}
       <button
-        onClick={() => commands.startCapture().catch(() => {})}
+        type="button"
+        onClick={() =>
+          commands.startCapture().catch((e) => {
+            reportError({ context: 'Capture', message: 'Failed to start capture', error: e });
+          })
+        }
         title="Capture screenshot (⌘⇧S)"
         className="flex items-center shrink-0 transition-colors"
         style={{
           gap: '5px',
           padding: '5px 10px',
-          borderRadius: '8px',
+          borderRadius: '999px',
           fontSize: '11px',
           fontWeight: 600,
           cursor: 'pointer',
           border: 'none',
           background: 'var(--accent-gradient)',
           color: '#fff',
+          boxShadow: '0 14px 32px rgba(249,118,85,0.26)',
           minHeight: btnSize,
         }}
         onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
@@ -443,6 +477,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         Capture
         {!isMobile && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', opacity: 0.6 }}>⌘⇧S</span>}
       </button>
+      </div>
     </div>
   );
 }

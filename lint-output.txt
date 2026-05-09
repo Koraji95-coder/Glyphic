@@ -1,0 +1,1483 @@
+
+> glyphic@1.0.0 lint
+> biome check .
+
+biome.json:2:14 deserialize ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  i The configuration schema version does not match the CLI version 2.4.14
+  
+    1 Γöé {
+  > 2 Γöé   "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+      Γöé              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 Γöé   "vcs": {
+    4 Γöé     "enabled": true,
+  
+  i   Expected:                     2.4.14
+      Found:                        2.4.12
+  
+  
+  i Run the command biome migrate to migrate the configuration file.
+  
+
+vitest.config.ts:3:18 lint/style/useNodejsImportProtocol  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  i A Node.js builtin module should be imported with the node: protocol.
+  
+    1 Γöé /// <reference types="vitest" />
+    2 Γöé import react from '@vitejs/plugin-react';
+  > 3 Γöé import path from 'path';
+      Γöé                  ^^^^^^
+    4 Γöé import { defineConfig } from 'vitest/config';
+    5 Γöé 
+  
+  i Using the node: protocol is more explicit and signals that the imported module belongs to Node.js.
+  
+  i Unsafe fix: Add the node: protocol.
+  
+     1  1 Γöé   /// <reference types="vitest" />ΓÉì
+     2  2 Γöé   import react from '@vitejs/plugin-react';ΓÉì
+     3    Γöé - import┬╖path┬╖from┬╖'path';ΓÉì
+        3 Γöé + import┬╖path┬╖from┬╖'node:path';ΓÉì
+     4  4 Γöé   import { defineConfig } from 'vitest/config';ΓÉì
+     5  5 Γöé   ΓÉì
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:51:9 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    49 Γöé       {/* Tool buttons */}
+    50 Γöé       {TOOLS.map(({ type, icon: Icon, label }) => (
+  > 51 Γöé         <button
+       Γöé         ^^^^^^^
+  > 52 Γöé           key={type}
+        ...
+  > 59 Γöé           }}
+  > 60 Γöé         >
+       Γöé         ^
+    61 Γöé           <Icon size={18} />
+    62 Γöé         </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:71:11 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    69 Γöé       <div className="flex items-center gap-1">
+    70 Γöé         {COLORS.map((c) => (
+  > 71 Γöé           <button
+       Γöé           ^^^^^^^
+  > 72 Γöé             key={c}
+        ...
+  > 79 Γöé             }}
+  > 80 Γöé           />
+       Γöé           ^^
+    81 Γöé         ))}
+    82 Γöé       </div>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:105:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    104 Γöé       {/* Undo/Redo */}
+  > 105 Γöé       <button
+        Γöé       ^^^^^^^
+  > 106 Γöé         onClick={onUndo}
+         ...
+  > 110 Γöé         style={{ color: 'var(--text-secondary)' }}
+  > 111 Γöé       >
+        Γöé       ^
+    112 Γöé         <Undo2 size={18} />
+    113 Γöé       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:114:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    112 Γöé         <Undo2 size={18} />
+    113 Γöé       </button>
+  > 114 Γöé       <button
+        Γöé       ^^^^^^^
+  > 115 Γöé         onClick={onRedo}
+         ...
+  > 119 Γöé         style={{ color: 'var(--text-secondary)' }}
+  > 120 Γöé       >
+        Γöé       ^
+    121 Γöé         <Redo2 size={18} />
+    122 Γöé       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:128:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    127 Γöé       {/* Save & Discard */}
+  > 128 Γöé       <button
+        Γöé       ^^^^^^^
+  > 129 Γöé         onClick={onSave}
+         ...
+  > 135 Γöé         }}
+  > 136 Γöé       >
+        Γöé       ^
+    137 Γöé         <Save size={14} />
+    138 Γöé         Save
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:140:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    138 Γöé         Save
+    139 Γöé       </button>
+  > 140 Γöé       <button
+        Γöé       ^^^^^^^
+  > 141 Γöé         onClick={onDiscard}
+  > 142 Γöé         title="Discard changes (Esc)"
+  > 143 Γöé         className="p-1.5 rounded transition-colors"
+  > 144 Γöé         style={{ color: 'var(--text-secondary)' }}
+  > 145 Γöé       >
+        Γöé       ^
+    146 Γöé         <X size={18} />
+    147 Γöé       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Editor\SlashCommand\SlashCommandMenu.tsx:14:3 lint/correctness/useExhaustiveDependencies  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This hook specifies more dependencies than necessary: items.
+  
+    13 Γöé   // Reset selection when items change
+  > 14 Γöé   useEffect(() => {
+       Γöé   ^^^^^^^^^
+    15 Γöé     setSelectedIndex(0);
+    16 Γöé   }, [items]);
+  
+  i Outer scope values aren't valid dependencies because mutating them doesn't re-render the component.
+  
+    14 Γöé   useEffect(() => {
+    15 Γöé     setSelectedIndex(0);
+  > 16 Γöé   }, [items]);
+       Γöé       ^^^^^
+    17 Γöé 
+    18 Γöé   // Scroll selected item into view
+  
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Specifying more dependencies than required can lead to unnecessary re-rendering
+    and degraded performance.
+  
+  i Unsafe fix: Remove the extra dependencies from the list.
+  
+    16 Γöé ┬╖┬╖},┬╖[items]);ΓÉì
+       Γöé       -----   
+
+src\components\Editor\SlashCommand\SlashCommandMenu.tsx:71:9 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    69 Γöé     >
+    70 Γöé       {items.map((item, index) => (
+  > 71 Γöé         <button
+       Γöé         ^^^^^^^
+  > 72 Γöé           key={item.title}
+        ...
+  > 79 Γöé           onMouseEnter={() => setSelectedIndex(index)}
+  > 80 Γöé         >
+       Γöé         ^
+    81 Γöé           <span
+    82 Γöé             className="w-8 h-8 flex items-center justify-center rounded text-sm font-medium shrink-0"
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+biome.json format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     1    Γöé - {ΓÉì
+     2    Γöé - ┬╖┬╖"$schema":┬╖"https://biomejs.dev/schemas/2.4.12/schema.json",ΓÉì
+     3    Γöé - ┬╖┬╖"vcs":┬╖{ΓÉì
+     4    Γöé - ┬╖┬╖┬╖┬╖"enabled":┬╖true,ΓÉì
+     5    Γöé - ┬╖┬╖┬╖┬╖"clientKind":┬╖"git",ΓÉì
+     6    Γöé - ┬╖┬╖┬╖┬╖"useIgnoreFile":┬╖trueΓÉì
+     7    Γöé - ┬╖┬╖},ΓÉì
+     8    Γöé - ┬╖┬╖"files":┬╖{ΓÉì
+     9    Γöé - ┬╖┬╖┬╖┬╖"ignoreUnknown":┬╖true,ΓÉì
+    10    Γöé - ┬╖┬╖┬╖┬╖"includes":┬╖["src/**",┬╖"*.ts",┬╖"*.tsx",┬╖"*.json"]ΓÉì
+    11    Γöé - ┬╖┬╖},ΓÉì
+    12    Γöé - ┬╖┬╖"formatter":┬╖{ΓÉì
+    13    Γöé - ┬╖┬╖┬╖┬╖"enabled":┬╖true,ΓÉì
+    14    Γöé - ┬╖┬╖┬╖┬╖"indentStyle":┬╖"space",ΓÉì
+    15    Γöé - ┬╖┬╖┬╖┬╖"indentWidth":┬╖2,ΓÉì
+    16    Γöé - ┬╖┬╖┬╖┬╖"lineWidth":┬╖120ΓÉì
+    17    Γöé - ┬╖┬╖},ΓÉì
+    18    Γöé - ┬╖┬╖"linter":┬╖{ΓÉì
+    19    Γöé - ┬╖┬╖┬╖┬╖"enabled":┬╖true,ΓÉì
+    20    Γöé - ┬╖┬╖┬╖┬╖"rules":┬╖{ΓÉì
+    21    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"recommended":┬╖true,ΓÉì
+    22    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"correctness":┬╖{ΓÉì
+    23    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"useExhaustiveDependencies":┬╖"warn",ΓÉì
+    24    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noUnusedVariables":┬╖"warn",ΓÉì
+    25    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noUnusedImports":┬╖"warn"ΓÉì
+    26    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖},ΓÉì
+    27    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"suspicious":┬╖{ΓÉì
+    28    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noExplicitAny":┬╖"warn"ΓÉì
+    29    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖},ΓÉì
+    30    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"style":┬╖{ΓÉì
+    31    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noNonNullAssertion":┬╖"warn",ΓÉì
+    32    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noDescendingSpecificity":┬╖"off"ΓÉì
+    33    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖},ΓÉì
+    34    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"a11y":┬╖{ΓÉì
+    35    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"useButtonType":┬╖"warn",ΓÉì
+    36    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noStaticElementInteractions":┬╖"off",ΓÉì
+    37    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"useKeyWithClickEvents":┬╖"off"ΓÉì
+    38    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+    39    Γöé - ┬╖┬╖┬╖┬╖}ΓÉì
+    40    Γöé - ┬╖┬╖},ΓÉì
+    41    Γöé - ┬╖┬╖"javascript":┬╖{ΓÉì
+    42    Γöé - ┬╖┬╖┬╖┬╖"formatter":┬╖{ΓÉì
+    43    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"quoteStyle":┬╖"single",ΓÉì
+    44    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"trailingCommas":┬╖"all"ΓÉì
+    45    Γöé - ┬╖┬╖┬╖┬╖}ΓÉì
+    46    Γöé - ┬╖┬╖},ΓÉì
+    47    Γöé - ┬╖┬╖"assist":┬╖{ΓÉì
+    48    Γöé - ┬╖┬╖┬╖┬╖"enabled":┬╖true,ΓÉì
+    49    Γöé - ┬╖┬╖┬╖┬╖"actions":┬╖{ΓÉì
+    50    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"source":┬╖{ΓÉì
+    51    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"organizeImports":┬╖"on"ΓÉì
+    52    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+    53    Γöé - ┬╖┬╖┬╖┬╖}ΓÉì
+    54    Γöé - ┬╖┬╖}ΓÉì
+    55    Γöé - }ΓÉì
+        1 Γöé + {
+        2 Γöé + ┬╖┬╖"$schema":┬╖"https://biomejs.dev/schemas/2.4.12/schema.json",
+        3 Γöé + ┬╖┬╖"vcs":┬╖{
+        4 Γöé + ┬╖┬╖┬╖┬╖"enabled":┬╖true,
+        5 Γöé + ┬╖┬╖┬╖┬╖"clientKind":┬╖"git",
+        6 Γöé + ┬╖┬╖┬╖┬╖"useIgnoreFile":┬╖true
+        7 Γöé + ┬╖┬╖},
+        8 Γöé + ┬╖┬╖"files":┬╖{
+        9 Γöé + ┬╖┬╖┬╖┬╖"ignoreUnknown":┬╖true,
+       10 Γöé + ┬╖┬╖┬╖┬╖"includes":┬╖["src/**",┬╖"*.ts",┬╖"*.tsx",┬╖"*.json"]
+       11 Γöé + ┬╖┬╖},
+       12 Γöé + ┬╖┬╖"formatter":┬╖{
+       13 Γöé + ┬╖┬╖┬╖┬╖"enabled":┬╖true,
+       14 Γöé + ┬╖┬╖┬╖┬╖"indentStyle":┬╖"space",
+       15 Γöé + ┬╖┬╖┬╖┬╖"indentWidth":┬╖2,
+       16 Γöé + ┬╖┬╖┬╖┬╖"lineWidth":┬╖120
+       17 Γöé + ┬╖┬╖},
+       18 Γöé + ┬╖┬╖"linter":┬╖{
+       19 Γöé + ┬╖┬╖┬╖┬╖"enabled":┬╖true,
+       20 Γöé + ┬╖┬╖┬╖┬╖"rules":┬╖{
+       21 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"recommended":┬╖true,
+       22 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"correctness":┬╖{
+       23 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"useExhaustiveDependencies":┬╖"warn",
+       24 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noUnusedVariables":┬╖"warn",
+       25 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noUnusedImports":┬╖"warn"
+       26 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖},
+       27 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"suspicious":┬╖{
+       28 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noExplicitAny":┬╖"warn"
+       29 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖},
+       30 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"style":┬╖{
+       31 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noNonNullAssertion":┬╖"warn",
+       32 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noDescendingSpecificity":┬╖"off"
+       33 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖},
+       34 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"a11y":┬╖{
+       35 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"useButtonType":┬╖"warn",
+       36 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"noStaticElementInteractions":┬╖"off",
+       37 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"useKeyWithClickEvents":┬╖"off"
+       38 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}
+       39 Γöé + ┬╖┬╖┬╖┬╖}
+       40 Γöé + ┬╖┬╖},
+       41 Γöé + ┬╖┬╖"javascript":┬╖{
+       42 Γöé + ┬╖┬╖┬╖┬╖"formatter":┬╖{
+       43 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"quoteStyle":┬╖"single",
+       44 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"trailingCommas":┬╖"all"
+       45 Γöé + ┬╖┬╖┬╖┬╖}
+       46 Γöé + ┬╖┬╖},
+       47 Γöé + ┬╖┬╖"assist":┬╖{
+       48 Γöé + ┬╖┬╖┬╖┬╖"enabled":┬╖true,
+       49 Γöé + ┬╖┬╖┬╖┬╖"actions":┬╖{
+       50 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"source":┬╖{
+       51 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖"organizeImports":┬╖"on"
+       52 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}
+       53 Γöé + ┬╖┬╖┬╖┬╖}
+       54 Γöé + ┬╖┬╖}
+       55 Γöé + }
+    56 56 Γöé   
+  
+
+package.json format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     1    Γöé - {ΓÉì
+     2    Γöé - ┬╖┬╖"name":┬╖"glyphic",ΓÉì
+     3    Γöé - ┬╖┬╖"private":┬╖true,ΓÉì
+     4    Γöé - ┬╖┬╖"version":┬╖"1.0.0",ΓÉì
+     5    Γöé - ┬╖┬╖"type":┬╖"module",ΓÉì
+     6    Γöé - ┬╖┬╖"scripts":┬╖{ΓÉì
+     7    Γöé - ┬╖┬╖┬╖┬╖"dev":┬╖"vite",ΓÉì
+     8    Γöé - ┬╖┬╖┬╖┬╖"build":┬╖"tsc┬╖&&┬╖vite┬╖build",ΓÉì
+     9    Γöé - ┬╖┬╖┬╖┬╖"preview":┬╖"vite┬╖preview",ΓÉì
+    10    Γöé - ┬╖┬╖┬╖┬╖"tauri":┬╖"tauri",ΓÉì
+    11    Γöé - ┬╖┬╖┬╖┬╖"desktop":┬╖"tauri┬╖dev",ΓÉì
+    12    Γöé - ┬╖┬╖┬╖┬╖"lint":┬╖"biome┬╖check┬╖.",ΓÉì
+    13    Γöé - ┬╖┬╖┬╖┬╖"lint:fix":┬╖"biome┬╖check┬╖--write┬╖.",ΓÉì
+    14    Γöé - ┬╖┬╖┬╖┬╖"test":┬╖"vitest┬╖run",ΓÉì
+    15    Γöé - ┬╖┬╖┬╖┬╖"test:watch":┬╖"vitest",ΓÉì
+    16    Γöé - ┬╖┬╖┬╖┬╖"test:ui":┬╖"vitest┬╖--ui"ΓÉì
+    17    Γöé - ┬╖┬╖},ΓÉì
+    18    Γöé - ┬╖┬╖"dependencies":┬╖{ΓÉì
+    19    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/api":┬╖"2.10.1",ΓÉì
+    20    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-clipboard-manager":┬╖"^2",ΓÉì
+    21    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-dialog":┬╖"^2",ΓÉì
+    22    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-fs":┬╖"^2",ΓÉì
+    23    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-global-shortcut":┬╖"^2",ΓÉì
+    24    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-shell":┬╖"^2",ΓÉì
+    25    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-code-block-lowlight":┬╖"^2",ΓÉì
+    26    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-highlight":┬╖"^2",ΓÉì
+    27    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-image":┬╖"^2",ΓÉì
+    28    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-link":┬╖"^2",ΓÉì
+    29    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-mathematics":┬╖"^2.27.2",ΓÉì
+    30    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-placeholder":┬╖"^2",ΓÉì
+    31    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-task-item":┬╖"^2",ΓÉì
+    32    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/extension-task-list":┬╖"^2",ΓÉì
+    33    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/pm":┬╖"^2",ΓÉì
+    34    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/react":┬╖"^2",ΓÉì
+    35    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/starter-kit":┬╖"^2",ΓÉì
+    36    Γöé - ┬╖┬╖┬╖┬╖"@tiptap/suggestion":┬╖"^2.27.2",ΓÉì
+    37    Γöé - ┬╖┬╖┬╖┬╖"@types/recharts":┬╖"^1.8.29",ΓÉì
+    38    Γöé - ┬╖┬╖┬╖┬╖"date-fns":┬╖"^3",ΓÉì
+    39    Γöé - ┬╖┬╖┬╖┬╖"dompurify":┬╖"^3.4.1",ΓÉì
+    40    Γöé - ┬╖┬╖┬╖┬╖"fabric":┬╖"^7.2.0",ΓÉì
+    41    Γöé - ┬╖┬╖┬╖┬╖"fuse.js":┬╖"^7",ΓÉì
+    42    Γöé - ┬╖┬╖┬╖┬╖"katex":┬╖"^0.16.45",ΓÉì
+    43    Γöé - ┬╖┬╖┬╖┬╖"lowlight":┬╖"^3",ΓÉì
+    44    Γöé - ┬╖┬╖┬╖┬╖"lucide-react":┬╖"^0.460.0",ΓÉì
+    45    Γöé - ┬╖┬╖┬╖┬╖"mermaid":┬╖"^11.14.0",ΓÉì
+    46    Γöé - ┬╖┬╖┬╖┬╖"react":┬╖"^19",ΓÉì
+    47    Γöé - ┬╖┬╖┬╖┬╖"react-dom":┬╖"^19",ΓÉì
+    48    Γöé - ┬╖┬╖┬╖┬╖"react-router-dom":┬╖"^6",ΓÉì
+    49    Γöé - ┬╖┬╖┬╖┬╖"recharts":┬╖"^3.8.1",ΓÉì
+    50    Γöé - ┬╖┬╖┬╖┬╖"zustand":┬╖"^4"ΓÉì
+    51    Γöé - ┬╖┬╖},ΓÉì
+    52    Γöé - ┬╖┬╖"devDependencies":┬╖{ΓÉì
+    53    Γöé - ┬╖┬╖┬╖┬╖"@biomejs/biome":┬╖"^2",ΓÉì
+    54    Γöé - ┬╖┬╖┬╖┬╖"@tauri-apps/cli":┬╖"2.10.0",ΓÉì
+    55    Γöé - ┬╖┬╖┬╖┬╖"@testing-library/jest-dom":┬╖"^6.9.1",ΓÉì
+    56    Γöé - ┬╖┬╖┬╖┬╖"@testing-library/react":┬╖"^16.3.2",ΓÉì
+    57    Γöé - ┬╖┬╖┬╖┬╖"@types/dompurify":┬╖"^3.0.5",ΓÉì
+    58    Γöé - ┬╖┬╖┬╖┬╖"@types/react":┬╖"^19",ΓÉì
+    59    Γöé - ┬╖┬╖┬╖┬╖"@types/react-dom":┬╖"^19",ΓÉì
+    60    Γöé - ┬╖┬╖┬╖┬╖"@vitejs/plugin-react":┬╖"^6",ΓÉì
+    61    Γöé - ┬╖┬╖┬╖┬╖"@vitest/ui":┬╖"^4.1.4",ΓÉì
+    62    Γöé - ┬╖┬╖┬╖┬╖"jsdom":┬╖"^29.0.2",ΓÉì
+    63    Γöé - ┬╖┬╖┬╖┬╖"typescript":┬╖"^5",ΓÉì
+    64    Γöé - ┬╖┬╖┬╖┬╖"vite":┬╖"^8",ΓÉì
+    65    Γöé - ┬╖┬╖┬╖┬╖"vitest":┬╖"^4.1.4"ΓÉì
+    66    Γöé - ┬╖┬╖}ΓÉì
+    67    Γöé - }ΓÉì
+        1 Γöé + {
+        2 Γöé + ┬╖┬╖"name":┬╖"glyphic",
+        3 Γöé + ┬╖┬╖"private":┬╖true,
+        4 Γöé + ┬╖┬╖"version":┬╖"1.0.0",
+        5 Γöé + ┬╖┬╖"type":┬╖"module",
+        6 Γöé + ┬╖┬╖"scripts":┬╖{
+        7 Γöé + ┬╖┬╖┬╖┬╖"dev":┬╖"vite",
+        8 Γöé + ┬╖┬╖┬╖┬╖"build":┬╖"tsc┬╖&&┬╖vite┬╖build",
+        9 Γöé + ┬╖┬╖┬╖┬╖"preview":┬╖"vite┬╖preview",
+       10 Γöé + ┬╖┬╖┬╖┬╖"tauri":┬╖"tauri",
+       11 Γöé + ┬╖┬╖┬╖┬╖"desktop":┬╖"tauri┬╖dev",
+       12 Γöé + ┬╖┬╖┬╖┬╖"lint":┬╖"biome┬╖check┬╖.",
+       13 Γöé + ┬╖┬╖┬╖┬╖"lint:fix":┬╖"biome┬╖check┬╖--write┬╖.",
+       14 Γöé + ┬╖┬╖┬╖┬╖"test":┬╖"vitest┬╖run",
+       15 Γöé + ┬╖┬╖┬╖┬╖"test:watch":┬╖"vitest",
+       16 Γöé + ┬╖┬╖┬╖┬╖"test:ui":┬╖"vitest┬╖--ui"
+       17 Γöé + ┬╖┬╖},
+       18 Γöé + ┬╖┬╖"dependencies":┬╖{
+       19 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/api":┬╖"2.10.1",
+       20 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-clipboard-manager":┬╖"^2",
+       21 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-dialog":┬╖"^2",
+       22 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-fs":┬╖"^2",
+       23 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-global-shortcut":┬╖"^2",
+       24 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/plugin-shell":┬╖"^2",
+       25 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-code-block-lowlight":┬╖"^2",
+       26 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-highlight":┬╖"^2",
+       27 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-image":┬╖"^2",
+       28 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-link":┬╖"^2",
+       29 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-mathematics":┬╖"^2.27.2",
+       30 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-placeholder":┬╖"^2",
+       31 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-task-item":┬╖"^2",
+       32 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/extension-task-list":┬╖"^2",
+       33 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/pm":┬╖"^2",
+       34 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/react":┬╖"^2",
+       35 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/starter-kit":┬╖"^2",
+       36 Γöé + ┬╖┬╖┬╖┬╖"@tiptap/suggestion":┬╖"^2.27.2",
+       37 Γöé + ┬╖┬╖┬╖┬╖"@types/recharts":┬╖"^1.8.29",
+       38 Γöé + ┬╖┬╖┬╖┬╖"date-fns":┬╖"^3",
+       39 Γöé + ┬╖┬╖┬╖┬╖"dompurify":┬╖"^3.4.1",
+       40 Γöé + ┬╖┬╖┬╖┬╖"fabric":┬╖"^7.2.0",
+       41 Γöé + ┬╖┬╖┬╖┬╖"fuse.js":┬╖"^7",
+       42 Γöé + ┬╖┬╖┬╖┬╖"katex":┬╖"^0.16.45",
+       43 Γöé + ┬╖┬╖┬╖┬╖"lowlight":┬╖"^3",
+       44 Γöé + ┬╖┬╖┬╖┬╖"lucide-react":┬╖"^0.460.0",
+       45 Γöé + ┬╖┬╖┬╖┬╖"mermaid":┬╖"^11.14.0",
+       46 Γöé + ┬╖┬╖┬╖┬╖"react":┬╖"^19",
+       47 Γöé + ┬╖┬╖┬╖┬╖"react-dom":┬╖"^19",
+       48 Γöé + ┬╖┬╖┬╖┬╖"react-router-dom":┬╖"^6",
+       49 Γöé + ┬╖┬╖┬╖┬╖"recharts":┬╖"^3.8.1",
+       50 Γöé + ┬╖┬╖┬╖┬╖"zustand":┬╖"^4"
+       51 Γöé + ┬╖┬╖},
+       52 Γöé + ┬╖┬╖"devDependencies":┬╖{
+       53 Γöé + ┬╖┬╖┬╖┬╖"@biomejs/biome":┬╖"^2",
+       54 Γöé + ┬╖┬╖┬╖┬╖"@tauri-apps/cli":┬╖"2.10.0",
+       55 Γöé + ┬╖┬╖┬╖┬╖"@testing-library/jest-dom":┬╖"^6.9.1",
+       56 Γöé + ┬╖┬╖┬╖┬╖"@testing-library/react":┬╖"^16.3.2",
+       57 Γöé + ┬╖┬╖┬╖┬╖"@types/dompurify":┬╖"^3.0.5",
+       58 Γöé + ┬╖┬╖┬╖┬╖"@types/react":┬╖"^19",
+       59 Γöé + ┬╖┬╖┬╖┬╖"@types/react-dom":┬╖"^19",
+       60 Γöé + ┬╖┬╖┬╖┬╖"@vitejs/plugin-react":┬╖"^6",
+       61 Γöé + ┬╖┬╖┬╖┬╖"@vitest/ui":┬╖"^4.1.4",
+       62 Γöé + ┬╖┬╖┬╖┬╖"jsdom":┬╖"^29.0.2",
+       63 Γöé + ┬╖┬╖┬╖┬╖"typescript":┬╖"^5",
+       64 Γöé + ┬╖┬╖┬╖┬╖"vite":┬╖"^8",
+       65 Γöé + ┬╖┬╖┬╖┬╖"vitest":┬╖"^4.1.4"
+       66 Γöé + ┬╖┬╖}
+       67 Γöé + }
+    68 68 Γöé   
+  
+
+src\__tests__\smoke.test.ts format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     1    Γöé - import┬╖{┬╖describe,┬╖expect,┬╖it,┬╖vi┬╖}┬╖from┬╖'vitest';ΓÉì
+     2    Γöé - import┬╖{┬╖commands┬╖}┬╖from┬╖'../lib/tauri/commands';ΓÉì
+     3    Γöé - ΓÉì
+     4    Γöé - //┬╖Mock┬╖the┬╖Tauri┬╖invoke┬╖bridge┬╖so┬╖tests┬╖run┬╖outside┬╖a┬╖Tauri┬╖webview.ΓÉì
+     5    Γöé - //┬╖Some┬╖commands┬╖guard┬╖with┬╖`isTauri`┬╖and┬╖return┬╖a┬╖fallback┬╖directly┬╖(no┬╖invokeΓÉì
+     6    Γöé - //┬╖call),┬╖so┬╖not┬╖every┬╖test┬╖needs┬╖the┬╖mock┬╖to┬╖be┬╖configured.ΓÉì
+     7    Γöé - vi.mock('@tauri-apps/api/core',┬╖()┬╖=>┬╖({ΓÉì
+     8    Γöé - ┬╖┬╖invoke:┬╖vi.fn(),ΓÉì
+     9    Γöé - }));ΓÉì
+    10    Γöé - ΓÉì
+    11    Γöé - describe('smoke',┬╖()┬╖=>┬╖{ΓÉì
+    12    Γöé - ┬╖┬╖it('math┬╖works',┬╖()┬╖=>┬╖{ΓÉì
+    13    Γöé - ┬╖┬╖┬╖┬╖expect(1┬╖+┬╖1).toBe(2);ΓÉì
+    14    Γöé - ┬╖┬╖});ΓÉì
+    15    Γöé - });ΓÉì
+    16    Γöé - ΓÉì
+    17    Γöé - describe('commands┬╖wrapper┬╖ΓÇö┬╖FE┬╖Prep',┬╖()┬╖=>┬╖{ΓÉì
+    18    Γöé - ┬╖┬╖//┬╖listFeTopics┬╖returns┬╖Promise.resolve([])┬╖directly┬╖when┬╖isTauri┬╖is┬╖false,ΓÉì
+    19    Γöé - ┬╖┬╖//┬╖without┬╖calling┬╖invoke.ΓÉì
+    20    Γöé - ┬╖┬╖it('listFeTopics┬╖resolves┬╖to┬╖an┬╖empty┬╖array┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{ΓÉì
+    21    Γöé - ┬╖┬╖┬╖┬╖const┬╖result┬╖=┬╖await┬╖commands.listFeTopics();ΓÉì
+    22    Γöé - ┬╖┬╖┬╖┬╖expect(Array.isArray(result)).toBe(true);ΓÉì
+    23    Γöé - ┬╖┬╖┬╖┬╖expect(result).toHaveLength(0);ΓÉì
+    24    Γöé - ┬╖┬╖});ΓÉì
+    25    Γöé - });ΓÉì
+    26    Γöé - ΓÉì
+    27    Γöé - describe('commands┬╖wrapper┬╖ΓÇö┬╖Diagram',┬╖()┬╖=>┬╖{ΓÉì
+    28    Γöé - ┬╖┬╖//┬╖renderDiagram┬╖calls┬╖Promise.reject('Not┬╖in┬╖Tauri')┬╖when┬╖isTauri┬╖is┬╖false.ΓÉì
+    29    Γöé - ┬╖┬╖it('renderDiagram┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{ΓÉì
+    30    Γöé - ┬╖┬╖┬╖┬╖await┬╖expect(commands.renderDiagram('mermaid',┬╖'graph┬╖TD\n┬╖┬╖A-->B')).rejects.toBe('Not┬╖in┬╖Tauri');ΓÉì
+    31    Γöé - ┬╖┬╖});ΓÉì
+    32    Γöé - ΓÉì
+    33    Γöé - ┬╖┬╖it('generateCode┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{ΓÉì
+    34    Γöé - ┬╖┬╖┬╖┬╖await┬╖expect(commands.generateCode('a┬╖half-wave┬╖rectifier',┬╖'schemdraw')).rejects.toBe('Not┬╖in┬╖Tauri');ΓÉì
+    35    Γöé - ┬╖┬╖});ΓÉì
+    36    Γöé - ΓÉì
+    37    Γöé - ┬╖┬╖it('exportPng┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{ΓÉì
+    38    Γöé - ┬╖┬╖┬╖┬╖await┬╖expect(commands.exportPng('schemdraw',┬╖'d┬╖=┬╖schemdraw.Drawing()')).rejects.toBe('Not┬╖in┬╖Tauri');ΓÉì
+    39    Γöé - ┬╖┬╖});ΓÉì
+    40    Γöé - });ΓÉì
+    41    Γöé - ΓÉì
+    42    Γöé - describe('commands┬╖wrapper┬╖ΓÇö┬╖Vault┬╖Study',┬╖()┬╖=>┬╖{ΓÉì
+    43    Γöé - ┬╖┬╖//┬╖ingestDocument┬╖and┬╖queryVault┬╖call┬╖Promise.reject('Not┬╖in┬╖Tauri')┬╖when┬╖isTauri┬╖is┬╖false.ΓÉì
+    44    Γöé - ┬╖┬╖it('ingestDocument┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{ΓÉì
+    45    Γöé - ┬╖┬╖┬╖┬╖await┬╖expect(commands.ingestDocument('/tmp/test.pdf',┬╖[])).rejects.toBe('Not┬╖in┬╖Tauri');ΓÉì
+    46    Γöé - ┬╖┬╖});ΓÉì
+    47    Γöé - ΓÉì
+    48    Γöé - ┬╖┬╖it('queryVault┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{ΓÉì
+    49    Γöé - ┬╖┬╖┬╖┬╖await┬╖expect(commands.queryVault("What┬╖is┬╖Ohm's┬╖law?")).rejects.toBe('Not┬╖in┬╖Tauri');ΓÉì
+    50    Γöé - ┬╖┬╖});ΓÉì
+    51    Γöé - });ΓÉì
+        1 Γöé + import┬╖{┬╖describe,┬╖expect,┬╖it,┬╖vi┬╖}┬╖from┬╖'vitest';
+        2 Γöé + import┬╖{┬╖commands┬╖}┬╖from┬╖'../lib/tauri/commands';
+        3 Γöé + 
+        4 Γöé + //┬╖Mock┬╖the┬╖Tauri┬╖invoke┬╖bridge┬╖so┬╖tests┬╖run┬╖outside┬╖a┬╖Tauri┬╖webview.
+        5 Γöé + //┬╖Some┬╖commands┬╖guard┬╖with┬╖`isTauri`┬╖and┬╖return┬╖a┬╖fallback┬╖directly┬╖(no┬╖invoke
+        6 Γöé + //┬╖call),┬╖so┬╖not┬╖every┬╖test┬╖needs┬╖the┬╖mock┬╖to┬╖be┬╖configured.
+        7 Γöé + vi.mock('@tauri-apps/api/core',┬╖()┬╖=>┬╖({
+        8 Γöé + ┬╖┬╖invoke:┬╖vi.fn(),
+        9 Γöé + }));
+       10 Γöé + 
+       11 Γöé + describe('smoke',┬╖()┬╖=>┬╖{
+       12 Γöé + ┬╖┬╖it('math┬╖works',┬╖()┬╖=>┬╖{
+       13 Γöé + ┬╖┬╖┬╖┬╖expect(1┬╖+┬╖1).toBe(2);
+       14 Γöé + ┬╖┬╖});
+       15 Γöé + });
+       16 Γöé + 
+       17 Γöé + describe('commands┬╖wrapper┬╖ΓÇö┬╖FE┬╖Prep',┬╖()┬╖=>┬╖{
+       18 Γöé + ┬╖┬╖//┬╖listFeTopics┬╖returns┬╖Promise.resolve([])┬╖directly┬╖when┬╖isTauri┬╖is┬╖false,
+       19 Γöé + ┬╖┬╖//┬╖without┬╖calling┬╖invoke.
+       20 Γöé + ┬╖┬╖it('listFeTopics┬╖resolves┬╖to┬╖an┬╖empty┬╖array┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{
+       21 Γöé + ┬╖┬╖┬╖┬╖const┬╖result┬╖=┬╖await┬╖commands.listFeTopics();
+       22 Γöé + ┬╖┬╖┬╖┬╖expect(Array.isArray(result)).toBe(true);
+       23 Γöé + ┬╖┬╖┬╖┬╖expect(result).toHaveLength(0);
+       24 Γöé + ┬╖┬╖});
+       25 Γöé + });
+       26 Γöé + 
+       27 Γöé + describe('commands┬╖wrapper┬╖ΓÇö┬╖Diagram',┬╖()┬╖=>┬╖{
+       28 Γöé + ┬╖┬╖//┬╖renderDiagram┬╖calls┬╖Promise.reject('Not┬╖in┬╖Tauri')┬╖when┬╖isTauri┬╖is┬╖false.
+       29 Γöé + ┬╖┬╖it('renderDiagram┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{
+       30 Γöé + ┬╖┬╖┬╖┬╖await┬╖expect(commands.renderDiagram('mermaid',┬╖'graph┬╖TD\n┬╖┬╖A-->B')).rejects.toBe('Not┬╖in┬╖Tauri');
+       31 Γöé + ┬╖┬╖});
+       32 Γöé + 
+       33 Γöé + ┬╖┬╖it('generateCode┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{
+       34 Γöé + ┬╖┬╖┬╖┬╖await┬╖expect(commands.generateCode('a┬╖half-wave┬╖rectifier',┬╖'schemdraw')).rejects.toBe('Not┬╖in┬╖Tauri');
+       35 Γöé + ┬╖┬╖});
+       36 Γöé + 
+       37 Γöé + ┬╖┬╖it('exportPng┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{
+       38 Γöé + ┬╖┬╖┬╖┬╖await┬╖expect(commands.exportPng('schemdraw',┬╖'d┬╖=┬╖schemdraw.Drawing()')).rejects.toBe('Not┬╖in┬╖Tauri');
+       39 Γöé + ┬╖┬╖});
+       40 Γöé + });
+       41 Γöé + 
+       42 Γöé + describe('commands┬╖wrapper┬╖ΓÇö┬╖Vault┬╖Study',┬╖()┬╖=>┬╖{
+       43 Γöé + ┬╖┬╖//┬╖ingestDocument┬╖and┬╖queryVault┬╖call┬╖Promise.reject('Not┬╖in┬╖Tauri')┬╖when┬╖isTauri┬╖is┬╖false.
+       44 Γöé + ┬╖┬╖it('ingestDocument┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{
+       45 Γöé + ┬╖┬╖┬╖┬╖await┬╖expect(commands.ingestDocument('/tmp/test.pdf',┬╖[])).rejects.toBe('Not┬╖in┬╖Tauri');
+       46 Γöé + ┬╖┬╖});
+       47 Γöé + 
+       48 Γöé + ┬╖┬╖it('queryVault┬╖rejects┬╖with┬╖"Not┬╖in┬╖Tauri"┬╖when┬╖not┬╖in┬╖Tauri',┬╖async┬╖()┬╖=>┬╖{
+       49 Γöé + ┬╖┬╖┬╖┬╖await┬╖expect(commands.queryVault("What┬╖is┬╖Ohm's┬╖law?")).rejects.toBe('Not┬╖in┬╖Tauri');
+       50 Γöé + ┬╖┬╖});
+       51 Γöé + });
+    52 52 Γöé   
+  
+
+src\components\Capture\RegionSelector.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+      1     Γöé - import┬╖{┬╖useCallback,┬╖useRef,┬╖useState┬╖}┬╖from┬╖'react';ΓÉì
+      2     Γöé - import┬╖{┬╖commands┬╖}┬╖from┬╖'../../lib/tauri/commands';ΓÉì
+      3     Γöé - import┬╖{┬╖useCaptureStore┬╖}┬╖from┬╖'../../stores/captureStore';ΓÉì
+      4     Γöé - import┬╖{┬╖useVaultStore┬╖}┬╖from┬╖'../../stores/vaultStore';ΓÉì
+      5     Γöé - import┬╖type┬╖{┬╖Region┬╖}┬╖from┬╖'../../types/capture';ΓÉì
+      6     Γöé - ΓÉì
+      7     Γöé - export┬╖function┬╖RegionSelector()┬╖{ΓÉì
+      8     Γöé - ┬╖┬╖const┬╖vaultPath┬╖=┬╖useVaultStore((s)┬╖=>┬╖s.vaultPath);ΓÉì
+      9     Γöé - ┬╖┬╖const┬╖captureMode┬╖=┬╖useCaptureStore((s)┬╖=>┬╖s.captureMode);ΓÉì
+     10     Γöé - ┬╖┬╖const┬╖setLastRegion┬╖=┬╖useCaptureStore((s)┬╖=>┬╖s.setLastRegion);ΓÉì
+     11     Γöé - ┬╖┬╖const┬╖addToQueue┬╖=┬╖useCaptureStore((s)┬╖=>┬╖s.addToQueue);ΓÉì
+     12     Γöé - ┬╖┬╖const┬╖[isDragging,┬╖setIsDragging]┬╖=┬╖useState(false);ΓÉì
+     13     Γöé - ┬╖┬╖const┬╖[region,┬╖setRegion]┬╖=┬╖useState<Region┬╖|┬╖null>(null);ΓÉì
+     14     Γöé - ┬╖┬╖const┬╖startPoint┬╖=┬╖useRef<{┬╖x:┬╖number;┬╖y:┬╖number┬╖}┬╖|┬╖null>(null);ΓÉì
+     15     Γöé - ΓÉì
+     16     Γöé - ┬╖┬╖const┬╖handleMouseDown┬╖=┬╖useCallback((e:┬╖React.MouseEvent)┬╖=>┬╖{ΓÉì
+     17     Γöé - ┬╖┬╖┬╖┬╖startPoint.current┬╖=┬╖{┬╖x:┬╖e.clientX,┬╖y:┬╖e.clientY┬╖};ΓÉì
+     18     Γöé - ┬╖┬╖┬╖┬╖setIsDragging(true);ΓÉì
+     19     Γöé - ┬╖┬╖┬╖┬╖setRegion(null);ΓÉì
+     20     Γöé - ┬╖┬╖},┬╖[]);ΓÉì
+     21     Γöé - ΓÉì
+     22     Γöé - ┬╖┬╖const┬╖handleMouseMove┬╖=┬╖useCallback(ΓÉì
+     23     Γöé - ┬╖┬╖┬╖┬╖(e:┬╖React.MouseEvent)┬╖=>┬╖{ΓÉì
+     24     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(!isDragging┬╖||┬╖!startPoint.current)┬╖return;ΓÉì
+     25     Γöé - ΓÉì
+     26     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖x┬╖=┬╖Math.min(startPoint.current.x,┬╖e.clientX);ΓÉì
+     27     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖y┬╖=┬╖Math.min(startPoint.current.y,┬╖e.clientY);ΓÉì
+     28     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖width┬╖=┬╖Math.abs(e.clientX┬╖-┬╖startPoint.current.x);ΓÉì
+     29     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖height┬╖=┬╖Math.abs(e.clientY┬╖-┬╖startPoint.current.y);ΓÉì
+     30     Γöé - ΓÉì
+     31     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖setRegion({┬╖x,┬╖y,┬╖width,┬╖height┬╖});ΓÉì
+     32     Γöé - ┬╖┬╖┬╖┬╖},ΓÉì
+     33     Γöé - ┬╖┬╖┬╖┬╖[isDragging],ΓÉì
+     34     Γöé - ┬╖┬╖);ΓÉì
+     35     Γöé - ΓÉì
+     36     Γöé - ┬╖┬╖const┬╖handleMouseUp┬╖=┬╖useCallback(ΓÉì
+     37     Γöé - ┬╖┬╖┬╖┬╖async┬╖(e:┬╖React.MouseEvent)┬╖=>┬╖{ΓÉì
+     38     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(!isDragging┬╖||┬╖!region┬╖||┬╖region.width┬╖<┬╖5┬╖||┬╖region.height┬╖<┬╖5)┬╖{ΓÉì
+     39     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setIsDragging(false);ΓÉì
+     40     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setRegion(null);ΓÉì
+     41     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return;ΓÉì
+     42     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     43     Γöé - ΓÉì
+     44     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖setIsDragging(false);ΓÉì
+     45     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖setLastRegion(region);ΓÉì
+     46     Γöé - ΓÉì
+     47     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖try┬╖{ΓÉì
+     48     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖const┬╖result┬╖=┬╖await┬╖commands.finishCapture(ΓÉì
+     49     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖captureMode,ΓÉì
+     50     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖region.x,ΓÉì
+     51     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖region.y,ΓÉì
+     52     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖region.width,ΓÉì
+     53     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖region.height,ΓÉì
+     54     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖vaultPath┬╖??┬╖'',ΓÉì
+     55     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖);ΓÉì
+     56     Γöé - ΓÉì
+     57     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖//┬╖Multi-capture:┬╖if┬╖Shift┬╖is┬╖held,┬╖keep┬╖overlay┬╖open┬╖and┬╖queue┬╖the┬╖captureΓÉì
+     58     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.shiftKey)┬╖{ΓÉì
+     59     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖addToQueue(result);ΓÉì
+     60     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setRegion(null);ΓÉì
+     61     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}┬╖else┬╖{ΓÉì
+     62     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖window.history.back();ΓÉì
+     63     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     64     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}┬╖catch┬╖(err)┬╖{ΓÉì
+     65     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖console.error('Capture┬╖failed:',┬╖err);ΓÉì
+     66     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     67     Γöé - ┬╖┬╖┬╖┬╖},ΓÉì
+     68     Γöé - ┬╖┬╖┬╖┬╖[isDragging,┬╖region,┬╖captureMode,┬╖vaultPath,┬╖setLastRegion,┬╖addToQueue],ΓÉì
+     69     Γöé - ┬╖┬╖);ΓÉì
+     70     Γöé - ΓÉì
+     71     Γöé - ┬╖┬╖return┬╖(ΓÉì
+     72     Γöé - ┬╖┬╖┬╖┬╖<divΓÉì
+     73     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖className="absolute┬╖inset-0┬╖z-10"ΓÉì
+     74     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖onMouseDown={handleMouseDown}ΓÉì
+     75     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖onMouseMove={handleMouseMove}ΓÉì
+     76     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖onMouseUp={handleMouseUp}ΓÉì
+     77     Γöé - ┬╖┬╖┬╖┬╖>ΓÉì
+     78     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖{/*┬╖Selection┬╖rectangle┬╖*/}ΓÉì
+     79     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖{region┬╖&&┬╖region.width┬╖>┬╖0┬╖&&┬╖region.height┬╖>┬╖0┬╖&&┬╖(ΓÉì
+     80     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<>ΓÉì
+     81     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{/*┬╖Clear┬╖area┬╖inside┬╖selection┬╖*/}ΓÉì
+     82     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     83     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="absolute"ΓÉì
+     84     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     85     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖left:┬╖region.x,ΓÉì
+     86     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖top:┬╖region.y,ΓÉì
+     87     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖region.width,ΓÉì
+     88     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖height:┬╖region.height,ΓÉì
+     89     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'2px┬╖solid┬╖var(--accent)',ΓÉì
+     90     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'transparent',ΓÉì
+     91     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖boxShadow:┬╖'0┬╖0┬╖0┬╖9999px┬╖rgba(0,┬╖0,┬╖0,┬╖0.3)',ΓÉì
+     92     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     93     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖/>ΓÉì
+     94     Γöé - ΓÉì
+     95     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{/*┬╖Dimension┬╖label┬╖*/}ΓÉì
+     96     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     97     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="absolute┬╖px-2┬╖py-0.5┬╖rounded┬╖text-xs┬╖font-mono"ΓÉì
+     98     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     99     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖left:┬╖region.x,ΓÉì
+    100     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖top:┬╖region.y┬╖+┬╖region.height┬╖+┬╖6,ΓÉì
+    101     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'rgba(0,┬╖0,┬╖0,┬╖0.75)',ΓÉì
+    102     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'#fff',ΓÉì
+    103     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    104     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    105     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{Math.round(region.width)}┬╖├ù┬╖{Math.round(region.height)}ΓÉì
+    106     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    107     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</>ΓÉì
+    108     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖)}ΓÉì
+    109     Γöé - ┬╖┬╖┬╖┬╖</div>ΓÉì
+    110     Γöé - ┬╖┬╖);ΓÉì
+    111     Γöé - }ΓÉì
+          1 Γöé + import┬╖{┬╖useCallback,┬╖useRef,┬╖useState┬╖}┬╖from┬╖'react';
+          2 Γöé + import┬╖{┬╖commands┬╖}┬╖from┬╖'../../lib/tauri/commands';
+          3 Γöé + import┬╖{┬╖useCaptureStore┬╖}┬╖from┬╖'../../stores/captureStore';
+          4 Γöé + import┬╖{┬╖useVaultStore┬╖}┬╖from┬╖'../../stores/vaultStore';
+          5 Γöé + import┬╖type┬╖{┬╖Region┬╖}┬╖from┬╖'../../types/capture';
+          6 Γöé + 
+          7 Γöé + export┬╖function┬╖RegionSelector()┬╖{
+          8 Γöé + ┬╖┬╖const┬╖vaultPath┬╖=┬╖useVaultStore((s)┬╖=>┬╖s.vaultPath);
+          9 Γöé + ┬╖┬╖const┬╖captureMode┬╖=┬╖useCaptureStore((s)┬╖=>┬╖s.captureMode);
+         10 Γöé + ┬╖┬╖const┬╖setLastRegion┬╖=┬╖useCaptureStore((s)┬╖=>┬╖s.setLastRegion);
+         11 Γöé + ┬╖┬╖const┬╖addToQueue┬╖=┬╖useCaptureStore((s)┬╖=>┬╖s.addToQueue);
+         12 Γöé + ┬╖┬╖const┬╖[isDragging,┬╖setIsDragging]┬╖=┬╖useState(false);
+         13 Γöé + ┬╖┬╖const┬╖[region,┬╖setRegion]┬╖=┬╖useState<Region┬╖|┬╖null>(null);
+         14 Γöé + ┬╖┬╖const┬╖startPoint┬╖=┬╖useRef<{┬╖x:┬╖number;┬╖y:┬╖number┬╖}┬╖|┬╖null>(null);
+         15 Γöé + 
+         16 Γöé + ┬╖┬╖const┬╖handleMouseDown┬╖=┬╖useCallback((e:┬╖React.MouseEvent)┬╖=>┬╖{
+         17 Γöé + ┬╖┬╖┬╖┬╖startPoint.current┬╖=┬╖{┬╖x:┬╖e.clientX,┬╖y:┬╖e.clientY┬╖};
+         18 Γöé + ┬╖┬╖┬╖┬╖setIsDragging(true);
+         19 Γöé + ┬╖┬╖┬╖┬╖setRegion(null);
+         20 Γöé + ┬╖┬╖},┬╖[]);
+         21 Γöé + 
+         22 Γöé + ┬╖┬╖const┬╖handleMouseMove┬╖=┬╖useCallback(
+         23 Γöé + ┬╖┬╖┬╖┬╖(e:┬╖React.MouseEvent)┬╖=>┬╖{
+         24 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(!isDragging┬╖||┬╖!startPoint.current)┬╖return;
+         25 Γöé + 
+         26 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖x┬╖=┬╖Math.min(startPoint.current.x,┬╖e.clientX);
+         27 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖y┬╖=┬╖Math.min(startPoint.current.y,┬╖e.clientY);
+         28 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖width┬╖=┬╖Math.abs(e.clientX┬╖-┬╖startPoint.current.x);
+         29 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖const┬╖height┬╖=┬╖Math.abs(e.clientY┬╖-┬╖startPoint.current.y);
+         30 Γöé + 
+         31 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖setRegion({┬╖x,┬╖y,┬╖width,┬╖height┬╖});
+         32 Γöé + ┬╖┬╖┬╖┬╖},
+         33 Γöé + ┬╖┬╖┬╖┬╖[isDragging],
+         34 Γöé + ┬╖┬╖);
+         35 Γöé + 
+         36 Γöé + ┬╖┬╖const┬╖handleMouseUp┬╖=┬╖useCallback(
+         37 Γöé + ┬╖┬╖┬╖┬╖async┬╖(e:┬╖React.MouseEvent)┬╖=>┬╖{
+         38 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(!isDragging┬╖||┬╖!region┬╖||┬╖region.width┬╖<┬╖5┬╖||┬╖region.height┬╖<┬╖5)┬╖{
+         39 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setIsDragging(false);
+  73 more lines truncated
+  
+
+src\components\Chat\OllamaStatusBanner.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+      1     Γöé - import┬╖{┬╖useCallback,┬╖useEffect,┬╖useRef,┬╖useState┬╖}┬╖from┬╖'react';ΓÉì
+      2     Γöé - import┬╖{┬╖useChatStore┬╖}┬╖from┬╖'../../stores/chatStore';ΓÉì
+      3     Γöé - ΓÉì
+      4     Γöé - const┬╖POLL_MS┬╖=┬╖30_000;ΓÉì
+      5     Γöé - ΓÉì
+      6     Γöé - export┬╖function┬╖OllamaStatusBanner()┬╖{ΓÉì
+      7     Γöé - ┬╖┬╖//┬╖Read┬╖all┬╖AI┬╖status┬╖from┬╖the┬╖shared┬╖chatStore┬╖ΓÇö┬╖avoids┬╖duplicate┬╖Ollama┬╖callsΓÉì
+      8     Γöé - ┬╖┬╖//┬╖that┬╖ChatPanel┬╖already┬╖triggers┬╖via┬╖refreshAiStatus()┬╖when┬╖the┬╖panel┬╖opens.ΓÉì
+      9     Γöé - ┬╖┬╖const┬╖refreshAiStatus┬╖=┬╖useChatStore((s)┬╖=>┬╖s.refreshAiStatus);ΓÉì
+     10     Γöé - ┬╖┬╖const┬╖provider┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiProvider);ΓÉì
+     11     Γöé - ┬╖┬╖const┬╖endpoint┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiEndpoint);ΓÉì
+     12     Γöé - ┬╖┬╖const┬╖model┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiOllamaModel);ΓÉì
+     13     Γöé - ┬╖┬╖const┬╖connected┬╖=┬╖useChatStore((s)┬╖=>┬╖s.isConnected);ΓÉì
+     14     Γöé - ┬╖┬╖const┬╖modelInstalled┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiModelInstalled);ΓÉì
+     15     Γöé - ΓÉì
+     16     Γöé - ┬╖┬╖const┬╖[checking,┬╖setChecking]┬╖=┬╖useState(false);ΓÉì
+     17     Γöé - ┬╖┬╖const┬╖intervalRef┬╖=┬╖useRef<ReturnType<typeof┬╖setInterval>┬╖|┬╖null>(null);ΓÉì
+     18     Γöé - ┬╖┬╖const┬╖mountedRef┬╖=┬╖useRef(true);ΓÉì
+     19     Γöé - ΓÉì
+     20     Γöé - ┬╖┬╖const┬╖checkNow┬╖=┬╖useCallback(async┬╖()┬╖=>┬╖{ΓÉì
+     21     Γöé - ┬╖┬╖┬╖┬╖if┬╖(!mountedRef.current)┬╖return;ΓÉì
+     22     Γöé - ┬╖┬╖┬╖┬╖setChecking(true);ΓÉì
+     23     Γöé - ┬╖┬╖┬╖┬╖try┬╖{ΓÉì
+     24     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖await┬╖refreshAiStatus();ΓÉì
+     25     Γöé - ┬╖┬╖┬╖┬╖}┬╖finally┬╖{ΓÉì
+     26     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(mountedRef.current)┬╖setChecking(false);ΓÉì
+     27     Γöé - ┬╖┬╖┬╖┬╖}ΓÉì
+     28     Γöé - ┬╖┬╖},┬╖[refreshAiStatus]);ΓÉì
+     29     Γöé - ΓÉì
+     30     Γöé - ┬╖┬╖useEffect(()┬╖=>┬╖{ΓÉì
+     31     Γöé - ┬╖┬╖┬╖┬╖mountedRef.current┬╖=┬╖true;ΓÉì
+     32     Γöé - ┬╖┬╖┬╖┬╖intervalRef.current┬╖=┬╖setInterval(checkNow,┬╖POLL_MS);ΓÉì
+     33     Γöé - ┬╖┬╖┬╖┬╖return┬╖()┬╖=>┬╖{ΓÉì
+     34     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖mountedRef.current┬╖=┬╖false;ΓÉì
+     35     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(intervalRef.current)┬╖clearInterval(intervalRef.current);ΓÉì
+     36     Γöé - ┬╖┬╖┬╖┬╖};ΓÉì
+     37     Γöé - ┬╖┬╖},┬╖[checkNow]);ΓÉì
+     38     Γöé - ΓÉì
+     39     Γöé - ┬╖┬╖if┬╖(provider┬╖!==┬╖'ollama')┬╖return┬╖null;ΓÉì
+     40     Γöé - ΓÉì
+     41     Γöé - ┬╖┬╖//┬╖Disconnected┬╖ΓÇö┬╖warning┬╖banner.ΓÉì
+     42     Γöé - ┬╖┬╖if┬╖(connected┬╖===┬╖false)┬╖{ΓÉì
+     43     Γöé - ┬╖┬╖┬╖┬╖return┬╖(ΓÉì
+     44     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     45     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖role="status"ΓÉì
+     46     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="flex┬╖items-center┬╖justify-between┬╖gap-3┬╖px-4┬╖py-2┬╖text-sm┬╖shrink-0"ΓÉì
+     47     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     48     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'rgba(224,┬╖160,┬╖80,┬╖0.08)',ΓÉì
+     49     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--warning)',ΓÉì
+     50     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderBottom:┬╖'1px┬╖solid┬╖rgba(224,┬╖160,┬╖80,┬╖0.2)',ΓÉì
+     51     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     52     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     53     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<span┬╖style={{┬╖color:┬╖'var(--text-secondary)'┬╖}}>ΓÉì
+     54     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖Ollama┬╖is┬╖not┬╖running┬╖({endpoint┬╖||┬╖'http://localhost:11434'}).┬╖Install┬╖from{'┬╖'}ΓÉì
+     55     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<aΓÉì
+     56     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖href="https://ollama.com/download"ΓÉì
+     57     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖target="_blank"ΓÉì
+     58     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖rel="noreferrer"ΓÉì
+     59     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{┬╖color:┬╖'var(--warning)',┬╖textDecoration:┬╖'underline'┬╖}}ΓÉì
+     60     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     61     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖ollama.com/downloadΓÉì
+     62     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</a>ΓÉì
+     63     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖,┬╖then┬╖start┬╖it.ΓÉì
+     64     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>ΓÉì
+     65     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<buttonΓÉì
+     66     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖type="button"ΓÉì
+     67     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={checkNow}ΓÉì
+     68     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖disabled={checking}ΓÉì
+     69     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="px-2┬╖py-0.5┬╖rounded┬╖shrink-0┬╖text-xs"ΓÉì
+     70     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     71     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖background:┬╖'transparent',ΓÉì
+     72     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'1px┬╖solid┬╖var(--warning)',ΓÉì
+     73     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--warning)',ΓÉì
+     74     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖cursor:┬╖checking┬╖?┬╖'not-allowed'┬╖:┬╖'pointer',ΓÉì
+     75     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖opacity:┬╖checking┬╖?┬╖0.5┬╖:┬╖1,ΓÉì
+     76     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     77     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     78     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{checking┬╖?┬╖'CheckingΓÇª'┬╖:┬╖'Retry'}ΓÉì
+     79     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</button>ΓÉì
+     80     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+     81     Γöé - ┬╖┬╖┬╖┬╖);ΓÉì
+     82     Γöé - ┬╖┬╖}ΓÉì
+     83     Γöé - ΓÉì
+     84     Γöé - ┬╖┬╖//┬╖Connected┬╖but┬╖the┬╖configured┬╖model┬╖isn't┬╖pulled┬╖yet┬╖ΓÇö┬╖actionable┬╖hint.ΓÉì
+     85     Γöé - ┬╖┬╖if┬╖(connected┬╖===┬╖true┬╖&&┬╖modelInstalled┬╖===┬╖false┬╖&&┬╖model)┬╖{ΓÉì
+     86     Γöé - ┬╖┬╖┬╖┬╖return┬╖(ΓÉì
+     87     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     88     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖role="status"ΓÉì
+     89     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="flex┬╖items-center┬╖justify-between┬╖gap-3┬╖px-4┬╖py-2┬╖text-xs┬╖shrink-0"ΓÉì
+     90     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     91     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'rgba(124,┬╖109,┬╖240,┬╖0.08)',ΓÉì
+     92     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderBottom:┬╖'1px┬╖solid┬╖rgba(124,┬╖109,┬╖240,┬╖0.2)',ΓÉì
+     93     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-secondary)',ΓÉì
+     94     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     95     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     96     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<span>ΓÉì
+     97     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖Ollama┬╖is┬╖running,┬╖but┬╖model┬╖<strong┬╖style={{┬╖color:┬╖'var(--accent)'┬╖}}>{model}</strong>┬╖isn't┬╖installed.┬╖PullΓÉì
+     98     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖it┬╖from┬╖Settings┬╖ΓåÆ┬╖AI.ΓÉì
+     99     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>ΓÉì
+    100     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<buttonΓÉì
+    101     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖type="button"ΓÉì
+    102     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={checkNow}ΓÉì
+    103     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖disabled={checking}ΓÉì
+    104     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="px-2┬╖py-0.5┬╖rounded┬╖shrink-0┬╖text-xs"ΓÉì
+    105     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    106     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖background:┬╖'transparent',ΓÉì
+    107     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'1px┬╖solid┬╖var(--accent)',ΓÉì
+    108     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--accent)',ΓÉì
+    109     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖cursor:┬╖checking┬╖?┬╖'not-allowed'┬╖:┬╖'pointer',ΓÉì
+    110     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖opacity:┬╖checking┬╖?┬╖0.5┬╖:┬╖1,ΓÉì
+    111     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    112     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    113     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{checking┬╖?┬╖'CheckingΓÇª'┬╖:┬╖'Recheck'}ΓÉì
+    114     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</button>ΓÉì
+    115     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    116     Γöé - ┬╖┬╖┬╖┬╖);ΓÉì
+    117     Γöé - ┬╖┬╖}ΓÉì
+    118     Γöé - ΓÉì
+    119     Γöé - ┬╖┬╖//┬╖Connected┬╖and┬╖model┬╖is┬╖installed┬╖ΓÇö┬╖silent┬╖(don't┬╖add┬╖chrome).ΓÉì
+    120     Γöé - ┬╖┬╖return┬╖null;ΓÉì
+    121     Γöé - }ΓÉì
+          1 Γöé + import┬╖{┬╖useCallback,┬╖useEffect,┬╖useRef,┬╖useState┬╖}┬╖from┬╖'react';
+          2 Γöé + import┬╖{┬╖useChatStore┬╖}┬╖from┬╖'../../stores/chatStore';
+          3 Γöé + 
+          4 Γöé + const┬╖POLL_MS┬╖=┬╖30_000;
+          5 Γöé + 
+          6 Γöé + export┬╖function┬╖OllamaStatusBanner()┬╖{
+          7 Γöé + ┬╖┬╖//┬╖Read┬╖all┬╖AI┬╖status┬╖from┬╖the┬╖shared┬╖chatStore┬╖ΓÇö┬╖avoids┬╖duplicate┬╖Ollama┬╖calls
+          8 Γöé + ┬╖┬╖//┬╖that┬╖ChatPanel┬╖already┬╖triggers┬╖via┬╖refreshAiStatus()┬╖when┬╖the┬╖panel┬╖opens.
+          9 Γöé + ┬╖┬╖const┬╖refreshAiStatus┬╖=┬╖useChatStore((s)┬╖=>┬╖s.refreshAiStatus);
+         10 Γöé + ┬╖┬╖const┬╖provider┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiProvider);
+         11 Γöé + ┬╖┬╖const┬╖endpoint┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiEndpoint);
+         12 Γöé + ┬╖┬╖const┬╖model┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiOllamaModel);
+         13 Γöé + ┬╖┬╖const┬╖connected┬╖=┬╖useChatStore((s)┬╖=>┬╖s.isConnected);
+         14 Γöé + ┬╖┬╖const┬╖modelInstalled┬╖=┬╖useChatStore((s)┬╖=>┬╖s.aiModelInstalled);
+         15 Γöé + 
+         16 Γöé + ┬╖┬╖const┬╖[checking,┬╖setChecking]┬╖=┬╖useState(false);
+         17 Γöé + ┬╖┬╖const┬╖intervalRef┬╖=┬╖useRef<ReturnType<typeof┬╖setInterval>┬╖|┬╖null>(null);
+         18 Γöé + ┬╖┬╖const┬╖mountedRef┬╖=┬╖useRef(true);
+         19 Γöé + 
+         20 Γöé + ┬╖┬╖const┬╖checkNow┬╖=┬╖useCallback(async┬╖()┬╖=>┬╖{
+         21 Γöé + ┬╖┬╖┬╖┬╖if┬╖(!mountedRef.current)┬╖return;
+         22 Γöé + ┬╖┬╖┬╖┬╖setChecking(true);
+         23 Γöé + ┬╖┬╖┬╖┬╖try┬╖{
+         24 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖await┬╖refreshAiStatus();
+         25 Γöé + ┬╖┬╖┬╖┬╖}┬╖finally┬╖{
+         26 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(mountedRef.current)┬╖setChecking(false);
+         27 Γöé + ┬╖┬╖┬╖┬╖}
+         28 Γöé + ┬╖┬╖},┬╖[refreshAiStatus]);
+         29 Γöé + 
+  93 more lines truncated
+  
+
+src\components\Editor\SlashCommand\SlashCommandMenu.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+      1     Γöé - import┬╖{┬╖useCallback,┬╖useEffect,┬╖useLayoutEffect,┬╖useRef,┬╖useState┬╖}┬╖from┬╖'react';ΓÉì
+      2     Γöé - import┬╖type┬╖{┬╖SlashCommandItem┬╖}┬╖from┬╖'../../../lib/tiptap/slashCommand';ΓÉì
+      3     Γöé - ΓÉì
+      4     Γöé - interface┬╖SlashCommandMenuProps┬╖{ΓÉì
+      5     Γöé - ┬╖┬╖items:┬╖SlashCommandItem[];ΓÉì
+      6     Γöé - ┬╖┬╖command:┬╖(item:┬╖SlashCommandItem)┬╖=>┬╖void;ΓÉì
+      7     Γöé - }ΓÉì
+      8     Γöé - ΓÉì
+      9     Γöé - export┬╖function┬╖SlashCommandMenu({┬╖items,┬╖command┬╖}:┬╖SlashCommandMenuProps)┬╖{ΓÉì
+     10     Γöé - ┬╖┬╖const┬╖[selectedIndex,┬╖setSelectedIndex]┬╖=┬╖useState(0);ΓÉì
+     11     Γöé - ┬╖┬╖const┬╖menuRef┬╖=┬╖useRef<HTMLDivElement>(null);ΓÉì
+     12     Γöé - ΓÉì
+     13     Γöé - ┬╖┬╖//┬╖Reset┬╖selection┬╖when┬╖items┬╖changeΓÉì
+     14     Γöé - ┬╖┬╖useEffect(()┬╖=>┬╖{ΓÉì
+     15     Γöé - ┬╖┬╖┬╖┬╖setSelectedIndex(0);ΓÉì
+     16     Γöé - ┬╖┬╖},┬╖[items]);ΓÉì
+     17     Γöé - ΓÉì
+     18     Γöé - ┬╖┬╖//┬╖Scroll┬╖selected┬╖item┬╖into┬╖viewΓÉì
+     19     Γöé - ┬╖┬╖useLayoutEffect(()┬╖=>┬╖{ΓÉì
+     20     Γöé - ┬╖┬╖┬╖┬╖const┬╖menu┬╖=┬╖menuRef.current;ΓÉì
+     21     Γöé - ┬╖┬╖┬╖┬╖if┬╖(!menu)┬╖return;ΓÉì
+     22     Γöé - ┬╖┬╖┬╖┬╖const┬╖selected┬╖=┬╖menu.children[selectedIndex]┬╖as┬╖HTMLElement┬╖|┬╖undefined;ΓÉì
+     23     Γöé - ┬╖┬╖┬╖┬╖selected?.scrollIntoView({┬╖block:┬╖'nearest'┬╖});ΓÉì
+     24     Γöé - ┬╖┬╖},┬╖[selectedIndex]);ΓÉì
+     25     Γöé - ΓÉì
+     26     Γöé - ┬╖┬╖const┬╖onKeyDown┬╖=┬╖useCallback(ΓÉì
+     27     Γöé - ┬╖┬╖┬╖┬╖(e:┬╖KeyboardEvent)┬╖=>┬╖{ΓÉì
+     28     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'ArrowDown')┬╖{ΓÉì
+     29     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();ΓÉì
+     30     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setSelectedIndex((i)┬╖=>┬╖(i┬╖+┬╖1)┬╖%┬╖items.length);ΓÉì
+     31     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖true;ΓÉì
+     32     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     33     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'ArrowUp')┬╖{ΓÉì
+     34     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();ΓÉì
+     35     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setSelectedIndex((i)┬╖=>┬╖(i┬╖-┬╖1┬╖+┬╖items.length)┬╖%┬╖items.length);ΓÉì
+     36     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖true;ΓÉì
+     37     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     38     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'Enter')┬╖{ΓÉì
+     39     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();ΓÉì
+     40     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(items[selectedIndex])┬╖{ΓÉì
+     41     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖command(items[selectedIndex]);ΓÉì
+     42     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     43     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖true;ΓÉì
+     44     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+     45     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖return┬╖false;ΓÉì
+     46     Γöé - ┬╖┬╖┬╖┬╖},ΓÉì
+     47     Γöé - ┬╖┬╖┬╖┬╖[items,┬╖selectedIndex,┬╖command],ΓÉì
+     48     Γöé - ┬╖┬╖);ΓÉì
+     49     Γöé - ΓÉì
+     50     Γöé - ┬╖┬╖useEffect(()┬╖=>┬╖{ΓÉì
+     51     Γöé - ┬╖┬╖┬╖┬╖const┬╖handler┬╖=┬╖(e:┬╖KeyboardEvent)┬╖=>┬╖onKeyDown(e);ΓÉì
+     52     Γöé - ┬╖┬╖┬╖┬╖document.addEventListener('keydown',┬╖handler,┬╖true);ΓÉì
+     53     Γöé - ┬╖┬╖┬╖┬╖return┬╖()┬╖=>┬╖document.removeEventListener('keydown',┬╖handler,┬╖true);ΓÉì
+     54     Γöé - ┬╖┬╖},┬╖[onKeyDown]);ΓÉì
+     55     Γöé - ΓÉì
+     56     Γöé - ┬╖┬╖if┬╖(items.length┬╖===┬╖0)┬╖return┬╖null;ΓÉì
+     57     Γöé - ΓÉì
+     58     Γöé - ┬╖┬╖return┬╖(ΓÉì
+     59     Γöé - ┬╖┬╖┬╖┬╖<divΓÉì
+     60     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖ref={menuRef}ΓÉì
+     61     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖className="rounded-lg┬╖overflow-hidden┬╖overflow-y-auto"ΓÉì
+     62     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     63     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'var(--bg-secondary)',ΓÉì
+     64     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'1px┬╖solid┬╖var(--border)',ΓÉì
+     65     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖boxShadow:┬╖'var(--shadow-md)',ΓÉì
+     66     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖maxHeight:┬╖'320px',ΓÉì
+     67     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖'280px',ΓÉì
+     68     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     69     Γöé - ┬╖┬╖┬╖┬╖>ΓÉì
+     70     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖{items.map((item,┬╖index)┬╖=>┬╖(ΓÉì
+     71     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<buttonΓÉì
+     72     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖key={item.title}ΓÉì
+     73     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={()┬╖=>┬╖command(item)}ΓÉì
+     74     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="flex┬╖items-center┬╖gap-3┬╖w-full┬╖px-3┬╖py-2┬╖text-left┬╖text-sm┬╖transition-colors"ΓÉì
+     75     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     76     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖index┬╖===┬╖selectedIndex┬╖?┬╖'var(--bg-hover)'┬╖:┬╖'transparent',ΓÉì
+     77     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-primary)',ΓÉì
+     78     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     79     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onMouseEnter={()┬╖=>┬╖setSelectedIndex(index)}ΓÉì
+     80     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     81     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<spanΓÉì
+     82     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="w-8┬╖h-8┬╖flex┬╖items-center┬╖justify-center┬╖rounded┬╖text-sm┬╖font-medium┬╖shrink-0"ΓÉì
+     83     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     84     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'var(--bg-tertiary)',ΓÉì
+     85     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-secondary)',ΓÉì
+     86     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     87     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     88     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{item.icon}ΓÉì
+     89     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>ΓÉì
+     90     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="min-w-0">ΓÉì
+     91     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="font-medium┬╖truncate">{item.title}</div>ΓÉì
+     92     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="text-xs┬╖truncate"┬╖style={{┬╖color:┬╖'var(--text-tertiary)'┬╖}}>ΓÉì
+     93     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{item.description}ΓÉì
+     94     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+     95     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+     96     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</button>ΓÉì
+     97     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖))}ΓÉì
+     98     Γöé - ┬╖┬╖┬╖┬╖</div>ΓÉì
+     99     Γöé - ┬╖┬╖);ΓÉì
+    100     Γöé - }ΓÉì
+          1 Γöé + import┬╖{┬╖useCallback,┬╖useEffect,┬╖useLayoutEffect,┬╖useRef,┬╖useState┬╖}┬╖from┬╖'react';
+          2 Γöé + import┬╖type┬╖{┬╖SlashCommandItem┬╖}┬╖from┬╖'../../../lib/tiptap/slashCommand';
+          3 Γöé + 
+          4 Γöé + interface┬╖SlashCommandMenuProps┬╖{
+          5 Γöé + ┬╖┬╖items:┬╖SlashCommandItem[];
+          6 Γöé + ┬╖┬╖command:┬╖(item:┬╖SlashCommandItem)┬╖=>┬╖void;
+          7 Γöé + }
+          8 Γöé + 
+          9 Γöé + export┬╖function┬╖SlashCommandMenu({┬╖items,┬╖command┬╖}:┬╖SlashCommandMenuProps)┬╖{
+         10 Γöé + ┬╖┬╖const┬╖[selectedIndex,┬╖setSelectedIndex]┬╖=┬╖useState(0);
+         11 Γöé + ┬╖┬╖const┬╖menuRef┬╖=┬╖useRef<HTMLDivElement>(null);
+         12 Γöé + 
+         13 Γöé + ┬╖┬╖//┬╖Reset┬╖selection┬╖when┬╖items┬╖change
+         14 Γöé + ┬╖┬╖useEffect(()┬╖=>┬╖{
+         15 Γöé + ┬╖┬╖┬╖┬╖setSelectedIndex(0);
+         16 Γöé + ┬╖┬╖},┬╖[items]);
+         17 Γöé + 
+         18 Γöé + ┬╖┬╖//┬╖Scroll┬╖selected┬╖item┬╖into┬╖view
+         19 Γöé + ┬╖┬╖useLayoutEffect(()┬╖=>┬╖{
+         20 Γöé + ┬╖┬╖┬╖┬╖const┬╖menu┬╖=┬╖menuRef.current;
+         21 Γöé + ┬╖┬╖┬╖┬╖if┬╖(!menu)┬╖return;
+         22 Γöé + ┬╖┬╖┬╖┬╖const┬╖selected┬╖=┬╖menu.children[selectedIndex]┬╖as┬╖HTMLElement┬╖|┬╖undefined;
+         23 Γöé + ┬╖┬╖┬╖┬╖selected?.scrollIntoView({┬╖block:┬╖'nearest'┬╖});
+         24 Γöé + ┬╖┬╖},┬╖[selectedIndex]);
+         25 Γöé + 
+         26 Γöé + ┬╖┬╖const┬╖onKeyDown┬╖=┬╖useCallback(
+         27 Γöé + ┬╖┬╖┬╖┬╖(e:┬╖KeyboardEvent)┬╖=>┬╖{
+         28 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'ArrowDown')┬╖{
+         29 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();
+         30 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setSelectedIndex((i)┬╖=>┬╖(i┬╖+┬╖1)┬╖%┬╖items.length);
+         31 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖true;
+         32 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}
+         33 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'ArrowUp')┬╖{
+         34 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();
+         35 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖setSelectedIndex((i)┬╖=>┬╖(i┬╖-┬╖1┬╖+┬╖items.length)┬╖%┬╖items.length);
+         36 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖true;
+         37 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}
+         38 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'Enter')┬╖{
+         39 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();
+         40 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(items[selectedIndex])┬╖{
+         41 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖command(items[selectedIndex]);
+         42 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}
+         43 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖return┬╖true;
+         44 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}
+         45 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖return┬╖false;
+         46 Γöé + ┬╖┬╖┬╖┬╖},
+         47 Γöé + ┬╖┬╖┬╖┬╖[items,┬╖selectedIndex,┬╖command],
+         48 Γöé + ┬╖┬╖);
+         49 Γöé + 
+         50 Γöé + ┬╖┬╖useEffect(()┬╖=>┬╖{
+  51 more lines truncated
+  
+
+src\components\Flashcards\ReviewCard.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+      1     Γöé - import┬╖type┬╖{┬╖Flashcard┬╖}┬╖from┬╖'../../types/ai';ΓÉì
+      2     Γöé - ΓÉì
+      3     Γöé - interface┬╖ReviewCardProps┬╖{ΓÉì
+      4     Γöé - ┬╖┬╖card:┬╖Flashcard;ΓÉì
+      5     Γöé - ┬╖┬╖isFlipped:┬╖boolean;ΓÉì
+      6     Γöé - ┬╖┬╖onFlip:┬╖()┬╖=>┬╖void;ΓÉì
+      7     Γöé - }ΓÉì
+      8     Γöé - ΓÉì
+      9     Γöé - export┬╖function┬╖ReviewCard({┬╖card,┬╖isFlipped,┬╖onFlip┬╖}:┬╖ReviewCardProps)┬╖{ΓÉì
+     10     Γöé - ┬╖┬╖return┬╖(ΓÉì
+     11     Γöé - ┬╖┬╖┬╖┬╖<buttonΓÉì
+     12     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖type="button"ΓÉì
+     13     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖aria-label={isFlipped┬╖?┬╖'Card┬╖answer┬╖ΓÇö┬╖click┬╖to┬╖flip┬╖back'┬╖:┬╖'Card┬╖question┬╖ΓÇö┬╖click┬╖to┬╖reveal┬╖answer'}ΓÉì
+     14     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖onClick={onFlip}ΓÉì
+     15     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     16     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'relative',ΓÉì
+     17     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖'100%',ΓÉì
+     18     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖maxWidth:┬╖'560px',ΓÉì
+     19     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖minHeight:┬╖'220px',ΓÉì
+     20     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖cursor:┬╖'pointer',ΓÉì
+     21     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖perspective:┬╖'1200px',ΓÉì
+     22     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖outline:┬╖'none',ΓÉì
+     23     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖background:┬╖'transparent',ΓÉì
+     24     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'none',ΓÉì
+     25     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖padding:┬╖0,ΓÉì
+     26     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖font:┬╖'inherit',ΓÉì
+     27     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'inherit',ΓÉì
+     28     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖textAlign:┬╖'inherit',ΓÉì
+     29     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖display:┬╖'block',ΓÉì
+     30     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     31     Γöé - ┬╖┬╖┬╖┬╖>ΓÉì
+     32     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖{/*┬╖Inner┬╖container┬╖that┬╖flips┬╖*/}ΓÉì
+     33     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     34     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     35     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'relative',ΓÉì
+     36     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖'100%',ΓÉì
+     37     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖minHeight:┬╖'220px',ΓÉì
+     38     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖transformStyle:┬╖'preserve-3d',ΓÉì
+     39     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖transition:┬╖'transform┬╖0.45s┬╖cubic-bezier(0.4,┬╖0,┬╖0.2,┬╖1)',ΓÉì
+     40     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖transform:┬╖isFlipped┬╖?┬╖'rotateY(180deg)'┬╖:┬╖'rotateY(0deg)',ΓÉì
+     41     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     42     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     43     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{/*┬╖Front┬╖(question)┬╖*/}ΓÉì
+     44     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     45     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     46     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'absolute',ΓÉì
+     47     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖inset:┬╖0,ΓÉì
+     48     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backfaceVisibility:┬╖'hidden',ΓÉì
+     49     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖WebkitBackfaceVisibility:┬╖'hidden',ΓÉì
+     50     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderRadius:┬╖'var(--radius-lg)',ΓÉì
+     51     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'var(--bg-card)',ΓÉì
+     52     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'1px┬╖solid┬╖var(--border)',ΓÉì
+     53     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖display:┬╖'flex',ΓÉì
+     54     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖flexDirection:┬╖'column',ΓÉì
+     55     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖alignItems:┬╖'center',ΓÉì
+     56     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖justifyContent:┬╖'center',ΓÉì
+     57     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖padding:┬╖'28px┬╖32px',ΓÉì
+     58     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖gap:┬╖'12px',ΓÉì
+     59     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     60     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     61     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<spanΓÉì
+     62     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     63     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖fontSize:┬╖'10px',ΓÉì
+     64     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖fontWeight:┬╖600,ΓÉì
+     65     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖letterSpacing:┬╖'0.08em',ΓÉì
+     66     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖textTransform:┬╖'uppercase',ΓÉì
+     67     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-ghost)',ΓÉì
+     68     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     69     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     70     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖QuestionΓÉì
+     71     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>ΓÉì
+     72     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<pΓÉì
+     73     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     74     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖fontSize:┬╖'16px',ΓÉì
+     75     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖lineHeight:┬╖1.6,ΓÉì
+     76     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-primary)',ΓÉì
+     77     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖textAlign:┬╖'center',ΓÉì
+     78     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+     79     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+     80     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{card.question}ΓÉì
+     81     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</p>ΓÉì
+     82     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<span┬╖style={{┬╖fontSize:┬╖'11px',┬╖color:┬╖'var(--text-ghost)',┬╖marginTop:┬╖'8px'┬╖}}>ΓÉì
+     83     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖Click┬╖or┬╖press┬╖Space┬╖to┬╖revealΓÉì
+     84     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>ΓÉì
+     85     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+     86     Γöé - ΓÉì
+     87     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{/*┬╖Back┬╖(answer)┬╖*/}ΓÉì
+     88     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+     89     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+     90     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'absolute',ΓÉì
+     91     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖inset:┬╖0,ΓÉì
+     92     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backfaceVisibility:┬╖'hidden',ΓÉì
+     93     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖WebkitBackfaceVisibility:┬╖'hidden',ΓÉì
+     94     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖transform:┬╖'rotateY(180deg)',ΓÉì
+     95     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderRadius:┬╖'var(--radius-lg)',ΓÉì
+     96     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'var(--accent-dim)',ΓÉì
+     97     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'1px┬╖solid┬╖var(--accent-muted)',ΓÉì
+     98     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖display:┬╖'flex',ΓÉì
+     99     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖flexDirection:┬╖'column',ΓÉì
+    100     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖alignItems:┬╖'center',ΓÉì
+    101     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖justifyContent:┬╖'center',ΓÉì
+    102     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖padding:┬╖'28px┬╖32px',ΓÉì
+    103     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖gap:┬╖'12px',ΓÉì
+    104     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    105     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    106     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<spanΓÉì
+    107     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    108     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖fontSize:┬╖'10px',ΓÉì
+    109     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖fontWeight:┬╖600,ΓÉì
+    110     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖letterSpacing:┬╖'0.08em',ΓÉì
+    111     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖textTransform:┬╖'uppercase',ΓÉì
+    112     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--accent)',ΓÉì
+    113     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    114     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    115     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖AnswerΓÉì
+    116     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</span>ΓÉì
+    117     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<pΓÉì
+    118     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    119     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖fontSize:┬╖'16px',ΓÉì
+    120     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖lineHeight:┬╖1.6,ΓÉì
+    121     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-primary)',ΓÉì
+    122     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖textAlign:┬╖'center',ΓÉì
+    123     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    124     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    125     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖{card.answer}ΓÉì
+    126     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</p>ΓÉì
+    127     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    128     Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    129     Γöé - ┬╖┬╖┬╖┬╖</button>ΓÉì
+    130     Γöé - ┬╖┬╖);ΓÉì
+    131     Γöé - }ΓÉì
+          1 Γöé + import┬╖type┬╖{┬╖Flashcard┬╖}┬╖from┬╖'../../types/ai';
+          2 Γöé + 
+          3 Γöé + interface┬╖ReviewCardProps┬╖{
+          4 Γöé + ┬╖┬╖card:┬╖Flashcard;
+          5 Γöé + ┬╖┬╖isFlipped:┬╖boolean;
+          6 Γöé + ┬╖┬╖onFlip:┬╖()┬╖=>┬╖void;
+          7 Γöé + }
+          8 Γöé + 
+          9 Γöé + export┬╖function┬╖ReviewCard({┬╖card,┬╖isFlipped,┬╖onFlip┬╖}:┬╖ReviewCardProps)┬╖{
+         10 Γöé + ┬╖┬╖return┬╖(
+         11 Γöé + ┬╖┬╖┬╖┬╖<button
+         12 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖type="button"
+         13 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖aria-label={isFlipped┬╖?┬╖'Card┬╖answer┬╖ΓÇö┬╖click┬╖to┬╖flip┬╖back'┬╖:┬╖'Card┬╖question┬╖ΓÇö┬╖click┬╖to┬╖reveal┬╖answer'}
+         14 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖onClick={onFlip}
+         15 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖style={{
+         16 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'relative',
+         17 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖'100%',
+         18 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖maxWidth:┬╖'560px',
+         19 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖minHeight:┬╖'220px',
+  113 more lines truncated
+  
+
+src\components\Help\ShortcutHelp.tsx format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     1    Γöé - import┬╖{┬╖Keyboard,┬╖X┬╖}┬╖from┬╖'lucide-react';ΓÉì
+     2    Γöé - import┬╖{┬╖useEffect┬╖}┬╖from┬╖'react';ΓÉì
+     3    Γöé - import┬╖{┬╖useHelpUiStore┬╖}┬╖from┬╖'../../stores/helpUiStore';ΓÉì
+     4    Γöé - import┬╖{┬╖ShortcutsList┬╖}┬╖from┬╖'./ShortcutsList';ΓÉì
+     5    Γöé - ΓÉì
+     6    Γöé - /**ΓÉì
+     7    Γöé - ┬╖*┬╖Global┬╖keyboard┬╖shortcut┬╖reference┬╖modal.┬╖Triggered┬╖by┬╖Ctrl+/,┬╖Ctrl+?┬╖orΓÉì
+     8    Γöé - ┬╖*┬╖the┬╖Help┬╖footer┬╖button.┬╖Renders┬╖the┬╖same┬╖`ShortcutsList`┬╖used┬╖by┬╖theΓÉì
+     9    Γöé - ┬╖*┬╖Settings┬╖modal┬╖so┬╖the┬╖two┬╖views┬╖never┬╖disagree.ΓÉì
+    10    Γöé - ┬╖*/ΓÉì
+    11    Γöé - export┬╖function┬╖ShortcutHelp()┬╖{ΓÉì
+    12    Γöé - ┬╖┬╖const┬╖{┬╖isOpen,┬╖close┬╖}┬╖=┬╖useHelpUiStore();ΓÉì
+    13    Γöé - ΓÉì
+    14    Γöé - ┬╖┬╖useEffect(()┬╖=>┬╖{ΓÉì
+    15    Γöé - ┬╖┬╖┬╖┬╖if┬╖(!isOpen)┬╖return;ΓÉì
+    16    Γöé - ┬╖┬╖┬╖┬╖const┬╖onKey┬╖=┬╖(e:┬╖KeyboardEvent)┬╖=>┬╖{ΓÉì
+    17    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'Escape')┬╖{ΓÉì
+    18    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();ΓÉì
+    19    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖close();ΓÉì
+    20    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}ΓÉì
+    21    Γöé - ┬╖┬╖┬╖┬╖};ΓÉì
+    22    Γöé - ┬╖┬╖┬╖┬╖window.addEventListener('keydown',┬╖onKey);ΓÉì
+    23    Γöé - ┬╖┬╖┬╖┬╖return┬╖()┬╖=>┬╖window.removeEventListener('keydown',┬╖onKey);ΓÉì
+    24    Γöé - ┬╖┬╖},┬╖[isOpen,┬╖close]);ΓÉì
+    25    Γöé - ΓÉì
+    26    Γöé - ┬╖┬╖if┬╖(!isOpen)┬╖return┬╖null;ΓÉì
+    27    Γöé - ΓÉì
+    28    Γöé - ┬╖┬╖return┬╖(ΓÉì
+    29    Γöé - ┬╖┬╖┬╖┬╖<divΓÉì
+    30    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖onClick={close}ΓÉì
+    31    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖onKeyDown={(e)┬╖=>┬╖{ΓÉì
+    32    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'Escape')┬╖close();ΓÉì
+    33    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    34    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖role="dialog"ΓÉì
+    35    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖aria-modal="true"ΓÉì
+    36    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖aria-label="Keyboard┬╖shortcuts"ΓÉì
+    37    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    38    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'fixed',ΓÉì
+    39    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖inset:┬╖0,ΓÉì
+    40    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'rgba(0,0,0,0.5)',ΓÉì
+    41    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖zIndex:┬╖110,ΓÉì
+    42    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖display:┬╖'flex',ΓÉì
+    43    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖alignItems:┬╖'center',ΓÉì
+    44    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖justifyContent:┬╖'center',ΓÉì
+    45    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    46    Γöé - ┬╖┬╖┬╖┬╖>ΓÉì
+    47    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖<divΓÉì
+    48    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={(e)┬╖=>┬╖e.stopPropagation()}ΓÉì
+    49    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onKeyDown={(e)┬╖=>┬╖e.stopPropagation()}ΓÉì
+    50    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖role="document"ΓÉì
+    51    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    52    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖'min(560px,┬╖92vw)',ΓÉì
+    53    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖maxHeight:┬╖'80vh',ΓÉì
+    54    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'var(--bg-app)',ΓÉì
+    55    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'1px┬╖solid┬╖var(--border)',ΓÉì
+    56    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderRadius:┬╖'10px',ΓÉì
+    57    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖boxShadow:┬╖'0┬╖12px┬╖40px┬╖rgba(0,0,0,0.5)',ΓÉì
+    58    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖display:┬╖'flex',ΓÉì
+    59    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖flexDirection:┬╖'column',ΓÉì
+    60    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖overflow:┬╖'hidden',ΓÉì
+    61    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    62    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    63    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<headerΓÉì
+    64    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖className="flex┬╖items-center┬╖justify-between┬╖shrink-0"ΓÉì
+    65    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    66    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖padding:┬╖'12px┬╖18px',ΓÉì
+    67    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderBottom:┬╖'1px┬╖solid┬╖var(--border)',ΓÉì
+    68    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    69    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    70    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="flex┬╖items-center"┬╖style={{┬╖gap:┬╖'8px'┬╖}}>ΓÉì
+    71    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<Keyboard┬╖size={16}┬╖style={{┬╖color:┬╖'var(--accent)'┬╖}}┬╖/>ΓÉì
+    72    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<h2┬╖style={{┬╖margin:┬╖0,┬╖fontSize:┬╖'14px',┬╖fontWeight:┬╖600,┬╖color:┬╖'var(--text-primary)'┬╖}}>ΓÉì
+    73    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖Keyboard┬╖ShortcutsΓÉì
+    74    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</h2>ΓÉì
+    75    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    76    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<buttonΓÉì
+    77    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖type="button"ΓÉì
+    78    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={close}ΓÉì
+    79    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖aria-label="Close┬╖shortcuts┬╖help"ΓÉì
+    80    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{ΓÉì
+    81    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖background:┬╖'transparent',ΓÉì
+    82    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖border:┬╖'none',ΓÉì
+    83    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖cursor:┬╖'pointer',ΓÉì
+    84    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖color:┬╖'var(--text-tertiary)',ΓÉì
+    85    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖padding:┬╖'4px',ΓÉì
+    86    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖borderRadius:┬╖'4px',ΓÉì
+    87    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖}}ΓÉì
+    88    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖>ΓÉì
+    89    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<X┬╖size={16}┬╖/>ΓÉì
+    90    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</button>ΓÉì
+    91    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</header>ΓÉì
+    92    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<div┬╖className="flex-1┬╖overflow-y-auto"┬╖style={{┬╖padding:┬╖'14px┬╖18px'┬╖}}>ΓÉì
+    93    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖<ShortcutsList┬╖/>ΓÉì
+    94    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    95    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖</div>ΓÉì
+    96    Γöé - ┬╖┬╖┬╖┬╖</div>ΓÉì
+    97    Γöé - ┬╖┬╖);ΓÉì
+    98    Γöé - }ΓÉì
+        1 Γöé + import┬╖{┬╖Keyboard,┬╖X┬╖}┬╖from┬╖'lucide-react';
+        2 Γöé + import┬╖{┬╖useEffect┬╖}┬╖from┬╖'react';
+        3 Γöé + import┬╖{┬╖useHelpUiStore┬╖}┬╖from┬╖'../../stores/helpUiStore';
+        4 Γöé + import┬╖{┬╖ShortcutsList┬╖}┬╖from┬╖'./ShortcutsList';
+        5 Γöé + 
+        6 Γöé + /**
+        7 Γöé + ┬╖*┬╖Global┬╖keyboard┬╖shortcut┬╖reference┬╖modal.┬╖Triggered┬╖by┬╖Ctrl+/,┬╖Ctrl+?┬╖or
+        8 Γöé + ┬╖*┬╖the┬╖Help┬╖footer┬╖button.┬╖Renders┬╖the┬╖same┬╖`ShortcutsList`┬╖used┬╖by┬╖the
+        9 Γöé + ┬╖*┬╖Settings┬╖modal┬╖so┬╖the┬╖two┬╖views┬╖never┬╖disagree.
+       10 Γöé + ┬╖*/
+       11 Γöé + export┬╖function┬╖ShortcutHelp()┬╖{
+       12 Γöé + ┬╖┬╖const┬╖{┬╖isOpen,┬╖close┬╖}┬╖=┬╖useHelpUiStore();
+       13 Γöé + 
+       14 Γöé + ┬╖┬╖useEffect(()┬╖=>┬╖{
+       15 Γöé + ┬╖┬╖┬╖┬╖if┬╖(!isOpen)┬╖return;
+       16 Γöé + ┬╖┬╖┬╖┬╖const┬╖onKey┬╖=┬╖(e:┬╖KeyboardEvent)┬╖=>┬╖{
+       17 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'Escape')┬╖{
+       18 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖e.preventDefault();
+       19 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖close();
+       20 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}
+       21 Γöé + ┬╖┬╖┬╖┬╖};
+       22 Γöé + ┬╖┬╖┬╖┬╖window.addEventListener('keydown',┬╖onKey);
+       23 Γöé + ┬╖┬╖┬╖┬╖return┬╖()┬╖=>┬╖window.removeEventListener('keydown',┬╖onKey);
+       24 Γöé + ┬╖┬╖},┬╖[isOpen,┬╖close]);
+       25 Γöé + 
+       26 Γöé + ┬╖┬╖if┬╖(!isOpen)┬╖return┬╖null;
+       27 Γöé + 
+       28 Γöé + ┬╖┬╖return┬╖(
+       29 Γöé + ┬╖┬╖┬╖┬╖<div
+       30 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖onClick={close}
+       31 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖onKeyDown={(e)┬╖=>┬╖{
+       32 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖if┬╖(e.key┬╖===┬╖'Escape')┬╖close();
+       33 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}}
+       34 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖role="dialog"
+       35 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖aria-modal="true"
+       36 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖aria-label="Keyboard┬╖shortcuts"
+       37 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖style={{
+       38 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖position:┬╖'fixed',
+       39 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖inset:┬╖0,
+       40 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖backgroundColor:┬╖'rgba(0,0,0,0.5)',
+       41 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖zIndex:┬╖110,
+       42 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖display:┬╖'flex',
+       43 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖alignItems:┬╖'center',
+       44 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖justifyContent:┬╖'center',
+       45 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖}}
+       46 Γöé + ┬╖┬╖┬╖┬╖>
+       47 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖<div
+       48 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onClick={(e)┬╖=>┬╖e.stopPropagation()}
+       49 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖onKeyDown={(e)┬╖=>┬╖e.stopPropagation()}
+       50 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖role="document"
+       51 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖style={{
+       52 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖width:┬╖'min(560px,┬╖92vw)',
+  47 more lines truncated
+  
+
+tsconfig.json format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     1    Γöé - {ΓÉì
+     2    Γöé - ┬╖┬╖"compilerOptions":┬╖{ΓÉì
+     3    Γöé - ┬╖┬╖┬╖┬╖"target":┬╖"ES2021",ΓÉì
+     4    Γöé - ┬╖┬╖┬╖┬╖"useDefineForClassFields":┬╖true,ΓÉì
+     5    Γöé - ┬╖┬╖┬╖┬╖"lib":┬╖["ES2021",┬╖"DOM",┬╖"DOM.Iterable"],ΓÉì
+     6    Γöé - ┬╖┬╖┬╖┬╖"module":┬╖"ESNext",ΓÉì
+     7    Γöé - ┬╖┬╖┬╖┬╖"skipLibCheck":┬╖true,ΓÉì
+     8    Γöé - ┬╖┬╖┬╖┬╖"moduleResolution":┬╖"bundler",ΓÉì
+     9    Γöé - ┬╖┬╖┬╖┬╖"allowImportingTsExtensions":┬╖true,ΓÉì
+    10    Γöé - ┬╖┬╖┬╖┬╖"resolveJsonModule":┬╖true,ΓÉì
+    11    Γöé - ┬╖┬╖┬╖┬╖"isolatedModules":┬╖true,ΓÉì
+    12    Γöé - ┬╖┬╖┬╖┬╖"noEmit":┬╖true,ΓÉì
+    13    Γöé - ┬╖┬╖┬╖┬╖"jsx":┬╖"react-jsx",ΓÉì
+    14    Γöé - ┬╖┬╖┬╖┬╖"strict":┬╖true,ΓÉì
+    15    Γöé - ┬╖┬╖┬╖┬╖"noUnusedLocals":┬╖false,ΓÉì
+    16    Γöé - ┬╖┬╖┬╖┬╖"noUnusedParameters":┬╖false,ΓÉì
+    17    Γöé - ┬╖┬╖┬╖┬╖"noFallthroughCasesInSwitch":┬╖true,ΓÉì
+    18    Γöé - ┬╖┬╖┬╖┬╖"ignoreDeprecations":┬╖"6.0",ΓÉì
+    19    Γöé - ┬╖┬╖┬╖┬╖"baseUrl":┬╖".",ΓÉì
+    20    Γöé - ┬╖┬╖┬╖┬╖"paths":┬╖{ΓÉì
+    21    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖"@/*":┬╖["src/*"]ΓÉì
+    22    Γöé - ┬╖┬╖┬╖┬╖}ΓÉì
+    23    Γöé - ┬╖┬╖},ΓÉì
+    24    Γöé - ┬╖┬╖"include":┬╖["src"],ΓÉì
+    25    Γöé - ┬╖┬╖"references":┬╖[{┬╖"path":┬╖"./tsconfig.node.json"┬╖}]ΓÉì
+    26    Γöé - }ΓÉì
+        1 Γöé + {
+        2 Γöé + ┬╖┬╖"compilerOptions":┬╖{
+        3 Γöé + ┬╖┬╖┬╖┬╖"target":┬╖"ES2021",
+        4 Γöé + ┬╖┬╖┬╖┬╖"useDefineForClassFields":┬╖true,
+        5 Γöé + ┬╖┬╖┬╖┬╖"lib":┬╖["ES2021",┬╖"DOM",┬╖"DOM.Iterable"],
+        6 Γöé + ┬╖┬╖┬╖┬╖"module":┬╖"ESNext",
+        7 Γöé + ┬╖┬╖┬╖┬╖"skipLibCheck":┬╖true,
+        8 Γöé + ┬╖┬╖┬╖┬╖"moduleResolution":┬╖"bundler",
+        9 Γöé + ┬╖┬╖┬╖┬╖"allowImportingTsExtensions":┬╖true,
+       10 Γöé + ┬╖┬╖┬╖┬╖"resolveJsonModule":┬╖true,
+       11 Γöé + ┬╖┬╖┬╖┬╖"isolatedModules":┬╖true,
+       12 Γöé + ┬╖┬╖┬╖┬╖"noEmit":┬╖true,
+       13 Γöé + ┬╖┬╖┬╖┬╖"jsx":┬╖"react-jsx",
+       14 Γöé + ┬╖┬╖┬╖┬╖"strict":┬╖true,
+       15 Γöé + ┬╖┬╖┬╖┬╖"noUnusedLocals":┬╖false,
+       16 Γöé + ┬╖┬╖┬╖┬╖"noUnusedParameters":┬╖false,
+       17 Γöé + ┬╖┬╖┬╖┬╖"noFallthroughCasesInSwitch":┬╖true,
+       18 Γöé + ┬╖┬╖┬╖┬╖"ignoreDeprecations":┬╖"6.0",
+       19 Γöé + ┬╖┬╖┬╖┬╖"baseUrl":┬╖".",
+       20 Γöé + ┬╖┬╖┬╖┬╖"paths":┬╖{
+       21 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖"@/*":┬╖["src/*"]
+       22 Γöé + ┬╖┬╖┬╖┬╖}
+       23 Γöé + ┬╖┬╖},
+       24 Γöé + ┬╖┬╖"include":┬╖["src"],
+       25 Γöé + ┬╖┬╖"references":┬╖[{┬╖"path":┬╖"./tsconfig.node.json"┬╖}]
+       26 Γöé + }
+    27 27 Γöé   
+  
+
+vitest.config.ts format ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Formatter would have printed the following content:
+  
+     1    Γöé - ///┬╖<reference┬╖types="vitest"┬╖/>ΓÉì
+     2    Γöé - import┬╖react┬╖from┬╖'@vitejs/plugin-react';ΓÉì
+     3    Γöé - import┬╖path┬╖from┬╖'path';ΓÉì
+     4    Γöé - import┬╖{┬╖defineConfig┬╖}┬╖from┬╖'vitest/config';ΓÉì
+     5    Γöé - ΓÉì
+     6    Γöé - export┬╖default┬╖defineConfig({ΓÉì
+     7    Γöé - ┬╖┬╖plugins:┬╖[react()],ΓÉì
+     8    Γöé - ┬╖┬╖resolve:┬╖{ΓÉì
+     9    Γöé - ┬╖┬╖┬╖┬╖alias:┬╖{ΓÉì
+    10    Γöé - ┬╖┬╖┬╖┬╖┬╖┬╖'@':┬╖path.resolve(import.meta.dirname,┬╖'./src'),ΓÉì
+    11    Γöé - ┬╖┬╖┬╖┬╖},ΓÉì
+    12    Γöé - ┬╖┬╖},ΓÉì
+    13    Γöé - ┬╖┬╖test:┬╖{ΓÉì
+    14    Γöé - ┬╖┬╖┬╖┬╖environment:┬╖'jsdom',ΓÉì
+    15    Γöé - ┬╖┬╖┬╖┬╖globals:┬╖true,ΓÉì
+    16    Γöé - ┬╖┬╖┬╖┬╖include:┬╖['src/**/*.{test,spec}.{ts,tsx}'],ΓÉì
+    17    Γöé - ┬╖┬╖},ΓÉì
+    18    Γöé - });ΓÉì
+        1 Γöé + ///┬╖<reference┬╖types="vitest"┬╖/>
+        2 Γöé + import┬╖react┬╖from┬╖'@vitejs/plugin-react';
+        3 Γöé + import┬╖path┬╖from┬╖'path';
+        4 Γöé + import┬╖{┬╖defineConfig┬╖}┬╖from┬╖'vitest/config';
+        5 Γöé + 
+        6 Γöé + export┬╖default┬╖defineConfig({
+        7 Γöé + ┬╖┬╖plugins:┬╖[react()],
+        8 Γöé + ┬╖┬╖resolve:┬╖{
+        9 Γöé + ┬╖┬╖┬╖┬╖alias:┬╖{
+       10 Γöé + ┬╖┬╖┬╖┬╖┬╖┬╖'@':┬╖path.resolve(import.meta.dirname,┬╖'./src'),
+       11 Γöé + ┬╖┬╖┬╖┬╖},
+       12 Γöé + ┬╖┬╖},
+       13 Γöé + ┬╖┬╖test:┬╖{
+       14 Γöé + ┬╖┬╖┬╖┬╖environment:┬╖'jsdom',
+       15 Γöé + ┬╖┬╖┬╖┬╖globals:┬╖true,
+       16 Γöé + ┬╖┬╖┬╖┬╖include:┬╖['src/**/*.{test,spec}.{ts,tsx}'],
+       17 Γöé + ┬╖┬╖},
+       18 Γöé + });
+    19 19 Γöé   
+  
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 146.
+Checked 106 files in 48ms. No fixes applied.
+Found 108 errors.
+Found 55 warnings.
+Found 3 infos.
+check ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Some errors were emitted while running checks.
+  
+

@@ -54,6 +54,7 @@ export function parseMarkdownToContent(markdown: string): string {
 
   const closeListsTo = (targetDepth: number) => {
     while (listStack.length > targetDepth) {
+      // biome-ignore lint/style/noNonNullAssertion: loop condition guarantees non-empty
       const frame = listStack.pop()!;
       closeOpenLi(frame);
       htmlLines.push(frame.type === 'ul' ? '</ul>' : '</ol>');
@@ -102,6 +103,7 @@ export function parseMarkdownToContent(markdown: string): string {
       // If we're staying or going shallower, close the previous <li> at the
       // target level first.
       while (listStack.length > depth + 1) {
+        // biome-ignore lint/style/noNonNullAssertion: loop condition guarantees non-empty
         const f = listStack.pop()!;
         closeOpenLi(f);
         htmlLines.push(f.type === 'ul' ? '</ul>' : '</ol>');
@@ -110,6 +112,7 @@ export function parseMarkdownToContent(markdown: string): string {
         listStack.length === depth + 1 &&
         (listStack[depth].type !== wantType || listStack[depth].isTask !== wantTask)
       ) {
+        // biome-ignore lint/style/noNonNullAssertion: length check above guarantees non-empty
         const f = listStack.pop()!;
         closeOpenLi(f);
         htmlLines.push(f.type === 'ul' ? '</ul>' : '</ol>');

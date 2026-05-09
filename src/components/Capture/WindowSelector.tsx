@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useCaptureStore } from '../../stores/captureStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -16,7 +17,7 @@ export function WindowSelector() {
       .getWindowList()
       .then(setWindows)
       .catch((e) => {
-        console.error('Failed to list windows:', e);
+        reportError({ context: 'Capture window list', message: 'Failed to list windows', error: e });
       });
   }, []);
 
@@ -32,7 +33,7 @@ export function WindowSelector() {
           window.history.back();
         }
       } catch (e) {
-        console.error('Window capture failed:', e);
+        reportError({ context: 'Capture window', message: 'Window capture failed', error: e });
       }
     },
     [vaultPath, addToQueue],

@@ -12,7 +12,7 @@ interface InkCanvasProps {
   tool?: 'pen' | 'highlighter' | 'eraser';
 }
 
-function strokeToPath(points: InkPoint[], baseWidth: number): string {
+function strokeToPath(points: InkPoint[], _baseWidth: number): string {
   if (points.length < 2) return '';
   let d = `M ${points[0].x} ${points[0].y}`;
   for (let i = 1; i < points.length; i++) {
@@ -49,7 +49,7 @@ export function InkCanvas({
   const { isPenActive, pointerType } = useStylus(containerRef);
 
   // Allow drawing with pen always, or with any pointer when isActive
-  const canDraw = isActive && (pointerType === 'pen' || isPenActive || pointerType === 'mouse');
+  const _canDraw = isActive && (pointerType === 'pen' || isPenActive || pointerType === 'mouse');
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -80,7 +80,7 @@ export function InkCanvas({
   );
 
   const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (_e: React.PointerEvent<HTMLDivElement>) => {
       if (!isDrawingRef.current) return;
       isDrawingRef.current = false;
 

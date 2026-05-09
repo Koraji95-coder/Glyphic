@@ -1,0 +1,699 @@
+{
+  "formulas": [
+    {
+      "id": "ohms_law",
+      "name": "Ohm's Law",
+      "formula_latex": "V = I \\cdot R",
+      "variables": {
+        "V": "Voltage (volts)",
+        "I": "Current (amperes)",
+        "R": "Resistance (ohms)"
+      },
+      "description": "Voltage equals current times resistance",
+      "topic": "circuit_analysis",
+      "handbook_page": 42
+    },
+    {
+      "id": "power_dc",
+      "name": "Power (DC)",
+      "formula_latex": "P = V \\cdot I = I^2 \\cdot R = \\frac{V^2}{R}",
+      "variables": {
+        "P": "Power (watts)",
+        "V": "Voltage (volts)",
+        "I": "Current (amperes)",
+        "R": "Resistance (ohms)"
+      },
+      "description": "Electrical power can be calculated three ways",
+      "topic": "circuit_analysis",
+      "handbook_page": 42
+    },
+    {
+      "id": "kirchhoff_voltage",
+      "name": "Kirchhoff's Voltage Law",
+      "formula_latex": "\\sum V = 0",
+      "variables": {
+        "V": "Voltage (volts)"
+      },
+      "description": "Sum of voltages around a closed loop equals zero",
+      "topic": "circuit_analysis",
+      "handbook_page": 43
+    },
+    {
+      "id": "kirchhoff_current",
+      "name": "Kirchhoff's Current Law",
+      "formula_latex": "\\sum I_{in} = \\sum I_{out}",
+      "variables": {
+        "I": "Current (amperes)"
+      },
+      "description": "Sum of currents entering a node equals sum leaving",
+      "topic": "circuit_analysis",
+      "handbook_page": 43
+    },
+    {
+      "id": "resistance_series",
+      "name": "Resistance (Series)",
+      "formula_latex": "R_{total} = R_1 + R_2 + R_3 + \\ldots",
+      "variables": {
+        "R": "Resistance (ohms)"
+      },
+      "description": "Total resistance in series is the sum",
+      "topic": "circuit_analysis",
+      "handbook_page": 43
+    },
+    {
+      "id": "resistance_parallel",
+      "name": "Resistance (Parallel)",
+      "formula_latex": "\\frac{1}{R_{total}} = \\frac{1}{R_1} + \\frac{1}{R_2} + \\frac{1}{R_3} + \\ldots",
+      "variables": {
+        "R": "Resistance (ohms)"
+      },
+      "description": "Reciprocal of total resistance equals sum of reciprocals",
+      "topic": "circuit_analysis",
+      "handbook_page": 43
+    },
+    {
+      "id": "force_newtons_second",
+      "name": "Newton's Second Law",
+      "formula_latex": "F = m \\cdot a",
+      "variables": {
+        "F": "Force (newtons)",
+        "m": "Mass (kilograms)",
+        "a": "Acceleration (m/s²)"
+      },
+      "description": "Force equals mass times acceleration",
+      "topic": "mechanics",
+      "handbook_page": 10
+    },
+    {
+      "id": "weight",
+      "name": "Weight",
+      "formula_latex": "W = m \\cdot g",
+      "variables": {
+        "W": "Weight (newtons)",
+        "m": "Mass (kilograms)",
+        "g": "Gravitational acceleration (9.81 m/s²)"
+      },
+      "description": "Weight is the gravitational force on an object",
+      "topic": "mechanics",
+      "handbook_page": 10
+    },
+    {
+      "id": "work_constant_force",
+      "name": "Work (Constant Force)",
+      "formula_latex": "W = F \\cdot d \\cdot \\cos(\\theta)",
+      "variables": {
+        "W": "Work (joules)",
+        "F": "Force (newtons)",
+        "d": "Distance (meters)",
+        "θ": "Angle between force and displacement (degrees)"
+      },
+      "description": "Work is force times displacement times cosine of angle",
+      "topic": "mechanics",
+      "handbook_page": 11
+    },
+    {
+      "id": "kinetic_energy",
+      "name": "Kinetic Energy",
+      "formula_latex": "KE = \\frac{1}{2} m v^2",
+      "variables": {
+        "KE": "Kinetic energy (joules)",
+        "m": "Mass (kilograms)",
+        "v": "Velocity (m/s)"
+      },
+      "description": "Kinetic energy of a moving object",
+      "topic": "mechanics",
+      "handbook_page": 11
+    },
+    {
+      "id": "potential_energy_gravity",
+      "name": "Potential Energy (Gravitational)",
+      "formula_latex": "PE = m \\cdot g \\cdot h",
+      "variables": {
+        "PE": "Potential energy (joules)",
+        "m": "Mass (kilograms)",
+        "g": "Gravitational acceleration (9.81 m/s²)",
+        "h": "Height (meters)"
+      },
+      "description": "Gravitational potential energy relative to reference",
+      "topic": "mechanics",
+      "handbook_page": 11
+    },
+    {
+      "id": "momentum",
+      "name": "Momentum",
+      "formula_latex": "p = m \\cdot v",
+      "variables": {
+        "p": "Momentum (kg·m/s)",
+        "m": "Mass (kilograms)",
+        "v": "Velocity (m/s)"
+      },
+      "description": "Momentum is mass times velocity",
+      "topic": "mechanics",
+      "handbook_page": 12
+    },
+    {
+      "id": "impulse",
+      "name": "Impulse",
+      "formula_latex": "J = F \\cdot \\Delta t = \\Delta p",
+      "variables": {
+        "J": "Impulse (N·s)",
+        "F": "Force (newtons)",
+        "Δt": "Time interval (seconds)",
+        "Δp": "Change in momentum (kg·m/s)"
+      },
+      "description": "Impulse equals change in momentum",
+      "topic": "mechanics",
+      "handbook_page": 12
+    },
+    {
+      "id": "stress",
+      "name": "Stress",
+      "formula_latex": "\\sigma = \\frac{F}{A}",
+      "variables": {
+        "σ": "Stress (pascals)",
+        "F": "Force (newtons)",
+        "A": "Area (m²)"
+      },
+      "description": "Stress is force per unit area",
+      "topic": "mechanics",
+      "handbook_page": 15
+    },
+    {
+      "id": "strain",
+      "name": "Strain",
+      "formula_latex": "\\varepsilon = \\frac{\\Delta L}{L_0}",
+      "variables": {
+        "ε": "Strain (dimensionless)",
+        "ΔL": "Change in length (meters)",
+        "L₀": "Original length (meters)"
+      },
+      "description": "Strain is the relative change in length",
+      "topic": "mechanics",
+      "handbook_page": 15
+    },
+    {
+      "id": "youngs_modulus",
+      "name": "Young's Modulus",
+      "formula_latex": "E = \\frac{\\sigma}{\\varepsilon}",
+      "variables": {
+        "E": "Young's modulus (pascals)",
+        "σ": "Stress (pascals)",
+        "ε": "Strain (dimensionless)"
+      },
+      "description": "Ratio of stress to strain in elastic region",
+      "topic": "mechanics",
+      "handbook_page": 15
+    },
+    {
+      "id": "temp_celsius_to_fahrenheit",
+      "name": "Temperature (Celsius to Fahrenheit)",
+      "formula_latex": "T_F = \\frac{9}{5} T_C + 32",
+      "variables": {
+        "T_F": "Temperature (Fahrenheit)",
+        "T_C": "Temperature (Celsius)"
+      },
+      "description": "Convert Celsius to Fahrenheit",
+      "topic": "thermodynamics",
+      "handbook_page": 28
+    },
+    {
+      "id": "temp_absolute_zero",
+      "name": "Absolute Temperature (Kelvin)",
+      "formula_latex": "T_K = T_C + 273.15",
+      "variables": {
+        "T_K": "Temperature (Kelvin)",
+        "T_C": "Temperature (Celsius)"
+      },
+      "description": "Convert Celsius to absolute temperature",
+      "topic": "thermodynamics",
+      "handbook_page": 28
+    },
+    {
+      "id": "heat_capacity",
+      "name": "Heat (Sensible Heating)",
+      "formula_latex": "Q = m \\cdot c \\cdot \\Delta T",
+      "variables": {
+        "Q": "Heat (joules)",
+        "m": "Mass (kilograms)",
+        "c": "Specific heat capacity (J/(kg·K))",
+        "ΔT": "Temperature change (K)"
+      },
+      "description": "Heat required to change temperature without phase change",
+      "topic": "thermodynamics",
+      "handbook_page": 29
+    },
+    {
+      "id": "density",
+      "name": "Density",
+      "formula_latex": "\\rho = \\frac{m}{V}",
+      "variables": {
+        "ρ": "Density (kg/m³)",
+        "m": "Mass (kilograms)",
+        "V": "Volume (m³)"
+      },
+      "description": "Density is mass per unit volume",
+      "topic": "thermodynamics",
+      "handbook_page": 29
+    },
+    {
+      "id": "pressure",
+      "name": "Pressure",
+      "formula_latex": "P = \\frac{F}{A}",
+      "variables": {
+        "P": "Pressure (pascals)",
+        "F": "Force (newtons)",
+        "A": "Area (m²)"
+      },
+      "description": "Pressure is force per unit area",
+      "topic": "thermodynamics",
+      "handbook_page": 30
+    },
+    {
+      "id": "ideal_gas",
+      "name": "Ideal Gas Law",
+      "formula_latex": "PV = nRT",
+      "variables": {
+        "P": "Pressure (pascals)",
+        "V": "Volume (m³)",
+        "n": "Number of moles",
+        "R": "Gas constant (8.314 J/(mol·K))",
+        "T": "Temperature (Kelvin)"
+      },
+      "description": "Equation of state for ideal gases",
+      "topic": "thermodynamics",
+      "handbook_page": 30
+    },
+    {
+      "id": "moment_of_inertia_rod",
+      "name": "Moment of Inertia (Rod, about center)",
+      "formula_latex": "I = \\frac{1}{12} m L^2",
+      "variables": {
+        "I": "Moment of inertia (kg·m²)",
+        "m": "Mass (kilograms)",
+        "L": "Length (meters)"
+      },
+      "description": "Rotational inertia of a rod about its center",
+      "topic": "mechanics",
+      "handbook_page": 13
+    },
+    {
+      "id": "moment_of_inertia_disk",
+      "name": "Moment of Inertia (Disk, about center)",
+      "formula_latex": "I = \\frac{1}{2} m r^2",
+      "variables": {
+        "I": "Moment of inertia (kg·m²)",
+        "m": "Mass (kilograms)",
+        "r": "Radius (meters)"
+      },
+      "description": "Rotational inertia of a disk about its center",
+      "topic": "mechanics",
+      "handbook_page": 13
+    },
+    {
+      "id": "torque",
+      "name": "Torque",
+      "formula_latex": "\\tau = r \\times F = r \\cdot F \\cdot \\sin(\\theta)",
+      "variables": {
+        "τ": "Torque (newton-meters)",
+        "r": "Distance from pivot (meters)",
+        "F": "Force (newtons)",
+        "θ": "Angle between r and F (degrees)"
+      },
+      "description": "Torque is the rotational equivalent of force",
+      "topic": "mechanics",
+      "handbook_page": 13
+    },
+    {
+      "id": "angular_velocity",
+      "name": "Angular Velocity",
+      "formula_latex": "\\omega = \\frac{\\theta}{t}",
+      "variables": {
+        "ω": "Angular velocity (rad/s)",
+        "θ": "Angular displacement (radians)",
+        "t": "Time (seconds)"
+      },
+      "description": "Rate of change of angular position",
+      "topic": "mechanics",
+      "handbook_page": 13
+    },
+    {
+      "id": "angular_momentum",
+      "name": "Angular Momentum",
+      "formula_latex": "L = I \\cdot \\omega",
+      "variables": {
+        "L": "Angular momentum (kg·m²/s)",
+        "I": "Moment of inertia (kg·m²)",
+        "ω": "Angular velocity (rad/s)"
+      },
+      "description": "Rotational equivalent of linear momentum",
+      "topic": "mechanics",
+      "handbook_page": 14
+    },
+    {
+      "id": "gyration_radius",
+      "name": "Radius of Gyration",
+      "formula_latex": "I = m \\cdot k^2",
+      "variables": {
+        "I": "Moment of inertia (kg·m²)",
+        "m": "Mass (kilograms)",
+        "k": "Radius of gyration (meters)"
+      },
+      "description": "Equivalent radius at which all mass could be concentrated",
+      "topic": "mechanics",
+      "handbook_page": 14
+    },
+    {
+      "id": "enthalpy",
+      "name": "Enthalpy",
+      "formula_latex": "H = U + PV",
+      "variables": {
+        "H": "Enthalpy (joules)",
+        "U": "Internal energy (joules)",
+        "P": "Pressure (pascals)",
+        "V": "Volume (m³)"
+      },
+      "description": "Total energy of a system including pressure-volume work",
+      "topic": "thermodynamics",
+      "handbook_page": 32
+    },
+    {
+      "id": "entropy",
+      "name": "Entropy",
+      "formula_latex": "\\Delta S = \\int \\frac{dQ}{T}",
+      "variables": {
+        "ΔS": "Change in entropy (J/K)",
+        "dQ": "Heat transfer (joules)",
+        "T": "Temperature (Kelvin)"
+      },
+      "description": "Measure of disorder or irreversibility",
+      "topic": "thermodynamics",
+      "handbook_page": 32
+    },
+    {
+      "id": "first_law",
+      "name": "First Law of Thermodynamics",
+      "formula_latex": "\\Delta U = Q - W",
+      "variables": {
+        "ΔU": "Change in internal energy (joules)",
+        "Q": "Heat added to system (joules)",
+        "W": "Work done by system (joules)"
+      },
+      "description": "Energy conservation in thermodynamic processes",
+      "topic": "thermodynamics",
+      "handbook_page": 31
+    },
+    {
+      "id": "efficiency_thermal",
+      "name": "Thermal Efficiency",
+      "formula_latex": "\\eta = \\frac{W_{net}}{Q_{in}}",
+      "variables": {
+        "η": "Thermal efficiency (dimensionless)",
+        "W_net": "Net work output (joules)",
+        "Q_in": "Heat input (joules)"
+      },
+      "description": "Ratio of useful work output to heat input",
+      "topic": "thermodynamics",
+      "handbook_page": 35
+    },
+    {
+      "id": "circle_area",
+      "name": "Circle Area",
+      "formula_latex": "A = \\pi r^2",
+      "variables": {
+        "A": "Area (m²)",
+        "r": "Radius (meters)"
+      },
+      "description": "Area of a circle",
+      "topic": "geometry",
+      "handbook_page": 1
+    },
+    {
+      "id": "circle_circumference",
+      "name": "Circle Circumference",
+      "formula_latex": "C = 2\\pi r = \\pi d",
+      "variables": {
+        "C": "Circumference (meters)",
+        "r": "Radius (meters)",
+        "d": "Diameter (meters)"
+      },
+      "description": "Perimeter of a circle",
+      "topic": "geometry",
+      "handbook_page": 1
+    },
+    {
+      "id": "triangle_area",
+      "name": "Triangle Area",
+      "formula_latex": "A = \\frac{1}{2} b \\cdot h",
+      "variables": {
+        "A": "Area (m²)",
+        "b": "Base (meters)",
+        "h": "Height (meters)"
+      },
+      "description": "Area of a triangle",
+      "topic": "geometry",
+      "handbook_page": 1
+    },
+    {
+      "id": "rectangle_area",
+      "name": "Rectangle Area",
+      "formula_latex": "A = l \\cdot w",
+      "variables": {
+        "A": "Area (m²)",
+        "l": "Length (meters)",
+        "w": "Width (meters)"
+      },
+      "description": "Area of a rectangle",
+      "topic": "geometry",
+      "handbook_page": 1
+    },
+    {
+      "id": "pythagorean_theorem",
+      "name": "Pythagorean Theorem",
+      "formula_latex": "a^2 + b^2 = c^2",
+      "variables": {
+        "a": "Side a (meters)",
+        "b": "Side b (meters)",
+        "c": "Hypotenuse (meters)"
+      },
+      "description": "Relationship for right triangles",
+      "topic": "geometry",
+      "handbook_page": 2
+    },
+    {
+      "id": "sine_law",
+      "name": "Sine Law",
+      "formula_latex": "\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C}",
+      "variables": {
+        "a": "Side a (meters)",
+        "b": "Side b (meters)",
+        "c": "Side c (meters)",
+        "A": "Angle A (degrees)",
+        "B": "Angle B (degrees)",
+        "C": "Angle C (degrees)"
+      },
+      "description": "Relationship between sides and angles in triangles",
+      "topic": "geometry",
+      "handbook_page": 2
+    },
+    {
+      "id": "cosine_law",
+      "name": "Cosine Law",
+      "formula_latex": "c^2 = a^2 + b^2 - 2ab\\cos(C)",
+      "variables": {
+        "a": "Side a (meters)",
+        "b": "Side b (meters)",
+        "c": "Side c (meters)",
+        "C": "Angle C (degrees)"
+      },
+      "description": "General triangle side-angle relationship",
+      "topic": "geometry",
+      "handbook_page": 2
+    },
+    {
+      "id": "logarithm",
+      "name": "Logarithm",
+      "formula_latex": "\\log_b(x) = y \\Rightarrow b^y = x",
+      "variables": {
+        "b": "Base",
+        "x": "Argument",
+        "y": "Result"
+      },
+      "description": "Logarithm is the inverse of exponentiation",
+      "topic": "mathematics",
+      "handbook_page": 3
+    },
+    {
+      "id": "exponential",
+      "name": "Exponential Function",
+      "formula_latex": "e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!}",
+      "variables": {
+        "e": "Euler's number (2.71828...)",
+        "x": "Exponent"
+      },
+      "description": "Natural exponential function",
+      "topic": "mathematics",
+      "handbook_page": 3
+    },
+    {
+      "id": "derivative_power",
+      "name": "Power Rule (Derivative)",
+      "formula_latex": "\\frac{d}{dx} x^n = n x^{n-1}",
+      "variables": {
+        "n": "Exponent"
+      },
+      "description": "Derivative of power function",
+      "topic": "mathematics",
+      "handbook_page": 4
+    },
+    {
+      "id": "integral_power",
+      "name": "Power Rule (Integral)",
+      "formula_latex": "\\int x^n dx = \\frac{x^{n+1}}{n+1} + C",
+      "variables": {
+        "n": "Exponent",
+        "C": "Constant of integration"
+      },
+      "description": "Integral of power function",
+      "topic": "mathematics",
+      "handbook_page": 4
+    },
+    {
+      "id": "centroid_triangle",
+      "name": "Centroid (Triangle)",
+      "formula_latex": "\\bar{x} = \\frac{x_1 + x_2 + x_3}{3}",
+      "variables": {
+        "x̄": "x-coordinate of centroid",
+        "x₁, x₂, x₃": "x-coordinates of vertices"
+      },
+      "description": "Center of mass of a triangle",
+      "topic": "mechanics",
+      "handbook_page": 16
+    },
+    {
+      "id": "centroid_rectangle",
+      "name": "Centroid (Rectangle)",
+      "formula_latex": "\\bar{x} = \\frac{l}{2}, \\quad \\bar{y} = \\frac{w}{2}",
+      "variables": {
+        "l": "Length (meters)",
+        "w": "Width (meters)"
+      },
+      "description": "Center of mass of a rectangle",
+      "topic": "mechanics",
+      "handbook_page": 16
+    },
+    {
+      "id": "pressure_hydrostatic",
+      "name": "Hydrostatic Pressure",
+      "formula_latex": "P = \\rho \\cdot g \\cdot h",
+      "variables": {
+        "P": "Pressure (pascals)",
+        "ρ": "Fluid density (kg/m³)",
+        "g": "Gravitational acceleration (9.81 m/s²)",
+        "h": "Depth (meters)"
+      },
+      "description": "Pressure in a fluid due to weight",
+      "topic": "thermodynamics",
+      "handbook_page": 37
+    },
+    {
+      "id": "buoyancy",
+      "name": "Buoyant Force",
+      "formula_latex": "F_b = \\rho \\cdot g \\cdot V",
+      "variables": {
+        "F_b": "Buoyant force (newtons)",
+        "ρ": "Fluid density (kg/m³)",
+        "g": "Gravitational acceleration (9.81 m/s²)",
+        "V": "Volume of fluid displaced (m³)"
+      },
+      "description": "Archimedes' principle - upward force on submerged object",
+      "topic": "thermodynamics",
+      "handbook_page": 37
+    },
+    {
+      "id": "continuity_equation",
+      "name": "Continuity Equation",
+      "formula_latex": "A_1 v_1 = A_2 v_2",
+      "variables": {
+        "A": "Cross-sectional area (m²)",
+        "v": "Velocity (m/s)"
+      },
+      "description": "Conservation of mass in fluid flow",
+      "topic": "thermodynamics",
+      "handbook_page": 38
+    },
+    {
+      "id": "bernoulli_equation",
+      "name": "Bernoulli's Equation",
+      "formula_latex": "\\frac{P}{\\rho g} + \\frac{v^2}{2g} + z = \\text{constant}",
+      "variables": {
+        "P": "Pressure (pascals)",
+        "ρ": "Fluid density (kg/m³)",
+        "g": "Gravitational acceleration (9.81 m/s²)",
+        "v": "Velocity (m/s)",
+        "z": "Height (meters)"
+      },
+      "description": "Energy conservation in fluid flow",
+      "topic": "thermodynamics",
+      "handbook_page": 38
+    },
+    {
+      "id": "reynolds_number",
+      "name": "Reynolds Number",
+      "formula_latex": "Re = \\frac{\\rho v D}{\\mu}",
+      "variables": {
+        "Re": "Reynolds number (dimensionless)",
+        "ρ": "Fluid density (kg/m³)",
+        "v": "Velocity (m/s)",
+        "D": "Characteristic diameter (meters)",
+        "μ": "Dynamic viscosity (Pa·s)"
+      },
+      "description": "Ratio of inertial to viscous forces",
+      "topic": "thermodynamics",
+      "handbook_page": 38
+    },
+    {
+      "id": "darcy_weisbach",
+      "name": "Darcy-Weisbach Equation",
+      "formula_latex": "h_f = f \\frac{L}{D} \\frac{v^2}{2g}",
+      "variables": {
+        "h_f": "Head loss (meters)",
+        "f": "Friction factor (dimensionless)",
+        "L": "Pipe length (meters)",
+        "D": "Pipe diameter (meters)",
+        "v": "Velocity (m/s)",
+        "g": "Gravitational acceleration (9.81 m/s²)"
+      },
+      "description": "Pressure drop due to friction in pipe flow",
+      "topic": "thermodynamics",
+      "handbook_page": 39
+    },
+    {
+      "id": "shear_stress",
+      "name": "Shear Stress",
+      "formula_latex": "\\tau = \\frac{V}{A}",
+      "variables": {
+        "τ": "Shear stress (pascals)",
+        "V": "Shear force (newtons)",
+        "A": "Area (m²)"
+      },
+      "description": "Stress due to shear force",
+      "topic": "mechanics",
+      "handbook_page": 18
+    },
+    {
+      "id": "bending_moment",
+      "name": "Bending Moment",
+      "formula_latex": "M = E I \\frac{d^2y}{dx^2}",
+      "variables": {
+        "M": "Bending moment (newton-meters)",
+        "E": "Young's modulus (pascals)",
+        "I": "Moment of inertia (m⁴)",
+        "y": "Deflection (meters)",
+        "x": "Position (meters)"
+      },
+      "description": "Moment-curvature relationship for beam bending",
+      "topic": "mechanics",
+      "handbook_page": 19
+    }
+  ]
+}

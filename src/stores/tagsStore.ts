@@ -28,7 +28,11 @@ export const useTagsStore = create<TagsState>((set, get) => ({
         await get().selectTag(current);
       }
     } catch (e) {
-      console.warn('refreshTags failed:', e);
+      const message = e instanceof Error ? e.message : String(e);
+      // During first-launch races, the DB may not have initialized yet.
+      if (!message.includes('no such table: notes')) {
+        console.warn('refreshTags failed:', e);
+      }
       set({ isLoading: false });
     }
   },

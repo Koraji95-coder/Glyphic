@@ -1,3 +1,4 @@
+import { FolderOpen, Plus } from 'lucide-react';
 import { useTagsStore } from '../../stores/tagsStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
@@ -31,10 +32,29 @@ export function FileTree() {
     return (
       <div
         className="flex flex-col items-center justify-center h-full px-4 text-center"
-        style={{ color: 'var(--text-tertiary)' }}
+        style={{ color: 'var(--text-tertiary)', gap: '6px', paddingBottom: '40px' }}
       >
-        <p className="text-sm">No notes yet</p>
-        <p className="text-xs mt-1">Create a note to get started</p>
+        <span
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '10px',
+            border: '1px solid var(--glass-border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--accent)',
+            background: 'rgba(255,255,255,0.03)',
+          }}
+        >
+          <FolderOpen size={16} />
+        </span>
+        <p className="text-sm" style={{ fontWeight: 500 }}>
+          No notes yet
+        </p>
+        <p className="text-xs" style={{ color: 'var(--text-ghost)', lineHeight: 1.5 }}>
+          Create your first note with <strong style={{ color: 'var(--accent-warm)' }}><Plus size={11} style={{ display: 'inline', verticalAlign: '-1px' }} /> New note</strong>
+        </p>
       </div>
     );
   }

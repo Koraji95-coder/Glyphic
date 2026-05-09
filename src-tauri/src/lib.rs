@@ -122,6 +122,22 @@ pub fn run() {
             commands::fe_commands::get_weak_fe_topics,
             commands::fe_commands::start_fe_session,
             commands::fe_commands::complete_fe_session,
+            commands::fe_commands::tick_session,
+            commands::fe_commands::take_break,
+            commands::fe_commands::seed_question_bank,
+            commands::fe_commands::get_question_for_session,
+            // Question Bank management
+            commands::fe_commands::list_topics_with_question_counts,
+            commands::fe_commands::list_questions_by_topic,
+            commands::fe_commands::get_question_detail,
+            commands::fe_commands::add_fe_question,
+            commands::fe_commands::update_fe_question,
+            commands::fe_commands::flag_question,
+            commands::fe_commands::mark_question_reviewed,
+            // FE reference materials (formulas, unit conversion, handbook Q&A)
+            commands::fe_commands::fe_formula_lookup,
+            commands::fe_commands::fe_unit_convert,
+            commands::fe_commands::fe_handbook_qa,
             // Flashcard SRS
             commands::flashcards::record_flashcard_review,
             commands::flashcards::get_due_flashcards,

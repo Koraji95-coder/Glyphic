@@ -9,9 +9,12 @@ use crate::vault::watcher::VaultWatcher;
 use crate::{DbState, WatcherState};
 
 /// Replace the placeholder in-memory DB with a connection to the real
-/// `.glyphic/index.db` for the freshly-opened vault, then rebuild the FTS
-/// index so search works immediately. Also starts the filesystem watcher so
-/// the UI can react to external changes.
+/// `.glyphic/index.db` for the freshly-opened vault, and starts the
+/// filesystem watcher so the UI can react to external changes.
+///
+/// Note: we intentionally do not run a blocking full reindex here. The
+/// frontend already triggers `reindex_vault` after `vaultPath` is set, which
+/// keeps startup responsive and avoids doing the same expensive scan twice.
 fn activate_vault(
     app: &tauri::AppHandle,
     db_state: &tauri::State<'_, DbState>,
@@ -19,7 +22,6 @@ fn activate_vault(
     path: &str,
 ) -> Result<(), String> {
     let conn = schema::init_database(Path::new(path))?;
-    let _ = index::reindex_vault(&conn, path);
     {
         let mut guard = db_state.0.lock().map_err(|e| format!("DB lock error: {e}"))?;
         *guard = conn;

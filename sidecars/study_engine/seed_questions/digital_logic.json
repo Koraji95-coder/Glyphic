@@ -1,0 +1,304 @@
+{
+  "topic": "Digital Logic",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "De Morgan's first theorem states:",
+      "choices": [
+        "A. (A·B)' = A' + B'",
+        "B. (A+B)' = A' · B'",
+        "C. A'' = A",
+        "D. A + A' = 1"
+      ],
+      "correct_answer": "A",
+      "explanation": "De Morgan's 1st: (A·B)' = A' + B'. 2nd: (A+B)' = A'·B'. Useful for converting between AND and OR forms.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A NAND gate is a universal gate because:",
+      "choices": [
+        "A. It can implement any Boolean function by itself",
+        "B. It has the highest fan-out",
+        "C. It is the fastest gate",
+        "D. It uses the fewest transistors"
+      ],
+      "correct_answer": "A",
+      "explanation": "NAND (and NOR) are universal: any logic function can be implemented using only NAND gates.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An XOR gate outputs 1 when:",
+      "choices": [
+        "A. Both inputs are 1",
+        "B. Inputs are the same",
+        "C. Inputs are different (exactly one is 1)",
+        "D. Both inputs are 0"
+      ],
+      "correct_answer": "C",
+      "explanation": "XOR (A ⊕ B) = 1 iff A ≠ B. Truth table: 00→0, 01→1, 10→1, 11→0.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Karnaugh map (K-map) is used to:",
+      "choices": [
+        "A. Design sequential circuits",
+        "B. Minimize Boolean expressions by grouping adjacent 1s",
+        "C. Calculate propagation delay",
+        "D. Convert binary to gray code"
+      ],
+      "correct_answer": "B",
+      "explanation": "K-maps graphically minimize SOP/POS Boolean expressions. Groups of 1, 2, 4, 8 adjacent cells eliminate variables.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A D flip-flop stores the value of D at the _____ edge of the clock.",
+      "choices": ["A. Low level", "B. Rising (positive) clock edge", "C. Falling only if enabled", "D. At any time asynchronously"],
+      "correct_answer": "B",
+      "explanation": "Standard positive-edge-triggered D FF: Q follows D at the rising clock edge; Q holds between edges.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An SR latch has a forbidden state when:",
+      "choices": ["A. S = 0, R = 0", "B. S = 1, R = 1", "C. S = 1, R = 0", "D. S = 0, R = 1"],
+      "correct_answer": "B",
+      "explanation": "SR latch: S=1,R=1 is forbidden (both S and R active simultaneously leads to undefined/race condition).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A 4-bit binary ripple counter counts from 0 to:",
+      "choices": ["A. 15 (2⁴ − 1)", "B. 16", "C. 8", "D. 4"],
+      "correct_answer": "A",
+      "explanation": "n-bit counter: 2ⁿ states, counting 0 to 2ⁿ − 1. 4-bit: 0 to 15 (16 states total).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A multiplexer (MUX) selects:",
+      "choices": [
+        "A. One of N inputs to a single output based on select lines",
+        "B. One of N outputs from a single input",
+        "C. Binary to BCD conversion",
+        "D. Only two inputs"
+      ],
+      "correct_answer": "A",
+      "explanation": "MUX (data selector): 2ⁿ data inputs, n select lines, 1 output. DEMUX is the reverse.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A 2-to-4 decoder with input AB = 10 asserts output:",
+      "choices": ["A. Y₀", "B. Y₁", "C. Y₂", "D. Y₃"],
+      "correct_answer": "C",
+      "explanation": "Decoder: binary input selects one output. AB = 10 (decimal 2) → Y₂ goes HIGH.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The SOP (Sum of Products) form of F = A'B + AB' + AB is:",
+      "choices": [
+        "A. (A + B)(A + B')",
+        "B. A'B + AB' + AB",
+        "C. Can be simplified to A + B",
+        "D. A'B' only"
+      ],
+      "correct_answer": "C",
+      "explanation": "F = A'B + AB' + AB = A(B'+B) + A'B = A + A'B = A + B (by absorption). Answer: F = A + B.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Setup time for a flip-flop is the minimum time:",
+      "choices": [
+        "A. The clock must remain HIGH after the clock edge",
+        "B. The data input D must be stable BEFORE the active clock edge",
+        "C. Between two consecutive clock edges",
+        "D. The output takes to change"
+      ],
+      "correct_answer": "B",
+      "explanation": "Setup time t_su: D must be stable at least t_su before the clock edge. Hold time t_h: D must remain stable after the edge.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Gray code differs from binary code in that:",
+      "choices": [
+        "A. Only one bit changes between successive values",
+        "B. It uses more bits",
+        "C. It is the same as BCD",
+        "D. Multiple bits always change simultaneously"
+      ],
+      "correct_answer": "A",
+      "explanation": "Gray code: adjacent values differ in exactly 1 bit. Used in encoders to avoid glitches during transitions.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A JK flip-flop with J = 1, K = 1 at the clock edge will:",
+      "choices": ["A. Set Q = 1", "B. Reset Q = 0", "C. Toggle Q", "D. Hold Q unchanged"],
+      "correct_answer": "C",
+      "explanation": "JK FF: J=0,K=0→hold; J=1,K=0→set; J=0,K=1→reset; J=1,K=1→toggle (Q_next = Q').",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In CMOS logic, a HIGH output is produced by:",
+      "choices": [
+        "A. Turning on the NMOS transistor",
+        "B. Turning on the PMOS pull-up transistor and turning off the NMOS pull-down",
+        "C. Shorting V_DD to GND",
+        "D. Floating the output"
+      ],
+      "correct_answer": "B",
+      "explanation": "CMOS: PMOS (pull-up) ON + NMOS (pull-down) OFF → output = V_DD (HIGH). Complementary operation.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The propagation delay t_pd of a logic gate is:",
+      "choices": [
+        "A. Time from input change to 50% point of output change",
+        "B. Time for clock to reach the gate",
+        "C. The setup time",
+        "D. The gate's power consumption"
+      ],
+      "correct_answer": "A",
+      "explanation": "Propagation delay: input 50% crossing to output 50% crossing. Critical for maximum clock frequency design.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which are types of programmable logic devices (PLDs)? (Select ALL that apply.)",
+      "choices": ["A. PROM", "B. PLA", "C. GAL", "D. FPGA"],
+      "correct_answer": "A,B,C,D",
+      "explanation": "PROM, PLA, GAL, and FPGA are all forms of programmable logic. PAL, CPLD are others.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A full adder takes inputs A, B, and Carry_in (Cin) and produces:",
+      "choices": [
+        "A. Sum = A ⊕ B ⊕ Cin; Cout = AB + Cin(A ⊕ B)",
+        "B. Sum = A + B; Cout = A · B",
+        "C. Only Sum, no carry output",
+        "D. Sum = A · B; Cout = A + B"
+      ],
+      "correct_answer": "A",
+      "explanation": "Full adder: Sum = A ⊕ B ⊕ Cin; Carry_out = AB + Cin(A⊕B). Used in ripple-carry and other adder architectures.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Two's complement representation of −5 in 8-bit binary is:",
+      "choices": ["A. 00000101", "B. 11111011", "C. 10000101", "D. 01111010"],
+      "correct_answer": "B",
+      "explanation": "+5 = 00000101. Invert: 11111010, Add 1: 11111011. So −5 = 11111011 in 8-bit two's complement.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A state machine is called a Moore machine when:",
+      "choices": [
+        "A. Outputs depend on both state and current inputs",
+        "B. Outputs depend only on the current state",
+        "C. It has no states",
+        "D. Inputs are asynchronous"
+      ],
+      "correct_answer": "B",
+      "explanation": "Moore: outputs are function of state only. Mealy: outputs are function of state AND inputs.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A tri-state buffer output can be in:",
+      "choices": [
+        "A. HIGH or LOW only",
+        "B. HIGH, LOW, or high-impedance (Hi-Z)",
+        "C. Any analog voltage",
+        "D. Only Hi-Z"
+      ],
+      "correct_answer": "B",
+      "explanation": "Tri-state: three output states — logic 1, logic 0, and Hi-Z (disconnected). Enables bus sharing.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Convert hexadecimal 0xAF to decimal.",
+      "choices": null, "correct_answer": "175", "unit": "", "tolerance": 0,
+      "explanation": "0xAF = 10×16 + 15 = 160 + 15 = 175",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A 4-to-1 MUX requires how many select lines?",
+      "choices": ["A. 1", "B. 2", "C. 4", "D. 3"],
+      "correct_answer": "B",
+      "explanation": "2ⁿ inputs need n select lines. 4 inputs → 2 select lines.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Fan-out of a logic gate is defined as:",
+      "choices": [
+        "A. Number of inputs a single gate output can drive reliably",
+        "B. The number of inputs the gate has",
+        "C. The power consumption",
+        "D. The propagation delay"
+      ],
+      "correct_answer": "A",
+      "explanation": "Fan-out: maximum number of gate inputs (same logic family) a single output can drive while maintaining correct logic levels.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Which Boolean identity is the absorption law?",
+      "choices": ["A. A + AB = A", "B. A + A = A", "C. A · 1 = A", "D. A + 0 = A"],
+      "correct_answer": "A",
+      "explanation": "Absorption: A + AB = A (and A(A+B) = A). Useful for simplifying Boolean expressions.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "CMOS dynamic power consumption is proportional to:",
+      "choices": [
+        "A. C × V_DD² × f (switching activity)",
+        "B. V_DD only",
+        "C. I_leak × V_DD only",
+        "D. 1/f"
+      ],
+      "correct_answer": "A",
+      "explanation": "CMOS dynamic power: P = α C V_DD² f where α is switching activity. Reducing V_DD or f saves power quadratically.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 4.1", "review_status": "ai_draft"
+    }
+  ]
+}

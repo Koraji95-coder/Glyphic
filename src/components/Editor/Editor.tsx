@@ -2,14 +2,17 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
 import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { useEditor } from '../../hooks/useEditor';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { events } from '../../lib/tauri/events';
 import { getEditorExtensions } from '../../lib/tiptap/extensions';
 import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
 import { serializeToMarkdown } from '../../lib/tiptap/markdownSerializer';
 import { useAnnotationStore } from '../../stores/annotationStore';
+import { useEditorActionStore } from '../../stores/editorActionStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useVaultStore } from '../../stores/vaultStore';
+import { Dashboard } from '../../modes/dashboard/Dashboard';
 import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
 import { EditorToolbar } from './EditorToolbar';
 import { NoteTagChips } from './NoteTagChips';
@@ -92,6 +95,32 @@ export function Editor({
     editor?.setEditable(!readOnly);
   }, [editor, readOnly]);
 
+  // Register editor action callbacks used by keyboard shortcuts and modals.
+  useEffect(() => {
+    const actionStore = useEditorActionStore.getState();
+    if (!editor || readOnly) return;
+
+    actionStore.setOnInsertLink((url: string, text?: string) => {
+      const linkText = text?.trim() || url;
+      editor.chain().focus().insertContent(`[${linkText}](${url})`).run();
+    });
+
+    actionStore.setOnInsertBacklink((noteTitle: string) => {
+      editor.chain().focus().insertContent(`[[${noteTitle}]]`).run();
+    });
+
+    actionStore.setOnToggleCodeBlock(() => {
+      editor.chain().focus().toggleCodeBlock().run();
+    });
+
+    return () => {
+      const cleanupStore = useEditorActionStore.getState();
+      cleanupStore.resetOnInsertLink();
+      cleanupStore.resetOnInsertBacklink();
+      cleanupStore.resetOnToggleCodeBlock();
+    };
+  }, [editor, readOnly]);
+
   // Load active note content
   useEffect(() => {
     if (!editor || !activeNotePath) return;
@@ -113,7 +142,7 @@ export function Editor({
         const content = parseMarkdownToContent(raw);
         editor.commands.setContent(content);
       } catch (e) {
-        console.error('Failed to load note:', e);
+        reportError({ context: 'Editor note load', message: 'Failed to load note', error: e });
       }
     };
     load();
@@ -121,7 +150,7 @@ export function Editor({
     return () => {
       cancelled = true;
     };
-  }, [editor, activeNotePath, readOnly]);
+  }, [editor, activeNotePath, readOnly, loadNote]);
 
   // Listen for captured screenshots to insert images
   const insertImage = useCallback(
@@ -159,11 +188,7 @@ export function Editor({
   }, [readOnly, forceSave]);
 
   if (!activeNotePath) {
-    return (
-      <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--text-tertiary)' }}>
-        <p className="text-lg">Select or create a note to get started</p>
-      </div>
-    );
+    return <Dashboard />;
   }
 
   // Build breadcrumb parts from the note path
@@ -200,7 +225,13 @@ export function Editor({
           ))}
         </div>
       )}
-      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-editor)' }}>
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{
+          background:
+            'radial-gradient(circle at top center, rgba(163,116,247,0.06), transparent 32%), radial-gradient(circle at bottom right, rgba(249,118,85,0.05), transparent 24%), rgba(13,11,22,0.45)',
+        }}
+      >
         <EditorContent editor={editor} />
       </div>
       {!readOnly && <AnnotationOverlayLazy />}

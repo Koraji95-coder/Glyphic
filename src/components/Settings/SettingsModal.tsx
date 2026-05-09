@@ -1,6 +1,7 @@
 import { Camera, Cog, Folder, Keyboard, Mic, PenTool, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { type SettingsSection, useSettingsUiStore } from '../../stores/settingsUiStore';
@@ -56,7 +57,7 @@ export function SettingsModal() {
       setSavingState('saved');
       setTimeout(() => setSavingState((s) => (s === 'saved' ? 'idle' : s)), 1500);
     } catch (e) {
-      console.error('Failed to save settings:', e);
+      reportError({ context: 'Settings save', message: 'Failed to save settings', error: e });
       setSavingState('idle');
     }
   };
@@ -87,10 +88,12 @@ export function SettingsModal() {
         style={{
           width: 'min(900px, 92vw)',
           height: 'min(640px, 88vh)',
-          backgroundColor: 'var(--bg-app)',
-          border: '1px solid var(--border)',
-          borderRadius: '10px',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+          backgroundColor: 'var(--glass-surface)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '16px',
+          boxShadow: '0 16px 60px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05)',
           display: 'flex',
           overflow: 'hidden',
         }}
@@ -98,8 +101,8 @@ export function SettingsModal() {
         <nav
           style={{
             width: '180px',
-            backgroundColor: 'var(--bg-sidebar)',
-            borderRight: '1px solid var(--border)',
+            backgroundColor: 'rgba(0,0,0,0.18)',
+            borderRight: '1px solid var(--glass-border)',
             padding: '14px 8px',
             display: 'flex',
             flexDirection: 'column',

@@ -1,0 +1,354 @@
+{
+  "topic": "Complex Numbers",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The complex number 3 + 4j in polar form is:",
+      "choices": ["A. 5∠53.1°", "B. 5∠36.9°", "C. 7∠45°", "D. 25∠53.1°"],
+      "correct_answer": "A",
+      "explanation": "|z| = √(9+16) = 5; θ = arctan(4/3) ≈ 53.1°. So z = 5∠53.1°.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Euler's formula states that e^(jθ) = ?",
+      "choices": [
+        "A. cos(θ) − j sin(θ)",
+        "B. cos(θ) + j sin(θ)",
+        "C. sin(θ) + j cos(θ)",
+        "D. e^θ(cos(j) + sin(j))"
+      ],
+      "correct_answer": "B",
+      "explanation": "Euler's formula: e^(jθ) = cos θ + j sin θ. Fundamental to phasor and AC analysis.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The complex conjugate of z = a + jb is:",
+      "choices": ["A. a − jb", "B. −a + jb", "C. −a − jb", "D. 1/(a+jb)"],
+      "correct_answer": "A",
+      "explanation": "Complex conjugate z* = a − jb; the imaginary part changes sign.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The product of z = 2∠30° and w = 3∠60° is:",
+      "choices": ["A. 6∠90°", "B. 5∠90°", "C. 6∠30°", "D. 6∠−30°"],
+      "correct_answer": "A",
+      "explanation": "Polar multiplication: magnitudes multiply, angles add. 2×3=6; 30°+60°=90°. Result = 6∠90°.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The quotient z/w where z = 10∠80° and w = 2∠30° is:",
+      "choices": ["A. 5∠50°", "B. 5∠110°", "C. 20∠110°", "D. 5∠−50°"],
+      "correct_answer": "A",
+      "explanation": "Polar division: magnitudes divide, angles subtract. 10/2 = 5; 80°−30° = 50°. Result = 5∠50°.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "What is |z| if z = 5 + 12j?",
+      "choices": null,
+      "correct_answer": "13",
+      "unit": "",
+      "tolerance": 0.05,
+      "explanation": "|z| = √(5² + 12²) = √(25 + 144) = √169 = 13",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The value of j² is:",
+      "choices": ["A. 1", "B. −1", "C. j", "D. −j"],
+      "correct_answer": "B",
+      "explanation": "By definition, j = √(−1), so j² = −1.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Convert z = 4∠−90° to rectangular form.",
+      "choices": ["A. 0 − 4j", "B. 4 + 0j", "C. −4 + 0j", "D. 0 + 4j"],
+      "correct_answer": "A",
+      "explanation": "z = 4(cos(−90°) + j sin(−90°)) = 4(0 − j) = −4j = 0 − 4j.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The sum (3 + 2j) + (1 − 5j) is:",
+      "choices": ["A. 4 + 7j", "B. 4 − 3j", "C. 2 − 3j", "D. 3 − 3j"],
+      "correct_answer": "B",
+      "explanation": "Add real and imaginary parts separately: (3+1) + (2−5)j = 4 − 3j.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The product (2 + j)(2 − j) equals:",
+      "choices": ["A. 4 + j²", "B. 5", "C. 3", "D. 4 − j²"],
+      "correct_answer": "B",
+      "explanation": "(2+j)(2−j) = 4 − j² = 4 − (−1) = 5. This is |z|² = 4 + 1 = 5.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "De Moivre's theorem states that (r∠θ)ⁿ = ?",
+      "choices": [
+        "A. r∠(nθ)",
+        "B. rⁿ∠θ",
+        "C. rⁿ∠(nθ)",
+        "D. nrⁿ⁻¹∠(nθ)"
+      ],
+      "correct_answer": "C",
+      "explanation": "De Moivre: (r e^{jθ})ⁿ = rⁿ e^{jnθ} = rⁿ∠(nθ). Used for nth powers and roots of complex numbers.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The real part of z = (1 + j)² is:",
+      "choices": ["A. 2", "B. 0", "C. 1", "D. −2"],
+      "correct_answer": "B",
+      "explanation": "(1+j)² = 1 + 2j + j² = 1 + 2j − 1 = 0 + 2j. Re(z) = 0.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The angle (argument) of z = −3 + 3j is:",
+      "choices": ["A. 45°", "B. 135°", "C. −45°", "D. 225°"],
+      "correct_answer": "B",
+      "explanation": "z is in the second quadrant (negative real, positive imaginary). θ = 180° − arctan(3/3) = 180° − 45° = 135°.",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "To divide complex numbers in rectangular form (a+jb)/(c+jd), multiply numerator and denominator by:",
+      "choices": [
+        "A. c + jd",
+        "B. c − jd (conjugate of denominator)",
+        "C. a + jb",
+        "D. 1/(c+jd)"
+      ],
+      "correct_answer": "B",
+      "explanation": "Multiply by conjugate c−jd to make denominator real: (c+jd)(c−jd) = c²+d².",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Which of the following equals cos(θ)?",
+      "choices": [
+        "A. (e^(jθ) − e^(−jθ)) / (2j)",
+        "B. (e^(jθ) + e^(−jθ)) / 2",
+        "C. j(e^(jθ) + e^(−jθ))",
+        "D. (e^(jθ) + e^(−jθ)) / (2j)"
+      ],
+      "correct_answer": "B",
+      "explanation": "From Euler's formula: cos θ = Re(e^{jθ}) = (e^{jθ} + e^{−jθ})/2.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The three cube roots of 1 (unity) are:",
+      "choices": [
+        "A. 1, j, −j",
+        "B. 1, ∠120°, ∠240°",
+        "C. 1, −1, j",
+        "D. 1, ∠60°, ∠120°"
+      ],
+      "correct_answer": "B",
+      "explanation": "The three cube roots of 1 have magnitude 1 and angles 0°, 120°, 240°: {1∠0°, 1∠120°, 1∠240°}.",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In circuit analysis, phasors represent sinusoidal signals as:",
+      "choices": [
+        "A. Time-domain waveforms",
+        "B. Complex amplitudes encoding both magnitude and phase",
+        "C. Purely real amplitudes",
+        "D. Power quantities"
+      ],
+      "correct_answer": "B",
+      "explanation": "A phasor V = |V|∠φ encodes the amplitude |V| and phase φ of v(t) = |V|cos(ωt + φ), simplifying AC calculations.",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.4",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which of the following are TRUE about complex conjugates z and z*? (Select ALL that apply.)",
+      "choices": [
+        "A. z × z* = |z|²",
+        "B. z + z* = 2 Re(z)",
+        "C. z − z* = 2j Im(z)",
+        "D. |z| = |z*|"
+      ],
+      "correct_answer": "A,B,C,D",
+      "explanation": "All four properties hold: z·z* = |z|²; z+z* = 2a (twice real part); z−z* = 2jb; magnitudes are equal.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The value of j^4 is:",
+      "choices": ["A. −1", "B. j", "C. 1", "D. −j"],
+      "correct_answer": "C",
+      "explanation": "j¹=j, j²=−1, j³=−j, j⁴=1. The powers of j cycle with period 4.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The imaginary part of z = 2e^(jπ/4) is:",
+      "choices": ["A. √2", "B. 2", "C. 1", "D. √2/2"],
+      "correct_answer": "A",
+      "explanation": "z = 2(cos 45° + j sin 45°) = 2(√2/2 + j√2/2) = √2 + j√2. Im(z) = √2.",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "What is the magnitude of the product (1+j)(1−j)?",
+      "choices": null,
+      "correct_answer": "2",
+      "unit": "",
+      "tolerance": 0.01,
+      "explanation": "(1+j)(1−j) = 1 − j² = 1 + 1 = 2 (real). |2| = 2. Alternatively: |1+j||1−j| = √2 × √2 = 2.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The polar form of z = −1 + 0j is:",
+      "choices": ["A. 1∠0°", "B. 1∠90°", "C. 1∠180°", "D. 1∠270°"],
+      "correct_answer": "C",
+      "explanation": "|−1| = 1; the angle is 180°. Equivalently, e^(jπ) = −1.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Complex power S in a circuit is defined as S = V × I* (V times conjugate of I). The real part of S is:",
+      "choices": [
+        "A. Reactive power Q in VAR",
+        "B. Apparent power in VA",
+        "C. Real (average) power P in watts",
+        "D. The power factor"
+      ],
+      "correct_answer": "C",
+      "explanation": "S = P + jQ; Re(S) = P (real power, watts), Im(S) = Q (reactive power, VAR).",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.6",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "If z = r∠θ, then 1/z = ?",
+      "choices": [
+        "A. (1/r)∠θ",
+        "B. r∠(−θ)",
+        "C. (1/r)∠(−θ)",
+        "D. (1/r)∠(180°−θ)"
+      ],
+      "correct_answer": "C",
+      "explanation": "1/z = 1/(r e^{jθ}) = (1/r) e^{−jθ} = (1/r)∠(−θ). Magnitude reciprocates, angle negates.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The complex exponential e^(j2π) equals:",
+      "choices": ["A. 0", "B. −1", "C. j", "D. 1"],
+      "correct_answer": "D",
+      "explanation": "e^(j2π) = cos(2π) + j sin(2π) = 1 + 0 = 1. Full rotation returns to unity.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.2",
+      "review_status": "ai_draft"
+    }
+  ]
+}
