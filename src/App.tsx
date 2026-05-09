@@ -12,6 +12,7 @@ import { StatusBar } from './components/Layout/StatusBar';
 import { TitleBar } from './components/Layout/TitleBar';
 import { Lightbox } from './components/Lightbox/Lightbox';
 import { Onboarding } from './components/Onboarding/Onboarding';
+import { PromptModal } from './components/common/PromptModal';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { Sidebar } from './components/Sidebar/Sidebar';
@@ -169,6 +170,7 @@ function MainLayout() {
       <Onboarding />
       {referenceModalOpen && <ReferenceModal />}
       <ErrorToast />
+      <PromptModal />
     </div>
   );
 }

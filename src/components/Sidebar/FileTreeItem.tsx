@@ -19,7 +19,9 @@ import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useSplitStore } from '../../stores/splitStore';
 import { useVaultStore } from '../../stores/vaultStore';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import type { VaultEntry } from '../../types/vault';
+
 
 interface FileTreeItemProps {
   entry: VaultEntry;
@@ -45,7 +47,9 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const pinNote = useVaultStore((s) => s.pinNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
+  const { openPrompt } = usePromptModalStore();
   const { createNote, deleteNote, deleteFolder } = useVault();
+  
 
   const isFolder = entry.entry_type === 'folder';
   const isActive = !isFolder && activeNotePath === entry.path;
@@ -93,70 +97,78 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     setVisibleChildrenCount(INITIAL_CHILDREN_BATCH);
   }, [expanded, isFolder]);
 
-  const handleNewNote = async () => {
+  const handleNewNote = () => {
     setCtxMenu(null);
     const folder = isFolder ? entry.path : entry.path.split('/').slice(0, -1).join('/');
-    const name = window.prompt('Note name:');
-    if (name) {
-      try {
-        const note = await createNote(folder, name);
-        if (note) {
-          setActiveNote(note.id, note.path);
+    openPrompt({
+      title: 'New Note',
+      placeholder: 'Note name',
+      onConfirm: async (name: string) => {
+        if (!name) return;
+        try {
+          const note = await createNote(folder, name);
+          if (note) setActiveNote(note.id, note.path);
+        } catch (e) {
+          reportError({ context: 'File tree create note', message: 'Failed to create note', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree create note', message: 'Failed to create note', error: e });
-      }
-    }
+      },
+    });
   };
 
-  const handleNewFolder = async () => {
+  const handleNewFolder = () => {
     setCtxMenu(null);
-    // Folder creation handled at vault level
-    const name = window.prompt('Folder name:');
-    if (name) {
-      try {
-        const vaultPath = useVaultStore.getState().vaultPath;
-        if (vaultPath) {
+    openPrompt({
+      title: 'New Folder',
+      placeholder: 'Folder name',
+      onConfirm: async (name: string) => {
+        if (!name || !useVaultStore.getState().vaultPath) return;
+        try {
+          const vaultPath = useVaultStore.getState().vaultPath!;
           const folder = isFolder ? entry.path : entry.path.split('/').slice(0, -1).join('/');
           const relativePath = folder ? `${folder}/${name}` : name;
           await commands.createFolder(vaultPath, relativePath);
           await useVaultStore.getState().refreshFileTree();
+        } catch (e) {
+          reportError({ context: 'File tree create folder', message: 'Failed to create folder', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree create folder', message: 'Failed to create folder', error: e });
-      }
-    }
+      },
+    });
   };
 
-  const handleRename = async () => {
+  const handleRename = () => {
     setCtxMenu(null);
-    const newName = window.prompt('New name:', title);
-    if (newName && newName !== title) {
-      try {
-        const vaultPath = useVaultStore.getState().vaultPath;
-        if (vaultPath) {
-          await commands.renameNote(vaultPath, entry.path, newName);
-          await useVaultStore.getState().refreshFileTree();
+    openPrompt({
+      title: 'Rename',
+      defaultValue: title,
+      onConfirm: async (newName: string) => {
+        if (!newName || newName === title) return;
+        try {
+          const vaultPath = useVaultStore.getState().vaultPath;
+          if (vaultPath) {
+            await commands.renameNote(vaultPath, entry.path, newName);
+            await useVaultStore.getState().refreshFileTree();
+          }
+        } catch (e) {
+          reportError({ context: 'File tree rename', message: 'Failed to rename', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree rename', message: 'Failed to rename', error: e });
-      }
-    }
+      },
+    });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setCtxMenu(null);
-    if (window.confirm(`Delete "${title}"?`)) {
-      try {
-        if (isFolder) {
-          await deleteFolder(entry.path);
-        } else {
+    openPrompt({
+      title: `Delete "${title}"?`,
+      isConfirm: true,
+      confirmLabel: 'Delete',
+      onConfirm: async () => {
+        try {
           await deleteNote(entry.path);
+        } catch (e) {
+          reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
-      }
-    }
+      },
+    });
   };
 
   return (

@@ -11,6 +11,7 @@ import { useEditorStore } from '../../stores/editorStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
 
+
 export function TitleBar() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const openNotes = useVaultStore((s) => s.openNotes);
@@ -517,9 +518,12 @@ export function TitleBar() {
               title="New note (prompts for name)"
               aria-label="New note"
               onClick={() => {
-                const name = window.prompt('Note name:');
-                if (name) {
-                  window.dispatchEvent(new CustomEvent('glyphic:new-note', { detail: { name } }));
+    openPrompt({
+      title: 'New Note',
+      placeholder: 'Note name',
+      onConfirm: (name: string) => {
+        if (name) {
+          window.dispatchEvent(new CustomEvent('glyphic:new-note', { detail: { name } }));
                 }
               }}
               style={{

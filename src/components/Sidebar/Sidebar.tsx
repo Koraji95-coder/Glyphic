@@ -18,6 +18,7 @@ import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import { ReviewSession } from '../Flashcards/ReviewSession';
 import { BacklinksPanel } from './BacklinksPanel';
 import { FileTree } from './FileTree';
@@ -43,57 +44,46 @@ export function Sidebar() {
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
   const { createNote } = useVault();
+  const { openPrompt } = usePromptModalStore();
 
   // Count notes and folders
   const { noteCount, folderCount } = countEntries(fileTree);
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
 
-  const handleNewNote = useCallback(
-    async (name?: string) => {
-      const noteName = name ?? window.prompt('Note name:');
-      if (noteName) {
-        try {
-          await createNote(selectedFolderPath, noteName);
-        } catch (e) {
-          reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
-        }
-      }
-    },
-    [createNote, selectedFolderPath],
-  );
-
-  // Listen for the "new-note" event dispatched from TitleBar's "+" button
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const name = (e as CustomEvent<{ name: string }>).detail?.name;
-      void handleNewNote(name);
-    };
-    window.addEventListener('glyphic:new-note', handler);
-    return () => window.removeEventListener('glyphic:new-note', handler);
-  }, [handleNewNote]);
-
-  const handleNewFolder = useCallback(async () => {
-    const name = window.prompt('Folder name:');
-    if (name && vaultPath) {
-      try {
-        const base = selectedFolderPath ? `${selectedFolderPath}/${name}` : name;
-        await commands.createFolder(vaultPath, base);
-        await refreshFileTree();
-      } catch (e) {
-        reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e });
-      }
+  const handleNewNote = useCallback(async (name?: string) => {
+    if (name) {
+      // direct from event
+      try { await createNote('', name); } catch (e) { reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e }); }
+      return;
     }
-  }, [vaultPath, refreshFileTree, selectedFolderPath]);
+    openPrompt({
+      title: 'New Note',
+      placeholder: 'Note name',
+      onConfirm: async (name: string) => {
+        if (!name) return;
+        try { await createNote('', name); } catch (e) { reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e }); }
+      },
+    });
+  }, [createNote, openPrompt]);
 
-  // Listen for the "new-folder" event dispatched from App.tsx (Ctrl+Shift+N)
-  useEffect(() => {
-    window.addEventListener('glyphic:new-folder', handleNewFolder);
-    return () => window.removeEventListener('glyphic:new-folder', handleNewFolder);
-  }, [handleNewFolder]);
+  const handleNewFolder = useCallback(() => {
+    openPrompt({
+      title: 'New Folder',
+      placeholder: 'Folder name',
+      onConfirm: async (name: string) => {
+        if (!name || !vaultPath) return;
+        try {
+          await commands.createFolder(vaultPath, name);
+          await refreshFileTree();
+        } catch (e) { reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e }); }
+      },
+    });
+  }, [vaultPath, refreshFileTree, openPrompt]);
 
   const handleTrash = useCallback(() => {
-    window.alert('Deleted notes are moved to your system Trash and can be restored from there.');
+    // replace alert with toast (see step 5)
+    // or temporarily: openPrompt({ title: 'Trash Info', isConfirm: true, confirmLabel: 'OK', onConfirm: () => {} });
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
