@@ -40,7 +40,8 @@ export function NoteTagChips({ notePath, refreshKey }: NoteTagChipsProps) {
       style={{
         gap: '4px',
         padding: '4px 28px 6px',
-        backgroundColor: 'var(--bg-editor)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%), var(--bg-editor)',
       }}
     >
       {tags.map((t) => (
@@ -49,13 +50,14 @@ export function NoteTagChips({ notePath, refreshKey }: NoteTagChipsProps) {
           className="flex items-center"
           style={{
             gap: '2px',
-            padding: '2px 8px',
+            padding: '3px 9px',
             borderRadius: '999px',
             fontSize: '11px',
             fontWeight: 500,
             color: 'var(--accent)',
-            backgroundColor: 'var(--accent-dim)',
-            border: '1px solid var(--border)',
+            background: 'linear-gradient(135deg, rgba(163,116,247,0.16), rgba(244,114,182,0.08))',
+            border: '1px solid rgba(163,116,247,0.2)',
+            boxShadow: '0 10px 24px rgba(163,116,247,0.12)',
           }}
         >
           <Hash size={11} />

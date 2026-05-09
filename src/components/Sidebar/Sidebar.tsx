@@ -1,4 +1,17 @@
-import { Database, GitBranch, GraduationCap, HelpCircle, LayoutList, PinOff, Settings, Trash2 } from 'lucide-react';
+import {
+  Database,
+  FileText,
+  FolderOpen,
+  GraduationCap,
+  Grid2X2,
+  HelpCircle,
+  LayoutList,
+  PinOff,
+  Plus,
+  Settings,
+  Trash2,
+  Workflow,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
@@ -19,7 +32,18 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
-  const { isSidebarOpen, closeSidebar, openFePrep, openVaultMode, openDiagramMode, isFocusMode } = useLayoutStore();
+  const {
+    isSidebarOpen,
+    closeSidebar,
+    openFePrep,
+    openVaultMode,
+    openDiagramMode,
+    isFocusMode,
+    isFePrepMode,
+    isVaultMode,
+    isDiagramMode,
+    closeFePrep,
+  } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
@@ -34,6 +58,13 @@ export function Sidebar() {
   const { noteCount, folderCount } = countEntries(fileTree);
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
+  const activeWorkspace: 'dashboard' | 'vault' | 'diagram' | 'study' = isVaultMode
+    ? 'vault'
+    : isDiagramMode
+      ? 'diagram'
+      : isFePrepMode
+        ? 'study'
+        : 'dashboard';
 
   const handleNewNote = useCallback(
     async (name?: string) => {
@@ -80,6 +111,13 @@ export function Sidebar() {
   const handleTrash = useCallback(() => {
     window.alert('Deleted notes are moved to your system Trash and can be restored from there.');
   }, []);
+
+  const workspaceCards = [
+    { key: 'dashboard' as const, label: 'Dashboard', icon: Grid2X2, onClick: closeFePrep },
+    { key: 'vault' as const, label: 'Vault Tools', icon: Database, onClick: openVaultMode },
+    { key: 'diagram' as const, label: 'Diagrams', icon: Workflow, onClick: openDiagramMode },
+    { key: 'study' as const, label: 'FE Prep', icon: GraduationCap, onClick: openFePrep },
+  ];
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -129,11 +167,12 @@ export function Sidebar() {
           <div
             className="flex items-center justify-center shrink-0"
             style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '6px',
+              width: '28px',
+              height: '28px',
+              borderRadius: '8px',
               background: 'var(--accent-gradient)',
-              fontSize: '10px',
+              boxShadow: '0 10px 24px rgba(163,116,247,0.2)',
+              fontSize: '11px',
               fontWeight: 700,
               color: '#fff',
             }}
@@ -144,7 +183,7 @@ export function Sidebar() {
             <div className="truncate" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>
               {vaultName}
             </div>
-            <div style={{ fontSize: '10px', color: 'var(--text-ghost)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>
               {noteCount} notes · {folderCount} folders
             </div>
           </div>
@@ -152,30 +191,72 @@ export function Sidebar() {
 
         <SearchBar />
 
-        {/* Action buttons */}
-        <div className="flex" style={{ gap: '4px' }}>
-          <SidebarActionButton primary onClick={() => handleNewNote()}>
-            ✚ Note
-          </SidebarActionButton>
-          <SidebarActionButton onClick={handleNewFolder}>📁 Folder</SidebarActionButton>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <SectionLabel>Workspace</SectionLabel>
+          <div className="grid grid-cols-2" style={{ gap: '6px' }}>
+            {workspaceCards.map((item) => {
+              const Icon = item.icon;
+              const active = activeWorkspace === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={item.onClick}
+                  className="flex items-center"
+                  style={{
+                    gap: '8px',
+                    padding: '10px 10px',
+                    borderRadius: '12px',
+                    border: active ? '1px solid rgba(163,116,247,0.22)' : '1px solid var(--glass-border)',
+                    background: active
+                      ? 'linear-gradient(135deg, rgba(163,116,247,0.18), rgba(249,118,85,0.08))'
+                      : 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    boxShadow: active ? '0 14px 28px rgba(163,116,247,0.12)' : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+                    cursor: 'pointer',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: active ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Icon size={14} />
+                  </span>
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <SectionLabel>Quick actions</SectionLabel>
+          <div className="flex" style={{ gap: '6px' }}>
+            <SidebarActionButton primary icon={<Plus size={13} />} onClick={() => handleNewNote()}>
+              New note
+            </SidebarActionButton>
+            <SidebarActionButton icon={<FolderOpen size={13} />} onClick={handleNewFolder}>
+              Folder
+            </SidebarActionButton>
+          </div>
         </div>
       </div>
 
       {/* Pinned notes section */}
       {pinnedNotes.length > 0 && (
         <div style={{ padding: '4px 10px 6px' }}>
-          <div
-            style={{
-              fontSize: '9px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'var(--text-ghost)',
-              padding: '4px 4px 4px',
-            }}
-          >
-            Pinned
-          </div>
+          <SectionLabel>Pinned</SectionLabel>
           {pinnedNotes.map((path) => {
             const name = path.replace(/\.md$/, '').split('/').pop() || path;
             return (
@@ -202,7 +283,7 @@ export function Sidebar() {
                   (e.currentTarget as HTMLDivElement).style.color = 'var(--text-secondary)';
                 }}
               >
-                <span style={{ fontSize: '11px', flexShrink: 0 }}>📌</span>
+                <FileText size={11} style={{ flexShrink: 0 }} />
                 <span className="flex-1 truncate">{name}</span>
                 <button
                   type="button"
@@ -255,8 +336,9 @@ export function Sidebar() {
         className="flex shrink-0"
         style={{
           padding: '6px 10px',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--glass-border)',
           gap: '4px',
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
         }}
       >
         <FooterButton
@@ -265,11 +347,8 @@ export function Sidebar() {
           onClick={() => useSettingsUiStore.getState().open('general')}
         />
         <FooterButton icon={<Trash2 size={12} />} label="Trash" onClick={handleTrash} />
-        <FooterButton icon={<Database size={12} />} label="Vault" onClick={openVaultMode} />
-        <FooterButton icon={<GitBranch size={12} />} label="Diagrams" onClick={openDiagramMode} />
-        <FooterButton icon={<GraduationCap size={12} />} label="FE Prep" onClick={openFePrep} />
-        <FooterButton icon={<LayoutList size={12} />} label="Review" onClick={openReview} />
         <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
+        <FooterButton icon={<LayoutList size={12} />} label="Review" onClick={openReview} />
       </div>
       <ReviewSession />
     </>
@@ -305,8 +384,10 @@ export function Sidebar() {
             left: 0,
             bottom: 0,
             width: '280px',
-            backgroundColor: 'var(--bg-sidebar)',
-            borderRight: '1px solid var(--border)',
+            backgroundColor: 'var(--glass-surface)',
+            backdropFilter: 'var(--glass-blur)',
+            WebkitBackdropFilter: 'var(--glass-blur)',
+            borderRight: '1px solid var(--glass-border)',
             zIndex: 50,
             transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
             transition: 'transform 0.25s ease',
@@ -325,8 +406,10 @@ export function Sidebar() {
       className="flex flex-col shrink-0 h-full relative"
       style={{
         width: `${width}px`,
-        backgroundColor: 'var(--bg-sidebar)',
-        borderRight: '1px solid var(--border)',
+        backgroundColor: 'var(--glass-surface)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        borderRight: '1px solid var(--glass-border)',
       }}
     >
       {sidebarContent}
@@ -363,10 +446,12 @@ function countEntries(entries: ReturnType<typeof useVaultStore.getState>['fileTr
 
 function SidebarActionButton({
   children,
+  icon,
   primary,
   onClick,
 }: {
   children: React.ReactNode;
+  icon?: React.ReactNode;
   primary?: boolean;
   onClick: () => void;
 }) {
@@ -377,28 +462,59 @@ function SidebarActionButton({
       className="flex items-center justify-center"
       style={{
         flex: 1,
-        gap: '4px',
-        padding: '5px 0',
-        borderRadius: '7px',
+        gap: '6px',
+        padding: '8px 0',
+        borderRadius: '10px',
         fontSize: '11px',
         fontWeight: 600,
         cursor: 'pointer',
-        border: primary ? '1px solid transparent' : '1px solid var(--border)',
-        backgroundColor: primary ? 'var(--accent-dim)' : 'var(--bg-card)',
-        color: primary ? 'var(--accent)' : 'var(--text-secondary)',
+        border: primary ? '1px solid transparent' : '1px solid var(--glass-border)',
+        background: primary
+          ? 'linear-gradient(135deg, #ff8b5e, #fb923c)'
+          : 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+        color: primary ? '#fff' : 'var(--text-secondary)',
         transition: 'all 0.15s',
+        boxShadow: primary ? '0 12px 28px rgba(249,118,85,0.26)' : 'inset 0 1px 0 rgba(255,255,255,0.04)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = primary ? 'var(--accent-muted)' : 'var(--bg-hover)';
-        if (!primary) e.currentTarget.style.color = 'var(--text-primary)';
+        if (primary) {
+          e.currentTarget.style.filter = 'brightness(1.12)';
+        } else {
+          e.currentTarget.style.background =
+            'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))';
+          e.currentTarget.style.color = 'var(--text-primary)';
+        }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = primary ? 'var(--accent-dim)' : 'var(--bg-card)';
-        e.currentTarget.style.color = primary ? 'var(--accent)' : 'var(--text-secondary)';
+        if (primary) {
+          e.currentTarget.style.filter = '';
+        } else {
+          e.currentTarget.style.background =
+            'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))';
+          e.currentTarget.style.color = 'var(--text-secondary)';
+        }
+      }}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        fontSize: '9px',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+        color: 'var(--text-ghost)',
+        padding: '2px 4px 0',
       }}
     >
       {children}
-    </button>
+    </div>
   );
 }
 
@@ -411,21 +527,23 @@ function FooterButton({ icon, label, onClick }: { icon: React.ReactNode; label: 
       style={{
         flex: 1,
         gap: '5px',
-        padding: '5px 0',
-        borderRadius: '6px',
+        padding: '7px 0',
+        borderRadius: '8px',
         fontSize: '10px',
         color: 'var(--text-ghost)',
         cursor: 'pointer',
-        border: 'none',
-        backgroundColor: 'transparent',
+        border: '1px solid transparent',
+        background: 'transparent',
         transition: 'all 0.15s',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-        e.currentTarget.style.color = 'var(--text-secondary)';
+        e.currentTarget.style.background = 'rgba(45,212,191,0.12)';
+        e.currentTarget.style.borderColor = 'rgba(45,212,191,0.18)';
+        e.currentTarget.style.color = 'var(--accent-teal)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.borderColor = 'transparent';
         e.currentTarget.style.color = 'var(--text-ghost)';
       }}
     >

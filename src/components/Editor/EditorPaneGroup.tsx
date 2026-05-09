@@ -135,8 +135,10 @@ function SecondaryPaneHeader({
         padding: '4px 10px',
         fontSize: '11px',
         color: 'var(--text-tertiary)',
-        backgroundColor: 'var(--bg-sidebar)',
-        borderBottom: '1px solid var(--border)',
+        backgroundColor: 'var(--glass-surface)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        borderBottom: '1px solid var(--glass-border)',
       }}
     >
       {direction === 'vertical' ? (

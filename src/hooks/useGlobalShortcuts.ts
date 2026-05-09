@@ -3,7 +3,11 @@ import { useEffect } from 'react';
 import { commands, isTauri } from '../lib/tauri/commands';
 import { useShortcutsRuntimeStore } from '../stores/shortcutsRuntimeStore';
 
+const loggedWarnings = new Set<string>();
+
 function warnShortcutIssue(message: string, error?: unknown) {
+  if (loggedWarnings.has(message)) return;
+  loggedWarnings.add(message);
   if (error !== undefined) {
     console.warn(`[Global shortcuts] ${message}`, error);
     return;
@@ -97,7 +101,12 @@ export function useGlobalShortcuts() {
       }
 
       if (failed.length > 0) {
-        warnShortcutIssue(`Some global shortcuts are unavailable: ${failed.join('; ')}`);
+        // Global shortcuts are optional (OS / permission / key conflicts); keep this informational.
+        const msg = `Some global shortcuts are unavailable: ${failed.join('; ')}`;
+        if (!loggedWarnings.has(msg)) {
+          loggedWarnings.add(msg);
+          console.info(`[Global shortcuts] ${msg}`);
+        }
       }
     })();
 

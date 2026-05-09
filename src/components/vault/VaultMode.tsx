@@ -248,6 +248,8 @@ export function VaultMode() {
               <p style={{ fontSize: '11px', color: 'var(--text-ghost)', margin: 0 }}>or click to browse</p>
               <input
                 ref={fileInputRef}
+                id="vault-file-ingest-input"
+                name="vaultFileIngest"
                 type="file"
                 accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg"
                 style={{ display: 'none' }}
@@ -258,6 +260,8 @@ export function VaultMode() {
             {/* URL ingest */}
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
+                id="vault-url-input"
+                name="vaultUrl"
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
@@ -292,6 +296,8 @@ export function VaultMode() {
             <SectionTitle>Semantic Search</SectionTitle>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
+                id="vault-query-input"
+                name="vaultQuery"
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

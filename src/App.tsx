@@ -149,7 +149,7 @@ function MainLayout() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-app)' }}>
+    <div className="flex flex-col h-screen w-screen overflow-hidden" style={{ background: 'transparent' }}>
       <TitleBar />
       <OcrBanner />
       <div className="flex flex-1 min-h-0">

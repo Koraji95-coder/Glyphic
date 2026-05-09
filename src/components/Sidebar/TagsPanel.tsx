@@ -1,14 +1,17 @@
 import { ChevronDown, ChevronRight, Hash, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTagsStore } from '../../stores/tagsStore';
+import { useVaultStore } from '../../stores/vaultStore';
 
 export function TagsPanel() {
   const { tags, selectedTag, isLoading, refreshTags, selectTag } = useTagsStore();
+  const vaultPath = useVaultStore((s) => s.vaultPath);
   const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
+    if (!vaultPath) return;
     refreshTags();
-  }, [refreshTags]);
+  }, [refreshTags, vaultPath]);
 
   const handleClick = (name: string) => {
     if (selectedTag === name) {
@@ -83,9 +86,9 @@ export function TagsPanel() {
                   fontSize: '10px',
                   fontWeight: active ? 600 : 500,
                   cursor: 'pointer',
-                  border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
-                  backgroundColor: active ? 'var(--accent-dim)' : 'var(--bg-card)',
-                  color: active ? 'var(--accent)' : 'var(--text-secondary)',
+                  border: `1px solid ${active ? 'var(--accent-teal)' : 'var(--glass-border)'}`,
+                  backgroundColor: active ? 'rgba(45,212,191,0.15)' : 'rgba(255,255,255,0.05)',
+                  color: active ? 'var(--accent-teal)' : 'var(--text-secondary)',
                   transition: 'all 0.15s',
                 }}
                 title={`${t.count} note${t.count === 1 ? '' : 's'} tagged #${t.name}`}

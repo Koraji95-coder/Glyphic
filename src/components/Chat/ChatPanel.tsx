@@ -1,4 +1,4 @@
-import { ArrowLeft, Pin, PinOff, Send, Settings, Square, X } from 'lucide-react';
+import { ArrowLeft, Camera, FileText, GraduationCap, Lightbulb, Pin, PinOff, Search, Send, Settings, Square, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -133,8 +133,12 @@ export function ChatPanel() {
       className="flex flex-col shrink-0 h-full"
       style={{
         width: isMobile ? '100%' : '360px',
-        borderLeft: isMobile ? 'none' : '1px solid var(--border)',
-        backgroundColor: 'var(--bg-editor)',
+        borderLeft: isMobile ? 'none' : '1px solid var(--glass-border)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%), var(--glass-surface)',
+        backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        boxShadow: '-24px 0 48px rgba(0,0,0,0.18)',
         position: 'relative',
         ...mobileOverlayStyle,
       }}
@@ -144,8 +148,8 @@ export function ChatPanel() {
         className="flex items-center justify-between px-4 shrink-0"
         style={{
           height: 'var(--toolbar-height)',
-          borderBottom: '1px solid var(--border)',
-          backgroundColor: 'var(--bg-sidebar)',
+          borderBottom: '1px solid var(--glass-border)',
+          backgroundColor: 'transparent',
         }}
       >
         <div className="flex items-center gap-2">
@@ -184,9 +188,9 @@ export function ChatPanel() {
                 gap: '3px',
                 padding: '1px 6px',
                 borderRadius: '999px',
-                backgroundColor: modelSource === 'note' ? 'var(--accent-dim)' : 'var(--bg-input)',
-                border: `1px solid ${modelSource === 'note' ? 'var(--accent-dim)' : 'transparent'}`,
-                color: modelSource === 'note' ? 'var(--accent)' : 'var(--text-ghost)',
+                  background: modelSource === 'note' ? 'rgba(163,116,247,0.16)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${modelSource === 'note' ? 'rgba(163,116,247,0.22)' : 'var(--glass-border)'}`,
+                  color: modelSource === 'note' ? 'var(--accent)' : 'var(--text-secondary)',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '9px',
                 cursor: 'pointer',
@@ -204,13 +208,15 @@ export function ChatPanel() {
                   top: '100%',
                   left: 0,
                   marginTop: '4px',
-                  backgroundColor: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
+                  background: 'rgba(14,11,26,0.92)',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
                   padding: '4px',
                   zIndex: 50,
                   minWidth: '180px',
-                  boxShadow: 'var(--shadow-glow, 0 4px 16px rgba(0,0,0,0.4))',
+                  boxShadow: '0 18px 36px rgba(0,0,0,0.34)',
                 }}
               >
                 <span
@@ -330,7 +336,7 @@ export function ChatPanel() {
               justifyContent: 'center',
               color: 'var(--text-secondary)',
               backgroundColor: 'transparent',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--glass-border)',
               cursor: 'pointer',
             }}
             onMouseEnter={(e) => {
@@ -355,7 +361,7 @@ export function ChatPanel() {
               fontFamily: 'var(--font-body)',
               color: 'var(--text-secondary)',
               backgroundColor: 'transparent',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--glass-border)',
               cursor: 'pointer',
             }}
             onMouseEnter={(e) => {
@@ -381,7 +387,7 @@ export function ChatPanel() {
               justifyContent: 'center',
               color: 'var(--text-secondary)',
               backgroundColor: 'transparent',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--glass-border)',
               cursor: 'pointer',
             }}
             onMouseEnter={(e) => {
@@ -401,10 +407,10 @@ export function ChatPanel() {
       <OllamaStatusBanner />
 
       {/* Context chips */}
-      <div className="flex shrink-0" style={{ gap: '3px', padding: '6px 14px' }}>
-        <ContextChip label="📄 Current note" active />
-        <ContextChip label="📁 Vault search" />
-        <ContextChip label="📷 Screenshots" />
+      <div className="flex shrink-0" style={{ gap: '6px', padding: '8px 14px 6px' }}>
+        <ContextChip label="Current note" icon={<FileText size={10} />} active />
+        <ContextChip label="Vault search" icon={<Search size={10} />} />
+        <ContextChip label="Screenshots" icon={<Camera size={10} />} />
       </div>
 
       {/* Messages */}
@@ -476,8 +482,11 @@ export function ChatPanel() {
                   whiteSpace: 'pre-wrap',
                   overflowWrap: 'anywhere',
                   wordBreak: 'break-word',
-                  backgroundColor: msg.role === 'user' ? 'var(--bg-active)' : 'var(--bg-elevated)',
-                  color: 'var(--text-primary)',
+                  background: msg.role === 'user' ? 'var(--accent-warm-gradient)' : 'rgba(255,255,255,0.07)',
+                  backdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
+                  WebkitBackdropFilter: msg.role === 'user' ? 'none' : 'blur(12px)',
+                  border: msg.role === 'user' ? 'none' : '1px solid var(--glass-border)',
+                  color: msg.role === 'user' ? '#fff' : 'var(--text-primary)',
                   borderBottomRightRadius: msg.role === 'user' ? '3px' : '12px',
                   borderBottomLeftRadius: msg.role === 'user' ? '12px' : '3px',
                   fontFamily: 'var(--font-body)',
@@ -504,12 +513,13 @@ export function ChatPanel() {
                       padding: '2px 8px',
                       borderRadius: '999px',
                       backgroundColor: 'var(--accent-dim)',
-                      color: 'var(--accent)',
+                          color: 'var(--accent)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '3px',
                       fontWeight: 500,
                       fontFamily: 'var(--font-body)',
+                          border: '1px solid rgba(163,116,247,0.22)',
                     }}
                   >
                     {TOOL_LABELS[tool.toolName] ?? `⚙️ ${tool.toolName}...`}
@@ -525,7 +535,10 @@ export function ChatPanel() {
                   style={{
                     gap: '3px',
                     padding: '8px 12px',
-                    backgroundColor: 'var(--bg-elevated)',
+                    backgroundColor: 'rgba(255,255,255,0.07)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid var(--glass-border)',
                     borderRadius: '12px',
                     borderBottomLeftRadius: '4px',
                   }}
@@ -575,25 +588,25 @@ export function ChatPanel() {
         style={{ padding: '8px 12px', borderTop: '1px solid var(--border-subtle)', gap: '6px' }}
       >
         <QuickActionCard
-          icon="📝"
+          icon={<FileText size={14} />}
           title="Summarize"
           desc="Condense note"
           onClick={() => handleQuickAction('Summarize this note for me.')}
         />
         <QuickActionCard
-          icon="🃏"
+          icon={<GraduationCap size={14} />}
           title="Flashcards"
           desc="Study cards"
           onClick={() => handleQuickAction('Generate flashcards from this note.')}
         />
         <QuickActionCard
-          icon="💡"
+          icon={<Lightbulb size={14} />}
           title="Explain"
           desc="Break down"
           onClick={() => handleQuickAction('Explain the selected text.')}
         />
         <QuickActionCard
-          icon="📷"
+          icon={<Camera size={14} />}
           title="Screenshot"
           desc="Describe"
           onClick={() => handleQuickAction('Describe and explain this lecture screenshot.')}
@@ -601,7 +614,7 @@ export function ChatPanel() {
       </div>
 
       {/* Input area */}
-      <div className="px-3 py-3 flex flex-col" style={{ borderTop: '1px solid var(--border)', gap: '4px' }}>
+      <div className="px-3 py-3 flex flex-col" style={{ borderTop: '1px solid var(--glass-border)', gap: '6px' }}>
         {/* Note context badge */}
         {includeNoteContext && activeNoteTitle && (
           <button
@@ -612,10 +625,10 @@ export function ChatPanel() {
             style={{
               alignSelf: 'flex-start',
               fontSize: '9px',
-              padding: '2px 7px',
-              borderRadius: '5px',
-              backgroundColor: 'var(--accent-dim)',
-              border: '1px solid var(--accent-dim)',
+              padding: '4px 9px',
+              borderRadius: '999px',
+              background: 'rgba(163,116,247,0.16)',
+              border: '1px solid rgba(163,116,247,0.22)',
               color: 'var(--accent)',
               cursor: 'pointer',
               fontFamily: 'var(--font-body)',
@@ -635,14 +648,14 @@ export function ChatPanel() {
             style={{
               alignSelf: 'flex-start',
               fontSize: '9px',
-              padding: '2px 7px',
-              borderRadius: '5px',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)',
-              color: 'var(--text-ghost)',
+              padding: '4px 9px',
+              borderRadius: '999px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid var(--glass-border)',
+              color: 'var(--text-secondary)',
               cursor: 'pointer',
               fontFamily: 'var(--font-body)',
-              opacity: 0.6,
+              opacity: 0.84,
             }}
             title="Click to include the active note as chat context"
           >
@@ -653,15 +666,21 @@ export function ChatPanel() {
           className="flex items-end"
           style={{
             gap: '6px',
-            borderRadius: '10px',
-            padding: '6px 10px',
-            backgroundColor: 'var(--bg-input)',
-            border: '1px solid var(--border)',
-            transition: 'border-color 0.2s',
+            borderRadius: '14px',
+            padding: '8px 10px',
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.04)',
+            border: '1px solid var(--glass-border)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
           }}
         >
           <textarea
             ref={textareaRef}
+            id="chat-message-input"
+            name="chatMessage"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -701,6 +720,7 @@ export function ChatPanel() {
                 cursor: 'pointer',
                 background: 'var(--red, #e05252)',
                 color: '#fff',
+                boxShadow: '0 10px 24px rgba(248,113,113,0.22)',
                 transition: 'all 0.15s',
               }}
             >
@@ -721,8 +741,9 @@ export function ChatPanel() {
                 justifyContent: 'center',
                 border: 'none',
                 cursor: 'pointer',
-                background: input.trim() ? 'var(--accent-gradient)' : 'var(--bg-elevated)',
+                background: input.trim() ? 'var(--accent-warm-gradient)' : 'var(--bg-elevated)',
                 color: input.trim() ? '#fff' : 'var(--text-ghost)',
+                boxShadow: input.trim() ? '0 12px 24px rgba(249,118,85,0.24)' : 'none',
                 transition: 'all 0.15s',
               }}
             >
@@ -787,21 +808,30 @@ export function ChatPanel() {
   );
 }
 
-function ContextChip({ label, active }: { label: string; active?: boolean }) {
+function ContextChip({
+  label,
+  icon,
+  active,
+}: {
+  label: string;
+  icon?: ReactNode;
+  active?: boolean;
+}) {
   return (
     <span
       style={{
-        fontSize: '9px',
-        padding: '2px 7px',
-        borderRadius: '5px',
-        backgroundColor: active ? 'var(--accent-dim)' : 'var(--bg-card)',
-        border: `1px solid ${active ? 'var(--accent-dim)' : 'var(--border-subtle)'}`,
-        color: active ? 'var(--accent)' : 'var(--text-ghost)',
+        fontSize: '10px',
+        padding: '4px 8px',
+        borderRadius: '999px',
+        background: active ? 'rgba(163,116,247,0.14)' : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${active ? 'rgba(163,116,247,0.22)' : 'var(--glass-border)'}`,
+        color: active ? 'var(--accent)' : 'var(--text-secondary)',
         display: 'flex',
         alignItems: 'center',
-        gap: '3px',
+        gap: '6px',
       }}
     >
+      {icon}
       {label}
     </span>
   );
@@ -968,7 +998,7 @@ function QuickActionCard({
   desc,
   onClick,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   desc: string;
   onClick: () => void;
@@ -979,28 +1009,50 @@ function QuickActionCard({
       onClick={onClick}
       className="flex flex-col shrink-0"
       style={{
-        gap: '2px',
-        padding: '8px 12px',
-        minWidth: '90px',
-        borderRadius: '8px',
-        backgroundColor: 'var(--bg-card)',
-        border: '1px solid var(--border)',
+        gap: '6px',
+        padding: '10px 12px',
+        minWidth: '106px',
+        borderRadius: '14px',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.03)',
+        border: '1px solid var(--glass-border)',
         cursor: 'pointer',
         transition: 'all 0.15s',
         textAlign: 'left',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-        e.currentTarget.style.borderColor = 'var(--accent-dim)';
-        e.currentTarget.style.transform = 'translateY(-1px)';
+        e.currentTarget.style.background =
+          'linear-gradient(180deg, rgba(249,118,85,0.14) 0%, rgba(163,116,247,0.08) 100%), rgba(255,255,255,0.03)';
+        e.currentTarget.style.borderColor = 'rgba(249,118,85,0.4)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 4px 16px rgba(249,118,85,0.2)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.background =
+          'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.03)';
+        e.currentTarget.style.borderColor = 'var(--glass-border)';
         e.currentTarget.style.transform = 'none';
+        e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.04)';
       }}
     >
-      <span style={{ fontSize: '14px' }}>{icon}</span>
+      <span
+        style={{
+          width: '28px',
+          height: '28px',
+          borderRadius: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          color: 'var(--accent-warm)',
+        }}
+      >
+        {icon}
+      </span>
       <span
         style={{
           fontSize: '10px',

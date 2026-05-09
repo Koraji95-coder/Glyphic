@@ -159,14 +159,18 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
         className="flex items-center gap-1 py-0.5 px-2 rounded cursor-pointer text-sm select-none group"
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
-          backgroundColor: isActive ? 'var(--accent-muted)' : 'transparent',
+          backgroundColor: isActive ? 'rgba(163,116,247,0.18)' : 'transparent',
           color: isActive ? 'var(--accent)' : 'var(--text-primary)',
+          borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
+          transition: 'background-color 0.12s, border-color 0.12s',
         }}
         onMouseEnter={(e) => {
-          if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+          if (!isActive) {
+            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isActive ? 'var(--accent-muted)' : 'transparent';
+          e.currentTarget.style.backgroundColor = isActive ? 'rgba(163,116,247,0.18)' : 'transparent';
         }}
       >
         {/* Expand chevron or spacer */}
