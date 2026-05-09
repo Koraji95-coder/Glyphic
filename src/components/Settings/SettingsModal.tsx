@@ -1,6 +1,7 @@
 import { Camera, Cog, Folder, Keyboard, Mic, PenTool, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { type SettingsSection, useSettingsUiStore } from '../../stores/settingsUiStore';
@@ -56,7 +57,7 @@ export function SettingsModal() {
       setSavingState('saved');
       setTimeout(() => setSavingState((s) => (s === 'saved' ? 'idle' : s)), 1500);
     } catch (e) {
-      console.error('Failed to save settings:', e);
+      reportError({ context: 'Settings save', message: 'Failed to save settings', error: e });
       setSavingState('idle');
     }
   };

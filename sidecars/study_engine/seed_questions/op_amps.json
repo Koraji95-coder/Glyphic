@@ -1,0 +1,323 @@
+{
+  "topic": "Op-Amps",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The two ideal op-amp assumptions for analyzing circuits with negative feedback are:",
+      "choices": [
+        "A. V+ = V− and I_in = 0 (virtual short + no input current)",
+        "B. V+ = V_CC and V− = 0",
+        "C. Infinite output impedance and zero gain",
+        "D. V+ ≠ V− and infinite input impedance"
+      ],
+      "correct_answer": "A",
+      "explanation": "Ideal op-amp with negative feedback: (1) virtual short: V+ = V−; (2) no input bias current: I+ = I− = 0.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The inverting amplifier gain is:",
+      "choices": ["A. A_v = R_f / R_in", "B. A_v = −R_f / R_in", "C. A_v = 1 + R_f/R_in", "D. A_v = R_in/R_f"],
+      "correct_answer": "B",
+      "explanation": "Inverting: A_v = −R_f / R_1. Signal is inverted (180° phase shift).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The non-inverting amplifier gain is:",
+      "choices": ["A. A_v = R_f / R_1", "B. A_v = −R_f / R_1", "C. A_v = 1 + R_f / R_1", "D. A_v = 1 − R_f/R_1"],
+      "correct_answer": "C",
+      "explanation": "Non-inverting: A_v = 1 + R_f/R_1. Minimum gain is 1 (voltage follower). No phase inversion.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An op-amp voltage follower (buffer) has gain:",
+      "choices": ["A. 0", "B. −1", "C. 1", "D. Depends on R_f"],
+      "correct_answer": "C",
+      "explanation": "Voltage follower: output connected directly to inverting input; A_v = +1. Provides high input Z, low output Z impedance matching.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The output of an op-amp summing (inverting) amplifier with inputs V₁, V₂ and equal resistors R is:",
+      "choices": [
+        "A. V_out = (V₁ + V₂)",
+        "B. V_out = −(R_f/R)(V₁ + V₂)",
+        "C. V_out = V₁ − V₂",
+        "D. V_out = V₁ × V₂"
+      ],
+      "correct_answer": "B",
+      "explanation": "Inverting summing: V_out = −(R_f/R)(V₁ + V₂ + …). If R_f = R then V_out = −(V₁+V₂).",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The output of a difference amplifier (with equal resistors R) is:",
+      "choices": [
+        "A. V_out = V₁ + V₂",
+        "B. V_out = V₂ − V₁",
+        "C. V_out = (R_f/R)(V₂ − V₁)",
+        "D. V_out = V₁ / V₂"
+      ],
+      "correct_answer": "C",
+      "explanation": "Difference amplifier: V_out = (R_f/R)(V+ − V−). Rejects common-mode signals.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An op-amp integrator produces V_out = ?",
+      "choices": [
+        "A. V_out = −(1/(R_1 C_f)) × ∫V_in dt",
+        "B. V_out = −R_f C_1 × dV_in/dt",
+        "C. V_out = V_in",
+        "D. V_out = −(R_f/R_1) V_in"
+      ],
+      "correct_answer": "A",
+      "explanation": "Inverting integrator: V_out = −1/(R_1 C_f) ∫V_in dt. Capacitor in feedback, resistor at input.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An op-amp differentiator produces V_out = ?",
+      "choices": [
+        "A. V_out = −R_f C_1 × dV_in/dt",
+        "B. V_out = −(1/R_f C_1) ∫V_in dt",
+        "C. V_out = V_in",
+        "D. V_out = R_f/R_1 × V_in"
+      ],
+      "correct_answer": "A",
+      "explanation": "Inverting differentiator: V_out = −R_f C_1 (dV_in/dt). Capacitor at input, resistor in feedback.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The slew rate of an op-amp limits:",
+      "choices": [
+        "A. The maximum output voltage",
+        "B. The maximum rate of change of output voltage (dV_out/dt)",
+        "C. The input offset voltage",
+        "D. The open-loop gain"
+      ],
+      "correct_answer": "B",
+      "explanation": "Slew rate SR = max |dV_out/dt| in V/μs. If a large signal exceeds SR, the output cannot follow — distortion occurs.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The gain-bandwidth product (GBW) of an op-amp means:",
+      "choices": [
+        "A. Closed-loop gain × 3-dB bandwidth = constant",
+        "B. Open-loop gain at DC",
+        "C. Maximum slew rate × gain",
+        "D. Gain at 1 MHz"
+      ],
+      "correct_answer": "A",
+      "explanation": "GBW = A_v × f_3dB = constant (for single-pole op-amps). Higher closed-loop gain → lower bandwidth.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Common-mode rejection ratio (CMRR) of an op-amp measures:",
+      "choices": [
+        "A. The ratio of differential gain to common-mode gain",
+        "B. The DC offset voltage",
+        "C. The output current limit",
+        "D. The unity-gain bandwidth"
+      ],
+      "correct_answer": "A",
+      "explanation": "CMRR = A_d / A_cm (or in dB: 20 log(A_d/A_cm)). High CMRR → rejects noise common to both inputs.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An op-amp comparator without feedback:",
+      "choices": [
+        "A. Operates in the linear region",
+        "B. Saturates at V+ or V− supply when V_in exceeds reference",
+        "C. Has gain of 1",
+        "D. Must use the virtual short assumption"
+      ],
+      "correct_answer": "B",
+      "explanation": "Comparator (no negative feedback): output slams to +V_sat or −V_sat. Cannot apply virtual short assumption.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Schmitt trigger (comparator with positive feedback) provides:",
+      "choices": [
+        "A. Hysteresis — two different threshold voltages for rising and falling inputs",
+        "B. Unity gain",
+        "C. Negative feedback to stabilize gain",
+        "D. Bandpass filtering"
+      ],
+      "correct_answer": "A",
+      "explanation": "Schmitt trigger: positive feedback creates hysteresis between V_TL (lower) and V_TH (upper) thresholds. Prevents noisy switching.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "An inverting amplifier has R_1 = 10 kΩ and R_f = 100 kΩ. What is the gain?",
+      "choices": null, "correct_answer": "-10", "unit": "V/V", "tolerance": 0.01,
+      "explanation": "A_v = −R_f/R_1 = −100k/10k = −10",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The input offset voltage (V_OS) of an op-amp is:",
+      "choices": [
+        "A. The differential voltage at the inputs when the output is zero",
+        "B. The supply voltage",
+        "C. The CMRR in mV",
+        "D. Zero for all real op-amps"
+      ],
+      "correct_answer": "A",
+      "explanation": "V_OS: small differential input voltage (mV) required to make V_out = 0. Causes DC errors in precision circuits.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Negative feedback in op-amp circuits:",
+      "choices": [
+        "A. Increases distortion and decreases bandwidth",
+        "B. Reduces gain but improves bandwidth, reduces distortion, stabilizes gain",
+        "C. Increases the open-loop gain",
+        "D. Is only useful in comparators"
+      ],
+      "correct_answer": "B",
+      "explanation": "Negative feedback: trading gain for bandwidth, linearity, stability, and predictable closed-loop behavior.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An instrumentation amplifier offers _____ over a simple difference amplifier.",
+      "choices": [
+        "A. Lower CMRR",
+        "B. Very high input impedance and high CMRR",
+        "C. Lower gain",
+        "D. Only single-ended input"
+      ],
+      "correct_answer": "B",
+      "explanation": "Instrumentation amp (3 op-amps): high Z differential inputs, high CMRR, programmable gain via single resistor.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which applications commonly use op-amps? (Select ALL that apply.)",
+      "choices": [
+        "A. Active filters",
+        "B. DAC/ADC building blocks",
+        "C. Signal amplification",
+        "D. Only digital logic gates"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Op-amps are used in active filters, DAC/ADC circuits, amplifiers, integrators, comparators, etc. Not for digital logic gates (those use logic IC families).",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A non-inverting amplifier has R_1 = 1 kΩ and R_f = 9 kΩ. What is the closed-loop gain?",
+      "choices": ["A. −9", "B. 9", "C. 10", "D. 0.1"],
+      "correct_answer": "C",
+      "explanation": "A_v = 1 + R_f/R_1 = 1 + 9k/1k = 10",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Op-amp output saturation occurs when:",
+      "choices": [
+        "A. The calculated linear output exceeds the supply rails (±V_sat)",
+        "B. The input current exceeds I_bias",
+        "C. Temperature drops below 0°C",
+        "D. The slew rate is less than 1 V/μs"
+      ],
+      "correct_answer": "A",
+      "explanation": "Saturation: when the ideal V_out would exceed ±(V_CC − ~1 V), the output clips at ±V_sat.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "An op-amp has GBW = 1 MHz and is configured for A_v = 20 V/V. What is its −3 dB bandwidth in kHz?",
+      "choices": null, "correct_answer": "50", "unit": "kHz", "tolerance": 1,
+      "explanation": "f_3dB = GBW / A_v = 1 MHz / 20 = 50 kHz",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For maximum full-power bandwidth (FPBW) of a sinusoidal output V_pk at frequency f, the slew rate must satisfy:",
+      "choices": [
+        "A. SR ≥ 2π f V_pk",
+        "B. SR ≥ f V_pk",
+        "C. SR ≥ V_pk / f",
+        "D. SR ≥ π f V_pk"
+      ],
+      "correct_answer": "A",
+      "explanation": "FPBW: SR = 2πf V_pk → f_FPBW = SR / (2π V_pk). The derivative of V_pk sin(2πft) peaks at 2πf V_pk.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A transimpedance amplifier (current-to-voltage converter) uses an op-amp with:",
+      "choices": [
+        "A. Resistor R_f in feedback; input current I_in connects to inverting input; V_out = −I_in R_f",
+        "B. Capacitor in feedback only",
+        "C. Input voltage source",
+        "D. R_f at the non-inverting input"
+      ],
+      "correct_answer": "A",
+      "explanation": "Transimpedance: I_in → inverting input (virtual ground), R_f in feedback; V_out = −I_in × R_f. Used with photodiodes.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The power supply rejection ratio (PSRR) of an op-amp measures:",
+      "choices": [
+        "A. The op-amp's ability to reject supply voltage variations from appearing at the output",
+        "B. The ratio of output power to input power",
+        "C. The maximum supply voltage",
+        "D. The output current capability"
+      ],
+      "correct_answer": "A",
+      "explanation": "PSRR = ΔV_supply / ΔV_output (or the equivalent input offset voltage change). High PSRR → noise on supply does not affect output.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An op-amp active low-pass filter using an inverting topology with C_f in parallel with R_f has −3 dB corner frequency:",
+      "choices": [
+        "A. f_c = 1 / (2π R_f C_f)",
+        "B. f_c = 1 / (2π R_1 C_f)",
+        "C. f_c = R_f C_f",
+        "D. f_c = R_1 / C_f"
+      ],
+      "correct_answer": "A",
+      "explanation": "Inverting low-pass: Z_f = R_f ‖ (1/jωC_f); corner when R_f = 1/(ωC_f) → f_c = 1/(2πR_f C_f).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 3.5", "review_status": "ai_draft"
+    }
+  ]
+}

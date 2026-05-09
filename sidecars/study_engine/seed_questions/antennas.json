@@ -1,0 +1,334 @@
+{
+  "topic": "Antennas",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "Antenna gain G is related to directivity D by:",
+      "choices": [
+        "A. G = D",
+        "B. G = η_r × D (radiation efficiency × directivity)",
+        "C. G = D/η_r",
+        "D. G = D²"
+      ],
+      "correct_answer": "B",
+      "explanation": "G = η_r × D. Directivity accounts for radiation pattern shape; efficiency accounts for conductor/dielectric losses. G ≤ D.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Directivity D of an antenna is defined as:",
+      "choices": [
+        "A. Ratio of maximum radiation intensity to average radiation intensity",
+        "B. Total radiated power",
+        "C. Ratio of gain to frequency",
+        "D. Radiation resistance"
+      ],
+      "correct_answer": "A",
+      "explanation": "D = U_max / U_avg = 4π U_max / P_rad. An isotropic radiator has D = 1 (0 dBi).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Friis Transmission Equation gives the received power P_r as:",
+      "choices": [
+        "A. P_r = P_t G_t G_r (λ/4πR)²",
+        "B. P_r = P_t (G_t + G_r)",
+        "C. P_r = P_t G_t G_r (4πR/λ)²",
+        "D. P_r = P_t / (4πR²)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Friis: P_r = P_t G_t G_r (λ/4πR)². The term (λ/4πR)² is the free-space path loss factor.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The effective aperture A_e of an antenna is related to gain G by:",
+      "choices": [
+        "A. A_e = G λ² / (4π)",
+        "B. A_e = G λ",
+        "C. A_e = G / (4πλ²)",
+        "D. A_e = 4π G / λ²"
+      ],
+      "correct_answer": "A",
+      "explanation": "A_e = Gλ²/(4π). For an isotropic antenna: A_e = λ²/(4π).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An isotropic radiator has directivity of:",
+      "choices": ["A. 0 dBi", "B. 2.15 dBi", "C. −3 dBi", "D. ∞ dBi"],
+      "correct_answer": "A",
+      "explanation": "Isotropic antenna: D = 1 = 0 dBi. A half-wave dipole has D ≈ 1.64 = 2.15 dBi.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The half-power beamwidth (HPBW) of an antenna radiation pattern is the angle between the two directions where the power is:",
+      "choices": [
+        "A. At maximum intensity",
+        "B. Half of (−3 dB) the maximum",
+        "C. Zero (nulls)",
+        "D. 10% of maximum"
+      ],
+      "correct_answer": "B",
+      "explanation": "HPBW: angular width of the main beam at the −3 dB (half-power) points. Narrower HPBW → higher directivity.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The radiation resistance R_rad of an antenna represents:",
+      "choices": [
+        "A. Ohmic losses in the conductor",
+        "B. An equivalent resistance that dissipates the same power as the antenna radiates",
+        "C. The input impedance reactive part",
+        "D. The ground-plane resistance"
+      ],
+      "correct_answer": "B",
+      "explanation": "R_rad: equivalent resistance where P = ½|I|² R_rad gives the radiated power. For a half-wave dipole, R_rad ≈ 73 Ω.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The input impedance of a half-wave dipole (in free space) is approximately:",
+      "choices": ["A. 50 Ω", "B. 73 + j42.5 Ω", "C. 300 Ω", "D. 75 Ω purely resistive"],
+      "correct_answer": "B",
+      "explanation": "Half-wave dipole: Z_in ≈ 73 + j42.5 Ω. Shortening slightly makes it resonant (~73 Ω, reactive part = 0).",
+      "difficulty": "hard", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Free-space path loss (FSPL) at distance R for wavelength λ is:",
+      "choices": [
+        "A. FSPL = (4πR/λ)²",
+        "B. FSPL = (λ/4πR)²",
+        "C. FSPL = 4πR²/λ",
+        "D. FSPL = R²/λ²"
+      ],
+      "correct_answer": "A",
+      "explanation": "FSPL = (4πR/λ)². In dB: FSPL_dB = 20 log(4πR/λ) = 20 log R + 20 log f + 147.55 (SI units).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Antenna reciprocity means:",
+      "choices": [
+        "A. An antenna radiates equally in all directions",
+        "B. Transmit and receive patterns and impedances are identical for a passive antenna",
+        "C. Antennas only work at one frequency",
+        "D. Gain equals directivity"
+      ],
+      "correct_answer": "B",
+      "explanation": "Reciprocity: a passive antenna has the same radiation pattern, gain, and impedance whether transmitting or receiving.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A parasitic element placed behind the driven element in a Yagi-Uda antenna, shorter than the driven element, acts as a:",
+      "choices": ["A. Director", "B. Reflector", "C. Load", "D. Feed"],
+      "correct_answer": "B",
+      "explanation": "Reflector: parasitic element slightly longer than λ/2, placed λ/4 behind. Directors: shorter elements in front, increase gain.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The polarization of an antenna refers to:",
+      "choices": [
+        "A. The frequency range",
+        "B. The orientation of the electric field vector in the far-field radiation",
+        "C. The physical tilt angle of the antenna",
+        "D. The gain pattern shape"
+      ],
+      "correct_answer": "B",
+      "explanation": "Polarization: orientation of E-field in the radiated wave (linear, circular, elliptical). Polarization mismatch reduces received power.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The far-field (Fraunhofer) region of an antenna begins at distance:",
+      "choices": [
+        "A. R = λ",
+        "B. R = 2D²/λ (D = maximum aperture dimension)",
+        "C. R = 10λ",
+        "D. R = D"
+      ],
+      "correct_answer": "B",
+      "explanation": "Far-field starts at R > 2D²/λ (Fraunhofer criterion). Near-field (reactive): R < 0.62√(D³/λ).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A patch (microstrip) antenna is preferred for mobile applications because:",
+      "choices": [
+        "A. Very high gain (>30 dBi)",
+        "B. Low profile, lightweight, and conformable to surfaces",
+        "C. Wide bandwidth",
+        "D. Operates at all frequencies"
+      ],
+      "correct_answer": "B",
+      "explanation": "Microstrip patch: low profile, lightweight, easily integrated on PCBs. Trade-off: narrow bandwidth (~2-5%), moderate gain.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The front-to-back ratio (FBR) of an antenna measures:",
+      "choices": [
+        "A. Gain versus frequency",
+        "B. Ratio of main lobe gain to back lobe gain",
+        "C. Input to output power ratio",
+        "D. Bandwidth to center frequency ratio"
+      ],
+      "correct_answer": "B",
+      "explanation": "FBR = G(0°)/G(180°) in dB. Higher FBR means better rejection of signals from behind the antenna.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which antenna types are primarily resonant (narrowband) antennas? (Select ALL that apply.)",
+      "choices": [
+        "A. Half-wave dipole",
+        "B. Quarter-wave monopole",
+        "C. Log-periodic array",
+        "D. Yagi-Uda array"
+      ],
+      "correct_answer": "A,B,D",
+      "explanation": "Dipole, monopole, and Yagi are resonant/narrowband. Log-periodic is a broadband frequency-independent design.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A 10 GHz link has P_t = 1 W, G_t = G_r = 20 dBi (=100), and R = 1 km. The received power P_r in dBm is approximately: (λ = c/f = 0.03 m)",
+      "choices": null, "correct_answer": "-17.5", "unit": "dBm", "tolerance": 1.0,
+      "explanation": "FSPL = (4πR/λ)² = (4π×1000/0.03)² ≈ (4.19×10⁵)² = 1.755×10¹¹. P_r = 1×100×100/1.755×10¹¹ = 5.7×10⁻⁸ W = 0.057 μW ≈ −42.5 dBm. In dB: P_r(dBW) = 0 + 20 + 20 − 10log(1.755×10¹¹) = 40 − 112.4 = −72.4 dBW = −42.4 dBm.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The effect of ground plane on a monopole antenna (λ/4 over perfect ground) is that it:",
+      "choices": [
+        "A. Eliminates radiation",
+        "B. Acts as a mirror, making it equivalent to a half-wave dipole with double the gain",
+        "C. Reduces radiation resistance to zero",
+        "D. Changes polarization to horizontal"
+      ],
+      "correct_answer": "B",
+      "explanation": "λ/4 monopole over perfect ground: image theory → equivalent to λ/2 dipole. R_rad ≈ 36.5 Ω (half of dipole's 73 Ω), gain = 5.15 dBi (dipole radiates in both hemispheres, monopole only upper).",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The aperture efficiency η_a of an aperture antenna (horn, dish) relates physical aperture A_p to effective aperture A_e by:",
+      "choices": [
+        "A. A_e = η_a × A_p",
+        "B. A_e = A_p / η_a",
+        "C. A_e = A_p always",
+        "D. A_e = A_p²"
+      ],
+      "correct_answer": "A",
+      "explanation": "A_e = η_a × A_p. For a parabolic dish, η_a ≈ 0.5–0.7. Gain = 4π A_e/λ² = 4π η_a A_p/λ².",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A circularly polarized (CP) antenna, compared to a linearly polarized antenna, is advantageous because:",
+      "choices": [
+        "A. CP has twice the bandwidth",
+        "B. CP is immune to polarization rotation from Faraday effect or multipath",
+        "C. CP has higher gain",
+        "D. CP reduces antenna size"
+      ],
+      "correct_answer": "B",
+      "explanation": "CP antennas are insensitive to the orientation angle of the receiving antenna (Faraday rotation, satellite links, multipath).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Antenna bandwidth is typically defined as the frequency range over which:",
+      "choices": [
+        "A. Gain is greater than 0 dBi",
+        "B. VSWR ≤ 2:1 (return loss ≥ 9.5 dB) or gain drops less than 3 dB",
+        "C. The antenna is resonant",
+        "D. No sidelobes exist"
+      ],
+      "correct_answer": "B",
+      "explanation": "Common bandwidth definition: VSWR ≤ 2 (|Γ| ≤ 1/3, RL ≥ 9.5 dB) or within 3 dB of peak gain. Both criteria are used in practice.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The gain of a parabolic dish antenna with aperture diameter D at wavelength λ is approximately:",
+      "choices": [
+        "A. G = η(D/λ)²",
+        "B. G = η(πD/λ)²",
+        "C. G = πD/λ",
+        "D. G = 4πD²/λ"
+      ],
+      "correct_answer": "B",
+      "explanation": "Parabolic dish: G = η(πD/λ)² where η ≈ 0.55–0.65. Large aperture → high gain (used in satellite dishes, radio telescopes).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An antenna array achieves higher gain than a single element by:",
+      "choices": [
+        "A. Using multiple elements with controlled phase/amplitude for constructive interference in desired direction",
+        "B. Connecting more power amplifiers",
+        "C. Shortening each element",
+        "D. Using only one polarization"
+      ],
+      "correct_answer": "A",
+      "explanation": "Phased array: controlled phase between elements creates constructive interference (beam forming) in desired direction, increasing gain.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A return loss of 20 dB corresponds to an approximate VSWR of:",
+      "choices": [
+        "A. 1.22:1",
+        "B. 2:1",
+        "C. 3:1",
+        "D. 10:1"
+      ],
+      "correct_answer": "A",
+      "explanation": "Return loss RL = -20log10|Gamma|. RL=20 dB gives |Gamma|=0.1, and VSWR=(1+|Gamma|)/(1-|Gamma|)=1.1/0.9=1.22.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 35,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For fixed physical aperture and efficiency, increasing frequency generally causes antenna gain to:",
+      "choices": [
+        "A. Decrease",
+        "B. Stay constant",
+        "C. Increase",
+        "D. Alternate between high and low"
+      ],
+      "correct_answer": "C",
+      "explanation": "Gain of an aperture antenna is G = 4pi*eta*A/lambda^2. As frequency increases, lambda decreases, so gain increases for fixed A and eta.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.4", "review_status": "ai_draft"
+    }
+  ]
+}

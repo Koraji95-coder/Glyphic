@@ -4,10 +4,13 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles/globals.css';
 
+const isTauriRuntime = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+const appTree = (
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
+  isTauriRuntime ? appTree : <React.StrictMode>{appTree}</React.StrictMode>,
 );

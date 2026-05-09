@@ -1,0 +1,326 @@
+{
+  "topic": "Embedded Systems",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "A real-time operating system (RTOS) differs from a general-purpose OS primarily in that it:",
+      "choices": [
+        "A. Uses more RAM",
+        "B. Guarantees tasks complete within bounded, deterministic time deadlines",
+        "C. Runs only on ARM processors",
+        "D. Cannot multitask"
+      ],
+      "correct_answer": "B",
+      "explanation": "RTOS: deterministic scheduling, guaranteed response times. Hard real-time: missing deadline = system failure. Soft real-time: missing deadline is tolerable.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Interrupt latency is defined as the time from:",
+      "choices": [
+        "A. System power-on to first interrupt",
+        "B. When an interrupt is asserted to when the ISR begins executing",
+        "C. ISR start to ISR completion",
+        "D. Task creation to task execution"
+      ],
+      "correct_answer": "B",
+      "explanation": "Interrupt latency: time from interrupt assertion to first ISR instruction. Includes: context save, interrupt detect, vector fetch. Critical in real-time systems.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "PWM (Pulse Width Modulation) controls analog output power by:",
+      "choices": [
+        "A. Varying the supply voltage",
+        "B. Varying the duty cycle (ON time / period) of a digital signal",
+        "C. Changing the clock frequency",
+        "D. Using a DAC only"
+      ],
+      "correct_answer": "B",
+      "explanation": "PWM duty cycle D = t_on/T. Average output ≈ D × V_supply. Used for motor control, LED dimming, power converters.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The I²C (Inter-Integrated Circuit) serial protocol uses:",
+      "choices": [
+        "A. 4 wires: MOSI, MISO, SCK, CS",
+        "B. 2 wires: SDA (data) and SCL (clock), supports multiple masters and slaves",
+        "C. 1 wire only",
+        "D. 3 wires with dedicated chip-select per device"
+      ],
+      "correct_answer": "B",
+      "explanation": "I²C: 2-wire bus (SDA, SCL), open-drain with pull-ups. Multi-master capable, 7-bit addresses (128 devices). Speeds: 100 kHz, 400 kHz, 1 MHz.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "SPI (Serial Peripheral Interface) uses how many wires for full-duplex communication?",
+      "choices": ["A. 2", "B. 3", "C. 4 (MOSI, MISO, SCLK, CS/SS)", "D. 8"],
+      "correct_answer": "C",
+      "explanation": "SPI: MOSI (master out slave in), MISO (master in slave out), SCLK (clock), CS (chip select per slave). Full-duplex, faster than I²C (tens of MHz).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "UART (Universal Asynchronous Receiver-Transmitter) communication is:",
+      "choices": [
+        "A. Synchronous, clock shared between devices",
+        "B. Asynchronous — no shared clock; uses start/stop bits and agreed baud rate",
+        "C. Only full-duplex",
+        "D. Requires 4 wires minimum"
+      ],
+      "correct_answer": "B",
+      "explanation": "UART: asynchronous serial. Start bit (0) + 8 data bits + stop bit (1). Both ends must agree on baud rate. Simple, 2-wire (TX, RX) communication.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A watchdog timer (WDT) in an embedded system is used to:",
+      "choices": [
+        "A. Measure elapsed time for tasks",
+        "B. Automatically reset the system if the software fails to 'pet' it within a specified period",
+        "C. Generate PWM signals",
+        "D. Synchronize multiple processors"
+      ],
+      "correct_answer": "B",
+      "explanation": "WDT: if software hangs or crashes (fails to periodically reset the WDT), the WDT times out and resets the MCU. Improves reliability.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An ADC (Analog-to-Digital Converter) with n-bit resolution and reference voltage V_ref has quantization step size (LSB) of:",
+      "choices": [
+        "A. V_ref × 2^n",
+        "B. V_ref / 2^n",
+        "C. 2^n / V_ref",
+        "D. n × V_ref"
+      ],
+      "correct_answer": "B",
+      "explanation": "ADC LSB = V_ref / 2^n. For 12-bit ADC with V_ref = 3.3 V: LSB = 3.3/4096 ≈ 0.806 mV.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Nyquist criterion for an ADC sampling an analog signal of bandwidth f_max requires sampling rate f_s to be:",
+      "choices": ["A. f_s > f_max", "B. f_s > 2f_max", "C. f_s = f_max", "D. f_s > f_max/2"],
+      "correct_answer": "B",
+      "explanation": "Nyquist: f_s > 2f_max to avoid aliasing. In practice, an anti-aliasing LPF is applied before the ADC.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Memory-mapped I/O in embedded systems means GPIO registers are accessed by:",
+      "choices": [
+        "A. Special assembly instructions only",
+        "B. Reading/writing specific memory addresses assigned to the peripheral",
+        "C. The DMA controller only",
+        "D. A dedicated I/O bus separate from memory"
+      ],
+      "correct_answer": "B",
+      "explanation": "Memory-mapped I/O: peripheral registers appear at fixed memory addresses. Pointer-based access in C: volatile uint32_t *gpio = (uint32_t*)0x40020000.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The 'volatile' keyword in embedded C code is used to:",
+      "choices": [
+        "A. Make variables faster",
+        "B. Tell the compiler not to optimize accesses to this variable (it can change outside program flow, e.g., hardware registers or ISR-shared variables)",
+        "C. Allocate variables in ROM",
+        "D. Prevent stack overflow"
+      ],
+      "correct_answer": "B",
+      "explanation": "volatile: compiler must read/write the actual memory location every time, not cache in a register. Essential for hardware registers, ISR-shared globals.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A task scheduler in an RTOS with preemptive priority scheduling will:",
+      "choices": [
+        "A. Run tasks in round-robin only",
+        "B. Immediately switch to a higher-priority task when it becomes ready",
+        "C. Wait until the current task finishes before switching",
+        "D. Run tasks in order of creation"
+      ],
+      "correct_answer": "B",
+      "explanation": "Preemptive: higher-priority ready task immediately preempts the running lower-priority task. Cooperative: task must yield voluntarily.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Priority inversion in an RTOS occurs when:",
+      "choices": [
+        "A. A high-priority task is blocked because a low-priority task holds a needed resource",
+        "B. Tasks are scheduled in wrong order",
+        "C. The RTOS crashes",
+        "D. Interrupt priority is set incorrectly"
+      ],
+      "correct_answer": "A",
+      "explanation": "Priority inversion: high-priority task blocked on mutex held by low-priority task, which in turn preempted by medium-priority task. Solved by priority inheritance.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A DAC (Digital-to-Analog Converter) with 8-bit resolution and 5 V reference can produce how many discrete output levels?",
+      "choices": ["A. 8", "B. 128", "C. 256", "D. 512"],
+      "correct_answer": "C",
+      "explanation": "N-bit DAC: 2^N levels. 8-bit: 2^8 = 256 levels, step size = 5/255 ≈ 19.6 mV.",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which are common serial communication protocols used in embedded systems? (Select ALL that apply.)",
+      "choices": ["A. UART/USART", "B. SPI", "C. I²C", "D. CAN (Controller Area Network)"],
+      "correct_answer": "A,B,C,D",
+      "explanation": "All four are widely used embedded serial protocols. CAN is common in automotive. I²C/SPI for sensors. UART for debug/host communication.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A timer configured to generate an interrupt every T_int seconds can create a periodic task by:",
+      "choices": [
+        "A. Stopping the CPU periodically",
+        "B. Triggering an ISR at each timer overflow/compare match to execute time-critical tasks",
+        "C. Resetting the system every T_int",
+        "D. Writing to GPIO pins"
+      ],
+      "correct_answer": "B",
+      "explanation": "Timer interrupt: timer counts to reload value → interrupt → ISR executes task (e.g., read sensor, update PWM). Fundamental real-time mechanism.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A 10-bit ADC has a 5 V reference. The quantization step size (LSB) in mV is approximately:",
+      "choices": null, "correct_answer": "4.88", "unit": "mV", "tolerance": 0.1,
+      "explanation": "LSB = V_ref/2^n = 5000 mV / 1024 ≈ 4.883 mV.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The purpose of an anti-aliasing filter placed before an ADC is to:",
+      "choices": [
+        "A. Amplify the signal",
+        "B. Remove frequency components above f_s/2 to prevent aliasing",
+        "C. Stabilize the ADC reference voltage",
+        "D. Convert from differential to single-ended"
+      ],
+      "correct_answer": "B",
+      "explanation": "Anti-aliasing LPF: attenuates signal above f_s/2 before sampling. Prevents high-frequency components from folding into baseband.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The main advantage of an FPGA over a microcontroller for real-time signal processing is:",
+      "choices": [
+        "A. Lower power consumption always",
+        "B. Massive parallel hardware execution — many operations truly simultaneous",
+        "C. Easier programming",
+        "D. Lower cost"
+      ],
+      "correct_answer": "B",
+      "explanation": "FPGA: implements custom digital logic in parallel — multiple operations per clock cycle. MCU: sequential execution. FPGA preferred for high-speed DSP, vision, crypto.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Flash memory in embedded systems is used for:",
+      "choices": [
+        "A. Volatile working data only",
+        "B. Non-volatile program storage (firmware/code) and persistent data",
+        "C. High-speed cache",
+        "D. Register storage"
+      ],
+      "correct_answer": "B",
+      "explanation": "Flash: non-volatile, can be electrically erased/programmed. Used for firmware (code), calibration data, bootloader. Slower than RAM; limited write cycles.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Debouncing a mechanical switch in software is needed because:",
+      "choices": [
+        "A. Switches have high resistance",
+        "B. Mechanical contacts bounce (make and break multiple times) for a few milliseconds after a press, generating multiple transitions",
+        "C. MCU GPIO pins have high capacitance",
+        "D. Switches generate analog signals"
+      ],
+      "correct_answer": "B",
+      "explanation": "Contact bounce: during transition, contacts briefly open/close multiple times (~5-50 ms). Debounce: read stable level, wait (e.g., 20 ms), re-read. Prevents phantom presses.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A semaphore in an RTOS is used primarily to:",
+      "choices": [
+        "A. Increase task priority",
+        "B. Signal between tasks or protect shared resources from simultaneous access",
+        "C. Allocate memory dynamically",
+        "D. Control interrupt priority"
+      ],
+      "correct_answer": "B",
+      "explanation": "Semaphore: binary semaphore = mutex (mutual exclusion for shared resources). Counting semaphore = signaling (producer/consumer). Prevents race conditions.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The power modes of a microcontroller (e.g., sleep, deep sleep, standby) are used to:",
+      "choices": [
+        "A. Increase clock speed during idle",
+        "B. Reduce power consumption by halting the CPU and/or peripherals when not needed",
+        "C. Enable more interrupt sources",
+        "D. Switch between internal and external clocks"
+      ],
+      "correct_answer": "B",
+      "explanation": "Low-power modes: CPU halted, peripherals disabled → current drops from mA to μA range. Critical for battery-powered IoT devices.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In interrupt-driven firmware, a common best practice is to keep ISRs short because:",
+      "choices": [
+        "A. ISRs run slower than tasks",
+        "B. Long ISRs increase interrupt latency and can block higher-priority real-time events",
+        "C. ISRs cannot access global variables",
+        "D. ISRs use floating-point only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Short ISRs reduce jitter and latency. Typical pattern: ISR captures minimal data and signals a task/queue for heavier processing.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 25,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A periodic task must run every 5 ms. What is its frequency in Hz?",
+      "choices": null,
+      "correct_answer": "200",
+      "unit": "Hz",
+      "tolerance": 0.5,
+      "explanation": "Frequency f = 1/T = 1/0.005 s = 200 Hz.",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 6.2", "review_status": "ai_draft"
+    }
+  ]
+}

@@ -1,0 +1,277 @@
+{
+  "topic": "Three-Phase Circuits",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "In a balanced three-phase system, the phase voltages are separated by:",
+      "choices": ["A. 90°", "B. 120°", "C. 180°", "D. 60°"],
+      "correct_answer": "B",
+      "explanation": "Three-phase: phases A, B, C displaced by 120° (360°/3).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a balanced Y (wye) system, the line voltage V_L is related to phase voltage V_P by:",
+      "choices": ["A. V_L = V_P / √3", "B. V_L = V_P × √3", "C. V_L = 3V_P", "D. V_L = V_P"],
+      "correct_answer": "B",
+      "explanation": "Y-connected: V_L = √3 × V_P ≈ 1.732 V_P. E.g., 120 V phase gives 208 V line.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a balanced delta (Δ) system, the line current I_L is related to phase current I_P by:",
+      "choices": ["A. I_L = I_P", "B. I_L = I_P / √3", "C. I_L = √3 × I_P", "D. I_L = 3 × I_P"],
+      "correct_answer": "C",
+      "explanation": "Delta: I_L = √3 × I_P. (Opposite of the wye voltage relationship.)",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The total real power in a balanced three-phase system is:",
+      "choices": [
+        "A. P = 3 V_P I_P cos θ",
+        "B. P = √3 V_L I_L cos θ",
+        "C. P = 3 V_L I_L cos θ",
+        "D. Both A and B"
+      ],
+      "correct_answer": "D",
+      "explanation": "P = 3V_P I_P cos θ = √3 V_L I_L cos θ. Both are equivalent (using Y or Δ relationships).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A balanced three-phase Y load has V_L = 208 V (line-to-line) and each phase impedance Z = 10 Ω (resistive). What is the total real power in watts?",
+      "choices": null, "correct_answer": "4326", "unit": "W", "tolerance": 50,
+      "explanation": "V_P = 208/√3 = 120 V; I_P = V_P/Z = 120/10 = 12 A; P = 3×V_P×I_P×cos0° = 3×120×12 = 4320 W ≈ 4326 W",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a balanced Y-connected system, the neutral current I_N is:",
+      "choices": ["A. 3× the phase current", "B. Zero", "C. Equal to line current", "D. √3× phase current"],
+      "correct_answer": "B",
+      "explanation": "In a balanced Y system, the three phase currents sum to zero → neutral current = 0.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The phase sequence ABC (positive sequence) means:",
+      "choices": [
+        "A. V_A leads V_B by 120°, V_B leads V_C by 120°",
+        "B. V_A lags V_B by 120°",
+        "C. All three voltages are in phase",
+        "D. V_B leads V_A by 120°"
+      ],
+      "correct_answer": "A",
+      "explanation": "Positive (ABC) sequence: V_A → V_B → V_C, each lagging the previous by 120°. V_A leads V_B by 120°.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a Δ-connected load with equal impedances Z_Δ, the equivalent Y-connected impedance Z_Y is:",
+      "choices": ["A. Z_Y = 3 Z_Δ", "B. Z_Y = Z_Δ / 3", "C. Z_Y = √3 Z_Δ", "D. Z_Y = Z_Δ / √3"],
+      "correct_answer": "B",
+      "explanation": "Δ-to-Y conversion: Z_Y = Z_Δ / 3. (Y arm is one-third of delta arm for balanced systems.)",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The two-wattmeter method measures total three-phase power by:",
+      "choices": [
+        "A. P_total = W₁ + W₂",
+        "B. P_total = W₁ − W₂",
+        "C. P_total = 2W₁",
+        "D. P_total = W₁ × W₂"
+      ],
+      "correct_answer": "A",
+      "explanation": "Two-wattmeter method: P_total = W₁ + W₂. The reactive power Q = √3(W₁ − W₂).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a balanced three-phase system, apparent power S is related to real P and reactive Q by:",
+      "choices": ["A. S = P + Q", "B. S = √(P² + Q²)", "C. S = P/Q", "D. S = P − Q"],
+      "correct_answer": "B",
+      "explanation": "S = √(P² + Q²) in VA; same relationship as single-phase complex power.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Line voltage in a 480 V (line-to-line) three-phase system equals _____ V phase-to-neutral.",
+      "choices": ["A. 480 V", "B. 277 V", "C. 830 V", "D. 240 V"],
+      "correct_answer": "B",
+      "explanation": "V_P = V_L / √3 = 480 / 1.732 ≈ 277 V. (North American 480 V systems: 277 V phase-to-neutral.)",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An unbalanced three-phase load _____ have a zero neutral current.",
+      "choices": ["A. Always does", "B. Does not in general", "C. Has if purely resistive", "D. Has if Y-connected"],
+      "correct_answer": "B",
+      "explanation": "Unbalanced loads generally have nonzero neutral current because the phasor sum of three unequal phase currents ≠ 0.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which are advantages of three-phase power over single-phase? (Select ALL that apply.)",
+      "choices": [
+        "A. Constant instantaneous power delivery (no pulsation for balanced loads)",
+        "B. More efficient use of conductors for same power",
+        "C. Self-starting rotating magnetic field for motors",
+        "D. Always lower voltage per phase"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Three-phase provides constant power, better copper utilization, and a rotating field for induction motors. Voltage relationship depends on connection type, not always lower.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Total reactive power Q in a balanced three-phase system is:",
+      "choices": [
+        "A. Q = 3 V_P I_P sin θ = √3 V_L I_L sin θ",
+        "B. Q = V_L I_L sin θ",
+        "C. Q = 3 V_L I_L sin θ",
+        "D. Q = √3 V_P I_P sin θ"
+      ],
+      "correct_answer": "A",
+      "explanation": "Q = 3V_P I_P sin θ = √3 V_L I_L sin θ (VAR). Same structure as real power formula.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a delta (Δ)-connected system, the line-to-line voltage equals:",
+      "choices": ["A. √3 times the phase voltage", "B. The phase voltage directly", "C. Phase voltage / √3", "D. 3 times the phase voltage"],
+      "correct_answer": "B",
+      "explanation": "In delta connection, each phase element is connected directly across a line pair: V_line = V_phase.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A balanced 3-phase Y load on a 120 V (phase-to-neutral) system with Z = 6 + j8 Ω per phase. What is the total apparent power S in VA? (Hint: I_P = V_P/|Z|)",
+      "choices": null, "correct_answer": "4320", "unit": "VA", "tolerance": 20,
+      "explanation": "|Z| = 10 Ω; I_P = 120/10 = 12 A; S = 3 × V_P × I_P = 3 × 120 × 12 = 4320 VA",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The per-unit system in power systems normalizes quantities by:",
+      "choices": [
+        "A. Setting all values to 1",
+        "B. Dividing actual values by chosen base quantities",
+        "C. Multiplying by √3",
+        "D. Expressing everything in decibels"
+      ],
+      "correct_answer": "B",
+      "explanation": "Per-unit: Z_pu = Z_actual / Z_base. Simplifies calculations in transformer and multi-voltage systems.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Symmetrical components break an unbalanced three-phase system into:",
+      "choices": [
+        "A. Positive, negative, and zero sequence components",
+        "B. Real, imaginary, and zero components",
+        "C. Line, phase, and neutral components",
+        "D. Fundamental, second, and third harmonic"
+      ],
+      "correct_answer": "A",
+      "explanation": "Fortescue's symmetrical components: any unbalanced 3-phase set = positive + negative + zero sequence balanced sets.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A three-phase transformer with delta primary and wye secondary causes a ___° phase shift between primary and secondary line voltages.",
+      "choices": ["A. 0°", "B. 30°", "C. 60°", "D. 90°"],
+      "correct_answer": "B",
+      "explanation": "Delta-wye (Δ-Y) transformers produce a 30° phase shift (by IEEE convention, wye lags delta by 30°).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Power factor in a balanced three-phase circuit is:",
+      "choices": [
+        "A. PF = cos(angle between line voltage and line current)",
+        "B. PF = cos(θ_Z) where θ_Z is the phase impedance angle",
+        "C. PF = P / S",
+        "D. All of the above"
+      ],
+      "correct_answer": "D",
+      "explanation": "All three definitions are equivalent: the impedance angle = voltage-current angle; PF = cos θ = P/S.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a wye-connected generator with phase sequence A-B-C and V_A = 100∠0°, V_B = ?",
+      "choices": ["A. 100∠120°", "B. 100∠−120°", "C. 100∠180°", "D. 100∠60°"],
+      "correct_answer": "B",
+      "explanation": "ABC sequence (positive): V_B lags V_A by 120°: V_B = 100∠−120°.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a balanced three-phase load, adding a neutral conductor:",
+      "choices": [
+        "A. Allows single-phase loads but does not change balanced three-phase operation",
+        "B. Triples the available power",
+        "C. Reduces line voltage",
+        "D. Is required for all three-phase systems"
+      ],
+      "correct_answer": "A",
+      "explanation": "The neutral carries zero current under balanced conditions; it enables single-phase loads and protects against voltage unbalance.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In 120/208 V three-phase Y system, '208 V' refers to:",
+      "choices": [
+        "A. Phase-to-neutral voltage",
+        "B. Line-to-line voltage (√3 × 120 ≈ 208 V)",
+        "C. Peak voltage",
+        "D. Maximum allowable voltage"
+      ],
+      "correct_answer": "B",
+      "explanation": "208 V = √3 × 120 V ≈ 208 V is the line-to-line voltage; 120 V is the phase-to-neutral voltage.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A three-phase induction motor runs most efficiently at:",
+      "choices": ["A. Light load", "B. Rated (full) load", "C. No load", "D. 200% overload"],
+      "correct_answer": "B",
+      "explanation": "Induction motors are designed for rated load efficiency; efficiency drops at no load (mostly magnetizing losses) and light load.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "Line voltage in a 480 V (L-L) three-phase system equals approximately how many volts phase-to-neutral?",
+      "choices": null, "correct_answer": "277", "unit": "V", "tolerance": 2,
+      "explanation": "V_P = V_L/√3 = 480/1.732 ≈ 277 V",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.11", "review_status": "ai_draft"
+    }
+  ]
+}

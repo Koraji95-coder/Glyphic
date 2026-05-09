@@ -1,5 +1,6 @@
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useCaptureStore } from '../../stores/captureStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -69,7 +70,7 @@ export function CaptureOverlay() {
         await commands.finishCapture('fullscreen', 0, 0, 0, 0, vaultPath ?? '');
         window.history.back();
       } catch (e) {
-        console.error('Fullscreen capture failed:', e);
+        reportError({ context: 'Capture overlay', message: 'Fullscreen capture failed', error: e });
       }
     };
     withDelay(doCapture);
@@ -91,7 +92,9 @@ export function CaptureOverlay() {
 
       if (key === 'escape') {
         // Cancel the capture session (hides overlay and cleans up temp file).
-        commands.cancelCapture().catch(() => {});
+        commands.cancelCapture().catch((e) => {
+          reportError({ context: 'Capture overlay', message: 'Failed to cancel capture', error: e });
+        });
         // If there are queued multi-captures, they were already emitted as events
         // and inserted by the editor; just clear the queue and close
         clearQueue();

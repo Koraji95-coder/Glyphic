@@ -26,7 +26,7 @@ export function StatusBar() {
         paddingLeft: '14px',
         paddingRight: '14px',
         fontSize: '10px',
-        color: 'var(--text-tertiary)',
+        color: 'var(--text-secondary)',
         fontFamily: 'var(--font-mono)',
       }}
     >

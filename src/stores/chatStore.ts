@@ -173,9 +173,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       // At least one listener registration failed — clean up any that succeeded.
       for (const fn of listeners) fn();
       const errorContent =
-        typeof listenerErr === 'string'
-          ? listenerErr
-          : 'ScribeAI: Failed to register stream listeners.';
+        typeof listenerErr === 'string' ? listenerErr : 'ScribeAI: Failed to register stream listeners.';
       set((s) => ({
         messages: s.messages.map((m) => (m.id === assistantMsgId ? { ...m, content: errorContent } : m)),
         isLoading: false,

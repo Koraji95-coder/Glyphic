@@ -1,0 +1,4 @@
+# Glyphic FE Engine — pinned dependencies
+# Install with: pip install -r sidecars/fe_engine/Requirements.txt
+pint==0.23
+chroma-db==0.3.21

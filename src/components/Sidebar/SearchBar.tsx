@@ -53,12 +53,20 @@ export function SearchBar() {
     <div className="relative">
       {/* Input container */}
       <div
-        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+        className="flex items-center gap-2 px-2.5 py-2 rounded-md transition-all"
         style={{
           backgroundColor: 'var(--bg-input)',
-          border: '1px solid var(--border)',
-          transition: 'all 0.15s',
+          border: '1px solid var(--border-subtle)',
+          transition: 'all 0.2s',
           cursor: 'text',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+          e.currentTarget.style.borderColor = 'var(--border)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--bg-input)';
+          e.currentTarget.style.borderColor = 'var(--border-subtle)';
         }}
       >
         <Search size={14} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />

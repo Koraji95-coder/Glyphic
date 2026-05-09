@@ -1,6 +1,7 @@
 import { listen } from '@tauri-apps/api/event';
 import { Check, Loader2, RefreshCw, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -20,6 +21,15 @@ interface ModelPullState {
   completed?: number;
   total?: number;
 }
+
+const RECOMMENDED_MODELS = [
+  'llama3.1:8b',
+  'qwen2.5:7b',
+  'qwen2.5-coder:7b',
+  'deepseek-r1:7b',
+  'mathstral:7b',
+  'llava:7b',
+];
 
 type TestResult =
   | { kind: 'idle' }
@@ -84,14 +94,16 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
     commands
       .aiGetConfig()
       .then(setConfig)
-      .catch(() => {});
+      .catch((e) => {
+        reportError({ context: 'AI settings', message: 'Failed to load AI config', error: e });
+      });
   }, []);
 
   useEffect(() => {
     if (isOllama) {
       void refreshModels();
     }
-  }, [config.provider, refreshModels]);
+  }, [refreshModels, isOllama]);
 
   // Listen for Ollama pull-progress events (Tauri only).
   useEffect(() => {
@@ -100,7 +112,14 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
     listen<PullProgressPayload>('ollama-pull-progress', (event) => {
       const { model, status, completed, total } = event.payload;
-      setPullProgress((prev) => ({ ...prev, [model]: { status, completed, total } }));
+      setPullProgress((prev) => {
+        const prevModel = prev[model];
+        const safeCompleted =
+          completed != null && prevModel?.completed != null && prevModel.total === total
+            ? Math.max(prevModel.completed, completed)
+            : completed;
+        return { ...prev, [model]: { status, completed: safeCompleted, total } };
+      });
       if (status === 'success') {
         setPullingModels((prev) => {
           const next = new Set(prev);
@@ -259,6 +278,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
             AI Settings
           </span>
           <button
+            type="button"
             onClick={onClose}
             className="p-1.5 rounded"
             style={{ color: 'var(--text-tertiary)' }}
@@ -289,6 +309,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           <div className="flex gap-2">
             {(['ollama', 'open_ai'] as const).map((p) => (
               <button
+                type="button"
                 key={p}
                 onClick={() => setConfig((c) => ({ ...c, provider: p }))}
                 style={{
@@ -507,7 +528,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                               width: pct != null ? `${pct}%` : '100%',
                               backgroundColor: 'var(--accent)',
                               borderRadius: '2px',
-                              transition: 'width 0.2s ease',
+                              transition: 'width 0.4s linear',
                               animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
                             }}
                           />
@@ -519,6 +540,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                       onClick={() => void handlePull(name)}
                       disabled={isPulling || isInstalled}
                       style={{
+                        width: '92px',
                         padding: '4px 10px',
                         borderRadius: '5px',
                         fontSize: '11px',
@@ -528,6 +550,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                         border: isInstalled ? '1px solid var(--success-fg, #5ec49e)' : 'none',
                         cursor: isPulling || isInstalled ? 'default' : 'pointer',
                         whiteSpace: 'nowrap',
+                        textAlign: 'center',
                         flexShrink: 0,
                       }}
                     >
@@ -574,7 +597,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
             {/* In-flight pulls + errors */}
             {(() => {
               const modelsToDisplay = [
-                ...pullingModels,
+                ...Array.from(pullingModels).filter((m) => !RECOMMENDED_MODELS.includes(m)),
                 ...Object.keys(pullErrors).filter((m) => !pullingModels.has(m)),
               ];
               return modelsToDisplay.map((m) => {
@@ -597,6 +620,8 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                           fontSize: '11px',
                           fontFamily: 'var(--font-body)',
                           color: err ? 'var(--error-fg, #e07070)' : 'var(--text-tertiary)',
+                          minWidth: '64px',
+                          textAlign: 'right',
                         }}
                       >
                         {err ?? (pct != null ? `${pct}%` : (prog?.status ?? ''))}
@@ -617,7 +642,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                             width: pct != null ? `${pct}%` : '100%',
                             backgroundColor: 'var(--accent)',
                             borderRadius: '2px',
-                            transition: 'width 0.2s ease',
+                            transition: 'width 0.4s linear',
                             animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
                           }}
                         />
@@ -647,6 +672,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
             </span>
             {isOllama && (
               <button
+                type="button"
                 onClick={() => void refreshModels()}
                 disabled={loadingModels}
                 className="flex items-center gap-1 text-xs px-2 py-1 rounded"
@@ -788,6 +814,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       {/* Footer actions */}
       <div className="px-3 py-3 flex justify-end gap-2" style={{ borderTop: '1px solid var(--border)' }}>
         <button
+          type="button"
           onClick={onClose}
           className="text-xs px-3 py-1.5 rounded"
           style={{
@@ -801,6 +828,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           Cancel
         </button>
         <button
+          type="button"
           onClick={handleSave}
           disabled={isSaving || !vaultPath}
           className="text-xs px-3 py-1.5 rounded flex items-center gap-1"

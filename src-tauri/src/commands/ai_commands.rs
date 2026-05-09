@@ -29,10 +29,18 @@ impl AiState {
         }
     }
 
+    /// Safely access the config, converting mutex poison errors to strings.
+    pub fn get_config(&self) -> Result<AiConfig, String> {
+        self.config
+            .lock()
+            .map(|guard| guard.clone())
+            .map_err(|e| format!("Failed to acquire config lock: {}", e))
+    }
+
     /// Build the appropriate provider from the current config.
-    pub fn provider(&self) -> ScribeAiProvider {
-        let config = self.config.lock().unwrap();
-        ScribeAiProvider::from_config(&config, self.client.clone())
+    pub fn provider(&self) -> Result<ScribeAiProvider, String> {
+        let config = self.get_config()?;
+        Ok(ScribeAiProvider::from_config(&config, self.client.clone()))
     }
 }
 
@@ -42,16 +50,18 @@ impl AiState {
 
 const SYSTEM_CHAT: &str = "You are ScribeAI, a study assistant embedded in the \
 Glyphic note-taking app for STEM students (math, physics, engineering, CS). \
-Be concise, precise, and helpful. When given note context, reference it \
-specifically. \
-- Always typeset math in LaTeX inside `$...$` (inline) or `$$...$$` (block). \
-- Always include units in answers and intermediate steps. \
-- For derivations, show step-by-step work; don't skip algebra. \
-- For diagrams (circuits, control loops, state machines, flowcharts), prefer \
-  fenced ```mermaid blocks. \
-- For code (Python/MATLAB/Verilog/SPICE), use fenced code blocks with the \
-  correct language tag. \
-Format your responses with markdown.";
+- Be concise and direct. NEVER repeat yourself. NEVER offer lists of options. \
+- Use clear structure for multi-part answers: short headers + bullet lists. \
+- Always typeset math in LaTeX: `$...$` (inline) or `$$...$$` (block). \
+- Include units and show algebraic steps in derivations. \
+- For diagrams: use mermaid blocks. For code: use fenced code blocks. \
+- Special instructions: \
+  * If user says 'no', 'nope', 'not yet', 'hello', or 'testing': respond with \
+    exactly ONE sentence and nothing else. No follow-ups, no options, no questions. \
+  * If you already said something similar to the user: say something completely \
+    different next time (different wording, different approach, or remain silent). \
+  * If you don't have enough info: ask ONE clarifying question and stop. \
+- Never mention tools, JSON, or internal implementation details.";
 
 const SYSTEM_SUMMARIZE: &str = "You are ScribeAI. Summarize the following \
 student notes into a concise, well-structured summary suitable for exam \
@@ -92,9 +102,9 @@ pub async fn ai_chat(
     state: State<'_, AiState>,
     db_state: State<'_, DbState>,
 ) -> Result<String, String> {
-    let provider = state.provider();
+    let provider = state.provider()?;
     let model = {
-        let config = state.config.lock().unwrap();
+        let config = state.get_config()?;
         model_override.unwrap_or_else(|| config.model_routing.chat.clone())
     };
 
@@ -185,9 +195,9 @@ pub async fn ai_summarize(
     note_content: String,
     state: State<'_, AiState>,
 ) -> Result<String, String> {
-    let provider = state.provider();
+    let provider = state.provider()?;
     let model = {
-        let config = state.config.lock().unwrap();
+        let config = state.get_config()?;
         config.model_routing.summarize.clone()
     };
 
@@ -204,9 +214,9 @@ pub async fn ai_flashcards(
     note_content: String,
     state: State<'_, AiState>,
 ) -> Result<Vec<serde_json::Value>, String> {
-    let provider = state.provider();
+    let provider = state.provider()?;
     let model = {
-        let config = state.config.lock().unwrap();
+        let config = state.get_config()?;
         config.model_routing.flashcards.clone()
     };
 
@@ -230,9 +240,9 @@ pub async fn ai_explain(
     text: String,
     state: State<'_, AiState>,
 ) -> Result<String, String> {
-    let provider = state.provider();
+    let provider = state.provider()?;
     let model = {
-        let config = state.config.lock().unwrap();
+        let config = state.get_config()?;
         if is_vision_content(&text) {
             config.model_routing.vision.clone()
         } else {
@@ -253,9 +263,9 @@ pub async fn ai_explain_screenshot(
     text: String,
     state: State<'_, AiState>,
 ) -> Result<String, String> {
-    let provider = state.provider();
+    let provider = state.provider()?;
     let model = {
-        let config = state.config.lock().unwrap();
+        let config = state.get_config()?;
         config.model_routing.vision.clone()
     };
 
@@ -271,7 +281,7 @@ pub async fn ai_explain_screenshot(
 pub async fn ai_check_connection(
     state: State<'_, AiState>,
 ) -> Result<bool, String> {
-    state.provider().check_connection().await
+    state.provider()?.check_connection().await
 }
 
 #[tauri::command]
@@ -380,9 +390,9 @@ pub async fn ai_chat_stream(
         map.insert(stream_id.clone(), cancel_tx);
     }
 
-    let provider = state.provider();
+    let provider = state.provider()?;
     let model = {
-        let config = state.config.lock().unwrap();
+        let config = state.get_config()?;
         model_override.unwrap_or_else(|| config.model_routing.chat.clone())
     };
 
@@ -634,12 +644,9 @@ pub async fn ai_study_chat(
     model_override: Option<String>,
     state: State<'_, AiState>,
 ) -> Result<String, String> {
-    let (endpoint, model) = {
-        let config = state.config.lock().unwrap();
-        let endpoint = config.ollama.endpoint.clone();
-        let model = model_override.unwrap_or_else(|| config.model_routing.chat.clone());
-        (endpoint, model)
-    };
+    let config = state.get_config()?;
+    let endpoint = config.ollama.endpoint.clone();
+    let model = model_override.unwrap_or_else(|| config.model_routing.chat.clone());
 
     let ollama_cfg = crate::ai::config::OllamaConfig { endpoint, model: model.clone() };
     let provider = crate::ai::ollama::OllamaProvider::new(ollama_cfg, state.client.clone());

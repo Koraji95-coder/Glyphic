@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { reportError } from '../lib/errorReporter';
 import { frontmatterRegistry } from '../lib/frontmatterRegistry';
 import { commands } from '../lib/tauri/commands';
 import { composeNote, extractFrontmatter, splitFrontmatter } from '../lib/tiptap/markdownParser';
@@ -21,6 +22,8 @@ export function useEditor() {
   // active when the hook first mounted) and never drops the YAML header.
   const pendingRef = useRef<PendingSave | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const contentSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestContentRef = useRef('');
 
   const writeNow = useCallback(
     async (pending: PendingSave) => {
@@ -29,7 +32,7 @@ export function useEditor() {
         await commands.saveNote(pending.vaultPath, pending.notePath, composeNote(pending));
         editorStore.markSaved();
       } catch (e) {
-        console.error('Save error:', e);
+        reportError({ context: 'Editor save', message: 'Save error', error: e });
       } finally {
         editorStore.setSaving(false);
       }
@@ -60,7 +63,15 @@ export function useEditor() {
 
   const handleContentChange = useCallback(
     (content: string) => {
-      editorStore.setContent(content);
+      latestContentRef.current = content;
+      // Keep editor content in store, but avoid updating a full document string
+      // on every keystroke (this causes heavy allocation churn while typing).
+      if (!contentSyncTimerRef.current) {
+        contentSyncTimerRef.current = setTimeout(() => {
+          contentSyncTimerRef.current = null;
+          editorStore.setContent(latestContentRef.current);
+        }, 750);
+      }
       editorStore.markDirty();
       const words = content.trim().split(/\s+/).filter(Boolean).length;
       editorStore.setWordCount(words);
@@ -90,6 +101,7 @@ export function useEditor() {
       // Expose the per-note ai_model so ChatPanel can use it without re-parsing.
       const fm = extractFrontmatter(raw);
       editorStore.setActiveNoteAiModel(typeof fm?.ai_model === 'string' ? fm.ai_model : null);
+      latestContentRef.current = body;
       editorStore.setContent(body);
       editorStore.markSaved();
       return body;
@@ -110,7 +122,13 @@ export function useEditor() {
       void commands.saveNote(pending.vaultPath, pending.notePath, composeNote(pending));
     };
     window.addEventListener('beforeunload', handler);
-    return () => window.removeEventListener('beforeunload', handler);
+    return () => {
+      window.removeEventListener('beforeunload', handler);
+      if (contentSyncTimerRef.current) {
+        clearTimeout(contentSyncTimerRef.current);
+        contentSyncTimerRef.current = null;
+      }
+    };
   }, []);
 
   return { ...editorStore, handleContentChange, loadNote, forceSave };

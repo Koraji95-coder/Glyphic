@@ -34,8 +34,13 @@ impl VaultWatcher {
         std::thread::spawn(move || {
             use std::collections::HashSet;
             let coalesce_window = Duration::from_millis(300);
+            // Backpressure: don't emit more than 1 event per second to prevent
+            // Tauri's unbounded PostMessage queue from accumulating.
+            let min_emit_interval = Duration::from_millis(1000);
             let mut pending: HashSet<String> = HashSet::new();
             let mut deadline: Option<Instant> = None;
+            let mut last_emit: Option<Instant> = None;
+            let mut emit_count = 0usize;
 
             loop {
                 // Wait either until the deadline or a default poll tick.
@@ -68,18 +73,34 @@ impl VaultWatcher {
                         if let Some(d) = deadline {
                             if Instant::now() >= d {
                                 if !pending.is_empty() {
-                                    // The frontend treats this event purely as a generic
-                                    // "refresh tree" signal, so emitting once per burst avoids
-                                    // flooding the webview message queue during large file changes.
-                                    let sample_path = pending.iter().next().cloned().unwrap_or_default();
-                                    pending.clear();
-                                    let _ = app_handle.emit(
-                                        "vault-changed",
-                                        VaultChangedPayload {
-                                            event_type: "changed".to_string(),
-                                            path: sample_path,
-                                        },
-                                    );
+                                    // Backpressure check: only emit if min interval has elapsed since
+                                    // last emit. This prevents Tauri's unbounded PostMessage queue
+                                    // from accumulating if the WebView event loop is slow.
+                                    let now = Instant::now();
+                                    let can_emit = last_emit
+                                        .map(|last| now.duration_since(last) >= min_emit_interval)
+                                        .unwrap_or(true);
+
+                                    if can_emit {
+                                        // The frontend treats this event purely as a generic
+                                        // "refresh tree" signal, so emitting once per burst avoids
+                                        // flooding the webview message queue during large file changes.
+                                        let sample_path = pending.iter().next().cloned().unwrap_or_default();
+                                        pending.clear();
+                                        emit_count += 1;
+                                        eprintln!("[Vault Watcher] Emitting vault-changed (count: {}, backlog: {})", emit_count, 0);
+                                        let _ = app_handle.emit(
+                                            "vault-changed",
+                                            VaultChangedPayload {
+                                                event_type: "changed".to_string(),
+                                                path: sample_path,
+                                            },
+                                        );
+                                        last_emit = Some(now);
+                                    } else {
+                                        // Backlog: don't emit yet, keep pending items for next interval.
+                                        eprintln!("[Vault Watcher] Backpressure: delaying emit (pending changes: {})", pending.len());
+                                    }
                                 }
                                 deadline = None;
                             }

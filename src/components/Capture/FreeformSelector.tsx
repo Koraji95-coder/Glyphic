@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useCaptureStore } from '../../stores/captureStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -47,7 +48,7 @@ export function FreeformSelector() {
           window.history.back();
         }
       } catch (e) {
-        console.error('Freeform capture failed:', e);
+        reportError({ context: 'Capture freeform', message: 'Freeform capture failed', error: e });
       }
     },
     [isDrawing, points, vaultPath, addToQueue],

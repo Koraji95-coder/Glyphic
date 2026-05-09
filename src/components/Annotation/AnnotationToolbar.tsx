@@ -49,6 +49,7 @@ export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, 
       {/* Tool buttons */}
       {TOOLS.map(({ type, icon: Icon, label }) => (
         <button
+          type="button"
           key={type}
           onClick={() => setActiveTool(type)}
           title={label}
@@ -69,6 +70,7 @@ export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, 
       <div className="flex items-center gap-1">
         {COLORS.map((c) => (
           <button
+            type="button"
             key={c}
             onClick={() => setColor(c)}
             className="w-5 h-5 rounded-full border-2 transition-transform"
@@ -103,6 +105,7 @@ export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, 
 
       {/* Undo/Redo */}
       <button
+        type="button"
         onClick={onUndo}
         disabled={!canUndo}
         title="Undo (Ctrl+Z)"
@@ -112,6 +115,7 @@ export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, 
         <Undo2 size={18} />
       </button>
       <button
+        type="button"
         onClick={onRedo}
         disabled={!canRedo}
         title="Redo (Ctrl+Shift+Z)"
@@ -126,6 +130,7 @@ export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, 
 
       {/* Save & Discard */}
       <button
+        type="button"
         onClick={onSave}
         title="Save annotations"
         className="flex items-center gap-1 px-2.5 py-1 rounded text-sm font-medium transition-colors"
@@ -138,6 +143,7 @@ export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, 
         Save
       </button>
       <button
+        type="button"
         onClick={onDiscard}
         title="Discard changes (Esc)"
         className="p-1.5 rounded transition-colors"

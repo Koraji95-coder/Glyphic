@@ -2,6 +2,7 @@ import { Database, GitBranch, GraduationCap, HelpCircle, LayoutList, PinOff, Set
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useHelpUiStore } from '../../stores/helpUiStore';
@@ -41,7 +42,7 @@ export function Sidebar() {
         try {
           await createNote('', noteName);
         } catch (e) {
-          console.error('Failed to create note:', e);
+          reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
         }
       }
     },
@@ -65,7 +66,7 @@ export function Sidebar() {
         await commands.createFolder(vaultPath, name);
         await refreshFileTree();
       } catch (e) {
-        console.error('Failed to create folder:', e);
+        reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e });
       }
     }
   }, [vaultPath, refreshFileTree]);
@@ -371,6 +372,7 @@ function SidebarActionButton({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="flex items-center justify-center"
       style={{

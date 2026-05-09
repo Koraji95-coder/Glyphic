@@ -10,6 +10,7 @@ import {
 } from 'fabric';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { saveAnnotations } from '../../lib/annotation/annotationIO';
+import { reportError } from '../../lib/errorReporter';
 import { useAnnotationStore } from '../../stores/annotationStore';
 import type { AnnotationData, AnnotationObject } from '../../types/annotation';
 import { AnnotationToolbar } from './AnnotationToolbar';
@@ -51,6 +52,7 @@ export function AnnotationOverlay() {
       const h = Math.round(img.height * scale);
       setImageSize({ width: w, height: h });
 
+      // biome-ignore lint/style/noNonNullAssertion: ref guaranteed non-null after img load
       const canvas = new Canvas(canvasRef.current!, {
         width: w,
         height: h,
@@ -98,6 +100,7 @@ export function AnnotationOverlay() {
   }, [activeTool, color, strokeWidth]);
 
   // Mouse handlers for arrow, rect, highlight, text
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pushUndo is defined later in the same render; adding it would cause TDZ error
   useEffect(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
@@ -213,18 +216,30 @@ export function AnnotationOverlay() {
       pushUndo();
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    canvas.on('mouse:down', handleMouseDown as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    canvas.on('mouse:move', handleMouseMove as any);
+    canvas.on(
+      'mouse:down',
+      // biome-ignore lint/suspicious/noExplicitAny: Fabric.js event types are untyped
+      handleMouseDown as any,
+    );
+    canvas.on(
+      'mouse:move',
+      // biome-ignore lint/suspicious/noExplicitAny: Fabric.js event types are untyped
+      handleMouseMove as any,
+    );
     canvas.on('mouse:up', handleMouseUp);
     canvas.on('path:created', handlePathCreated);
 
     return () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      canvas.off('mouse:down', handleMouseDown as any);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      canvas.off('mouse:move', handleMouseMove as any);
+      canvas.off(
+        'mouse:down',
+        // biome-ignore lint/suspicious/noExplicitAny: Fabric.js event types are untyped
+        handleMouseDown as any,
+      );
+      canvas.off(
+        'mouse:move',
+        // biome-ignore lint/suspicious/noExplicitAny: Fabric.js event types are untyped
+        handleMouseMove as any,
+      );
       canvas.off('mouse:up', handleMouseUp);
       canvas.off('path:created', handlePathCreated);
     };
@@ -241,6 +256,7 @@ export function AnnotationOverlay() {
     const canvas = fabricRef.current;
     if (!canvas || undoStack.length <= 1) return;
     const newStack = [...undoStack];
+    // biome-ignore lint/style/noNonNullAssertion: non-empty guaranteed by length check
     const current = newStack.pop()!;
     setRedoStack((prev) => [...prev, current]);
     setUndoStack(newStack);
@@ -251,7 +267,7 @@ export function AnnotationOverlay() {
         canvas.requestRenderAll();
       })
       .catch((e: unknown) => {
-        console.error('Undo failed:', e);
+        reportError({ context: 'Annotation undo', message: 'Undo failed', error: e });
       });
   }, [undoStack]);
 
@@ -259,6 +275,7 @@ export function AnnotationOverlay() {
     const canvas = fabricRef.current;
     if (!canvas || redoStack.length === 0) return;
     const newRedoStack = [...redoStack];
+    // biome-ignore lint/style/noNonNullAssertion: non-empty guaranteed by length check
     const state = newRedoStack.pop()!;
     setRedoStack(newRedoStack);
     setUndoStack((prev) => [...prev, state]);
@@ -268,7 +285,7 @@ export function AnnotationOverlay() {
         canvas.requestRenderAll();
       })
       .catch((e: unknown) => {
-        console.error('Redo failed:', e);
+        reportError({ context: 'Annotation redo', message: 'Redo failed', error: e });
       });
   }, [redoStack]);
 
@@ -287,7 +304,7 @@ export function AnnotationOverlay() {
       await saveAnnotations(annotationFilePath, data);
       setAnnotationData(data);
     } catch (e) {
-      console.error('Failed to save annotations:', e);
+      reportError({ context: 'Annotation save', message: 'Failed to save annotations', error: e });
     }
 
     closeAnnotation();

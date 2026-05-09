@@ -1,0 +1,374 @@
+{
+  "topic": "Linear Algebra",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The determinant of the matrix [[2, 1], [4, 3]] is:",
+      "choices": ["A. 2", "B. 10", "C. 6", "D. −2"],
+      "correct_answer": "A",
+      "explanation": "det = 2×3 − 1×4 = 6 − 4 = 2",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "If matrix A is 3×4 and matrix B is 4×2, the product AB has dimension:",
+      "choices": ["A. 3×2", "B. 4×4", "C. 3×4", "D. 2×3"],
+      "correct_answer": "A",
+      "explanation": "For AB to exist, columns of A must equal rows of B (4=4). Result is rows(A)×cols(B) = 3×2.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A square matrix A is singular if and only if:",
+      "choices": [
+        "A. det(A) ≠ 0",
+        "B. det(A) = 0",
+        "C. A = Aᵀ",
+        "D. A has all positive eigenvalues"
+      ],
+      "correct_answer": "B",
+      "explanation": "A matrix is singular (non-invertible) when its determinant equals zero.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The eigenvalues of [[3, 0], [0, 5]] are:",
+      "choices": ["A. 3 and 5", "B. 8 and 0", "C. 15 and 1", "D. 4 and 4"],
+      "correct_answer": "A",
+      "explanation": "A diagonal matrix has eigenvalues equal to its diagonal entries: 3 and 5.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The inverse of A = [[2, 1], [1, 1]] is:",
+      "choices": [
+        "A. [[1, -1], [-1, 2]]",
+        "B. [[1, 1], [1, 2]]",
+        "C. [[0.5, -0.5], [-0.5, 1]]",
+        "D. [[-1, 1], [1, -2]]"
+      ],
+      "correct_answer": "A",
+      "explanation": "det(A) = 2−1 = 1. A⁻¹ = (1/det) × [[d, −b], [−c, a]] = [[1, −1], [−1, 2]].",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Two vectors u = [1, 0] and v = [0, 1] are:",
+      "choices": [
+        "A. Parallel",
+        "B. Orthogonal (perpendicular)",
+        "C. Anti-parallel",
+        "D. Linearly dependent"
+      ],
+      "correct_answer": "B",
+      "explanation": "u · v = 1×0 + 0×1 = 0; zero dot product means the vectors are orthogonal.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "What is the rank of the matrix [[1, 2, 3], [2, 4, 6], [0, 0, 0]]?",
+      "choices": null,
+      "correct_answer": "1",
+      "unit": "",
+      "tolerance": 0,
+      "explanation": "Row 2 = 2×Row 1; Row 3 = 0. Only one linearly independent row, so rank = 1.",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The trace of matrix A = [[4, 2], [1, 7]] is:",
+      "choices": ["A. 28", "B. 11", "C. 5", "D. 3"],
+      "correct_answer": "B",
+      "explanation": "Trace = sum of diagonal elements = 4 + 7 = 11.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The characteristic equation for eigenvalues of A = [[a, b], [c, d]] is:",
+      "choices": [
+        "A. λ² − (a+d)λ + (ad−bc) = 0",
+        "B. λ² + (a+d)λ − (ad−bc) = 0",
+        "C. λ² + (ad−bc) = 0",
+        "D. λ(a+d) = (ad−bc)"
+      ],
+      "correct_answer": "A",
+      "explanation": "det(A − λI) = 0 gives (a−λ)(d−λ)−bc = λ² − (a+d)λ + (ad−bc) = 0.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A set of vectors is linearly dependent if:",
+      "choices": [
+        "A. All vectors are unit vectors",
+        "B. At least one vector can be written as a linear combination of the others",
+        "C. Their dot products are nonzero",
+        "D. The set spans R³"
+      ],
+      "correct_answer": "B",
+      "explanation": "Linear dependence means one vector is redundant — expressible as a combination of the others.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Cramer's rule is used to solve Ax = b when:",
+      "choices": [
+        "A. A is singular",
+        "B. A is square and non-singular (det ≠ 0)",
+        "C. A is rectangular",
+        "D. b = 0"
+      ],
+      "correct_answer": "B",
+      "explanation": "Cramer's rule applies to square systems with non-zero determinant, giving each variable as a ratio of determinants.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "If λ is an eigenvalue of A, then an eigenvector x satisfies:",
+      "choices": [
+        "A. Ax = λx",
+        "B. Ax = λA",
+        "C. Ax = 0",
+        "D. Ax + λx = 1"
+      ],
+      "correct_answer": "A",
+      "explanation": "By definition, Ax = λx; the matrix transforms x only by scaling it by λ.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The transpose of matrix A = [[1, 2, 3], [4, 5, 6]] is:",
+      "choices": [
+        "A. [[1, 4], [2, 5], [3, 6]]",
+        "B. [[1, 2, 3], [4, 5, 6]]",
+        "C. [[6, 5, 4], [3, 2, 1]]",
+        "D. [[1, 2], [3, 4], [5, 6]]"
+      ],
+      "correct_answer": "A",
+      "explanation": "Transpose interchanges rows and columns; the 2×3 matrix becomes 3×2: rows of A become columns of Aᵀ.",
+      "difficulty": "easy",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For an n×n matrix A, the product of its eigenvalues equals:",
+      "choices": [
+        "A. trace(A)",
+        "B. det(A)",
+        "C. rank(A)",
+        "D. n"
+      ],
+      "correct_answer": "B",
+      "explanation": "Product of eigenvalues = det(A); sum of eigenvalues = trace(A). Both are useful properties.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Gaussian elimination is used to solve a linear system by transforming the augmented matrix into:",
+      "choices": [
+        "A. Row echelon form (upper triangular)",
+        "B. The identity matrix",
+        "C. A diagonal matrix",
+        "D. The original coefficient matrix"
+      ],
+      "correct_answer": "A",
+      "explanation": "Gaussian elimination applies row operations to reach row echelon (upper triangular) form, then uses back-substitution.",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which of the following are properties of an orthogonal matrix Q? (Select ALL that apply.)",
+      "choices": [
+        "A. Qᵀ = Q⁻¹",
+        "B. det(Q) = ±1",
+        "C. QQᵀ = I",
+        "D. Eigenvalues are always positive"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Orthogonal matrices satisfy Qᵀ = Q⁻¹, hence QQᵀ = I, and |det(Q)| = 1. Eigenvalues can be ±1 or complex.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 75,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The null space of a matrix A consists of all vectors x such that:",
+      "choices": ["A. Ax = b", "B. Ax = 0", "C. Aᵀx = 0", "D. xᵀx = 0"],
+      "correct_answer": "B",
+      "explanation": "The null space (kernel) of A is {x : Ax = 0}; its dimension is the nullity.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "For A = [[1, 3], [2, 4]], what is det(A)?",
+      "choices": null,
+      "correct_answer": "-2",
+      "unit": "",
+      "tolerance": 0,
+      "explanation": "det = 1×4 − 3×2 = 4 − 6 = −2",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "If A is positive definite, then all its eigenvalues are:",
+      "choices": ["A. Negative", "B. Zero", "C. Positive", "D. Purely imaginary"],
+      "correct_answer": "C",
+      "explanation": "A symmetric positive definite matrix has all positive eigenvalues (and all positive pivots).",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A linear map T: Rⁿ → Rᵐ can be represented as multiplication by:",
+      "choices": ["A. An n×m vector", "B. An m×n matrix", "C. An n×n diagonal matrix", "D. An m×m matrix"],
+      "correct_answer": "B",
+      "explanation": "A linear transformation from Rⁿ to Rᵐ is represented by an m×n matrix; T(x) = Ax with A ∈ Rᵐˣⁿ.",
+      "difficulty": "medium",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The cross product of u = [1, 0, 0] and v = [0, 1, 0] is:",
+      "choices": ["A. [0, 0, 0]", "B. [1, 1, 0]", "C. [0, 0, 1]", "D. [0, 0, −1]"],
+      "correct_answer": "C",
+      "explanation": "i × j = k (right-hand rule). The cross product of unit vectors î and ĵ is k̂ = [0, 0, 1].",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For the system Ax = b to have a unique solution, which condition must hold?",
+      "choices": [
+        "A. b = 0",
+        "B. A is square with det(A) = 0",
+        "C. A is square with det(A) ≠ 0",
+        "D. A has more rows than columns"
+      ],
+      "correct_answer": "C",
+      "explanation": "A unique solution exists when A is square (n×n) and non-singular (det ≠ 0), so A⁻¹ exists and x = A⁻¹b.",
+      "difficulty": "easy",
+      "bloom_level": 2,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The dot product of u = [3, 4] and v = [4, −3] is:",
+      "choices": ["A. 25", "B. 12", "C. 0", "D. 7"],
+      "correct_answer": "C",
+      "explanation": "u · v = 3×4 + 4×(−3) = 12 − 12 = 0; the vectors are orthogonal.",
+      "difficulty": "easy",
+      "bloom_level": 3,
+      "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The LU decomposition factors matrix A into:",
+      "choices": [
+        "A. A lower triangular matrix × an upper triangular matrix",
+        "B. An orthogonal matrix × a symmetric matrix",
+        "C. A diagonal matrix × a row echelon matrix",
+        "D. Two square root matrices"
+      ],
+      "correct_answer": "A",
+      "explanation": "LU decomposition: A = LU where L is lower triangular and U is upper triangular; used for efficient linear system solving.",
+      "difficulty": "medium",
+      "bloom_level": 1,
+      "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "If A has eigenvalue λ, what is the corresponding eigenvalue of A⁻¹?",
+      "choices": ["A. −λ", "B. 1/λ", "C. λ²", "D. λ − 1"],
+      "correct_answer": "B",
+      "explanation": "If Ax = λx and λ ≠ 0, then A⁻¹x = (1/λ)x; eigenvalues of A⁻¹ are reciprocals of those of A.",
+      "difficulty": "medium",
+      "bloom_level": 3,
+      "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.1",
+      "review_status": "ai_draft"
+    }
+  ]
+}

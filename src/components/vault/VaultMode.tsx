@@ -1,5 +1,6 @@
 import { Database, Search, Trash2, Upload, X, Zap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { events } from '../../lib/tauri/events';
 import { useLayoutStore } from '../../stores/layoutStore';
@@ -140,7 +141,7 @@ export function VaultMode() {
       setSources((prev) => prev.filter((s) => s.id !== sourceId));
       setQueryResults([]);
     } catch (e) {
-      console.error('Failed to delete source:', e);
+      reportError({ context: 'Vault source delete', message: 'Failed to delete source', error: e });
     }
   }, []);
 
@@ -152,7 +153,7 @@ export function VaultMode() {
       const result = (await commands.queryVault(query.trim())) as { results?: QueryChunk[] };
       setQueryResults(result?.results ?? []);
     } catch (e) {
-      console.error('Query failed:', e);
+      reportError({ context: 'Vault query', message: 'Query failed', error: e });
     } finally {
       setSearching(false);
     }
@@ -164,7 +165,7 @@ export function VaultMode() {
       const result = (await commands.generateFlashcards(sourceId, 5)) as { flashcards?: unknown[] };
       setFlashcardResult({ sourceId, cards: result?.flashcards ?? [] });
     } catch (e) {
-      console.error('Flashcard generation failed:', e);
+      reportError({ context: 'Vault flashcard generation', message: 'Flashcard generation failed', error: e });
     } finally {
       setFlashcardBusy(null);
     }
@@ -321,9 +322,9 @@ export function VaultMode() {
 
             {queryResults.length > 0 && (
               <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {queryResults.map((chunk, i) => (
+                {queryResults.map((chunk) => (
                   <div
-                    key={i}
+                    key={`${chunk.source_label}:${chunk.text.slice(0, 30)}`}
                     style={{
                       padding: '14px 16px',
                       borderRadius: 'var(--radius-md)',
@@ -465,9 +466,9 @@ export function VaultMode() {
                 </button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {(flashcardResult.cards as Array<{ question?: string; answer?: string }>).map((card, i) => (
+                {(flashcardResult.cards as Array<{ question?: string; answer?: string }>).map((card) => (
                   <div
-                    key={i}
+                    key={card.question ?? card.answer ?? 'card'}
                     style={{
                       padding: '14px 16px',
                       borderRadius: 'var(--radius-md)',

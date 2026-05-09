@@ -18,6 +18,7 @@ import {
 import { useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLectureMode } from '../../hooks/useLectureMode';
+import { reportError } from '../../lib/errorReporter';
 import { exportNoteToPdf, suggestPdfFileName } from '../../lib/export/pdfExport';
 import { commands } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
@@ -64,7 +65,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       setExportStatus('Exported');
       setTimeout(() => setExportStatus(null), 2000);
     } catch (e) {
-      console.error('Markdown export failed:', e);
+      reportError({ context: 'Markdown export', message: 'Export failed', error: e });
       setExportStatus(`Export failed: ${e}`);
       setTimeout(() => setExportStatus(null), 4000);
     }
@@ -84,7 +85,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         suggestedFileName: suggestPdfFileName(activeNotePath),
       });
     } catch (e) {
-      console.error('PDF export failed:', e);
+      reportError({ context: 'PDF export', message: 'Export failed', error: e });
       setExportStatus(`PDF export failed: ${e}`);
       setTimeout(() => setExportStatus(null), 4000);
     }
@@ -198,6 +199,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
             const Icon = btn.icon;
             return (
               <button
+                type="button"
                 key={btn.label}
                 onClick={btn.action}
                 title={btn.label}
@@ -235,6 +237,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       {/* Draw / Ink mode toggle — hero button style */}
       <button
+        type="button"
         onClick={toggleInkMode}
         title="Draw Mode"
         className="flex items-center shrink-0 transition-colors"
@@ -265,6 +268,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       {/* Lecture mode toggle — hero button style */}
       <button
+        type="button"
         onClick={toggleLectureMode}
         title="Lecture Mode"
         className="flex items-center shrink-0 transition-colors"
@@ -421,7 +425,12 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       {/* Capture button — gradient hero */}
       <button
-        onClick={() => commands.startCapture().catch(() => {})}
+        type="button"
+        onClick={() =>
+          commands.startCapture().catch((e) => {
+            reportError({ context: 'Capture', message: 'Failed to start capture', error: e });
+          })
+        }
         title="Capture screenshot (⌘⇧S)"
         className="flex items-center shrink-0 transition-colors"
         style={{

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLectureMode } from '../../hooks/useLectureMode';
 
 export function LectureModeToggle() {
-  const { lectureModeActive, lectureModeStartedAt, toggleLectureMode, getElapsedTime, getTimestamp } = useLectureMode();
+  const { lectureModeActive, toggleLectureMode, getElapsedTime, getTimestamp } = useLectureMode();
   const [elapsed, setElapsed] = useState('00:00');
   const [startTime, setStartTime] = useState('');
 
@@ -36,6 +36,7 @@ export function LectureModeToggle() {
       <div className="flex items-center gap-3">
         <span className="font-mono font-medium">{elapsed}</span>
         <button
+          type="button"
           onClick={toggleLectureMode}
           className="p-0.5 rounded hover:bg-opacity-20 transition-colors"
           title="Stop Lecture Mode"

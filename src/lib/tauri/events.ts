@@ -1,6 +1,20 @@
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { CaptureResult } from '../../types/capture';
 
+const isTauriRuntime = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+const noopUnlisten: UnlistenFn = () => Promise.resolve();
+
+function safeListen<T>(eventName: string, handler: (payload: T) => void): Promise<UnlistenFn> {
+  if (!isTauriRuntime) return Promise.resolve(noopUnlisten);
+  return listen<T>(eventName, (event) => handler(event.payload));
+}
+
+function safeListenNoPayload(eventName: string, handler: () => void): Promise<UnlistenFn> {
+  if (!isTauriRuntime) return Promise.resolve(noopUnlisten);
+  return listen(eventName, () => handler());
+}
+
 interface VaultChangedPayload {
   event_type: 'created' | 'modified' | 'deleted';
   path: string;
@@ -34,28 +48,28 @@ export interface VaultIngestProgressPayload {
 
 export const events = {
   onScreenshotCaptured: (handler: (result: CaptureResult) => void): Promise<UnlistenFn> =>
-    listen<CaptureResult>('screenshot-captured', (event) => handler(event.payload)),
+    safeListen<CaptureResult>('screenshot-captured', handler),
 
   onVaultChanged: (handler: (payload: VaultChangedPayload) => void): Promise<UnlistenFn> =>
-    listen<VaultChangedPayload>('vault-changed', (event) => handler(event.payload)),
+    safeListen<VaultChangedPayload>('vault-changed', handler),
 
   onSaveStatus: (handler: (payload: SaveStatusPayload) => void): Promise<UnlistenFn> =>
-    listen<SaveStatusPayload>('save-status', (event) => handler(event.payload)),
+    safeListen<SaveStatusPayload>('save-status', handler),
 
   onIndexUpdated: (handler: (payload: IndexUpdatedPayload) => void): Promise<UnlistenFn> =>
-    listen<IndexUpdatedPayload>('index-updated', (event) => handler(event.payload)),
+    safeListen<IndexUpdatedPayload>('index-updated', handler),
 
-  onCaptureCancelled: (handler: () => void): Promise<UnlistenFn> => listen('capture-cancelled', () => handler()),
+  onCaptureCancelled: (handler: () => void): Promise<UnlistenFn> => safeListenNoPayload('capture-cancelled', handler),
 
   onChatStreamChunk: (handler: (payload: ChatStreamChunkPayload) => void): Promise<UnlistenFn> =>
-    listen<ChatStreamChunkPayload>('chat-stream-chunk', (event) => handler(event.payload)),
+    safeListen<ChatStreamChunkPayload>('chat-stream-chunk', handler),
 
   onChatStreamDone: (handler: (payload: ChatStreamEndPayload) => void): Promise<UnlistenFn> =>
-    listen<ChatStreamEndPayload>('chat-stream-done', (event) => handler(event.payload)),
+    safeListen<ChatStreamEndPayload>('chat-stream-done', handler),
 
   onChatStreamCancelled: (handler: (payload: ChatStreamEndPayload) => void): Promise<UnlistenFn> =>
-    listen<ChatStreamEndPayload>('chat-stream-cancelled', (event) => handler(event.payload)),
+    safeListen<ChatStreamEndPayload>('chat-stream-cancelled', handler),
 
   onVaultIngestProgress: (handler: (payload: VaultIngestProgressPayload) => void): Promise<UnlistenFn> =>
-    listen<VaultIngestProgressPayload>('vault-ingest-progress', (event) => handler(event.payload)),
+    safeListen<VaultIngestProgressPayload>('vault-ingest-progress', handler),
 };

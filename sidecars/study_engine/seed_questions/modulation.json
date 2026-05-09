@@ -1,0 +1,299 @@
+{
+  "topic": "Modulation",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "Amplitude Modulation (AM) modulation index m is defined as:",
+      "choices": [
+        "A. m = A_c / A_m",
+        "B. m = A_m / A_c (where A_m = message amplitude, A_c = carrier amplitude)",
+        "C. m = f_c / f_m",
+        "D. m = A_c + A_m"
+      ],
+      "correct_answer": "B",
+      "explanation": "AM modulation index: m = A_m/A_c. For no distortion (no overmodulation): m ≤ 1. Also m = (A_max − A_min)/(A_max + A_min).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The bandwidth of a standard AM (DSB-FC) signal with message bandwidth W is:",
+      "choices": ["A. W Hz", "B. W/2 Hz", "C. 2W Hz", "D. 4W Hz"],
+      "correct_answer": "C",
+      "explanation": "AM bandwidth = 2W. The modulated signal has upper and lower sidebands, each of bandwidth W.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Double-Sideband Suppressed-Carrier (DSB-SC) modulation compared to standard AM is more power-efficient because:",
+      "choices": [
+        "A. It doubles the bandwidth",
+        "B. It eliminates the carrier which carries no message information — all power goes to sidebands",
+        "C. It uses only the upper sideband",
+        "D. It reduces the message bandwidth"
+      ],
+      "correct_answer": "B",
+      "explanation": "Standard AM: carrier uses up to 2/3 of total power (wasted). DSB-SC removes carrier → 100% of power in sidebands.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Single Sideband (SSB) modulation bandwidth is:",
+      "choices": ["A. 2W", "B. 4W", "C. W (half that of DSB)", "D. W/2"],
+      "correct_answer": "C",
+      "explanation": "SSB transmits only one sideband → BW = W. Most spectrum-efficient analog modulation. Used in HF voice communications.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The frequency deviation in FM modulation is Δf. For a message frequency f_m, the FM modulation index β is:",
+      "choices": ["A. β = f_m/Δf", "B. β = Δf/f_m", "C. β = Δf × f_m", "D. β = f_c/Δf"],
+      "correct_answer": "B",
+      "explanation": "FM modulation index: β = Δf/f_m (peak frequency deviation / message frequency).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Carson's rule estimates the FM bandwidth as:",
+      "choices": [
+        "A. BW = 2Δf",
+        "B. BW = 2(Δf + f_m) = 2f_m(β + 1)",
+        "C. BW = 2f_m only",
+        "D. BW = Δf + f_m"
+      ],
+      "correct_answer": "B",
+      "explanation": "Carson's rule: BW ≈ 2(Δf + f_m) = 2f_m(β+1). Approximates 98% of signal power. FM broadcast: Δf = 75 kHz, f_m = 15 kHz → BW ≈ 180 kHz.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "FM demodulation is more noise-resistant than AM because:",
+      "choices": [
+        "A. FM uses higher carrier frequencies",
+        "B. FM captures the frequency content — amplitude noise is ignored by the limiter/discriminator",
+        "C. FM signals are louder",
+        "D. FM uses digital encoding"
+      ],
+      "correct_answer": "B",
+      "explanation": "FM receiver: limiter removes amplitude variations → AM noise is rejected. FM SNR improvement: FM advantage = 3β²(β+1) over AM for wideband FM.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "ASK (Amplitude Shift Keying) modulates data by varying:",
+      "choices": ["A. Carrier phase", "B. Carrier frequency", "C. Carrier amplitude", "D. Symbol rate"],
+      "correct_answer": "C",
+      "explanation": "ASK: amplitude varies with data (e.g., OOK = on-off keying is binary ASK). Simple but susceptible to amplitude noise.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Binary FSK uses two frequencies f₁ and f₂. The minimum bandwidth for orthogonal FSK is approximately:",
+      "choices": ["A. f_b (bit rate)", "B. 2f_b", "C. f₂ − f₁", "D. f_b/2"],
+      "correct_answer": "A",
+      "explanation": "Minimum orthogonal FSK spacing: Δf = f_b/2 (MSK). Practical FSK bandwidth ≈ 2Δf + f_b ≈ f_b to 2f_b depending on deviation.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "BPSK (Binary Phase Shift Keying) encodes data by:",
+      "choices": [
+        "A. Using two amplitude levels",
+        "B. Shifting carrier phase by 0° or 180° for each bit",
+        "C. Using two carrier frequencies",
+        "D. Varying the symbol duration"
+      ],
+      "correct_answer": "B",
+      "explanation": "BPSK: carrier phase = 0° for '1', 180° for '0'. Bandwidth-efficient and resistant to amplitude noise.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "QAM (Quadrature Amplitude Modulation) improves spectral efficiency over BPSK/QPSK by:",
+      "choices": [
+        "A. Using both amplitude AND phase dimensions to carry more bits per symbol",
+        "B. Transmitting on two frequencies",
+        "C. Reducing the carrier frequency",
+        "D. Using error-correction codes"
+      ],
+      "correct_answer": "A",
+      "explanation": "QAM: combines amplitude and phase → 16-QAM sends 4 bits/symbol; 64-QAM sends 6 bits/symbol. Higher SNR needed for higher-order QAM.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Nyquist bandwidth theorem states that the minimum bandwidth required to transmit symbols at rate R_s is:",
+      "choices": ["A. B_min = R_s / 2", "B. B_min = R_s", "C. B_min = 2R_s", "D. B_min = R_s × log₂M"],
+      "correct_answer": "A",
+      "explanation": "Nyquist: minimum bandwidth B_min = R_s/2 (for ideal sinc pulses). In practice, roll-off filters (raised cosine) require more bandwidth.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "QPSK (Quadrature PSK) sends _____ bits per symbol using 4 phase states.",
+      "choices": ["A. 1", "B. 2", "C. 4", "D. 8"],
+      "correct_answer": "B",
+      "explanation": "QPSK: M = 4 states → log₂(4) = 2 bits/symbol. Same bandwidth as BPSK but double the data rate.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The SNR improvement of wideband FM over AM (for large β) is approximately:",
+      "choices": ["A. β dB", "B. 3β²(β+1) linear", "C. No improvement", "D. 10 log β"],
+      "correct_answer": "B",
+      "explanation": "FM SNR advantage ≈ 3β²(β+1) compared to DSB-SC. For β = 5: improvement ≈ 3×25×6 = 450× (26.5 dB). Wideband FM trades bandwidth for noise performance.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The AM efficiency η is the fraction of total AM power in the sidebands:",
+      "choices": [
+        "A. η = m²/(2+m²)",
+        "B. η = m/(1+m)",
+        "C. η = m²",
+        "D. η = 1/(1+m²)"
+      ],
+      "correct_answer": "A",
+      "explanation": "AM total power: P_T = P_c(1 + m²/2). Sideband power: P_c m²/2. Efficiency η = (m²/2)/(1+m²/2) = m²/(2+m²). At m=1: η = 1/3.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which digital modulation schemes are coherent (require carrier phase reference for demodulation)? (Select ALL that apply.)",
+      "choices": ["A. BPSK", "B. QPSK", "C. 16-QAM", "D. GFSK (non-coherent FSK)"],
+      "correct_answer": "A,B,C",
+      "explanation": "BPSK, QPSK, QAM are coherent: require phase reference. Non-coherent FSK uses envelope/frequency detection; no phase reference needed.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "An FM radio station has a maximum frequency deviation Δf = 75 kHz and maximum audio frequency f_m = 15 kHz. Using Carson's rule, the bandwidth in kHz is:",
+      "choices": null, "correct_answer": "180", "unit": "kHz", "tolerance": 1,
+      "explanation": "BW = 2(Δf + f_m) = 2(75 + 15) = 2 × 90 = 180 kHz.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Spectral efficiency (bits/s/Hz) of M-ary QAM is:",
+      "choices": [
+        "A. log₂(M) bits/s/Hz",
+        "B. M bits/s/Hz",
+        "C. 1 bit/s/Hz regardless of M",
+        "D. 2M bits/s/Hz"
+      ],
+      "correct_answer": "A",
+      "explanation": "M-ary QAM: log₂(M) bits/symbol. With Nyquist bandwidth: efficiency = log₂(M) bits/s/Hz. 64-QAM: 6 bits/s/Hz.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Overmodulation in AM (m > 1) causes:",
+      "choices": [
+        "A. Improved power efficiency",
+        "B. Carrier clipping and harmonic distortion (intermodulation)",
+        "C. Wider bandwidth with no distortion",
+        "D. No practical effect"
+      ],
+      "correct_answer": "B",
+      "explanation": "Overmodulation (m > 1): envelope goes negative → carrier phase reversal → clipping, spectral splatter, distortion.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Phase Modulation (PM) and Frequency Modulation (FM) differ in that:",
+      "choices": [
+        "A. FM frequency deviation is proportional to message amplitude; PM phase deviation is proportional to message amplitude",
+        "B. PM uses higher frequencies",
+        "C. FM can carry digital data; PM cannot",
+        "D. PM has no sidebands"
+      ],
+      "correct_answer": "A",
+      "explanation": "FM: instantaneous frequency deviation ∝ m(t). PM: instantaneous phase deviation ∝ m(t). FM frequency deviation = PM frequency deviation × f_m.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "OFDM (Orthogonal Frequency Division Multiplexing) achieves spectral efficiency by:",
+      "choices": [
+        "A. Using a single carrier at high rate",
+        "B. Overlapping many orthogonal subcarriers — each carrying data at a lower rate",
+        "C. Using time slots only",
+        "D. Compressing the signal bandwidth"
+      ],
+      "correct_answer": "B",
+      "explanation": "OFDM: many overlapping orthogonal subcarriers (orthogonality avoids ICI). Robust against multipath. Used in 4G LTE, 802.11 Wi-Fi.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The FM modulation index β = 5 for a single-tone 1 kHz message. The peak frequency deviation Δf is:",
+      "choices": ["A. 0.2 kHz", "B. 1 kHz", "C. 5 kHz", "D. 50 kHz"],
+      "correct_answer": "C",
+      "explanation": "β = Δf/f_m → Δf = β × f_m = 5 × 1 kHz = 5 kHz.",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In superheterodyne receiver design, the intermediate frequency (IF) stage:",
+      "choices": [
+        "A. Operates at the original carrier frequency",
+        "B. Converts the RF signal to a fixed lower frequency for filtering and amplification",
+        "C. Performs final demodulation at RF",
+        "D. Eliminates the need for a local oscillator"
+      ],
+      "correct_answer": "B",
+      "explanation": "Superheterodyne: RF → mixer + LO → fixed IF (e.g., 455 kHz AM, 10.7 MHz FM). IF stage provides selectivity and gain.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For binary digital modulation, the bit error probability generally decreases when:",
+      "choices": [
+        "A. Eb/N0 increases",
+        "B. Symbol rate increases",
+        "C. Carrier frequency decreases",
+        "D. Channel bandwidth decreases"
+      ],
+      "correct_answer": "A",
+      "explanation": "Higher energy per bit relative to noise spectral density (Eb/N0) improves decision reliability and lowers BER.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Compared with BPSK at the same bit rate and BER target, QPSK typically requires:",
+      "choices": [
+        "A. About the same Eb/N0 and about half the occupied bandwidth",
+        "B. Much higher Eb/N0 and double bandwidth",
+        "C. Lower Eb/N0 but double bandwidth",
+        "D. No coherent reference"
+      ],
+      "correct_answer": "A",
+      "explanation": "QPSK can be viewed as two orthogonal BPSK streams. For a given BER, required Eb/N0 is similar to BPSK while spectral efficiency is higher.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 35,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.5", "review_status": "ai_draft"
+    }
+  ]
+}

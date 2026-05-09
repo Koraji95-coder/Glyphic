@@ -12,6 +12,7 @@ interface NoteTagChipsProps {
 export function NoteTagChips({ notePath, refreshKey }: NoteTagChipsProps) {
   const [tags, setTags] = useState<string[]>([]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refreshKey is a prop that causes refetches when changed
   useEffect(() => {
     if (!notePath) {
       setTags([]);

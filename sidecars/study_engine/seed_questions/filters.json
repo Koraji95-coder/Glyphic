@@ -1,0 +1,303 @@
+{
+  "topic": "Filters",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "A low-pass filter passes frequencies:",
+      "choices": ["A. Above the cutoff", "B. Below the cutoff frequency", "C. Only at the cutoff", "D. All frequencies equally"],
+      "correct_answer": "B",
+      "explanation": "LPF: passes f < f_c, attenuates f > f_c. HPF: opposite. BPF: passes a band between f_L and f_H.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The cutoff (−3 dB) frequency of a simple RC low-pass filter is:",
+      "choices": ["A. f_c = RC", "B. f_c = 1/(2πRC)", "C. f_c = 2πRC", "D. f_c = R/C"],
+      "correct_answer": "B",
+      "explanation": "f_c = 1/(2πRC) Hz (or ω_c = 1/RC rad/s). At f_c, |H| = 1/√2 ≈ −3 dB.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The transfer function of a first-order passive RC low-pass filter is:",
+      "choices": [
+        "A. H(s) = sRC/(1+sRC)",
+        "B. H(s) = 1/(1+sRC)",
+        "C. H(s) = sRC",
+        "D. H(s) = 1/(sRC)"
+      ],
+      "correct_answer": "B",
+      "explanation": "RC LPF: H(s) = (1/sC)/(R + 1/sC) = 1/(1+sRC) = ω_c/(s+ω_c) where ω_c = 1/RC.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A first-order high-pass RC filter rolls off at _____ below the cutoff frequency.",
+      "choices": ["A. −40 dB/decade", "B. −20 dB/decade", "C. −6 dB/decade", "D. −60 dB/decade"],
+      "correct_answer": "B",
+      "explanation": "First-order filter: −20 dB/decade (= −6 dB/octave) slope in the stopband. Second-order: −40 dB/decade.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Butterworth filter is characterized by:",
+      "choices": [
+        "A. Maximally flat (monotonic) response in the passband with no ripple",
+        "B. Equiripple in the passband",
+        "C. Equiripple in both passband and stopband",
+        "D. Linear phase response"
+      ],
+      "correct_answer": "A",
+      "explanation": "Butterworth: maximally flat magnitude—no ripple in pass or stopband, monotonically decreasing. Chebyshev: passband ripple for steeper rolloff.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Chebyshev Type I filter has:",
+      "choices": [
+        "A. Maximally flat passband",
+        "B. Equiripple in the passband and monotone stopband",
+        "C. Equiripple in both passband and stopband",
+        "D. Linear phase"
+      ],
+      "correct_answer": "B",
+      "explanation": "Chebyshev I: equiripple passband, monotone stopband. Steeper rolloff than Butterworth of same order.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Bessel filter is designed to maximize:",
+      "choices": [
+        "A. Stopband attenuation",
+        "B. Passband flatness",
+        "C. Linear phase response (constant group delay)",
+        "D. Equiripple in the stopband"
+      ],
+      "correct_answer": "C",
+      "explanation": "Bessel filter: maximally linear phase (constant group delay) → minimum signal distortion. Magnitude roll-off is less sharp than Butterworth.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An Elliptic (Cauer) filter has:",
+      "choices": [
+        "A. Equiripple in both passband AND stopband — sharpest rolloff for given order",
+        "B. Maximally flat passband",
+        "C. Linear phase only",
+        "D. Monotone passband and stopband"
+      ],
+      "correct_answer": "A",
+      "explanation": "Elliptic: equiripple in both bands → sharpest transition. Tradeoff: complex design, nonlinear phase.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The quality factor Q of a bandpass filter is:",
+      "choices": [
+        "A. Q = f_0 / BW (center frequency / −3 dB bandwidth)",
+        "B. Q = BW / f_0",
+        "C. Q = f_0²",
+        "D. Q = 1/(2πRC)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Q = f_0/BW. High Q → narrow bandwidth, sharper selectivity. For series RLC: Q = ω₀L/R = 1/(ω₀RC).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A Bode magnitude plot approximation uses _____ at a pole frequency.",
+      "choices": [
+        "A. A sharp notch",
+        "B. A −20 dB/decade slope break (asymptote changes from 0 to −20 dB/decade)",
+        "C. An increase of +20 dB/decade",
+        "D. No change"
+      ],
+      "correct_answer": "B",
+      "explanation": "Bode approx: at each real pole ω_p, the slope decreases by 20 dB/decade. At each zero, slope increases 20 dB/decade.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "An RC LPF has R = 1 kΩ and C = 10 nF. The −3 dB frequency in kHz is approximately:",
+      "choices": null, "correct_answer": "15.92", "unit": "kHz", "tolerance": 0.5,
+      "explanation": "f_c = 1/(2π×1000×10×10⁻⁹) = 1/(2π×10⁻⁵) = 10⁵/(2π) ≈ 15,915 Hz ≈ 15.92 kHz",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An active filter uses an op-amp to:",
+      "choices": [
+        "A. Provide gain and allow filters with no inductors",
+        "B. Replace both R and C",
+        "C. Only increase the cutoff frequency",
+        "D. Reduce bandwidth"
+      ],
+      "correct_answer": "A",
+      "explanation": "Active filters: op-amp provides gain (>1 possible) and eliminates need for bulky inductors, suitable for audio/instrumentation frequencies.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Sallen-Key topology is a popular second-order active filter using:",
+      "choices": [
+        "A. Two op-amps in cascade",
+        "B. One op-amp with two RC sections providing two poles",
+        "C. An inductor and capacitor",
+        "D. A transformer"
+      ],
+      "correct_answer": "B",
+      "explanation": "Sallen-Key: single op-amp + two R, two C → two complex poles. Simple, well-understood second-order active filter.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A notch (band-reject) filter has:",
+      "choices": [
+        "A. Zero attenuation at all frequencies",
+        "B. A deep attenuation at the notch frequency, passing all others",
+        "C. Maximum gain at center frequency",
+        "D. Infinite bandwidth"
+      ],
+      "correct_answer": "B",
+      "explanation": "Notch filter: attenuates a specific frequency (e.g., 60 Hz hum rejection) while passing all other frequencies.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Group delay of a filter is defined as:",
+      "choices": [
+        "A. τ_g = −dφ/dω (negative derivative of phase with respect to frequency)",
+        "B. The time to reach steady state",
+        "C. 1/f_c",
+        "D. Phase at DC"
+      ],
+      "correct_answer": "A",
+      "explanation": "Group delay: τ_g(ω) = −dφ(ω)/dω. Constant group delay ↔ linear phase ↔ no waveform distortion.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which filter types exhibit equiripple behavior? (Select ALL that apply.)",
+      "choices": [
+        "A. Chebyshev Type I",
+        "B. Chebyshev Type II",
+        "C. Elliptic (Cauer)",
+        "D. Butterworth"
+      ],
+      "correct_answer": "A,B,C",
+      "explanation": "Chebyshev I: passband equiripple; Chebyshev II: stopband equiripple; Elliptic: both bands equiripple. Butterworth is maximally flat (no ripple).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A second-order low-pass filter's rolloff rate is:",
+      "choices": ["A. −20 dB/decade", "B. −40 dB/decade", "C. −60 dB/decade", "D. −12 dB/decade"],
+      "correct_answer": "B",
+      "explanation": "Each pole contributes −20 dB/decade. Second-order (2 poles): −40 dB/decade asymptotic rolloff.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Frequency transformation converts a LPF prototype to a HPF by substituting:",
+      "choices": [
+        "A. s → s/ω_c",
+        "B. s → ω_c/s",
+        "C. s → s + ω_c",
+        "D. s → sω_c"
+      ],
+      "correct_answer": "B",
+      "explanation": "LP-to-HP: s → ω_c/s. LP-to-BP: s → (s² + ω₀²)/(Bs) where B = bandwidth.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A 3rd-order Butterworth LPF has how many poles?",
+      "choices": ["A. 1", "B. 2", "C. 3", "D. 6"],
+      "correct_answer": "C",
+      "explanation": "An nth-order filter has n poles. 3rd-order Butterworth: 3 poles, one real and two complex conjugate.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 10,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The bandwidth of a series RLC bandpass filter is:",
+      "choices": ["A. BW = R/L = R × ω₀/ω₀L", "B. BW = Q/ω₀", "C. BW = 1/(RC)", "D. BW = ω₀²"],
+      "correct_answer": "A",
+      "explanation": "Series RLC: BW = R/L rad/s; f_BW = R/(2πL) Hz. Also Q = ω₀L/R → BW = ω₀/Q.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A series RLC circuit has R = 10 Ω, L = 1 mH, C = 10 nF. The center frequency f₀ in kHz is approximately:",
+      "choices": null, "correct_answer": "50.33", "unit": "kHz", "tolerance": 1,
+      "explanation": "ω₀ = 1/√(LC) = 1/√(10⁻³ × 10⁻⁸) = 1/√(10⁻¹¹) = 10^5.5 ≈ 316,228 rad/s; f₀ = 316228/(2π) ≈ 50.3 kHz",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 90,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The phase margin (PM) of a feedback system at the gain crossover frequency should be:",
+      "choices": ["A. Greater than 0° (typically > 45°) for stability", "B. Exactly 0°", "C. Negative for stability", "D. Greater than 180°"],
+      "correct_answer": "A",
+      "explanation": "Phase margin: angle above −180° at gain crossover. PM > 0° → stable; PM > 45° → good stability margin.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An all-pass filter has:",
+      "choices": [
+        "A. Flat magnitude response but frequency-dependent phase",
+        "B. Zero phase shift at all frequencies",
+        "C. Flat phase but frequency-dependent magnitude",
+        "D. No output at any frequency"
+      ],
+      "correct_answer": "A",
+      "explanation": "All-pass filter: |H(jω)| = 1 for all ω (constant gain), but phase varies. Used for phase correction/equalization.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "An inductor L in series with a capacitor C forms a resonant circuit with ω₀ = ?",
+      "choices": ["A. LC", "B. 1/√(LC)", "C. √(L/C)", "D. √(C/L)"],
+      "correct_answer": "B",
+      "explanation": "Resonant frequency: ω₀ = 1/√(LC). At resonance, X_L = X_C (inductive and capacitive reactances cancel).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a first-order RC high-pass filter, the magnitude response at very low frequency (ω -> 0) is:",
+      "choices": [
+        "A. Approximately 0",
+        "B. Approximately 1",
+        "C. Approximately √2",
+        "D. Infinite"
+      ],
+      "correct_answer": "A",
+      "explanation": "HPF transfer function H(jω)=jωRC/(1+jωRC). As ω->0, numerator goes to 0 so |H|->0.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.10", "review_status": "ai_draft"
+    }
+  ]
+}

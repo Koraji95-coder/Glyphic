@@ -1,0 +1,313 @@
+{
+  "topic": "Fourier Series",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The Fourier series represents a periodic signal as:",
+      "choices": [
+        "A. A single sinusoid at the fundamental frequency",
+        "B. A sum of sinusoids at integer multiples (harmonics) of the fundamental frequency",
+        "C. A polynomial expansion",
+        "D. A product of cosine functions"
+      ],
+      "correct_answer": "B",
+      "explanation": "Fourier series: f(t) = a₀ + Σ[aₙcos(nω₀t) + bₙsin(nω₀t)]. Decomposes a periodic signal into its harmonic content.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The fundamental frequency ω₀ for a signal with period T is:",
+      "choices": ["A. ω₀ = T/2π", "B. ω₀ = 2π/T", "C. ω₀ = 1/T", "D. ω₀ = 2T"],
+      "correct_answer": "B",
+      "explanation": "ω₀ = 2π/T rad/s; f₀ = 1/T Hz. The fundamental period and frequency are reciprocals (up to 2π factor).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For an even function f(t) = f(−t), the Fourier series contains:",
+      "choices": [
+        "A. Only sine terms",
+        "B. Only cosine terms (and DC term a₀)",
+        "C. Both sine and cosine terms",
+        "D. Only odd harmonics"
+      ],
+      "correct_answer": "B",
+      "explanation": "Even symmetry → bₙ = 0 for all n. Only cosine (and DC) terms. Odd function f(−t) = −f(t) → aₙ = 0, only sine terms.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a signal with half-wave symmetry f(t + T/2) = −f(t), the Fourier series contains:",
+      "choices": ["A. Only even harmonics", "B. Only odd harmonics", "C. DC term only", "D. Both even and odd harmonics"],
+      "correct_answer": "B",
+      "explanation": "Half-wave symmetry: only odd harmonics (n = 1, 3, 5, …). No DC term, no even harmonics.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The DC component a₀ in a Fourier series equals:",
+      "choices": [
+        "A. The average value of f(t) over one period",
+        "B. The peak amplitude",
+        "C. f(0)",
+        "D. The RMS value"
+      ],
+      "correct_answer": "A",
+      "explanation": "a₀ = (1/T) ∫₀ᵀ f(t) dt — the average (mean) value of the function over one period.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Fourier coefficients aₙ are computed by:",
+      "choices": [
+        "A. aₙ = (2/T) ∫₀ᵀ f(t) cos(nω₀t) dt",
+        "B. aₙ = (1/T) ∫₀ᵀ f(t) sin(nω₀t) dt",
+        "C. aₙ = f(nω₀)",
+        "D. aₙ = T/2 × f(n)"
+      ],
+      "correct_answer": "A",
+      "explanation": "aₙ = (2/T) ∫₀ᵀ f(t) cos(nω₀t) dt for n ≥ 1. Uses orthogonality of cosine functions.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Parseval's theorem states that for a periodic signal:",
+      "choices": [
+        "A. Average power = a₀² + ½Σ(aₙ² + bₙ²)",
+        "B. Total energy = integral of f(t)",
+        "C. RMS value = peak / √2 always",
+        "D. Bandwidth × time = constant"
+      ],
+      "correct_answer": "A",
+      "explanation": "Parseval's: <f²> = a₀² + ½Σ(aₙ² + bₙ²). Power in time domain = sum of power in each harmonic.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A square wave with 50% duty cycle and amplitude ±A has a Fourier series with:",
+      "choices": [
+        "A. Only even harmonics",
+        "B. No DC, only odd harmonics with amplitude 4A/(nπ)",
+        "C. All harmonics with equal amplitude",
+        "D. Only the fundamental"
+      ],
+      "correct_answer": "B",
+      "explanation": "Square wave (zero mean, ±A): f(t) = (4A/π)[sin(ω₀t) + sin(3ω₀t)/3 + sin(5ω₀t)/5 + …]. Odd harmonics, decreasing as 1/n.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The exponential form of the Fourier series uses complex coefficients cₙ = ?",
+      "choices": [
+        "A. cₙ = (1/T) ∫₀ᵀ f(t) e^(−jnω₀t) dt",
+        "B. cₙ = (aₙ + bₙ)/2",
+        "C. cₙ = aₙ − jbₙ",
+        "D. cₙ = bₙ/aₙ"
+      ],
+      "correct_answer": "A",
+      "explanation": "Exponential FS: f(t) = Σcₙ e^(jnω₀t); cₙ = (1/T)∫f(t)e^(−jnω₀t)dt. Related: cₙ = (aₙ−jbₙ)/2 for n>0.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A triangular wave has harmonics that decrease as:",
+      "choices": ["A. 1/n", "B. 1/n²", "C. 1/n³", "D. Exponentially"],
+      "correct_answer": "B",
+      "explanation": "Triangular wave: amplitude ∝ 1/n². Square wave: 1/n. Smoothness → faster harmonic decay (per integration theorem).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Gibbs phenomenon occurs in Fourier series approximations at:",
+      "choices": [
+        "A. Smooth portions of the signal",
+        "B. Discontinuities, where the partial sum overshoots by ~9% of the jump",
+        "C. Zero crossings",
+        "D. Even harmonics only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Gibbs phenomenon: at jump discontinuities, the Fourier series overshoots ~8.9% of the jump regardless of how many terms are used.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Filtering a signal by passing it through a linear time-invariant (LTI) system multiplies the Fourier coefficients by:",
+      "choices": [
+        "A. The system's impulse response h(t)",
+        "B. The system's frequency response H(nω₀) at each harmonic",
+        "C. A constant factor for all harmonics",
+        "D. Nothing — the Fourier coefficients are unchanged"
+      ],
+      "correct_answer": "B",
+      "explanation": "LTI filtering in frequency domain: output cₙ_out = cₙ_in × H(nω₀). Each harmonic is multiplied by H at that frequency.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Fourier series converges to the midpoint of a jump discontinuity because of the:",
+      "choices": [
+        "A. Gibbs phenomenon",
+        "B. Dirichlet conditions and Fourier convergence theorem",
+        "C. Parseval's theorem",
+        "D. Nyquist criterion"
+      ],
+      "correct_answer": "B",
+      "explanation": "Dirichlet conditions: at a jump, FS converges to the average of left and right limits: [f(t+) + f(t−)] / 2.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Which of the following is a Dirichlet condition for Fourier series convergence?",
+      "choices": [
+        "A. f(t) must be differentiable everywhere",
+        "B. f(t) must be absolutely integrable over one period: ∫|f(t)|dt < ∞",
+        "C. f(t) must be an even function",
+        "D. f(t) must be continuous everywhere"
+      ],
+      "correct_answer": "B",
+      "explanation": "Dirichlet conditions: f(t) single-valued, finite discontinuities, bounded variation, and absolutely integrable. Continuity is not required.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "The Fourier series is useful in which applications? (Select ALL that apply.)",
+      "choices": [
+        "A. Analyzing steady-state response to periodic inputs",
+        "B. Power quality / harmonic analysis",
+        "C. Computing transient response of linear systems",
+        "D. Analyzing audio and speech signals"
+      ],
+      "correct_answer": "A,B,D",
+      "explanation": "Fourier series is for periodic signals: steady-state response, power harmonics, audio analysis. Transient (non-periodic) response uses Fourier/Laplace transforms.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A sawtooth wave from 0 to 2π has fundamental amplitude (b₁) = 2/1 = 2. What is the 3rd harmonic amplitude b₃?",
+      "choices": null, "correct_answer": "0.667", "unit": "", "tolerance": 0.01,
+      "explanation": "Sawtooth: bₙ = 2/n (with appropriate normalization). b₃ = 2/3 ≈ 0.667",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A periodic signal of period T = 2 ms has a fundamental frequency of:",
+      "choices": ["A. 500 Hz", "B. 2 kHz", "C. 1 kHz", "D. 2π kHz"],
+      "correct_answer": "A",
+      "explanation": "f₀ = 1/T = 1/0.002 = 500 Hz",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Fourier transform is an extension of the Fourier series for:",
+      "choices": [
+        "A. Periodic signals only",
+        "B. Aperiodic (non-periodic) signals with finite energy",
+        "C. Discrete-time signals only",
+        "D. Signals with no DC component"
+      ],
+      "correct_answer": "B",
+      "explanation": "Fourier transform generalizes FS to aperiodic signals by letting T → ∞, converting the discrete spectrum to a continuous one.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The frequency spectrum of a periodic signal with fundamental f₀ has spectral lines at:",
+      "choices": [
+        "A. f₀ only",
+        "B. Integer multiples nf₀ (n = 0, 1, 2, 3, …)",
+        "C. f₀/2, f₀, 3f₀/2, ...",
+        "D. All frequencies"
+      ],
+      "correct_answer": "B",
+      "explanation": "Periodic signal: discrete spectrum at DC (0), f₀, 2f₀, 3f₀, … The spacing is f₀.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The time-shift property of Fourier series states that shifting f(t) by t₀ multiplies cₙ by:",
+      "choices": [
+        "A. e^(jnω₀t₀)",
+        "B. e^(−jnω₀t₀)",
+        "C. nω₀t₀",
+        "D. |cₙ|"
+      ],
+      "correct_answer": "B",
+      "explanation": "Time shift: f(t−t₀) ↔ cₙ e^(−jnω₀t₀). Only phase changes; magnitudes |cₙ| remain unchanged.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Multiplying a Fourier series by a constant K multiplies:",
+      "choices": ["A. The fundamental frequency by K", "B. All Fourier coefficients by K", "C. Only the DC term", "D. The period by K"],
+      "correct_answer": "B",
+      "explanation": "Linearity: K·f(t) ↔ K·cₙ for all n. The period and frequency are unchanged.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A square wave with period T = 1 ms and amplitude A = 5 V (zero mean). The fundamental (1st harmonic) peak amplitude = 4A/π ≈ ?",
+      "choices": null, "correct_answer": "6.37", "unit": "V", "tolerance": 0.05,
+      "explanation": "1st harmonic peak = 4A/π = 4×5/π = 20/π ≈ 6.37 V",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Total harmonic distortion (THD) is computed from Fourier series as:",
+      "choices": [
+        "A. THD = √(Σ Aₙ² for n≥2) / A₁",
+        "B. THD = A₂/A₁",
+        "C. THD = A₁/A₀",
+        "D. THD = 1/Σ Aₙ²"
+      ],
+      "correct_answer": "A",
+      "explanation": "THD = √(A₂²+A₃²+…) / A₁. Measures harmonic content relative to fundamental. Important in power systems and audio.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A full-wave rectified sine wave has fundamental frequency _____ the original sine wave.",
+      "choices": ["A. Same as", "B. Twice", "C. Half", "D. Four times"],
+      "correct_answer": "B",
+      "explanation": "Full-wave rectification folds negative half-cycles up → period is halved → fundamental frequency doubles to 2f₀.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For an odd function f(t) = -f(-t), the trigonometric Fourier series contains:",
+      "choices": [
+        "A. Only cosine terms",
+        "B. Only sine terms",
+        "C. Only DC term",
+        "D. Both sine and cosine terms with equal coefficients"
+      ],
+      "correct_answer": "B",
+      "explanation": "Odd symmetry forces a0=0 and an=0, leaving only sine coefficients bn.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    }
+  ]
+}

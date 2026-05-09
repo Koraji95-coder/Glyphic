@@ -141,14 +141,11 @@ async fn run_study_engine(app: &AppHandle, request: serde_json::Value) -> Result
 fn study_model_endpoint_from_state(
     state: &AiState,
     model_override: Option<String>,
-) -> (String, String) {
-    let (endpoint, model) = {
-        let config = state.config.lock().unwrap();
-        let endpoint = config.ollama.endpoint.clone();
-        let model = model_override.unwrap_or_else(|| config.model_routing.chat.clone());
-        (endpoint, model)
-    };
-    (endpoint, model)
+) -> Result<(String, String), String> {
+    let config = state.get_config()?;
+    let endpoint = config.ollama.endpoint.clone();
+    let model = model_override.unwrap_or_else(|| config.model_routing.chat.clone());
+    Ok((endpoint, model))
 }
 
 // ── Tauri commands ────────────────────────────────────────────────────────────
@@ -188,7 +185,7 @@ pub async fn study_ask(
         };
 
     // ── 2. Call study sidecar (local Ollama) ─────────────────────────────────
-    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override);
+    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override)?;
     let sidecar_req = json!({
         "action": "study_ask",
         "question": &question,
@@ -223,7 +220,7 @@ pub async fn grade_math_answer(
     model_override: Option<String>,
     state: State<'_, AiState>,
 ) -> Result<serde_json::Value, String> {
-    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override);
+    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override)?;
     let req = json!({
         "action": "grade_math_answer",
         "problem": problem,
@@ -245,7 +242,7 @@ pub async fn solve_math(
     model_override: Option<String>,
     state: State<'_, AiState>,
 ) -> Result<serde_json::Value, String> {
-    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override);
+    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override)?;
     let req = json!({
         "action": "solve_math",
         "problem": problem,
@@ -270,7 +267,7 @@ pub async fn generate_problems(
     model_override: Option<String>,
     state: State<'_, AiState>,
 ) -> Result<serde_json::Value, String> {
-    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override);
+    let (endpoint, model) = study_model_endpoint_from_state(&state, model_override)?;
     let req = json!({
         "action": "generate_problems",
         "topic": topic,

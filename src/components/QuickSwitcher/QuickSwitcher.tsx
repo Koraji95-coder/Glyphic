@@ -2,6 +2,7 @@ import Fuse from 'fuse.js';
 import { Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
+import { reportError } from '../../lib/errorReporter';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
 
@@ -114,7 +115,7 @@ export function QuickSwitcher() {
         setActiveNote(note.path, note.path);
       }
     } catch (e) {
-      console.error('Failed to create note:', e);
+      reportError({ context: 'Quick switcher create note', message: 'Failed to create note', error: e });
     }
     setOpen(false);
   }, [query, createNote, setActiveNote]);

@@ -2,12 +2,14 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
 import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { useEditor } from '../../hooks/useEditor';
+import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { events } from '../../lib/tauri/events';
 import { getEditorExtensions } from '../../lib/tiptap/extensions';
 import { parseMarkdownToContent } from '../../lib/tiptap/markdownParser';
 import { serializeToMarkdown } from '../../lib/tiptap/markdownSerializer';
 import { useAnnotationStore } from '../../stores/annotationStore';
+import { useEditorActionStore } from '../../stores/editorActionStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
@@ -92,6 +94,32 @@ export function Editor({
     editor?.setEditable(!readOnly);
   }, [editor, readOnly]);
 
+  // Register editor action callbacks used by keyboard shortcuts and modals.
+  useEffect(() => {
+    const actionStore = useEditorActionStore.getState();
+    if (!editor || readOnly) return;
+
+    actionStore.setOnInsertLink((url: string, text?: string) => {
+      const linkText = text?.trim() || url;
+      editor.chain().focus().insertContent(`[${linkText}](${url})`).run();
+    });
+
+    actionStore.setOnInsertBacklink((noteTitle: string) => {
+      editor.chain().focus().insertContent(`[[${noteTitle}]]`).run();
+    });
+
+    actionStore.setOnToggleCodeBlock(() => {
+      editor.chain().focus().toggleCodeBlock().run();
+    });
+
+    return () => {
+      const cleanupStore = useEditorActionStore.getState();
+      cleanupStore.resetOnInsertLink();
+      cleanupStore.resetOnInsertBacklink();
+      cleanupStore.resetOnToggleCodeBlock();
+    };
+  }, [editor, readOnly]);
+
   // Load active note content
   useEffect(() => {
     if (!editor || !activeNotePath) return;
@@ -113,7 +141,7 @@ export function Editor({
         const content = parseMarkdownToContent(raw);
         editor.commands.setContent(content);
       } catch (e) {
-        console.error('Failed to load note:', e);
+        reportError({ context: 'Editor note load', message: 'Failed to load note', error: e });
       }
     };
     load();
@@ -121,7 +149,7 @@ export function Editor({
     return () => {
       cancelled = true;
     };
-  }, [editor, activeNotePath, readOnly]);
+  }, [editor, activeNotePath, readOnly, loadNote]);
 
   // Listen for captured screenshots to insert images
   const insertImage = useCallback(

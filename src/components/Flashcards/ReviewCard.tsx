@@ -1,4 +1,5 @@
 import type { Flashcard } from '../../types/ai';
+import { MathBlock } from '../common/Math';
 
 interface ReviewCardProps {
   card: Flashcard;
@@ -77,7 +78,7 @@ export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
               textAlign: 'center',
             }}
           >
-            {card.question}
+            <MathBlock content={card.question} />
           </p>
           <span style={{ fontSize: '11px', color: 'var(--text-ghost)', marginTop: '8px' }}>
             Click or press Space to reveal
@@ -122,7 +123,7 @@ export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
               textAlign: 'center',
             }}
           >
-            {card.answer}
+            <MathBlock content={card.answer} />
           </p>
         </div>
       </div>

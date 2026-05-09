@@ -1,0 +1,334 @@
+{
+  "topic": "Transmission Lines",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "The characteristic impedance of a lossless transmission line is:",
+      "choices": [
+        "A. Z₀ = √(L'/C') where L' and C' are inductance and capacitance per unit length",
+        "B. Z₀ = L'/C'",
+        "C. Z₀ = R'/G'",
+        "D. Z₀ = √(R'/G')"
+      ],
+      "correct_answer": "A",
+      "explanation": "Lossless line: Z₀ = √(L'/C'). For lossy: Z₀ = √((R'+jωL')/(G'+jωC')).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The reflection coefficient Γ_L at a load Z_L on a line with characteristic impedance Z₀ is:",
+      "choices": [
+        "A. Γ_L = (Z_L + Z₀)/(Z_L − Z₀)",
+        "B. Γ_L = (Z_L − Z₀)/(Z_L + Z₀)",
+        "C. Γ_L = Z_L / Z₀",
+        "D. Γ_L = Z₀ / Z_L"
+      ],
+      "correct_answer": "B",
+      "explanation": "Γ_L = (Z_L − Z₀)/(Z_L + Z₀). Matched load Z_L = Z₀ → Γ_L = 0 (no reflection). Open circuit Z_L = ∞ → Γ = +1. Short Z_L = 0 → Γ = −1.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The voltage standing wave ratio (VSWR) is defined as:",
+      "choices": [
+        "A. VSWR = (1 − |Γ|)/(1 + |Γ|)",
+        "B. VSWR = (1 + |Γ|)/(1 − |Γ|)",
+        "C. VSWR = |Γ|²",
+        "D. VSWR = 1/|Γ|"
+      ],
+      "correct_answer": "B",
+      "explanation": "VSWR = V_max/V_min = (1 + |Γ|)/(1 − |Γ|). Ranges from 1 (matched) to ∞ (total reflection). Perfect match: VSWR = 1.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The propagation constant γ of a transmission line is:",
+      "choices": [
+        "A. γ = √((R'+jωL')(G'+jωC')) = α + jβ",
+        "B. γ = jω√(L'C')",
+        "C. γ = R'/Z₀",
+        "D. γ = ω/c"
+      ],
+      "correct_answer": "A",
+      "explanation": "γ = √((R'+jωL')(G'+jωC')) = α + jβ. α = attenuation (Np/m); β = phase constant (rad/m). Lossless: α = 0, β = ω√(L'C').",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a lossless transmission line, the phase velocity is:",
+      "choices": [
+        "A. v_p = 1/√(L'C')",
+        "B. v_p = √(L'C')",
+        "C. v_p = Z₀/ω",
+        "D. v_p = ω/(L'C')"
+      ],
+      "correct_answer": "A",
+      "explanation": "v_p = ω/β = 1/√(L'C'). For air-filled coaxial: v_p = c.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A quarter-wave transformer (λ/4 section) with impedance Z₁ matching source Z₀ to load Z_L requires:",
+      "choices": [
+        "A. Z₁ = √(Z₀ × Z_L)",
+        "B. Z₁ = Z₀ + Z_L",
+        "C. Z₁ = Z₀ / Z_L",
+        "D. Z₁ = (Z₀ + Z_L)/2"
+      ],
+      "correct_answer": "A",
+      "explanation": "Quarter-wave transformer: Z₁ = √(Z₀ Z_L). The λ/4 section transforms Z_L to Z₀²/Z_L at the source end.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The input impedance of a lossless transmission line of length l with load Z_L is:",
+      "choices": [
+        "A. Z_in = Z₀(Z_L + jZ₀ tan βl)/(Z₀ + jZ_L tan βl)",
+        "B. Z_in = Z₀ + Z_L",
+        "C. Z_in = Z_L e^(−jβl)",
+        "D. Z_in = Z₀ Z_L"
+      ],
+      "correct_answer": "A",
+      "explanation": "Z_in = Z₀(Z_L + jZ₀ tan βl)/(Z₀ + jZ_L tan βl). Special cases: l = λ/4 → Z_in = Z₀²/Z_L; l = λ/2 → Z_in = Z_L.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a short-circuit terminated lossless line (Z_L = 0), the input impedance is:",
+      "choices": [
+        "A. Z_in = jZ₀ tan(βl) — purely reactive",
+        "B. Z_in = Z₀",
+        "C. Z_in = 0",
+        "D. Z_in = ∞"
+      ],
+      "correct_answer": "A",
+      "explanation": "Z_L = 0: Z_in = jZ₀ tan(βl). At l = λ/4: Z_in = ∞ (open circuit equivalent). Purely reactive — no power dissipated.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Smith chart is primarily used for:",
+      "choices": [
+        "A. Plotting time-domain signals",
+        "B. Graphically determining impedance, reflection coefficient, and matching network design",
+        "C. Computing Fourier transforms",
+        "D. Analyzing transistor gain"
+      ],
+      "correct_answer": "B",
+      "explanation": "Smith chart: graphical tool for impedance transformation, reflection coefficient, VSWR, and matching network design for transmission lines.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "On the Smith chart, the center of the chart represents:",
+      "choices": [
+        "A. Short circuit (Z = 0)",
+        "B. Open circuit (Z = ∞)",
+        "C. Matched load (Γ = 0, Z = Z₀)",
+        "D. Pure reactance"
+      ],
+      "correct_answer": "C",
+      "explanation": "Smith chart center: Γ = 0, normalized impedance z = 1 + j0 (perfect match). Short: left edge; open: right edge.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Standing waves on a transmission line are caused by:",
+      "choices": [
+        "A. Too much loss",
+        "B. Reflection from a mismatched load (|Γ| > 0)",
+        "C. Traveling waves only",
+        "D. The source impedance"
+      ],
+      "correct_answer": "B",
+      "explanation": "Standing waves = superposition of forward and reflected waves. Reflection coefficient |Γ| > 0 whenever Z_L ≠ Z₀.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Return loss (RL) related to reflection coefficient Γ is:",
+      "choices": [
+        "A. RL = 20 log₁₀|Γ| dB",
+        "B. RL = −20 log₁₀|Γ| dB",
+        "C. RL = |Γ|²",
+        "D. RL = 10 log₁₀|Γ|"
+      ],
+      "correct_answer": "B",
+      "explanation": "Return loss RL = −20 log₁₀|Γ| dB. Higher RL = less reflection. Perfect match: RL = ∞; total reflection: RL = 0 dB.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A 50 Ω line is terminated with Z_L = 150 Ω. What is |Γ|?",
+      "choices": null, "correct_answer": "0.5", "unit": "", "tolerance": 0.01,
+      "explanation": "Γ = (Z_L − Z₀)/(Z_L + Z₀) = (150−50)/(150+50) = 100/200 = 0.5. VSWR = (1+0.5)/(1−0.5) = 1.5/0.5 = 3.",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Telegrapher's equations describe:",
+      "choices": [
+        "A. Voltage and current as functions of position and time on a transmission line",
+        "B. Power flow in free space",
+        "C. Antenna radiation patterns",
+        "D. Signal delays in digital circuits"
+      ],
+      "correct_answer": "A",
+      "explanation": "Telegrapher's equations: ∂V/∂z = −(R' + jωL')I; ∂I/∂z = −(G' + jωC')V. They govern V(z) and I(z) along a line.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A λ/2 (half-wavelength) transmission line with load Z_L has input impedance:",
+      "choices": ["A. Z_in = Z₀²/Z_L", "B. Z_in = Z₀", "C. Z_in = Z_L (impedance repeats)", "D. Z_in = jZ₀"],
+      "correct_answer": "C",
+      "explanation": "At l = λ/2: tan(βl) = tan(π) = 0 → Z_in = Z_L. Impedance repeats every half-wavelength.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A stub matching network uses a short-circuited or open-circuited stub of length l to:",
+      "choices": [
+        "A. Absorb power and increase VSWR",
+        "B. Add a pure susceptance to cancel the reactive part of the load and achieve matching",
+        "C. Replace the load",
+        "D. Increase the line length only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Stub tuner: adds pure susceptance (jB) to cancel the imaginary part of the load admittance, achieving impedance match.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The maximum power transfer on a transmission line occurs when:",
+      "choices": [
+        "A. Z_L = 0",
+        "B. Z_L = Z₀* (complex conjugate of source)",
+        "C. Z_L = 2Z₀",
+        "D. VSWR is maximized"
+      ],
+      "correct_answer": "B",
+      "explanation": "Maximum power transfer: Z_L = Z_S* (source conjugate match). For real Z₀: Z_L = Z₀. This gives Γ = 0 (if Z_S = Z₀).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A coaxial cable has inner conductor radius a and outer conductor radius b. The characteristic impedance is:",
+      "choices": [
+        "A. Z₀ = (60/√ε_r) ln(b/a)",
+        "B. Z₀ = (120/√ε_r) ln(b/a)",
+        "C. Z₀ = ln(b/a)",
+        "D. Z₀ = 50 Ω always"
+      ],
+      "correct_answer": "A",
+      "explanation": "Coaxial cable: Z₀ = (60/√ε_r) ln(b/a) Ω. For air dielectric (ε_r=1) and b/a ≈ 3.59: Z₀ = 50 Ω (standard coax).",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which conditions result in total reflection (|Γ| = 1) on a transmission line? (Select ALL that apply.)",
+      "choices": ["A. Open circuit load (Z_L = ∞)", "B. Short circuit load (Z_L = 0)", "C. Purely reactive load (Z_L = jX)", "D. Matched load (Z_L = Z₀)"],
+      "correct_answer": "A,B,C",
+      "explanation": "Total reflection: open (Γ=+1), short (Γ=−1), and purely reactive load (|Γ|=1, power reflected entirely). Matched: Γ=0.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In the context of transmission lines, the term 'dispersion' refers to:",
+      "choices": [
+        "A. Signal spreading in time because phase velocity varies with frequency",
+        "B. Loss due to radiation",
+        "C. Standing wave formation",
+        "D. Impedance mismatch"
+      ],
+      "correct_answer": "A",
+      "explanation": "Dispersion: phase velocity varies with frequency → signal components travel at different speeds → pulse spreading in time.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The wavelength on a transmission line with phase velocity v_p at frequency f is:",
+      "choices": ["A. λ = v_p / f", "B. λ = f / v_p", "C. λ = f × v_p", "D. λ = c/f always"],
+      "correct_answer": "A",
+      "explanation": "λ = v_p/f. If the line has a dielectric (ε_r > 1), v_p < c and λ is shorter than in free space.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Lumped-circuit models for transmission lines are valid when the physical length is:",
+      "choices": [
+        "A. Much greater than the wavelength (l >> λ)",
+        "B. Much less than the wavelength (l << λ)",
+        "C. Equal to λ/4",
+        "D. At least 100λ"
+      ],
+      "correct_answer": "B",
+      "explanation": "Lumped model valid for l << λ (typically l < λ/10). For l ~ λ or longer, distributed (transmission line) analysis is needed.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Insertion loss of a two-port network is defined as:",
+      "choices": [
+        "A. IL = 10 log₁₀(P_in/P_out) dB",
+        "B. IL = 20 log₁₀(P_in/P_out) dB",
+        "C. IL = |S₁₁|² dB",
+        "D. IL = S₂₁ dB"
+      ],
+      "correct_answer": "A",
+      "explanation": "Insertion loss: IL = 10 log₁₀(P_in/P_out) dB. Note: IL ≥ 0 dB (passive networks). Often expressed as −20 log₁₀|S₂₁|.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Heaviside condition for a distortionless transmission line requires:",
+      "choices": [
+        "A. R' = G' = 0",
+        "B. R'/L' = G'/C' (loss balanced between electric and magnetic)",
+        "C. Z₀ = 50 Ω",
+        "D. The line length equals λ/4"
+      ],
+      "correct_answer": "B",
+      "explanation": "Heaviside (distortionless): R'/L' = G'/C'. Then α = R'√(C'/L') and v_p = 1/√(L'C') are constant with frequency → no dispersion.",
+      "difficulty": "hard", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A matched load on a transmission line means:",
+      "choices": [
+        "A. ZL = 0",
+        "B. ZL = infinity",
+        "C. ZL = Z0 so reflection coefficient is zero",
+        "D. VSWR is infinite"
+      ],
+      "correct_answer": "C",
+      "explanation": "When ZL equals Z0, Γ=(ZL-Z0)/(ZL+Z0)=0, so no reflected wave is produced and VSWR equals 1.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 15,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 5.3", "review_status": "ai_draft"
+    }
+  ]
+}

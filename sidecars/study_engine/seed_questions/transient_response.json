@@ -1,0 +1,282 @@
+{
+  "topic": "Transient Response",
+  "questions": [
+    {
+      "type": "mc_single",
+      "prompt": "For a first-order RC circuit, the time constant τ is:",
+      "choices": ["A. R/C", "B. RC", "C. √(RC)", "D. R+C"],
+      "correct_answer": "B",
+      "explanation": "τ = RC. After one time constant, the response reaches ~63.2% of its final value.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For a first-order RL circuit, the time constant τ is:",
+      "choices": ["A. L/R", "B. LR", "C. R/L", "D. √(L/R)"],
+      "correct_answer": "A",
+      "explanation": "τ = L/R for a series RL circuit.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "After 5 time constants, a decaying exponential reaches approximately ___% of its initial value.",
+      "choices": ["A. 0.67%", "B. 36.8%", "C. 63.2%", "D. 5%"],
+      "correct_answer": "A",
+      "explanation": "e^(−5) ≈ 0.0067 = 0.67%. Conventionally, a transient is considered over after 5τ.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A series RC circuit has R = 10 kΩ and C = 1 μF. What is τ in milliseconds?",
+      "choices": null, "correct_answer": "10", "unit": "ms", "tolerance": 0.1,
+      "explanation": "τ = RC = 10000 × 10⁻⁶ = 10 ms",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The voltage across a charging capacitor from 0 V toward V_s is:",
+      "choices": [
+        "A. v(t) = V_s × e^(−t/τ)",
+        "B. v(t) = V_s (1 − e^(−t/τ))",
+        "C. v(t) = V_s × t/τ",
+        "D. v(t) = V_s (1 + e^(−t/τ))"
+      ],
+      "correct_answer": "B",
+      "explanation": "Charging capacitor: v(t) = V_s(1 − e^(−t/τ)). Starts at 0, approaches V_s.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The natural response of an RLC circuit is overdamped when:",
+      "choices": [
+        "A. α < ω₀ (α = R/2L, ω₀ = 1/√(LC))",
+        "B. α = ω₀",
+        "C. α > ω₀",
+        "D. R = 0"
+      ],
+      "correct_answer": "C",
+      "explanation": "α = R/(2L); ω₀ = 1/√(LC). Overdamped: α > ω₀ (real distinct roots, no oscillation).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The voltage across an inductor during transient response is:",
+      "choices": [
+        "A. v_L = L di/dt",
+        "B. v_L = i/L",
+        "C. v_L = L × i",
+        "D. v_L = di/L"
+      ],
+      "correct_answer": "A",
+      "explanation": "Inductor voltage: v_L = L(di/dt). The inductor opposes instantaneous changes in current.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The current through a capacitor during transient response is:",
+      "choices": [
+        "A. i_C = C × v",
+        "B. i_C = v/C",
+        "C. i_C = C dv/dt",
+        "D. i_C = dv/(C dt)"
+      ],
+      "correct_answer": "C",
+      "explanation": "Capacitor current: i_C = C(dv/dt). The capacitor opposes instantaneous changes in voltage.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "At t = 0⁻ (just before switching), the initial inductor current and capacitor voltage are:",
+      "choices": [
+        "A. Always zero",
+        "B. Equal to their DC steady-state values",
+        "C. Equal to the source voltage",
+        "D. Infinite"
+      ],
+      "correct_answer": "B",
+      "explanation": "Initial conditions: at t=0⁻, i_L = DC steady-state current; v_C = DC steady-state voltage (continuity of state variables).",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "In a series RLC circuit with R = 10 Ω, L = 1 H, C = 0.04 F, α = R/(2L) and ω₀ = 1/√(LC). The circuit is:",
+      "choices": ["A. Overdamped", "B. Critically damped", "C. Underdamped", "D. Purely oscillatory"],
+      "correct_answer": "B",
+      "explanation": "α = 10/2 = 5; ω₀ = 1/√(0.04) = 5. Since α = ω₀, the response is critically damped.",
+      "difficulty": "hard", "bloom_level": 3, "estimated_seconds": 120,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The undamped natural frequency ω₀ for a series RLC circuit is:",
+      "choices": ["A. R/(2L)", "B. 1/√(LC)", "C. √(L/C)", "D. RC"],
+      "correct_answer": "B",
+      "explanation": "ω₀ = 1/√(LC) rad/s for both series and parallel RLC circuits.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "At DC steady state, a capacitor behaves as:",
+      "choices": ["A. A short circuit", "B. An open circuit", "C. A resistor R = 1/(ωC)", "D. An inductor"],
+      "correct_answer": "B",
+      "explanation": "At DC (f=0), X_C = 1/(ωC) → ∞ (open circuit). At DC steady state, no current flows through the capacitor.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "At DC steady state, an inductor behaves as:",
+      "choices": ["A. An open circuit", "B. A short circuit", "C. A capacitor", "D. A current source"],
+      "correct_answer": "B",
+      "explanation": "At DC steady state, inductor current is constant (di/dt = 0), so v_L = 0 → short circuit (wire).",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The complete response of a first-order circuit is:",
+      "choices": [
+        "A. Only the forced (particular) response",
+        "B. Only the natural (homogeneous) response",
+        "C. Natural response + forced (steady-state) response",
+        "D. Product of natural and forced responses"
+      ],
+      "correct_answer": "C",
+      "explanation": "Complete = Natural + Forced (particular). Natural decays; forced persists at steady state.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "An RL series circuit has R = 5 Ω, L = 0.5 H. The time constant τ in seconds is:",
+      "choices": null, "correct_answer": "0.1", "unit": "s", "tolerance": 0.001,
+      "explanation": "τ = L/R = 0.5/5 = 0.1 s",
+      "difficulty": "easy", "bloom_level": 3, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The damped natural frequency ω_d of an underdamped RLC circuit is:",
+      "choices": [
+        "A. ω_d = √(ω₀² − α²)",
+        "B. ω_d = α − ω₀",
+        "C. ω_d = ω₀ + α",
+        "D. ω_d = √(α² + ω₀²)"
+      ],
+      "correct_answer": "A",
+      "explanation": "Damped frequency: ω_d = √(ω₀² − α²). Only exists when underdamped (α < ω₀).",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The Laplace transform of the unit step u(t) is:",
+      "choices": ["A. 1/s", "B. 1/s²", "C. s", "D. e^(-s)"],
+      "correct_answer": "A",
+      "explanation": "L{u(t)} = 1/s. The unit step is the integral of the impulse δ(t) which transforms to 1.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 1.4", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_multi",
+      "prompt": "Which quantities CANNOT change instantaneously in a circuit? (Select ALL that apply.)",
+      "choices": [
+        "A. Capacitor voltage",
+        "B. Inductor current",
+        "C. Resistor voltage",
+        "D. Resistor current"
+      ],
+      "correct_answer": "A,B",
+      "explanation": "State variables (C voltage, L current) cannot jump instantaneously due to energy storage. Resistor V and I can change instantaneously.",
+      "difficulty": "medium", "bloom_level": 2, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "A step response of a second-order underdamped system exhibits:",
+      "choices": [
+        "A. Monotonic rise to final value",
+        "B. Oscillation that decays around the final value (overshoot and ringing)",
+        "C. No response",
+        "D. A purely exponential decay"
+      ],
+      "correct_answer": "B",
+      "explanation": "Underdamped (ζ < 1): the step response oscillates (overshoots) before settling. Higher ζ reduces overshoot.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The settling time of a second-order system (to within 2% of final value) is approximately:",
+      "choices": ["A. 2/α", "B. 4/α (= 4/ζω_n)", "C. 1/ω₀", "D. π/ω_d"],
+      "correct_answer": "B",
+      "explanation": "T_s ≈ 4/(ζω_n) = 4/α for ±2% criterion; T_s ≈ 3/α for ±5%.",
+      "difficulty": "medium", "bloom_level": 1, "estimated_seconds": 45,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "For an RC integrator (capacitor output), at high frequencies the output is:",
+      "choices": ["A. Large (high gain)", "B. Small (attenuated)", "C. Equal to input", "D. Phase-shifted by 0°"],
+      "correct_answer": "B",
+      "explanation": "RC low-pass filter: at high f, X_C → 0, capacitor voltage → 0. Output is attenuated at high frequencies.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The unit impulse response h(t) of a system is the output when the input is:",
+      "choices": [
+        "A. A unit step function",
+        "B. A unit impulse δ(t)",
+        "C. A sinusoidal input",
+        "D. A ramp function"
+      ],
+      "correct_answer": "B",
+      "explanation": "h(t) = impulse response = response to δ(t) input with zero initial conditions. Fundamental characterization of LTI systems.",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.9", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "Energy stored in a charged capacitor C with voltage V is:",
+      "choices": ["A. CV", "B. CV²", "C. CV²/2", "D. C²V/2"],
+      "correct_answer": "C",
+      "explanation": "E_C = ½CV². Energy stored in inductor: E_L = ½LI².",
+      "difficulty": "easy", "bloom_level": 1, "estimated_seconds": 20,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "numeric",
+      "prompt": "A capacitor C = 100 μF charged to 50 V stores how many millijoules of energy?",
+      "choices": null, "correct_answer": "125", "unit": "mJ", "tolerance": 0.5,
+      "explanation": "E = ½CV² = 0.5 × 100×10⁻⁶ × 2500 = 0.125 J = 125 mJ",
+      "difficulty": "medium", "bloom_level": 3, "estimated_seconds": 60,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    },
+    {
+      "type": "mc_single",
+      "prompt": "The forced response of a circuit driven by a DC source at t → ∞ is:",
+      "choices": [
+        "A. Zero for all circuits",
+        "B. The DC steady-state value (capacitors = open, inductors = short)",
+        "C. The initial condition value",
+        "D. Oscillatory"
+      ],
+      "correct_answer": "B",
+      "explanation": "At t → ∞, all transients decay. The forced (DC) response has capacitors as open circuits and inductors as short circuits.",
+      "difficulty": "easy", "bloom_level": 2, "estimated_seconds": 30,
+      "handbook_ref": "FE Reference Handbook 10.0, Section 2.8", "review_status": "ai_draft"
+    }
+  ]
+}

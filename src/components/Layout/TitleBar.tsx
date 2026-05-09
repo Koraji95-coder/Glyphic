@@ -2,6 +2,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { Maximize2, Menu, MessageSquare, Minimize2, Plus, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { reportError } from '../../lib/errorReporter';
 import { useChatStore } from '../../stores/chatStore';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -17,7 +18,12 @@ export function TitleBar() {
   const [isMaximized, setIsMaximized] = useState(false);
   const isMobile = useIsMobile();
 
-  const appWindow = getCurrentWindow();
+  let appWindow: ReturnType<typeof getCurrentWindow> | null = null;
+  try {
+    appWindow = getCurrentWindow();
+  } catch {
+    appWindow = null;
+  }
 
   // Track open notes — ensure active note is in the tab list
   useEffect(() => {
@@ -27,7 +33,7 @@ export function TitleBar() {
   }, [activeNotePath, openNotes, addOpenNote]);
 
   useEffect(() => {
-    if (isMobile) return;
+    if (isMobile || !appWindow) return;
 
     const checkMaximized = async () => {
       try {
@@ -52,14 +58,33 @@ export function TitleBar() {
       });
 
     return () => unlisten?.();
-  }, [isMobile]);
+  }, [isMobile, appWindow]);
 
-  const handleMinimize = useCallback(() => appWindow.minimize(), []);
+  const handleMinimize = useCallback(async () => {
+    if (!appWindow) return;
+    try {
+      await appWindow.minimize();
+    } catch (error) {
+      reportError({ context: 'Title bar minimize', message: 'Unable to minimize window', error });
+    }
+  }, [appWindow]);
   const handleToggleMaximize = useCallback(async () => {
-    await appWindow.toggleMaximize();
-    setIsMaximized(await appWindow.isMaximized());
-  }, []);
-  const handleClose = useCallback(() => appWindow.close(), []);
+    if (!appWindow) return;
+    try {
+      await appWindow.toggleMaximize();
+      setIsMaximized(await appWindow.isMaximized());
+    } catch (error) {
+      reportError({ context: 'Title bar maximize', message: 'Unable to toggle maximize', error });
+    }
+  }, [appWindow]);
+  const handleClose = useCallback(async () => {
+    if (!appWindow) return;
+    try {
+      await appWindow.close();
+    } catch (error) {
+      reportError({ context: 'Title bar close', message: 'Unable to close window', error });
+    }
+  }, [appWindow]);
 
   const handleCloseTab = useCallback(
     (path: string, e: React.MouseEvent) => {
@@ -100,6 +125,7 @@ export function TitleBar() {
       <div className="flex items-center shrink-0" style={{ gap: '8px' }}>
         {isMobile ? (
           <button
+            type="button"
             onClick={toggleSidebar}
             aria-label="Open sidebar"
             className="touch-target p-2 rounded transition-colors"
@@ -109,23 +135,26 @@ export function TitleBar() {
           >
             <Menu size={18} />
           </button>
-        ) : (
+        ) : appWindow ? (
           <>
             {/* macOS traffic lights */}
             <div className="flex items-center gap-1.5">
               <button
+                type="button"
                 onClick={handleClose}
                 aria-label="Close"
                 className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
                 style={{ backgroundColor: '#ff5f57' }}
               />
               <button
+                type="button"
                 onClick={handleMinimize}
                 aria-label="Minimize"
                 className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
                 style={{ backgroundColor: '#febc2e' }}
               />
               <button
+                type="button"
                 onClick={handleToggleMaximize}
                 aria-label={isMaximized ? 'Restore' : 'Maximize'}
                 className="w-3 h-3 rounded-full transition-opacity hover:opacity-80"
@@ -134,6 +163,8 @@ export function TitleBar() {
             </div>
             <div className="w-px h-4" style={{ backgroundColor: 'var(--border)' }} />
           </>
+        ) : (
+          <div style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>Browser Preview</div>
         )}
       </div>
 
@@ -277,54 +308,82 @@ export function TitleBar() {
       )}
 
       {/* Right: actions */}
-      <div className="flex items-center shrink-0" style={{ gap: '4px' }}>
+      <div className="flex items-center shrink-0" style={{ gap: '6px' }}>
         {/* Focus mode toggle */}
         {!isMobile && (
           <button
+            type="button"
             onClick={toggleFocusMode}
             title={isFocusMode ? 'Exit focus mode (F11)' : 'Focus mode — hide sidebar (F11)'}
             aria-label={isFocusMode ? 'Exit focus mode' : 'Enter focus mode'}
-            className="p-1.5 rounded transition-colors"
+            className="rounded transition-colors"
             style={{
+              padding: '6px 10px',
               backgroundColor: isFocusMode ? 'var(--accent-dim)' : 'transparent',
-              color: isFocusMode ? 'var(--accent)' : 'var(--text-tertiary)',
+              color: isFocusMode ? 'var(--accent)' : 'var(--text-secondary)',
+              border: isFocusMode ? '1px solid var(--accent-dim)' : '1px solid var(--border-subtle)',
             }}
             onMouseEnter={(e) => {
-              if (!isFocusMode) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+              if (!isFocusMode) {
+                e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                e.currentTarget.style.color = 'var(--accent)';
+              }
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = isFocusMode ? 'var(--accent-dim)' : 'transparent';
+              e.currentTarget.style.color = isFocusMode ? 'var(--accent)' : 'var(--text-secondary)';
             }}
           >
             {isFocusMode ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
           </button>
         )}
         <button
+          type="button"
           title="Quick Switcher (⌘P)"
-          className="p-1.5 rounded transition-colors"
-          style={{ color: 'var(--text-tertiary)', backgroundColor: 'transparent' }}
+          className="rounded transition-colors"
+          style={{
+            padding: '6px 10px',
+            color: 'var(--text-secondary)',
+            backgroundColor: 'transparent',
+            border: '1px solid var(--border-subtle)',
+            cursor: 'pointer',
+          }}
           onClick={() => window.dispatchEvent(new CustomEvent('glyphic:open-quick-switcher'))}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+            e.currentTarget.style.color = 'var(--accent)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+          }}
         >
           <Search size={14} />
         </button>
         <button
+          type="button"
           onClick={togglePanel}
           title="ScribeAI Chat (Ctrl+Shift+A)"
-          className="touch-target p-1.5 rounded transition-colors"
+          className="rounded transition-colors"
           style={{
+            padding: '6px 10px',
             backgroundColor: chatOpen ? 'var(--accent-dim)' : 'transparent',
-            color: chatOpen ? 'var(--accent)' : 'var(--text-tertiary)',
+            color: chatOpen ? 'var(--accent)' : 'var(--text-secondary)',
+            border: chatOpen ? '1px solid var(--accent-dim)' : '1px solid var(--border-subtle)',
+            cursor: 'pointer',
           }}
           onMouseEnter={(e) => {
-            if (!chatOpen) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+            if (!chatOpen) {
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+              e.currentTarget.style.color = 'var(--accent)';
+            }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = chatOpen ? 'var(--accent-dim)' : 'transparent';
+            e.currentTarget.style.color = chatOpen ? 'var(--accent)' : 'var(--text-secondary)';
           }}
         >
-          <MessageSquare size={15} />
+          <MessageSquare size={16} />
         </button>
       </div>
     </div>

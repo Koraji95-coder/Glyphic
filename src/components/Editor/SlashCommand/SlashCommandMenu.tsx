@@ -10,7 +10,7 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Reset selection when items change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: items is a prop — prop reference changes do trigger re-renders
   useEffect(() => {
     setSelectedIndex(0);
   }, [items]);
@@ -69,6 +69,7 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
     >
       {items.map((item, index) => (
         <button
+          type="button"
           key={item.title}
           onClick={() => command(item)}
           className="flex items-center gap-3 w-full px-3 py-2 text-left text-sm transition-colors"

@@ -1,0 +1,451 @@
+
+> glyphic@1.0.0 lint
+> biome check .
+
+biome.json:2:14 deserialize ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  i The configuration schema version does not match the CLI version 2.4.14
+  
+    1 Γöé {
+  > 2 Γöé   "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+      Γöé              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 Γöé   "vcs": {
+    4 Γöé     "enabled": true,
+  
+  i   Expected:                     2.4.14
+      Found:                        2.4.12
+  
+  
+  i Run the command biome migrate to migrate the configuration file.
+  
+
+vite.config.ts:2:18 lint/style/useNodejsImportProtocol  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  i A Node.js builtin module should be imported with the node: protocol.
+  
+    1 Γöé import react from '@vitejs/plugin-react';
+  > 2 Γöé import path from 'path';
+      Γöé                  ^^^^^^
+    3 Γöé import { defineConfig } from 'vite';
+    4 Γöé 
+  
+  i Using the node: protocol is more explicit and signals that the imported module belongs to Node.js.
+  
+  i Unsafe fix: Add the node: protocol.
+  
+     1  1 Γöé   import react from '@vitejs/plugin-react';
+     2    Γöé - import┬╖path┬╖from┬╖'path';
+        2 Γöé + import┬╖path┬╖from┬╖'node:path';
+     3  3 Γöé   import { defineConfig } from 'vite';
+     4  4 Γöé   
+  
+
+vitest.config.ts:3:18 lint/style/useNodejsImportProtocol  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  i A Node.js builtin module should be imported with the node: protocol.
+  
+    1 Γöé /// <reference types="vitest" />
+    2 Γöé import react from '@vitejs/plugin-react';
+  > 3 Γöé import path from 'path';
+      Γöé                  ^^^^^^
+    4 Γöé import { defineConfig } from 'vitest/config';
+    5 Γöé 
+  
+  i Using the node: protocol is more explicit and signals that the imported module belongs to Node.js.
+  
+  i Unsafe fix: Add the node: protocol.
+  
+     1  1 Γöé   /// <reference types="vitest" />
+     2  2 Γöé   import react from '@vitejs/plugin-react';
+     3    Γöé - import┬╖path┬╖from┬╖'path';
+        3 Γöé + import┬╖path┬╖from┬╖'node:path';
+     4  4 Γöé   import { defineConfig } from 'vitest/config';
+     5  5 Γöé   
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:51:9 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    49 Γöé       {/* Tool buttons */}
+    50 Γöé       {TOOLS.map(({ type, icon: Icon, label }) => (
+  > 51 Γöé         <button
+       Γöé         ^^^^^^^
+  > 52 Γöé           key={type}
+        ...
+  > 59 Γöé           }}
+  > 60 Γöé         >
+       Γöé         ^
+    61 Γöé           <Icon size={18} />
+    62 Γöé         </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:71:11 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    69 Γöé       <div className="flex items-center gap-1">
+    70 Γöé         {COLORS.map((c) => (
+  > 71 Γöé           <button
+       Γöé           ^^^^^^^
+  > 72 Γöé             key={c}
+        ...
+  > 79 Γöé             }}
+  > 80 Γöé           />
+       Γöé           ^^
+    81 Γöé         ))}
+    82 Γöé       </div>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:105:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    104 Γöé       {/* Undo/Redo */}
+  > 105 Γöé       <button
+        Γöé       ^^^^^^^
+  > 106 Γöé         onClick={onUndo}
+         ...
+  > 110 Γöé         style={{ color: 'var(--text-secondary)' }}
+  > 111 Γöé       >
+        Γöé       ^
+    112 Γöé         <Undo2 size={18} />
+    113 Γöé       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:114:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    112 Γöé         <Undo2 size={18} />
+    113 Γöé       </button>
+  > 114 Γöé       <button
+        Γöé       ^^^^^^^
+  > 115 Γöé         onClick={onRedo}
+         ...
+  > 119 Γöé         style={{ color: 'var(--text-secondary)' }}
+  > 120 Γöé       >
+        Γöé       ^
+    121 Γöé         <Redo2 size={18} />
+    122 Γöé       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:128:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    127 Γöé       {/* Save & Discard */}
+  > 128 Γöé       <button
+        Γöé       ^^^^^^^
+  > 129 Γöé         onClick={onSave}
+         ...
+  > 135 Γöé         }}
+  > 136 Γöé       >
+        Γöé       ^
+    137 Γöé         <Save size={14} />
+    138 Γöé         Save
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Annotation\AnnotationToolbar.tsx:140:7 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    138 Γöé         Save
+    139 Γöé       </button>
+  > 140 Γöé       <button
+        Γöé       ^^^^^^^
+  > 141 Γöé         onClick={onDiscard}
+  > 142 Γöé         title="Discard changes (Esc)"
+  > 143 Γöé         className="p-1.5 rounded transition-colors"
+  > 144 Γöé         style={{ color: 'var(--text-secondary)' }}
+  > 145 Γöé       >
+        Γöé       ^
+    146 Γöé         <X size={18} />
+    147 Γöé       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Editor\Editor.tsx:96:3 lint/correctness/useExhaustiveDependencies  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This hook does not specify its dependency on loadNote.
+  
+    95 Γöé   // Load active note content
+  > 96 Γöé   useEffect(() => {
+       Γöé   ^^^^^^^^^
+    97 Γöé     if (!editor || !activeNotePath) return;
+    98 Γöé 
+  
+  i This dependency is being used here, but is not specified in the hook dependency list.
+  
+    108 Γöé           raw = await commands.readNote(vp, activeNotePath);
+    109 Γöé         } else {
+  > 110 Γöé           raw = await loadNote(activeNotePath);
+        Γöé                       ^^^^^^^^
+    111 Γöé         }
+    112 Γöé         if (cancelled) return;
+  
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Failing to specify dependencies can result in Effects not updating correctly when state changes.
+    These "stale closures" are a common source of surprising bugs.
+  
+  i Unsafe fix: Add the missing dependency loadNote to the list.
+  
+    124 Γöé ┬╖┬╖},┬╖[editor,┬╖activeNotePath,┬╖readOnly,┬╖loadNote]);
+        Γöé                                       ++++++++++   
+
+src\components\Editor\EditorToolbar.tsx:200:15 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    198 Γöé             const Icon = btn.icon;
+    199 Γöé             return (
+  > 200 Γöé               <button
+        Γöé               ^^^^^^^
+  > 201 Γöé                 key={btn.label}
+         ...
+  > 224 Γöé                 }}
+  > 225 Γöé               >
+        Γöé               ^
+    226 Γöé                 <Icon size={iconSize} />
+    227 Γöé               </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Editor\NoteTagChips.tsx:15:3 lint/correctness/useExhaustiveDependencies  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This hook specifies more dependencies than necessary: refreshKey.
+  
+    13 Γöé   const [tags, setTags] = useState<string[]>([]);
+    14 Γöé 
+  > 15 Γöé   useEffect(() => {
+       Γöé   ^^^^^^^^^
+    16 Γöé     if (!notePath) {
+    17 Γöé       setTags([]);
+  
+  i Outer scope values aren't valid dependencies because mutating them doesn't re-render the component.
+  
+    30 Γöé       cancelled = true;
+    31 Γöé     };
+  > 32 Γöé   }, [notePath, refreshKey]);
+       Γöé                 ^^^^^^^^^^
+    33 Γöé 
+    34 Γöé   if (tags.length === 0) return null;
+  
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Specifying more dependencies than required can lead to unnecessary re-rendering
+    and degraded performance.
+  
+  i Unsafe fix: Remove the extra dependencies from the list.
+  
+    32 Γöé ┬╖┬╖},┬╖[notePath,┬╖refreshKey]);
+       Γöé               ------------   
+
+src\components\Editor\SlashCommand\SlashCommandMenu.tsx:14:3 lint/correctness/useExhaustiveDependencies  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This hook specifies more dependencies than necessary: items.
+  
+    13 Γöé   // Reset selection when items change
+  > 14 Γöé   useEffect(() => {
+       Γöé   ^^^^^^^^^
+    15 Γöé     setSelectedIndex(0);
+    16 Γöé   }, [items]);
+  
+  i Outer scope values aren't valid dependencies because mutating them doesn't re-render the component.
+  
+    14 Γöé   useEffect(() => {
+    15 Γöé     setSelectedIndex(0);
+  > 16 Γöé   }, [items]);
+       Γöé       ^^^^^
+    17 Γöé 
+    18 Γöé   // Scroll selected item into view
+  
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Specifying more dependencies than required can lead to unnecessary re-rendering
+    and degraded performance.
+  
+  i Unsafe fix: Remove the extra dependencies from the list.
+  
+    16 Γöé ┬╖┬╖},┬╖[items]);
+       Γöé       -----   
+
+src\components\Editor\SlashCommand\SlashCommandMenu.tsx:71:9 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    69 Γöé     >
+    70 Γöé       {items.map((item, index) => (
+  > 71 Γöé         <button
+       Γöé         ^^^^^^^
+  > 72 Γöé           key={item.title}
+        ...
+  > 79 Γöé           onMouseEnter={() => setSelectedIndex(index)}
+  > 80 Γöé         >
+       Γöé         ^
+    81 Γöé           <span
+    82 Γöé             className="w-8 h-8 flex items-center justify-center rounded text-sm font-medium shrink-0"
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\Ink\InkCanvas.tsx:15:43 lint/correctness/noUnusedFunctionParameters  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This parameter is unused.
+  
+    13 Γöé }
+    14 Γöé 
+  > 15 Γöé function strokeToPath(points: InkPoint[], baseWidth: number): string {
+       Γöé                                           ^^^^^^^^^
+    16 Γöé   if (points.length < 2) return '';
+    17 Γöé   let d = `M ${points[0].x} ${points[0].y}`;
+  
+  i Unused parameters might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: If this is intentional, prepend baseWidth with an underscore.
+  
+     13  13 Γöé   }
+     14  14 Γöé   
+     15     Γöé - function┬╖strokeToPath(points:┬╖InkPoint[],┬╖baseWidth:┬╖number):┬╖string┬╖{
+         15 Γöé + function┬╖strokeToPath(points:┬╖InkPoint[],┬╖_baseWidth:┬╖number):┬╖string┬╖{
+     16  16 Γöé     if (points.length < 2) return '';
+     17  17 Γöé     let d = `M ${points[0].x} ${points[0].y}`;
+  
+
+src\components\Ink\InkCanvas.tsx:52:9 lint/correctness/noUnusedVariables  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This variable canDraw is unused.
+  
+    51 Γöé   // Allow drawing with pen always, or with any pointer when isActive
+  > 52 Γöé   const canDraw = isActive && (pointerType === 'pen' || isPenActive || pointerType === 'mouse');
+       Γöé         ^^^^^^^
+    53 Γöé 
+    54 Γöé   const handlePointerDown = useCallback(
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend canDraw with an underscore.
+  
+     50  50 Γöé   
+     51  51 Γöé     // Allow drawing with pen always, or with any pointer when isActive
+     52     Γöé - ┬╖┬╖const┬╖canDraw┬╖=┬╖isActive┬╖&&┬╖(pointerType┬╖===┬╖'pen'┬╖||┬╖isPenActive┬╖||┬╖pointerType┬╖===┬╖'mouse');
+         52 Γöé + ┬╖┬╖const┬╖_canDraw┬╖=┬╖isActive┬╖&&┬╖(pointerType┬╖===┬╖'pen'┬╖||┬╖isPenActive┬╖||┬╖pointerType┬╖===┬╖'mouse');
+     53  53 Γöé   
+     54  54 Γöé     const handlePointerDown = useCallback(
+  
+
+src\components\Ink\InkCanvas.tsx:83:6 lint/correctness/noUnusedFunctionParameters  FIXABLE  ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This parameter is unused.
+  
+    82 Γöé   const handlePointerUp = useCallback(
+  > 83 Γöé     (e: React.PointerEvent<HTMLDivElement>) => {
+       Γöé      ^
+    84 Γöé       if (!isDrawingRef.current) return;
+    85 Γöé       isDrawingRef.current = false;
+  
+  i Unused parameters might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: If this is intentional, prepend e with an underscore.
+  
+     81  81 Γöé   
+     82  82 Γöé     const handlePointerUp = useCallback(
+     83     Γöé - ┬╖┬╖┬╖┬╖(e:┬╖React.PointerEvent<HTMLDivElement>)┬╖=>┬╖{
+         83 Γöé + ┬╖┬╖┬╖┬╖(_e:┬╖React.PointerEvent<HTMLDivElement>)┬╖=>┬╖{
+     84  84 Γöé         if (!isDrawingRef.current) return;
+     85  85 Γöé         isDrawingRef.current = false;
+  
+
+src\components\LectureMode\LectureModeToggle.tsx:6:30 lint/correctness/noUnusedVariables ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! This variable lectureModeStartedAt is unused.
+  
+    5 Γöé export function LectureModeToggle() {
+  > 6 Γöé   const { lectureModeActive, lectureModeStartedAt, toggleLectureMode, getElapsedTime, getTimestamp } = useLectureMode();
+      Γöé                              ^^^^^^^^^^^^^^^^^^^^
+    7 Γöé   const [elapsed, setElapsed] = useState('00:00');
+    8 Γöé   const [startTime, setStartTime] = useState('');
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\components\LectureMode\LectureModeToggle.tsx:38:9 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    36 Γöé       <div className="flex items-center gap-3">
+    37 Γöé         <span className="font-mono font-medium">{elapsed}</span>
+  > 38 Γöé         <button
+       Γöé         ^^^^^^^
+  > 39 Γöé           onClick={toggleLectureMode}
+  > 40 Γöé           className="p-0.5 rounded hover:bg-opacity-20 transition-colors"
+  > 41 Γöé           title="Stop Lecture Mode"
+  > 42 Γöé           style={{ color: 'var(--text-secondary)' }}
+  > 43 Γöé         >
+       Γöé         ^
+    44 Γöé           <X size={14} />
+    45 Γöé         </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src\components\ThemeSwitcher\ThemeSwitcher.tsx:40:11 lint/a11y/useButtonType ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ! Provide an explicit type prop for the button element.
+  
+    38 Γöé         const isActive = theme === opt.value || (opt.value === 'indigo' && (theme === 'dark' || theme === 'system'));
+    39 Γöé         return (
+  > 40 Γöé           <button
+       Γöé           ^^^^^^^
+  > 41 Γöé             key={opt.value}
+        ...
+  > 53 Γöé             }}
+  > 54 Γöé           />
+       Γöé           ^^
+    55 Γöé         );
+    56 Γöé       })}
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 40.
+Checked 106 files in 43ms. No fixes applied.
+Found 2 errors.
+Found 55 warnings.
+Found 3 infos.
+check ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+  ├ù Some errors were emitted while running checks.
+  
+

@@ -1,4 +1,5 @@
 import { ArrowLeft, Pin, PinOff, Send, Settings, Square, X } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TOOL_LABELS, useChatStore } from '../../stores/chatStore';
@@ -27,7 +28,6 @@ export function ChatPanel() {
     pinModelToNote,
   } = useChatStore();
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
-  const noteContent = useEditorStore((s) => s.content);
   const activeNoteAiModel = useEditorStore((s) => s.activeNoteAiModel);
   const activeNoteTitle = activeNotePath ? (activeNotePath.split('/').pop()?.replace(/\.md$/, '') ?? null) : null;
   const [input, setInput] = useState('');
@@ -89,9 +89,9 @@ export function ChatPanel() {
     const text = input.trim();
     if (!text || isLoading) return;
     setInput('');
-    const ctx = includeNoteContext && activeNotePath ? noteContent : undefined;
+    const ctx = includeNoteContext && activeNotePath ? useEditorStore.getState().content : undefined;
     await sendMessage(text, ctx, activeNoteAiModel ?? undefined);
-  }, [input, isLoading, sendMessage, includeNoteContext, activeNotePath, noteContent, activeNoteAiModel]);
+  }, [input, isLoading, sendMessage, includeNoteContext, activeNotePath, activeNoteAiModel]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -317,26 +317,55 @@ export function ChatPanel() {
             />
           )}
         </div>
-        <div className="flex items-center" style={{ gap: '2px' }}>
+        <div className="flex items-center" style={{ gap: '6px' }}>
           <button
             type="button"
             onClick={() => useSettingsUiStore.getState().open('ai')}
             title="AI settings"
-            className="touch-target p-1.5 rounded"
-            style={{ color: 'var(--text-tertiary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            className="touch-target rounded transition-colors"
+            style={{
+              padding: '6px 10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+              e.currentTarget.style.color = 'var(--accent)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
-            <Settings size={13} />
+            <Settings size={14} />
           </button>
           <button
             type="button"
             onClick={clearChat}
             title="Clear chat"
-            className="touch-target p-1 rounded text-xs"
-            style={{ color: 'var(--text-tertiary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-tertiary)')}
+            className="touch-target rounded transition-colors"
+            style={{
+              padding: '6px 10px',
+              fontSize: '11px',
+              fontFamily: 'var(--font-body)',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+              e.currentTarget.style.color = 'var(--accent)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             Clear
           </button>
@@ -344,12 +373,27 @@ export function ChatPanel() {
             type="button"
             onClick={togglePanel}
             title="Close chat"
-            className="touch-target p-1.5 rounded"
-            style={{ color: 'var(--text-tertiary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            className="touch-target rounded transition-colors"
+            style={{
+              padding: '6px 10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+              e.currentTarget.style.color = 'var(--error, #e07070)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
-            {isMobile ? <ArrowLeft size={18} /> : <X size={14} />}
+            {isMobile ? <ArrowLeft size={16} /> : <X size={16} />}
           </button>
         </div>
       </div>
@@ -400,14 +444,15 @@ export function ChatPanel() {
             <div
               className="flex items-center justify-center shrink-0"
               style={{
-                width: '24px',
-                height: '24px',
+                width: '28px',
+                height: '28px',
                 borderRadius: '6px',
                 background: msg.role === 'user' ? 'var(--bg-elevated)' : 'var(--accent-gradient)',
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: msg.role === 'user' ? 'var(--text-secondary)' : '#fff',
                 fontFamily: msg.role === 'user' ? 'var(--font-body)' : 'var(--font-display)',
+                flexShrink: 0,
               }}
             >
               {msg.role === 'user' ? 'U' : 'G'}
@@ -416,26 +461,29 @@ export function ChatPanel() {
             <div
               className="flex flex-col"
               style={{
-                gap: '3px',
-                maxWidth: '82%',
+                gap: '4px',
+                maxWidth: '85%',
                 minWidth: 0,
                 alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
               }}
             >
               <div
                 style={{
-                  padding: '8px 12px',
+                  padding: '10px 14px',
                   borderRadius: '12px',
-                  fontSize: '12px',
-                  lineHeight: 1.6,
+                  fontSize: msg.role === 'assistant' ? '13px' : '12px',
+                  lineHeight: 1.65,
+                  whiteSpace: 'pre-wrap',
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word',
                   backgroundColor: msg.role === 'user' ? 'var(--bg-active)' : 'var(--bg-elevated)',
                   color: 'var(--text-primary)',
-                  borderBottomRightRadius: msg.role === 'user' ? '4px' : '12px',
-                  borderBottomLeftRadius: msg.role === 'user' ? '12px' : '4px',
+                  borderBottomRightRadius: msg.role === 'user' ? '3px' : '12px',
+                  borderBottomLeftRadius: msg.role === 'user' ? '12px' : '3px',
                   fontFamily: 'var(--font-body)',
                 }}
               >
-                {msg.content}
+                {msg.role === 'assistant' ? <FormattedAssistantMessage content={msg.content} /> : msg.content}
               </div>
               <span style={{ fontSize: '9px', color: 'var(--text-ghost)', fontFamily: 'var(--font-mono)' }}>
                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -757,6 +805,161 @@ function ContextChip({ label, active }: { label: string; active?: boolean }) {
       {label}
     </span>
   );
+}
+
+function InlineMarkdown({ text }: { text: string }) {
+  const parts: ReactNode[] = [];
+  let remaining = text;
+  let offset = 0;
+
+  // Patterns in order of precedence (longest/most specific first)
+  const patterns = [
+    { regex: /\*\*([^*]+)\*\*/g, type: 'bold' as const },
+    { regex: /__([^_]+)__/g, type: 'bold' as const },
+    { regex: /`([^`]+)`/g, type: 'code' as const },
+    { regex: /\*([^*]+)\*/g, type: 'em' as const },
+    { regex: /_([^_]+)_/g, type: 'em' as const },
+  ];
+
+  while (remaining.length > 0) {
+    let bestMatch: { start: number; end: number; type: 'bold' | 'em' | 'code'; match: string } | null = null;
+
+    for (const { regex, type } of patterns) {
+      regex.lastIndex = 0;
+      const execResult = regex.exec(remaining);
+      if (execResult && (bestMatch === null || execResult.index < bestMatch.start)) {
+        bestMatch = { start: execResult.index, end: regex.lastIndex, type, match: execResult[1] };
+      }
+    }
+
+    if (!bestMatch) {
+      parts.push(remaining);
+      break;
+    }
+
+    if (bestMatch.start > 0) {
+      parts.push(remaining.substring(0, bestMatch.start));
+    }
+
+    if (bestMatch.type === 'bold') {
+      parts.push(<strong key={`bold-${offset}`}>{bestMatch.match}</strong>);
+    } else if (bestMatch.type === 'em') {
+      parts.push(<em key={`em-${offset}`}>{bestMatch.match}</em>);
+    } else if (bestMatch.type === 'code') {
+      parts.push(
+        <code
+          key={`code-${offset}`}
+          style={{
+            backgroundColor: 'var(--bg-app)',
+            padding: '1px 4px',
+            borderRadius: '2px',
+            fontFamily: 'var(--font-mono, monospace)',
+            fontSize: '0.9em',
+          }}
+        >
+          {bestMatch.match}
+        </code>,
+      );
+    }
+
+    offset += 1;
+    remaining = remaining.substring(bestMatch.end);
+  }
+
+  return <>{parts}</>;
+}
+
+function FormattedAssistantMessage({ content }: { content: string }) {
+  const lines = content.split('\n');
+  const blocks: ReactNode[] = [];
+  let bulletItems: string[] = [];
+  let numberedItems: string[] = [];
+  let keyCounter = 0;
+
+  const nextKey = () => {
+    keyCounter += 1;
+    return keyCounter;
+  };
+
+  const flushBullets = () => {
+    if (bulletItems.length === 0) return;
+    const blockKey = nextKey();
+    blocks.push(
+      <ul key={`ul-${blockKey}`} style={{ margin: '6px 0 6px 18px', listStyleType: 'disc' }}>
+        {bulletItems.map((item) => (
+          <li key={`ul-item-${blockKey}-${item}`} style={{ margin: '2px 0' }}>
+            <InlineMarkdown text={item} />
+          </li>
+        ))}
+      </ul>,
+    );
+    bulletItems = [];
+  };
+
+  const flushNumbered = () => {
+    if (numberedItems.length === 0) return;
+    const blockKey = nextKey();
+    blocks.push(
+      <ol key={`ol-${blockKey}`} style={{ margin: '6px 0 6px 18px', listStyleType: 'decimal' }}>
+        {numberedItems.map((item) => (
+          <li key={`ol-item-${blockKey}-${item}`} style={{ margin: '2px 0' }}>
+            <InlineMarkdown text={item} />
+          </li>
+        ))}
+      </ol>,
+    );
+    numberedItems = [];
+  };
+
+  lines.forEach((rawLine) => {
+    const line = rawLine.trimEnd();
+    const heading = line.match(/^#{1,3}\s+(.*)$/);
+    const bullet = line.match(/^(?:\*|-)\s+(.*)$/);
+    const numbered = line.match(/^\d+\.\s+(.*)$/);
+
+    if (heading) {
+      flushBullets();
+      flushNumbered();
+      const blockKey = nextKey();
+      blocks.push(
+        <div key={`h-${blockKey}`} style={{ marginTop: '8px', marginBottom: '4px', fontWeight: 700 }}>
+          <InlineMarkdown text={heading[1]} />
+        </div>,
+      );
+      return;
+    }
+
+    if (bullet) {
+      flushNumbered();
+      bulletItems.push(bullet[1]);
+      return;
+    }
+
+    if (numbered) {
+      flushBullets();
+      numberedItems.push(numbered[1]);
+      return;
+    }
+
+    flushBullets();
+    flushNumbered();
+
+    if (line.trim().length === 0) {
+      blocks.push(<div key={`sp-${nextKey()}`} style={{ height: '6px' }} />);
+      return;
+    }
+
+    blocks.push(
+      <div key={`p-${nextKey()}`} style={{ margin: '3px 0' }}>
+        <InlineMarkdown text={line} />
+      </div>,
+    );
+  });
+
+  flushBullets();
+  flushNumbered();
+
+  return <>{blocks}</>;
 }
 
 function QuickActionCard({

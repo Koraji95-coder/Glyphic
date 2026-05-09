@@ -289,19 +289,47 @@ function Tip({ icon, title, body }: { icon: React.ReactNode; title: string; body
 
 type AiCheckState = { kind: 'checking' } | { kind: 'ok'; models: string[] } | { kind: 'fail'; error: string };
 
+const AI_CHECK_TIMEOUT_MS = 8000;
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+  return await new Promise<T>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      reject(new Error(timeoutMessage));
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        window.clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
+
 function AiSetupStep({ onContinue }: { onContinue: () => void }) {
   const [state, setState] = useState<AiCheckState>({ kind: 'checking' });
 
   const runCheck = useCallback(async () => {
     setState({ kind: 'checking' });
     try {
-      const ok = await commands.aiCheckConnection();
+      const ok = await withTimeout(
+        commands.aiCheckConnection(),
+        AI_CHECK_TIMEOUT_MS,
+        'Timed out while checking Ollama connection.',
+      );
       if (!ok) {
         setState({ kind: 'fail', error: 'Ollama is not reachable on http://localhost:11434.' });
         return;
       }
       try {
-        const models = await commands.aiListModels();
+        const models = await withTimeout(
+          commands.aiListModels(),
+          AI_CHECK_TIMEOUT_MS,
+          'Timed out while listing Ollama models.',
+        );
         setState({ kind: 'ok', models });
       } catch {
         setState({ kind: 'ok', models: [] });
