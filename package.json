@@ -9,8 +9,9 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "desktop": "tauri dev",
-    "lint": "biome check .",
     "lint:fix": "biome check --write .",
+    "lint": "biome check src",
+    "format": "biome format --write src",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui"

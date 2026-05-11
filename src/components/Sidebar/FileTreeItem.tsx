@@ -17,11 +17,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import { useSplitStore } from '../../stores/splitStore';
 import { useVaultStore } from '../../stores/vaultStore';
-import { usePromptModalStore } from '../../stores/promptModalStore';
 import type { VaultEntry } from '../../types/vault';
-
 
 interface FileTreeItemProps {
   entry: VaultEntry;
@@ -49,7 +48,6 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   const unpinNote = useVaultStore((s) => s.unpinNote);
   const { openPrompt } = usePromptModalStore();
   const { createNote, deleteNote, deleteFolder } = useVault();
-  
 
   const isFolder = entry.entry_type === 'folder';
   const isActive = !isFolder && activeNotePath === entry.path;
@@ -103,7 +101,8 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     openPrompt({
       title: 'New Note',
       placeholder: 'Note name',
-      onConfirm: async (name: string) => {
+      onConfirm: async (result) => {
+        const name = typeof result === 'string' ? result.trim() : '';
         if (!name) return;
         try {
           const note = await createNote(folder, name);
@@ -120,10 +119,11 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     openPrompt({
       title: 'New Folder',
       placeholder: 'Folder name',
-      onConfirm: async (name: string) => {
-        if (!name || !useVaultStore.getState().vaultPath) return;
+      onConfirm: async (result) => {
+        const name = typeof result === 'string' ? result.trim() : '';
+        const vaultPath = useVaultStore.getState().vaultPath;
+        if (!name || !vaultPath) return;
         try {
-          const vaultPath = useVaultStore.getState().vaultPath!;
           const folder = isFolder ? entry.path : entry.path.split('/').slice(0, -1).join('/');
           const relativePath = folder ? `${folder}/${name}` : name;
           await commands.createFolder(vaultPath, relativePath);
@@ -140,7 +140,8 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     openPrompt({
       title: 'Rename',
       defaultValue: title,
-      onConfirm: async (newName: string) => {
+      onConfirm: async (result) => {
+        const newName = typeof result === 'string' ? result.trim() : '';
         if (!newName || newName === title) return;
         try {
           const vaultPath = useVaultStore.getState().vaultPath;
@@ -161,9 +162,14 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       title: `Delete "${title}"?`,
       isConfirm: true,
       confirmLabel: 'Delete',
-      onConfirm: async () => {
+      onConfirm: async (result) => {
+        if (result !== true) return;
         try {
-          await deleteNote(entry.path);
+          if (isFolder) {
+            await deleteFolder(entry.path);
+          } else {
+            await deleteNote(entry.path);
+          }
         } catch (e) {
           reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
         }

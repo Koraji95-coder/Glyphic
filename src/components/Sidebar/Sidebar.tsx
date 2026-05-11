@@ -1,13 +1,4 @@
-import {
-  FileText,
-  FolderOpen,
-  HelpCircle,
-  LayoutList,
-  PinOff,
-  Plus,
-  Settings,
-  Trash2,
-} from 'lucide-react';
+import { FileText, FolderOpen, HelpCircle, LayoutList, PinOff, Plus, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
@@ -16,9 +7,9 @@ import { commands } from '../../lib/tauri/commands';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
-import { usePromptModalStore } from '../../stores/promptModalStore';
 import { ReviewSession } from '../Flashcards/ReviewSession';
 import { BacklinksPanel } from './BacklinksPanel';
 import { FileTree } from './FileTree';
@@ -29,11 +20,7 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
-  const {
-    isSidebarOpen,
-    closeSidebar,
-    isFocusMode,
-  } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, isFocusMode } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
@@ -51,35 +38,51 @@ export function Sidebar() {
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
 
-  const handleNewNote = useCallback(async (name?: string) => {
-    if (name) {
-      // direct from event
-      try { await createNote('', name); } catch (e) { reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e }); }
-      return;
-    }
-    openPrompt({
-      title: 'New Note',
-      placeholder: 'Note name',
-      onConfirm: async (name: string) => {
-        if (!name) return;
-        try { await createNote('', name); } catch (e) { reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e }); }
-      },
-    });
-  }, [createNote, openPrompt]);
+  const handleNewNote = useCallback(
+    async (name?: string) => {
+      if (name) {
+        // direct from event
+        try {
+          await createNote(selectedFolderPath, name);
+        } catch (e) {
+          reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
+        }
+        return;
+      }
+      openPrompt({
+        title: 'New Note',
+        placeholder: 'Note name',
+        onConfirm: async (result) => {
+          const name = typeof result === 'string' ? result.trim() : '';
+          if (!name) return;
+          try {
+            await createNote(selectedFolderPath, name);
+          } catch (e) {
+            reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
+          }
+        },
+      });
+    },
+    [createNote, openPrompt, selectedFolderPath],
+  );
 
   const handleNewFolder = useCallback(() => {
     openPrompt({
       title: 'New Folder',
       placeholder: 'Folder name',
-      onConfirm: async (name: string) => {
+      onConfirm: async (result) => {
+        const name = typeof result === 'string' ? result.trim() : '';
         if (!name || !vaultPath) return;
         try {
-          await commands.createFolder(vaultPath, name);
+          const base = selectedFolderPath ? `${selectedFolderPath}/${name}` : name;
+          await commands.createFolder(vaultPath, base);
           await refreshFileTree();
-        } catch (e) { reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e }); }
+        } catch (e) {
+          reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e });
+        }
       },
     });
-  }, [vaultPath, refreshFileTree, openPrompt]);
+  }, [vaultPath, refreshFileTree, openPrompt, selectedFolderPath]);
 
   const handleTrash = useCallback(() => {
     // replace alert with toast (see step 5)
@@ -398,8 +401,7 @@ function SidebarActionButton({
         if (primary) {
           e.currentTarget.style.filter = 'brightness(1.12)';
         } else {
-          e.currentTarget.style.background =
-            'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))';
+          e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))';
           e.currentTarget.style.color = 'var(--text-primary)';
         }
       }}
@@ -407,8 +409,7 @@ function SidebarActionButton({
         if (primary) {
           e.currentTarget.style.filter = '';
         } else {
-          e.currentTarget.style.background =
-            'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))';
+          e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))';
           e.currentTarget.style.color = 'var(--text-secondary)';
         }
       }}

@@ -40,8 +40,7 @@ export function NoteTagChips({ notePath, refreshKey }: NoteTagChipsProps) {
       style={{
         gap: '4px',
         padding: '4px 28px 6px',
-        background:
-          'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%), var(--bg-editor)',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%), var(--bg-editor)',
       }}
     >
       {tags.map((t) => (

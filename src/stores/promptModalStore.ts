@@ -4,9 +4,9 @@ interface PromptConfig {
   title: string;
   placeholder?: string;
   defaultValue?: string;
-  isConfirm?: boolean;           // true = confirmation dialog (no input)
+  isConfirm?: boolean;
   confirmLabel?: string;
-  onConfirm: (result: string | boolean) => void;
+  onConfirm: (result: string | boolean) => void | Promise<void>;
   onCancel?: () => void;
 }
 

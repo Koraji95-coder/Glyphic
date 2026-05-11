@@ -140,7 +140,10 @@ export function SearchBar() {
                   onClick={() => handleOpenResult(result.id, result.path)}
                   className="flex flex-col w-full px-3 py-2 text-left transition-colors"
                   style={{
-                    background: i === selectedIndex ? 'linear-gradient(135deg, rgba(163,116,247,0.14), rgba(249,118,85,0.06))' : 'transparent',
+                    background:
+                      i === selectedIndex
+                        ? 'linear-gradient(135deg, rgba(163,116,247,0.14), rgba(249,118,85,0.06))'
+                        : 'transparent',
                     borderRadius: '10px',
                   }}
                   onMouseEnter={() => setSelectedIndex(i)}

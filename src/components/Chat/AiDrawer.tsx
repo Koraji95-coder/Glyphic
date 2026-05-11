@@ -1,6 +1,6 @@
 import { MessageSquare } from 'lucide-react';
-import { ChatPanel } from './ChatPanel';
 import { useChatStore } from '../../stores/chatStore';
+import { ChatPanel } from './ChatPanel';
 
 export function AiDrawer() {
   const isOpen = useChatStore((s) => s.isOpen);
