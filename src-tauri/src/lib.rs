@@ -93,6 +93,7 @@ pub fn run() {
             commands::backup_commands::get_backup_status,
             commands::backup_commands::set_dropbox_token,
             commands::backup_commands::get_backup_history,
+            commands::backup_commands::detect_changes,
             // state
             state_commands::get_recent_vaults,
             state_commands::add_recent_vault,

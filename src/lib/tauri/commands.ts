@@ -185,6 +185,15 @@ export interface BackupStatusResponse {
   dropbox_enabled: boolean;
 }
 
+export interface ChangeDetectionResponse {
+  has_changes: boolean;
+  notes_changed: number;
+  screenshots_changed: number;
+  total_files: number;
+  estimated_size_bytes: number;
+  size_warning: boolean;
+}
+
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 export const commands = {
@@ -505,4 +514,6 @@ export const commands = {
     isTauri
       ? invoke<BackupHistoryEntry[]>('get_backup_history', { vaultPath, limit: limit ?? 10 })
       : Promise.reject('Not in Tauri'),
+  detectChanges: (vaultPath: string) =>
+    isTauri ? invoke<ChangeDetectionResponse>('detect_changes', { vaultPath }) : Promise.reject('Not in Tauri'),
 };

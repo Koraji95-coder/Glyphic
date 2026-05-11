@@ -49,6 +49,17 @@ pub struct BackupStatusResponse {
     pub dropbox_enabled: bool,
 }
 
+/// Change detection response for UI
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChangeDetectionResponse {
+    pub has_changes: bool,
+    pub notes_changed: usize,
+    pub screenshots_changed: usize,
+    pub total_files: usize,
+    pub estimated_size_bytes: i64,
+    pub size_warning: bool,
+}
+
 /// Trigger a manual backup to Dropbox
 #[tauri::command]
 pub async fn backup_now(vault_path: String) -> Result<BackupHistoryEntry, String> {
@@ -261,6 +272,42 @@ pub fn get_backup_history(vault_path: String, limit: i64) -> Result<Vec<BackupHi
         .map_err(|e| format!("Failed to collect backup history: {e}"))?;
 
     Ok(entries)
+}
+
+/// Detect if vault content has changed since last backup (without triggering backup)
+/// Returns change summary with size warning info
+#[tauri::command]
+pub fn detect_changes(vault_path: String) -> Result<ChangeDetectionResponse, String> {
+    let vault = Path::new(&vault_path);
+    let conn = schema::init_database(vault)?;
+
+    // Detect changes
+    let change_result = BackupService::detect_changes(&conn, vault)?;
+
+    // Calculate estimated backup size if changes exist
+    let estimated_size_bytes = if change_result.has_changes {
+        let changed_files: Vec<String> = change_result
+            .new_notes
+            .iter()
+            .chain(change_result.new_screenshots.iter())
+            .cloned()
+            .collect();
+        BackupService::calculate_backup_size(vault, &changed_files).unwrap_or(0)
+    } else {
+        0
+    };
+
+    // Check if size would exceed warning threshold
+    let size_warning = BackupService::check_size_warning(estimated_size_bytes);
+
+    Ok(ChangeDetectionResponse {
+        has_changes: change_result.has_changes,
+        notes_changed: change_result.new_notes.len(),
+        screenshots_changed: change_result.new_screenshots.len(),
+        total_files: change_result.total_files_to_backup,
+        estimated_size_bytes,
+        size_warning,
+    })
 }
 
 // ── Helper functions ──
