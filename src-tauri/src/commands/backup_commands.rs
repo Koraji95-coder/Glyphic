@@ -4,6 +4,7 @@ use std::path::Path;
 use uuid::Uuid;
 
 use crate::db::schema;
+use crate::services::backup_service::{BackupService, ChangeDetectionResult};
 
 /// Backup status enumeration
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -56,6 +57,14 @@ pub async fn backup_now(vault_path: String) -> Result<BackupHistoryEntry, String
     // Get DB connection
     let conn = schema::init_database(vault)?;
 
+    // Detect if vault content has changed since last backup
+    let change_result = BackupService::detect_changes(&conn, vault)?;
+
+    // If no changes detected, skip backup
+    if !change_result.has_changes {
+        return Err("No changes detected since last backup".to_string());
+    }
+
     // Create backup record
     let backup_id = Uuid::new_v4().to_string();
     let now = Utc::now().to_rfc3339();
@@ -67,6 +76,26 @@ pub async fn backup_now(vault_path: String) -> Result<BackupHistoryEntry, String
     )
     .map_err(|e| format!("Failed to create backup record: {e}"))?;
 
+    // Build list of changed files
+    let file_list = BackupService::build_backup_file_list(vault, &change_result)?;
+
+    // Calculate backup size (only changed files)
+    let changed_file_paths: Vec<String> = file_list
+        .iter()
+        .filter_map(|p| p.to_str().map(|s| s.to_string()))
+        .collect();
+    let backup_size = BackupService::calculate_backup_size(vault, &changed_file_paths)?;
+
+    // Check if size exceeds 150MB warning threshold
+    if BackupService::check_size_warning(backup_size) {
+        // TODO: Return size warning to UI — user can confirm or cancel
+        // For now, log and continue
+        eprintln!(
+            "WARNING: Backup size {} exceeds 150MB threshold",
+            format_bytes(backup_size)
+        );
+    }
+
     // Count notes and screenshots for metadata
     let notes_count: i64 = conn
         .query_row("SELECT COUNT(*) FROM notes", [], |row| row.get(0))
@@ -76,9 +105,9 @@ pub async fn backup_now(vault_path: String) -> Result<BackupHistoryEntry, String
         .query_row("SELECT COUNT(*) FROM screenshots", [], |row| row.get(0))
         .unwrap_or(0);
 
-    // Attempt backup to Dropbox
-    // TODO: Implement actual Dropbox backup (serialize vault, upload, etc.)
-    let backup_result = perform_dropbox_backup(vault, notes_count, screenshots_count).await;
+    // Attempt backup to Dropbox with incremental payload
+    let backup_result =
+        perform_dropbox_backup(vault, &change_result, backup_size, notes_count, screenshots_count).await;
 
     match backup_result {
         Ok((dropbox_path, size_bytes)) => {
@@ -97,6 +126,9 @@ pub async fn backup_now(vault_path: String) -> Result<BackupHistoryEntry, String
                 ],
             )
             .map_err(|e| format!("Failed to update backup record: {e}"))?;
+
+            // Record backup completion and update last_backup_timestamp
+            BackupService::record_backup_completion(&conn, &backup_id)?;
 
             get_backup_entry(&conn, &backup_id)
         }
@@ -233,6 +265,20 @@ pub fn get_backup_history(vault_path: String, limit: i64) -> Result<Vec<BackupHi
 
 // ── Helper functions ──
 
+/// Format bytes to human-readable size (B, KB, MB, GB)
+fn format_bytes(bytes: i64) -> String {
+    const UNITS: &[&str] = &["B", "KB", "MB", "GB"];
+    let mut size = bytes as f64;
+    let mut unit_idx = 0;
+
+    while size > 1024.0 && unit_idx < UNITS.len() - 1 {
+        size /= 1024.0;
+        unit_idx += 1;
+    }
+
+    format!("{:.2} {}", size, UNITS[unit_idx])
+}
+
 /// Helper: Get a single backup entry by ID
 fn get_backup_entry(conn: &rusqlite::Connection, backup_id: &str) -> Result<BackupHistoryEntry, String> {
     conn.query_row(
@@ -257,20 +303,25 @@ fn get_backup_entry(conn: &rusqlite::Connection, backup_id: &str) -> Result<Back
     .map_err(|e| format!("Failed to retrieve backup entry: {e}"))
 }
 
-/// Perform the actual Dropbox backup
-/// TODO: Implement full backup serialization and Dropbox API integration
+/// Perform the actual Dropbox backup with incremental payload
+/// Accepts only changed files from ChangeDetectionResult
+/// TODO: Implement full Dropbox API integration
 /// Returns: (dropbox_path, size_bytes)
 async fn perform_dropbox_backup(
     _vault_path: &Path,
+    _change_result: &ChangeDetectionResult,
+    _backup_size: i64,
     _notes_count: i64,
     _screenshots_count: i64,
 ) -> Result<(String, i64), String> {
-    // Placeholder implementation
+    // Placeholder implementation with incremental logic
     // In full implementation, this would:
-    // 1. Serialize vault (notes, screenshots, annotations) to YAML/JSON
-    // 2. Create tarball
-    // 3. Upload to Dropbox API with hardened path handling
-    // 4. Return remote path and size
+    // 1. Create temporary directory for backup payload
+    // 2. Copy only changed files (from ChangeDetectionResult) to temp dir
+    // 3. Create tarball from temp directory
+    // 4. Upload to Dropbox API with hardened path handling
+    // 5. Clean up temporary directory
+    // 6. Return remote path and actual uploaded size
 
     let dropbox_path = format!(
         "/Glyphic/Backups/backup-{}.tar.gz",

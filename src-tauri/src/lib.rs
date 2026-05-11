@@ -4,6 +4,7 @@ pub mod commands;
 pub mod db;
 pub mod export;
 pub mod ocr;
+pub mod services;
 pub mod vault;
 // ← Remove pub mod diagrams; and pub mod fe; from here
 //   They belong inside commands/mod.rs
