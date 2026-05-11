@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AiDrawer } from './components/Chat/AiDrawer';
 import { ErrorToast } from './components/common/ErrorToast';
+import { PromptModal } from './components/common/PromptModal';
 import { DiagramMode } from './components/diagrams/DiagramMode';
 import { EditorPaneGroup } from './components/Editor/EditorPaneGroup';
 import { ReferenceModal } from './components/Editor/ReferenceModal';
@@ -169,6 +170,7 @@ function MainLayout() {
       <Onboarding />
       {referenceModalOpen && <ReferenceModal />}
       <ErrorToast />
+      <PromptModal />
     </div>
   );
 }

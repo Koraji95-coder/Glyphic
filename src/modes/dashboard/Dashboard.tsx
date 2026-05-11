@@ -1,6 +1,6 @@
 import { Activity, BookOpen, FolderOpen, GraduationCap, Plus, Upload } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { commands, type FeTopicStats } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -100,11 +100,7 @@ export function Dashboard() {
         >
           <StatCard label="Total notes" value={String(totalNotes)} icon={<BookOpen size={15} />} />
           <StatCard label="Folders" value={String(totalFolders)} icon={<FolderOpen size={15} />} />
-          <StatCard
-            label="Documents ingested"
-            value={String(sourcesIngested)}
-            icon={<Upload size={15} />}
-          />
+          <StatCard label="Documents ingested" value={String(sourcesIngested)} icon={<Upload size={15} />} />
           <StatCard
             label="FE accuracy"
             value={feSummary.attempts > 0 ? `${feSummary.accuracy}%` : '--'}
@@ -139,7 +135,9 @@ export function Dashboard() {
                   <span className="truncate" style={{ maxWidth: '75%' }}>
                     {note.title}
                   </span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>{formatRelative(note.modifiedAt)}</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>
+                    {formatRelative(note.modifiedAt)}
+                  </span>
                 </button>
               ))}
             </div>
@@ -153,7 +151,10 @@ export function Dashboard() {
             <div className="flex flex-col" style={{ gap: '8px' }}>
               {feStats.slice(0, 5).map((topic) => (
                 <div key={topic.topic_id} style={{ display: 'grid', gap: '4px' }}>
-                  <div className="flex items-center justify-between" style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
+                  >
                     <span>Topic #{topic.topic_id}</span>
                     <span>{Math.round(topic.accuracy)}%</span>
                   </div>
@@ -246,7 +247,9 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
         {icon}
       </div>
       <div>
-        <div style={{ fontSize: '10px', color: 'var(--text-ghost)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <div
+          style={{ fontSize: '10px', color: 'var(--text-ghost)', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+        >
           {label}
         </div>
         <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1 }}>{value}</div>
@@ -258,8 +261,7 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
 const panelStyle: CSSProperties = {
   borderRadius: '16px',
   border: '1px solid var(--glass-border)',
-  background:
-    'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), var(--glass-surface)',
+  background: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), var(--glass-surface)',
   backdropFilter: 'var(--glass-blur)',
   WebkitBackdropFilter: 'var(--glass-blur)',
   padding: '14px',

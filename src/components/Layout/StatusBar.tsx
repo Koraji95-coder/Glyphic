@@ -61,9 +61,7 @@ export function StatusBar() {
       </div>
 
       <div className="flex items-center" style={{ gap: '8px' }}>
-        {lectureModeActive && (
-          <StatusPill style={{ color: 'var(--green)' }}>● Lecture {getElapsedTime()}</StatusPill>
-        )}
+        {lectureModeActive && <StatusPill style={{ color: 'var(--green)' }}>● Lecture {getElapsedTime()}</StatusPill>}
         {!isMobile && <StatusPill>Glyphic v1.0</StatusPill>}
       </div>
     </div>

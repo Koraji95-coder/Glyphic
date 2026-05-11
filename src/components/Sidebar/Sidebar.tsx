@@ -1,13 +1,4 @@
-import {
-  FileText,
-  FolderOpen,
-  HelpCircle,
-  LayoutList,
-  PinOff,
-  Plus,
-  Settings,
-  Trash2,
-} from 'lucide-react';
+import { FileText, FolderOpen, HelpCircle, LayoutList, PinOff, Plus, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
@@ -16,6 +7,7 @@ import { commands } from '../../lib/tauri/commands';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useHelpUiStore } from '../../stores/helpUiStore';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { ReviewSession } from '../Flashcards/ReviewSession';
@@ -28,20 +20,18 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
-  const {
-    isSidebarOpen,
-    closeSidebar,
-    isFocusMode,
-  } = useLayoutStore();
+  const { isSidebarOpen, closeSidebar, isFocusMode } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
   const vaultPath = useVaultStore((s) => s.vaultPath);
   const refreshFileTree = useVaultStore((s) => s.refreshFileTree);
+  const selectedFolderPath = useVaultStore((s) => s.selectedFolderPath);
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
   const { createNote } = useVault();
+  const { openPrompt } = usePromptModalStore();
 
   // Count notes and folders
   const { noteCount, folderCount } = countEntries(fileTree);
@@ -50,48 +40,53 @@ export function Sidebar() {
 
   const handleNewNote = useCallback(
     async (name?: string) => {
-      const noteName = name ?? window.prompt('Note name:');
-      if (noteName) {
+      if (name) {
+        // direct from event
         try {
-          await createNote('', noteName);
+          await createNote(selectedFolderPath, name);
         } catch (e) {
           reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
         }
+        return;
       }
+      openPrompt({
+        title: 'New Note',
+        placeholder: 'Note name',
+        onConfirm: async (result) => {
+          const name = typeof result === 'string' ? result.trim() : '';
+          if (!name) return;
+          try {
+            await createNote(selectedFolderPath, name);
+          } catch (e) {
+            reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
+          }
+        },
+      });
     },
-    [createNote],
+    [createNote, openPrompt, selectedFolderPath],
   );
 
-  // Listen for the "new-note" event dispatched from TitleBar's "+" button
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const name = (e as CustomEvent<{ name: string }>).detail?.name;
-      void handleNewNote(name);
-    };
-    window.addEventListener('glyphic:new-note', handler);
-    return () => window.removeEventListener('glyphic:new-note', handler);
-  }, [handleNewNote]);
-
-  const handleNewFolder = useCallback(async () => {
-    const name = window.prompt('Folder name:');
-    if (name && vaultPath) {
-      try {
-        await commands.createFolder(vaultPath, name);
-        await refreshFileTree();
-      } catch (e) {
-        reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e });
-      }
-    }
-  }, [vaultPath, refreshFileTree]);
-
-  // Listen for the "new-folder" event dispatched from App.tsx (Ctrl+Shift+N)
-  useEffect(() => {
-    window.addEventListener('glyphic:new-folder', handleNewFolder);
-    return () => window.removeEventListener('glyphic:new-folder', handleNewFolder);
-  }, [handleNewFolder]);
+  const handleNewFolder = useCallback(() => {
+    openPrompt({
+      title: 'New Folder',
+      placeholder: 'Folder name',
+      onConfirm: async (result) => {
+        const name = typeof result === 'string' ? result.trim() : '';
+        if (!name || !vaultPath) return;
+        try {
+          const base = selectedFolderPath ? `${selectedFolderPath}/${name}` : name;
+          await commands.createFolder(vaultPath, base);
+          await refreshFileTree();
+        } catch (e) {
+          reportError({ context: 'Sidebar create folder', message: 'Failed to create folder', error: e });
+        }
+      },
+    });
+  }, [vaultPath, refreshFileTree, openPrompt, selectedFolderPath]);
 
   const handleTrash = useCallback(() => {
-    window.alert('Deleted notes are moved to your system Trash and can be restored from there.');
+    // replace alert with toast (see step 5)
+    // or temporarily: openPrompt({ title: 'Trash Info', isConfirm: true, confirmLabel: 'OK', onConfirm: () => {} });
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -406,8 +401,7 @@ function SidebarActionButton({
         if (primary) {
           e.currentTarget.style.filter = 'brightness(1.12)';
         } else {
-          e.currentTarget.style.background =
-            'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))';
+          e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))';
           e.currentTarget.style.color = 'var(--text-primary)';
         }
       }}
@@ -415,8 +409,7 @@ function SidebarActionButton({
         if (primary) {
           e.currentTarget.style.filter = '';
         } else {
-          e.currentTarget.style.background =
-            'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))';
+          e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))';
           e.currentTarget.style.color = 'var(--text-secondary)';
         }
       }}

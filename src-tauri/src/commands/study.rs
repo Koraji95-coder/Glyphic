@@ -41,6 +41,25 @@ fn study_python_cmd(app: &AppHandle) -> (std::ffi::OsString, Vec<std::ffi::OsStr
         if shim.exists() {
             return (shim.into_os_string(), vec![]);
         }
+
+        let venv_python = if cfg!(target_os = "windows") {
+            resource_dir
+                .join("sidecars")
+                .join("venv")
+                .join("Scripts")
+                .join("python.exe")
+        } else {
+            resource_dir
+                .join("sidecars")
+                .join("venv")
+                .join("bin")
+                .join("python")
+        };
+        if venv_python.exists() {
+            if let Ok(script) = study_engine_path(app) {
+                return (venv_python.into_os_string(), vec![script.into_os_string()]);
+            }
+        }
     }
     if let Ok(script) = study_engine_path(app) {
         return (

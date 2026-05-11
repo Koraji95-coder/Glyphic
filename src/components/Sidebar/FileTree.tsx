@@ -53,7 +53,10 @@ export function FileTree() {
           No notes yet
         </p>
         <p className="text-xs" style={{ color: 'var(--text-ghost)', lineHeight: 1.5 }}>
-          Create your first note with <strong style={{ color: 'var(--accent-warm)' }}><Plus size={11} style={{ display: 'inline', verticalAlign: '-1px' }} /> New note</strong>
+          Create your first note with{' '}
+          <strong style={{ color: 'var(--accent-warm)' }}>
+            <Plus size={11} style={{ display: 'inline', verticalAlign: '-1px' }} /> New note
+          </strong>
         </p>
       </div>
     );

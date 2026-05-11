@@ -1,14 +1,27 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { FileText, GraduationCap, Grid2X2, Maximize2, Menu, MessageSquare, Minimize2, Plus, Search, Workflow, X } from 'lucide-react';
+import {
+  FileText,
+  GraduationCap,
+  Grid2X2,
+  Maximize2,
+  Menu,
+  MessageSquare,
+  Minimize2,
+  Plus,
+  Search,
+  Workflow,
+  X,
+} from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { frontmatterRegistry } from '../../lib/frontmatterRegistry';
 import { reportError } from '../../lib/errorReporter';
+import { frontmatterRegistry } from '../../lib/frontmatterRegistry';
 import { commands } from '../../lib/tauri/commands';
 import { composeNote } from '../../lib/tiptap/markdownParser';
 import { useChatStore } from '../../stores/chatStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useLayoutStore } from '../../stores/layoutStore';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import { useVaultStore } from '../../stores/vaultStore';
 
 export function TitleBar() {
@@ -18,6 +31,7 @@ export function TitleBar() {
   const addOpenNote = useVaultStore((s) => s.addOpenNote);
   const removeOpenNote = useVaultStore((s) => s.removeOpenNote);
   const vaultPath = useVaultStore((s) => s.vaultPath);
+  const { openPrompt } = usePromptModalStore();
   const content = useEditorStore((s) => s.content);
   const isDirty = useEditorStore((s) => s.isDirty);
   const setSaving = useEditorStore((s) => s.setSaving);
@@ -517,10 +531,16 @@ export function TitleBar() {
               title="New note (prompts for name)"
               aria-label="New note"
               onClick={() => {
-                const name = window.prompt('Note name:');
-                if (name) {
-                  window.dispatchEvent(new CustomEvent('glyphic:new-note', { detail: { name } }));
-                }
+                openPrompt({
+                  title: 'New Note',
+                  placeholder: 'Note name',
+                  onConfirm: (result) => {
+                    const name = typeof result === 'string' ? result.trim() : '';
+                    if (name) {
+                      window.dispatchEvent(new CustomEvent('glyphic:new-note', { detail: { name } }));
+                    }
+                  },
+                });
               }}
               style={{
                 width: '28px',

@@ -36,6 +36,25 @@ fn diagram_python_cmd(app: &AppHandle) -> (std::ffi::OsString, Vec<std::ffi::OsS
         if shim.exists() {
             return (shim.into_os_string(), vec![]);
         }
+
+        let venv_python = if cfg!(target_os = "windows") {
+            resource_dir
+                .join("sidecars")
+                .join("venv")
+                .join("Scripts")
+                .join("python.exe")
+        } else {
+            resource_dir
+                .join("sidecars")
+                .join("venv")
+                .join("bin")
+                .join("python")
+        };
+        if venv_python.exists() {
+            if let Ok(script) = diagram_engine_path(app) {
+                return (venv_python.into_os_string(), vec![script.into_os_string()]);
+            }
+        }
     }
     // Fallback: plain python3 with the script path as arg
     if let Ok(script) = diagram_engine_path(app) {
@@ -293,6 +312,15 @@ pub async fn generate_code(
     app: AppHandle,
 ) -> Result<GeneratedDiagramCode, String> {
     let (cmd, extra_args) = diagram_python_cmd(&app);
+    if cfg!(target_os = "windows") {
+        let cmd_name = cmd.to_string_lossy().to_ascii_lowercase();
+        if cmd_name == "python3" || cmd_name == "python" || cmd_name == "py" {
+            return Err(
+                "Python sidecar runtime is not configured. Run sidecars/install_deps.sh (or provide launcher shims)."
+                    .to_string(),
+            );
+        }
+    }
     let req = json!({
         "action": "generate_code",
         "description": description,

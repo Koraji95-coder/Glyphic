@@ -17,6 +17,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVault } from '../../hooks/useVault';
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
+import { usePromptModalStore } from '../../stores/promptModalStore';
 import { useSplitStore } from '../../stores/splitStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
@@ -41,10 +42,12 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
 
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+  const setSelectedFolderPath = useVaultStore((s) => s.setSelectedFolderPath);
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const pinNote = useVaultStore((s) => s.pinNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
-  const { createNote, deleteNote } = useVault();
+  const { openPrompt } = usePromptModalStore();
+  const { createNote, deleteNote, deleteFolder } = useVault();
 
   const isFolder = entry.entry_type === 'folder';
   const isActive = !isFolder && activeNotePath === entry.path;
@@ -56,11 +59,14 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
 
   const handleClick = useCallback(() => {
     if (isFolder) {
+      setSelectedFolderPath(entry.path);
       setExpanded((prev) => !prev);
     } else {
+      const parentFolder = entry.path.split('/').slice(0, -1).join('/');
+      setSelectedFolderPath(parentFolder);
       setActiveNote(entry.path, entry.path);
     }
-  }, [isFolder, entry.path, setActiveNote]);
+  }, [isFolder, entry.path, setActiveNote, setSelectedFolderPath]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -89,66 +95,86 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     setVisibleChildrenCount(INITIAL_CHILDREN_BATCH);
   }, [expanded, isFolder]);
 
-  const handleNewNote = async () => {
+  const handleNewNote = () => {
     setCtxMenu(null);
     const folder = isFolder ? entry.path : entry.path.split('/').slice(0, -1).join('/');
-    const name = window.prompt('Note name:');
-    if (name) {
-      try {
-        const note = await createNote(folder, name);
-        if (note) {
-          setActiveNote(note.id, note.path);
+    openPrompt({
+      title: 'New Note',
+      placeholder: 'Note name',
+      onConfirm: async (result) => {
+        const name = typeof result === 'string' ? result.trim() : '';
+        if (!name) return;
+        try {
+          const note = await createNote(folder, name);
+          if (note) setActiveNote(note.id, note.path);
+        } catch (e) {
+          reportError({ context: 'File tree create note', message: 'Failed to create note', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree create note', message: 'Failed to create note', error: e });
-      }
-    }
+      },
+    });
   };
 
-  const handleNewFolder = async () => {
+  const handleNewFolder = () => {
     setCtxMenu(null);
-    // Folder creation handled at vault level
-    const name = window.prompt('Folder name:');
-    if (name) {
-      try {
+    openPrompt({
+      title: 'New Folder',
+      placeholder: 'Folder name',
+      onConfirm: async (result) => {
+        const name = typeof result === 'string' ? result.trim() : '';
         const vaultPath = useVaultStore.getState().vaultPath;
-        if (vaultPath) {
+        if (!name || !vaultPath) return;
+        try {
           const folder = isFolder ? entry.path : entry.path.split('/').slice(0, -1).join('/');
           const relativePath = folder ? `${folder}/${name}` : name;
           await commands.createFolder(vaultPath, relativePath);
           await useVaultStore.getState().refreshFileTree();
+        } catch (e) {
+          reportError({ context: 'File tree create folder', message: 'Failed to create folder', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree create folder', message: 'Failed to create folder', error: e });
-      }
-    }
+      },
+    });
   };
 
-  const handleRename = async () => {
+  const handleRename = () => {
     setCtxMenu(null);
-    const newName = window.prompt('New name:', title);
-    if (newName && newName !== title) {
-      try {
-        const vaultPath = useVaultStore.getState().vaultPath;
-        if (vaultPath) {
-          await commands.renameNote(vaultPath, entry.path, newName);
-          await useVaultStore.getState().refreshFileTree();
+    openPrompt({
+      title: 'Rename',
+      defaultValue: title,
+      onConfirm: async (result) => {
+        const newName = typeof result === 'string' ? result.trim() : '';
+        if (!newName || newName === title) return;
+        try {
+          const vaultPath = useVaultStore.getState().vaultPath;
+          if (vaultPath) {
+            await commands.renameNote(vaultPath, entry.path, newName);
+            await useVaultStore.getState().refreshFileTree();
+          }
+        } catch (e) {
+          reportError({ context: 'File tree rename', message: 'Failed to rename', error: e });
         }
-      } catch (e) {
-        reportError({ context: 'File tree rename', message: 'Failed to rename', error: e });
-      }
-    }
+      },
+    });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setCtxMenu(null);
-    if (window.confirm(`Delete "${title}"?`)) {
-      try {
-        await deleteNote(entry.path);
-      } catch (e) {
-        reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
-      }
-    }
+    openPrompt({
+      title: `Delete "${title}"?`,
+      isConfirm: true,
+      confirmLabel: 'Delete',
+      onConfirm: async (result) => {
+        if (result !== true) return;
+        try {
+          if (isFolder) {
+            await deleteFolder(entry.path);
+          } else {
+            await deleteNote(entry.path);
+          }
+        } catch (e) {
+          reportError({ context: 'File tree delete', message: 'Failed to delete', error: e });
+        }
+      },
+    });
   };
 
   return (
@@ -257,9 +283,9 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
                 }}
               />
               <CtxItem icon={Pencil} label="Rename" onClick={handleRename} />
-              <CtxItem icon={Trash2} label="Delete" onClick={handleDelete} danger />
             </>
           )}
+          <CtxItem icon={Trash2} label="Delete" onClick={handleDelete} danger />
         </div>
       )}
     </>

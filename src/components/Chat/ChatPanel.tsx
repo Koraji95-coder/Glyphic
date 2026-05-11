@@ -1,4 +1,17 @@
-import { ArrowLeft, Camera, FileText, GraduationCap, Lightbulb, Pin, PinOff, Search, Send, Settings, Square, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  Camera,
+  FileText,
+  GraduationCap,
+  Lightbulb,
+  Pin,
+  PinOff,
+  Search,
+  Send,
+  Settings,
+  Square,
+  X,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -188,9 +201,9 @@ export function ChatPanel() {
                 gap: '3px',
                 padding: '1px 6px',
                 borderRadius: '999px',
-                  background: modelSource === 'note' ? 'rgba(163,116,247,0.16)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${modelSource === 'note' ? 'rgba(163,116,247,0.22)' : 'var(--glass-border)'}`,
-                  color: modelSource === 'note' ? 'var(--accent)' : 'var(--text-secondary)',
+                background: modelSource === 'note' ? 'rgba(163,116,247,0.16)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${modelSource === 'note' ? 'rgba(163,116,247,0.22)' : 'var(--glass-border)'}`,
+                color: modelSource === 'note' ? 'var(--accent)' : 'var(--text-secondary)',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '9px',
                 cursor: 'pointer',
@@ -513,13 +526,13 @@ export function ChatPanel() {
                       padding: '2px 8px',
                       borderRadius: '999px',
                       backgroundColor: 'var(--accent-dim)',
-                          color: 'var(--accent)',
+                      color: 'var(--accent)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '3px',
                       fontWeight: 500,
                       fontFamily: 'var(--font-body)',
-                          border: '1px solid rgba(163,116,247,0.22)',
+                      border: '1px solid rgba(163,116,247,0.22)',
                     }}
                   >
                     {TOOL_LABELS[tool.toolName] ?? `⚙️ ${tool.toolName}...`}
@@ -808,15 +821,7 @@ export function ChatPanel() {
   );
 }
 
-function ContextChip({
-  label,
-  icon,
-  active,
-}: {
-  label: string;
-  icon?: ReactNode;
-  active?: boolean;
-}) {
+function ContextChip({ label, icon, active }: { label: string; icon?: ReactNode; active?: boolean }) {
   return (
     <span
       style={{
