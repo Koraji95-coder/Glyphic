@@ -1,4 +1,4 @@
-import { Camera, Cog, Folder, Keyboard, Mic, PenTool, Sparkles, X } from 'lucide-react';
+import { Camera, Cog, Folder, Keyboard, Mic, PenTool, Sparkles, X, HardDrive } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { useVault } from '../../hooks/useVault';
@@ -11,12 +11,14 @@ import type { VaultConfig } from '../../types/vault';
 
 import { AiSettingsPanel } from '../Chat/AiSettingsPanel';
 import { ShortcutsList } from '../Help/ShortcutsList';
+import { BackupStatusPanel } from './BackupStatusPanel';
 
 const NAV_ITEMS: Array<{ id: SettingsSection; label: string; icon: React.ComponentType<{ size?: number }> }> = [
   { id: 'general', label: 'General', icon: Cog },
   { id: 'editor', label: 'Editor', icon: PenTool },
   { id: 'capture', label: 'Capture', icon: Camera },
   { id: 'lecture', label: 'Lecture', icon: Mic },
+  { id: 'backup', label: 'Backup', icon: HardDrive },
   { id: 'ai', label: 'AI', icon: Sparkles },
   { id: 'shortcuts', label: 'Shortcuts', icon: Keyboard },
 ];
@@ -122,6 +124,7 @@ export function SettingsModal() {
             {section === 'editor' && draft && <EditorSection draft={draft} onChange={persist} />}
             {section === 'capture' && draft && <CaptureSection draft={draft} onChange={persist} vaultPath={vaultPath} />}
             {section === 'lecture' && draft && <LectureSection draft={draft} onChange={persist} />}
+            {section === 'backup' && vaultPath && <BackupStatusPanel vaultPath={vaultPath} />}
             {section === 'ai' && <AiSettingsPanel onClose={close} embedded />}
             {section === 'shortcuts' && <ShortcutsList />}
           </div>

@@ -99,6 +99,26 @@ pub fn init_database(vault_path: &Path) -> Result<Connection, String> {
             FOREIGN KEY (target_note_id) REFERENCES notes(id) ON DELETE CASCADE
         );
 
+        -- Backup metadata table for Dropbox sync tracking
+        CREATE TABLE IF NOT EXISTS backup_history (
+            id               TEXT PRIMARY KEY,
+            timestamp        TEXT NOT NULL,
+            status           TEXT NOT NULL DEFAULT 'pending',
+            error_message    TEXT,
+            dropbox_path     TEXT,
+            size_bytes       INTEGER DEFAULT 0,
+            notes_count      INTEGER DEFAULT 0,
+            screenshots_count INTEGER DEFAULT 0,
+            created_at       TEXT NOT NULL
+        );
+
+        -- Settings for backup (encryption key, dropbox token, last sync time)
+        CREATE TABLE IF NOT EXISTS backup_settings (
+            key              TEXT PRIMARY KEY,
+            value            TEXT NOT NULL,
+            updated_at       TEXT NOT NULL
+        );
+
         -- Triggers: keep notes_fts in sync with notes
         CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
             INSERT INTO notes_fts(rowid, title, content, tags)

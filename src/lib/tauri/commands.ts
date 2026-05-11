@@ -166,6 +166,25 @@ export interface GeneratedDiagramCode {
   warnings: string[];
 }
 
+// ── Backup types ──────────────────────────────────────────────────────────────
+export interface BackupHistoryEntry {
+  id: string;
+  timestamp: string;
+  status: string;
+  error_message?: string;
+  dropbox_path?: string;
+  size_bytes: number;
+  notes_count: number;
+  screenshots_count: number;
+  created_at: string;
+}
+
+export interface BackupStatusResponse {
+  last_backup?: BackupHistoryEntry;
+  is_backing_up: boolean;
+  dropbox_enabled: boolean;
+}
+
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 export const commands = {
@@ -474,4 +493,16 @@ export const commands = {
       : Promise.reject('Not in Tauri'),
   feHandbookQA: (question: string) =>
     isTauri ? invoke<HandbookQAResult>('fe_handbook_qa', { question }) : Promise.reject('Not in Tauri'),
+
+  // Backup & Dropbox
+  backupNow: (vaultPath: string) =>
+    isTauri ? invoke<BackupHistoryEntry>('backup_now', { vaultPath }) : Promise.reject('Not in Tauri'),
+  getBackupStatus: (vaultPath: string) =>
+    isTauri ? invoke<BackupStatusResponse>('get_backup_status', { vaultPath }) : Promise.reject('Not in Tauri'),
+  setDropboxToken: (vaultPath: string, token: string) =>
+    isTauri ? invoke<void>('set_dropbox_token', { vaultPath, token }) : Promise.reject('Not in Tauri'),
+  getBackupHistory: (vaultPath: string, limit?: number) =>
+    isTauri
+      ? invoke<BackupHistoryEntry[]>('get_backup_history', { vaultPath, limit: limit ?? 10 })
+      : Promise.reject('Not in Tauri'),
 };

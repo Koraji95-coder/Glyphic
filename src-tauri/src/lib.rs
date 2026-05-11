@@ -87,6 +87,11 @@ pub fn run() {
             // settings
             settings_commands::get_settings,
             settings_commands::update_settings,
+            // backup
+            commands::backup_commands::backup_now,
+            commands::backup_commands::get_backup_status,
+            commands::backup_commands::set_dropbox_token,
+            commands::backup_commands::get_backup_history,
             // state
             state_commands::get_recent_vaults,
             state_commands::add_recent_vault,

@@ -1,5 +1,6 @@
 pub mod ai_commands;
 pub mod annotation_commands;
+pub mod backup_commands;
 pub mod capture_commands;
 pub mod export_commands;
 pub mod flashcards;
