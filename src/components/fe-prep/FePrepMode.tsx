@@ -47,9 +47,9 @@ const EXAM_PRESET_MINUTES = [60, 180, 360] as const;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function accuracyColor(pct: number) {
-  if (pct >= 0.7) return 'var(--green, #4ade80)';
-  if (pct >= 0.5) return '#facc15';
-  return 'var(--red, #f87171)';
+  if (pct >= 0.7) return '#34d399';
+  if (pct >= 0.5) return '#fbbf24';
+  return '#f87171';
 }
 
 function groupByCategory(topics: FeTopic[]): Record<string, FeTopic[]> {

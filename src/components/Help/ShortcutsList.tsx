@@ -1,70 +1,45 @@
 import { shortcutsByCategory } from '../../lib/shortcuts';
 import { useShortcutsRuntimeStore } from '../../stores/shortcutsRuntimeStore';
 
-/** Reusable keyboard-shortcut reference list (used in both Settings and Help). */
 export function ShortcutsList() {
   const groups = shortcutsByCategory();
   const globalOverrides = useShortcutsRuntimeStore((s) => s.globalOverrides);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-      {(Object.keys(groups) as Array<keyof typeof groups>).map((cat) => {
-        const entries = groups[cat];
+    <div className="space-y-8">
+      {(Object.keys(groups) as Array<keyof typeof groups>).map((category) => {
+        const entries = groups[category];
         if (entries.length === 0) return null;
+
         return (
-          <section key={cat}>
-            <h3
-              style={{
-                margin: '0 0 8px',
-                fontSize: '11px',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: 'var(--text-ghost)',
-              }}
-            >
-              {cat}
+          <div key={category}>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">
+              {category}
             </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '4px' }}>
-              {entries.map((s) => {
-                const activeCombo = globalOverrides[s.combo] ?? s.combo;
-                const isFallback = activeCombo !== s.combo;
+            <div className="space-y-1">
+              {entries.map((shortcut) => {
+                const activeCombo = globalOverrides[shortcut.combo] ?? shortcut.combo;
+                const isFallback = activeCombo !== shortcut.combo;
+
                 return (
-                  <li
-                    key={`${s.combo}-${activeCombo}`}
-                    className="flex items-center"
-                    style={{
-                      justifyContent: 'space-between',
-                      padding: '6px 10px',
-                      borderRadius: '6px',
-                      backgroundColor: 'var(--bg-card)',
-                    }}
+                  <div
+                    key={`${shortcut.combo}-${activeCombo}`}
+                    className="flex items-center justify-between px-4 py-3 bg-zinc-800/50 hover:bg-zinc-800 rounded-2xl transition-colors"
                   >
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{s.description}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="text-zinc-300">{shortcut.description}</span>
+                    <div className="flex items-center gap-2">
                       {isFallback && (
-                        <span style={{ fontSize: '10px', color: 'var(--text-ghost)' }} title={`Default: ${s.combo}`}>
-                          fallback
-                        </span>
+                        <span className="text-[10px] text-zinc-500">fallback</span>
                       )}
-                      <kbd
-                        style={{
-                          fontSize: '11px',
-                          fontFamily: 'var(--font-mono, monospace)',
-                          color: 'var(--text-primary)',
-                          background: 'var(--bg-input)',
-                          border: '1px solid var(--border)',
-                          borderRadius: '4px',
-                          padding: '2px 6px',
-                        }}
-                      >
+                      <kbd className="px-3 py-1 bg-zinc-900 border border-zinc-700 rounded-xl text-xs font-mono text-white">
                         {activeCombo}
                       </kbd>
                     </div>
-                  </li>
+                  </div>
                 );
               })}
-            </ul>
-          </section>
+            </div>
+          </div>
         );
       })}
     </div>

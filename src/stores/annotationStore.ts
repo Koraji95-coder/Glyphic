@@ -25,7 +25,7 @@ export const useAnnotationStore = create<AnnotationState>((set) => ({
   imageSrc: null,
   annotationFilePath: null,
   activeTool: 'arrow',
-  color: '#ef4444',
+  color: '#a374f7', // Electric Violet (Midnight Eclipse primary accent)
   strokeWidth: 2,
   fontSize: 16,
   annotationData: null,

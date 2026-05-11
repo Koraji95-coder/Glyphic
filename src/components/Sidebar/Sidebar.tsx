@@ -1,5 +1,6 @@
 import { FileText, FolderOpen, HelpCircle, LayoutList, PinOff, Plus, Settings, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useVault } from '../../hooks/useVault';
 import { reportError } from '../../lib/errorReporter';
@@ -10,6 +11,7 @@ import { useLayoutStore } from '../../stores/layoutStore';
 import { usePromptModalStore } from '../../stores/promptModalStore';
 import { useSettingsUiStore } from '../../stores/settingsUiStore';
 import { useVaultStore } from '../../stores/vaultStore';
+
 import { ReviewSession } from '../Flashcards/ReviewSession';
 import { BacklinksPanel } from './BacklinksPanel';
 import { FileTree } from './FileTree';
@@ -20,8 +22,10 @@ export function Sidebar() {
   const [width, setWidth] = useState(260);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
+
   const { isSidebarOpen, closeSidebar, isFocusMode } = useLayoutStore();
   const openReview = useFlashcardReviewStore((s) => s.open);
+
   const vaultConfig = useVaultStore((s) => s.vaultConfig);
   const fileTree = useVaultStore((s) => s.fileTree);
   const vaultPath = useVaultStore((s) => s.vaultPath);
@@ -30,51 +34,48 @@ export function Sidebar() {
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
+
   const { createNote } = useVault();
   const { openPrompt } = usePromptModalStore();
 
-  // Count notes and folders
   const { noteCount, folderCount } = countEntries(fileTree);
   const vaultName = vaultConfig?.vault?.name || 'My Vault';
   const initial = vaultName.charAt(0).toUpperCase();
 
-  const handleNewNote = useCallback(
-    async (name?: string) => {
-      if (name) {
-        // direct from event
+  const handleNewNote = useCallback(async (name?: string) => {
+    if (name) {
+      try {
+        await createNote(selectedFolderPath, name);
+      } catch (e) {
+        reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
+      }
+      return;
+    }
+
+    openPrompt({
+      title: 'New Note',
+      placeholder: 'Note name',
+      onConfirm: async (result) => {
+        const noteName = typeof result === 'string' ? result.trim() : '';
+        if (!noteName) return;
         try {
-          await createNote(selectedFolderPath, name);
+          await createNote(selectedFolderPath, noteName);
         } catch (e) {
           reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
         }
-        return;
-      }
-      openPrompt({
-        title: 'New Note',
-        placeholder: 'Note name',
-        onConfirm: async (result) => {
-          const name = typeof result === 'string' ? result.trim() : '';
-          if (!name) return;
-          try {
-            await createNote(selectedFolderPath, name);
-          } catch (e) {
-            reportError({ context: 'Sidebar create note', message: 'Failed to create note', error: e });
-          }
-        },
-      });
-    },
-    [createNote, openPrompt, selectedFolderPath],
-  );
+      },
+    });
+  }, [createNote, openPrompt, selectedFolderPath]);
 
   const handleNewFolder = useCallback(() => {
     openPrompt({
       title: 'New Folder',
       placeholder: 'Folder name',
       onConfirm: async (result) => {
-        const name = typeof result === 'string' ? result.trim() : '';
-        if (!name || !vaultPath) return;
+        const folderName = typeof result === 'string' ? result.trim() : '';
+        if (!folderName || !vaultPath) return;
         try {
-          const base = selectedFolderPath ? `${selectedFolderPath}/${name}` : name;
+          const base = selectedFolderPath ? `${selectedFolderPath}/${folderName}` : folderName;
           await commands.createFolder(vaultPath, base);
           await refreshFileTree();
         } catch (e) {
@@ -85,8 +86,7 @@ export function Sidebar() {
   }, [vaultPath, refreshFileTree, openPrompt, selectedFolderPath]);
 
   const handleTrash = useCallback(() => {
-    // replace alert with toast (see step 5)
-    // or temporarily: openPrompt({ title: 'Trash Info', isConfirm: true, confirmLabel: 'OK', onConfirm: () => {} });
+    // TODO: Implement trash functionality later
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -96,12 +96,13 @@ export function Sidebar() {
     document.body.style.userSelect = 'none';
   }, []);
 
+  // Resize logic
   useEffect(() => {
     if (isMobile) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing.current) return;
-      const newWidth = Math.max(200, Math.min(500, e.clientX));
+      const newWidth = Math.max(220, Math.min(420, e.clientX));
       setWidth(newWidth);
     };
 
@@ -115,6 +116,7 @@ export function Sidebar() {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
@@ -123,117 +125,66 @@ export function Sidebar() {
 
   const sidebarContent = (
     <>
-      {/* Vault header */}
-      <div
-        style={{
-          padding: '10px 12px 6px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-        }}
-      >
-        {/* User / Vault info */}
-        <div className="flex items-center" style={{ gap: '8px', padding: '2px 4px' }}>
-          <div
-            className="flex items-center justify-center shrink-0"
-            style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '8px',
-              background: 'var(--accent-gradient)',
-              boxShadow: '0 10px 24px rgba(163,116,247,0.2)',
-              fontSize: '11px',
-              fontWeight: 700,
-              color: '#fff',
-            }}
-          >
+      {/* Vault Header */}
+      <div className="px-5 py-6 border-b border-zinc-800 bg-zinc-900/70 backdrop-blur-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-gradient-to-br from-violet-500 via-fuchsia-500 to-cyan-400 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-inner">
             {initial}
           </div>
-          <div style={{ minWidth: 0 }}>
-            <div className="truncate" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>
-              {vaultName}
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-lg tracking-tight truncate text-white">{vaultName}</div>
+            <div className="text-xs text-zinc-400">
+              {noteCount} notes • {folderCount} folders
             </div>
-            <div style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>
-              {noteCount} notes · {folderCount} folders
-            </div>
-          </div>
-        </div>
-
-        <SearchBar />
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <SectionLabel>Quick actions</SectionLabel>
-          <div className="flex" style={{ gap: '6px' }}>
-            <SidebarActionButton primary icon={<Plus size={13} />} onClick={() => handleNewNote()}>
-              New note
-            </SidebarActionButton>
-            <SidebarActionButton icon={<FolderOpen size={13} />} onClick={handleNewFolder}>
-              Folder
-            </SidebarActionButton>
           </div>
         </div>
       </div>
 
-      {/* Pinned notes section */}
+      <SearchBar />
+
+      {/* Quick Actions */}
+      <div className="px-4 py-5">
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 mb-3 px-2">Quick Actions</div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleNewNote()}
+            className="flex-1 flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 transition-colors text-white font-medium py-3 px-4 rounded-2xl text-sm shadow-inner"
+          >
+            <Plus size={16} />
+            New Note
+          </button>
+          <button
+            onClick={handleNewFolder}
+            className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 transition-colors font-medium py-3 px-4 rounded-2xl text-sm"
+          >
+            <FolderOpen size={16} />
+            Folder
+          </button>
+        </div>
+      </div>
+
+      {/* Pinned Notes */}
       {pinnedNotes.length > 0 && (
-        <div style={{ padding: '4px 10px 6px' }}>
-          <SectionLabel>Pinned</SectionLabel>
+        <div className="px-4 pb-4">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 mb-2 px-2">Pinned</div>
           {pinnedNotes.map((path) => {
             const name = path.replace(/\.md$/, '').split('/').pop() || path;
             return (
               <div
                 key={path}
-                className="flex items-center"
-                style={{
-                  gap: '6px',
-                  padding: '4px 8px',
-                  margin: '1px 2px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  color: 'var(--text-secondary)',
-                  transition: 'all 0.12s',
-                }}
                 onClick={() => setActiveNote(path, path)}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--bg-hover)';
-                  (e.currentTarget as HTMLDivElement).style.color = 'var(--text-primary)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent';
-                  (e.currentTarget as HTMLDivElement).style.color = 'var(--text-secondary)';
-                }}
+                className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-800 rounded-xl cursor-pointer group"
               >
-                <FileText size={11} style={{ flexShrink: 0 }} />
-                <span className="flex-1 truncate">{name}</span>
+                <FileText size={15} className="text-zinc-400" />
+                <span className="flex-1 truncate text-sm text-white">{name}</span>
                 <button
-                  type="button"
-                  title="Unpin note"
                   onClick={(e) => {
                     e.stopPropagation();
                     unpinNote(path);
                   }}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '2px',
-                    borderRadius: '4px',
-                    color: 'var(--text-ghost)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                    e.currentTarget.style.backgroundColor = 'var(--bg-active)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--text-ghost)';
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
+                  className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-400 transition-all"
                 >
-                  <PinOff size={10} />
+                  <PinOff size={14} />
                 </button>
               </div>
             );
@@ -241,80 +192,61 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* Tag filter chips */}
       <TagsPanel />
-
-      {/* Backlinks */}
       <BacklinksPanel />
 
-      {/* File tree */}
-      <div className="flex-1 overflow-y-auto" style={{ padding: '4px 0' }}>
+      {/* File Tree */}
+      <div className="flex-1 overflow-y-auto px-2 min-h-0">
         <FileTree />
       </div>
 
-      {/* Sidebar footer */}
-      <div
-        className="flex shrink-0"
-        style={{
-          padding: '6px 10px',
-          borderTop: '1px solid var(--glass-border)',
-          gap: '4px',
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
-        }}
-      >
-        <FooterButton
-          icon={<Settings size={12} />}
-          label="Settings"
+      {/* Footer Actions */}
+      <div className="border-t border-zinc-800 p-3 flex items-center gap-1 bg-zinc-900/70 backdrop-blur-xl">
+        <button
           onClick={() => useSettingsUiStore.getState().open('general')}
-        />
-        <FooterButton icon={<Trash2 size={12} />} label="Trash" onClick={handleTrash} />
-        <FooterButton icon={<HelpCircle size={12} />} label="Help" onClick={() => useHelpUiStore.getState().open()} />
-        <FooterButton icon={<LayoutList size={12} />} label="Review" onClick={openReview} />
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+        >
+          <Settings size={16} />
+          Settings
+        </button>
+        <button
+          onClick={handleTrash}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+        >
+          <Trash2 size={16} />
+          Trash
+        </button>
+        <button
+          onClick={() => useHelpUiStore.getState().open()}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+        >
+          <HelpCircle size={16} />
+          Help
+        </button>
+        <button
+          onClick={openReview}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+        >
+          <LayoutList size={16} />
+          Review
+        </button>
       </div>
+
       <ReviewSession />
     </>
   );
 
-  // In focus mode on desktop, hide the sidebar entirely
-  if (!isMobile && isFocusMode) {
-    return null;
-  }
+  if (!isMobile && isFocusMode) return null;
 
   if (isMobile) {
     return (
       <>
-        {/* Backdrop */}
         {isSidebarOpen && (
-          <div
-            onClick={closeSidebar}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              zIndex: 40,
-            }}
-          />
+          <div className="fixed inset-0 bg-black/60 z-40" onClick={closeSidebar} />
         )}
-
-        {/* Drawer */}
         <aside
-          className="flex flex-col h-full"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            width: '280px',
-            backgroundColor: 'var(--glass-surface)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
-            borderRight: '1px solid var(--glass-border)',
-            zIndex: 50,
-            transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
-            transition: 'transform 0.25s ease',
-            overflowY: 'auto',
-            overscrollBehavior: 'contain',
-          }}
+          className="fixed top-0 bottom-0 left-0 w-72 bg-[#050507] border-r border-zinc-800 z-50 flex flex-col transition-transform duration-300"
+          style={{ transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)' }}
         >
           {sidebarContent}
         </aside>
@@ -324,33 +256,22 @@ export function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col shrink-0 h-full relative"
-      style={{
-        width: `${width}px`,
-        backgroundColor: 'var(--glass-surface)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        borderRight: '1px solid var(--glass-border)',
-      }}
+      className="flex flex-col h-full relative border-r border-zinc-800 bg-[#050507]"
+      style={{ width: `${width}px` }}
     >
       {sidebarContent}
 
-      {/* Resize handle */}
+      {/* Resize Handle */}
       <div
         onMouseDown={handleMouseDown}
-        className="absolute top-0 right-0 w-1 h-full cursor-col-resize z-10 transition-colors"
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-dim)')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-violet-500/30 transition-colors z-10"
       />
     </aside>
   );
 }
 
 /** Count notes and folders recursively */
-function countEntries(entries: ReturnType<typeof useVaultStore.getState>['fileTree']): {
-  noteCount: number;
-  folderCount: number;
-} {
+function countEntries(entries: any[]): { noteCount: number; folderCount: number } {
   let noteCount = 0;
   let folderCount = 0;
   for (const e of entries) {
@@ -363,111 +284,4 @@ function countEntries(entries: ReturnType<typeof useVaultStore.getState>['fileTr
     }
   }
   return { noteCount, folderCount };
-}
-
-function SidebarActionButton({
-  children,
-  icon,
-  primary,
-  onClick,
-}: {
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-  primary?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center"
-      style={{
-        flex: 1,
-        gap: '6px',
-        padding: '8px 0',
-        borderRadius: '10px',
-        fontSize: '11px',
-        fontWeight: 600,
-        cursor: 'pointer',
-        border: primary ? '1px solid transparent' : '1px solid var(--glass-border)',
-        background: primary
-          ? 'linear-gradient(135deg, #ff8b5e, #fb923c)'
-          : 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-        color: primary ? '#fff' : 'var(--text-secondary)',
-        transition: 'all 0.15s',
-        boxShadow: primary ? '0 12px 28px rgba(249,118,85,0.26)' : 'inset 0 1px 0 rgba(255,255,255,0.04)',
-      }}
-      onMouseEnter={(e) => {
-        if (primary) {
-          e.currentTarget.style.filter = 'brightness(1.12)';
-        } else {
-          e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))';
-          e.currentTarget.style.color = 'var(--text-primary)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (primary) {
-          e.currentTarget.style.filter = '';
-        } else {
-          e.currentTarget.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))';
-          e.currentTarget.style.color = 'var(--text-secondary)';
-        }
-      }}
-    >
-      {icon}
-      {children}
-    </button>
-  );
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        fontSize: '9px',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-        color: 'var(--text-ghost)',
-        padding: '2px 4px 0',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function FooterButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center justify-center"
-      style={{
-        flex: 1,
-        gap: '5px',
-        padding: '7px 0',
-        borderRadius: '8px',
-        fontSize: '10px',
-        color: 'var(--text-ghost)',
-        cursor: 'pointer',
-        border: '1px solid transparent',
-        background: 'transparent',
-        transition: 'all 0.15s',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(45,212,191,0.12)';
-        e.currentTarget.style.borderColor = 'rgba(45,212,191,0.18)';
-        e.currentTarget.style.color = 'var(--accent-teal)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'transparent';
-        e.currentTarget.style.borderColor = 'transparent';
-        e.currentTarget.style.color = 'var(--text-ghost)';
-      }}
-    >
-      {icon}
-      {label}
-    </button>
-  );
 }

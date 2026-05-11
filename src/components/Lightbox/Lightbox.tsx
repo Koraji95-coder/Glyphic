@@ -1,11 +1,11 @@
 import { Maximize2, Minimize2, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { useLightboxStore } from '../../stores/lightboxStore';
 
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 8;
 
-/** Full-resolution image viewer with wheel-zoom and drag-pan. ESC closes. */
 export function Lightbox() {
   const { src, close } = useLightboxStore();
   const [zoom, setZoom] = useState(1);
@@ -52,14 +52,17 @@ export function Lightbox() {
       e.preventDefault();
       dragState.current = { startX: e.clientX, startY: e.clientY, originX: pan.x, originY: pan.y };
     },
-    [pan.x, pan.y],
+    [pan]
   );
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       const d = dragState.current;
       if (!d) return;
-      setPan({ x: d.originX + (e.clientX - d.startX), y: d.originY + (e.clientY - d.startY) });
+      setPan({
+        x: d.originX + (e.clientX - d.startX),
+        y: d.originY + (e.clientY - d.startY),
+      });
     };
     const onUp = () => {
       dragState.current = null;
@@ -80,20 +83,7 @@ export function Lightbox() {
       aria-modal="true"
       aria-label="Image viewer"
       onClick={close}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') close();
-      }}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.92)',
-        zIndex: 200,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        cursor: dragState.current ? 'grabbing' : 'grab',
-      }}
+      className="fixed inset-0 bg-black/95 z-[200] flex items-center justify-center overflow-hidden"
       onWheel={onWheel}
       onMouseDown={onMouseDown}
     >
@@ -102,69 +92,42 @@ export function Lightbox() {
         alt=""
         draggable={false}
         onClick={(e) => e.stopPropagation()}
+        className="max-w-none max-h-none select-none pointer-events-none"
         style={{
-          maxWidth: 'none',
-          maxHeight: 'none',
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
           transformOrigin: 'center center',
           transition: dragState.current ? 'none' : 'transform 0.08s ease-out',
-          userSelect: 'none',
-          pointerEvents: 'none',
           imageRendering: zoom > 2 ? 'pixelated' : 'auto',
         }}
       />
 
+      {/* Controls Bar */}
       <div
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        role="toolbar"
-        aria-label="Lightbox controls"
-        style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: '4px',
-          padding: '6px',
-          backgroundColor: 'rgba(20,20,28,0.85)',
-          border: '1px solid var(--border)',
-          borderRadius: '999px',
-          backdropFilter: 'blur(8px)',
-        }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-zinc-900/90 backdrop-blur-2xl border border-zinc-700 rounded-3xl px-2 py-2 shadow-2xl z-50"
       >
-        <ToolbarBtn label="Zoom out (-)" onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.25))}>
-          <ZoomOut size={14} />
+        <ToolbarBtn label="Zoom out" onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.25))}>
+          <ZoomOut size={16} />
         </ToolbarBtn>
-        <span
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 10px',
-            fontSize: '11px',
-            color: 'var(--text-tertiary)',
-            fontFamily: 'var(--font-mono, monospace)',
-            minWidth: '52px',
-            justifyContent: 'center',
-          }}
-        >
+
+        <span className="px-4 text-xs font-mono text-zinc-400 min-w-[52px] text-center">
           {Math.round(zoom * 100)}%
         </span>
-        <ToolbarBtn label="Zoom in (+)" onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.25))}>
-          <ZoomIn size={14} />
+
+        <ToolbarBtn label="Zoom in" onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.25))}>
+          <ZoomIn size={16} />
         </ToolbarBtn>
+
         <ToolbarBtn
-          label="Fit (0)"
+          label="Fit to screen"
           onClick={() => {
             setZoom(1);
             setPan({ x: 0, y: 0 });
           }}
         >
-          <Minimize2 size={14} />
+          <Minimize2 size={16} />
         </ToolbarBtn>
-        <ToolbarBtn label="100%" onClick={() => setZoom(1)}>
-          <Maximize2 size={14} />
-        </ToolbarBtn>
+
         <ToolbarBtn
           label="Reset"
           onClick={() => {
@@ -172,50 +135,37 @@ export function Lightbox() {
             setPan({ x: 0, y: 0 });
           }}
         >
-          <RotateCcw size={14} />
+          <RotateCcw size={16} />
         </ToolbarBtn>
       </div>
 
+      {/* Close Button */}
       <button
         type="button"
         onClick={close}
-        aria-label="Close viewer"
-        style={{
-          position: 'absolute',
-          top: '16px',
-          right: '16px',
-          background: 'rgba(20,20,28,0.85)',
-          border: '1px solid var(--border)',
-          color: 'var(--text-primary)',
-          cursor: 'pointer',
-          padding: '8px',
-          borderRadius: '50%',
-          backdropFilter: 'blur(8px)',
-        }}
+        className="absolute top-6 right-6 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-white p-3 rounded-3xl transition-colors z-50"
       >
-        <X size={16} />
+        <X size={20} />
       </button>
     </div>
   );
 }
 
-function ToolbarBtn({ children, label, onClick }: { children: React.ReactNode; label: string; onClick: () => void }) {
+function ToolbarBtn({
+  children,
+  label,
+  onClick,
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       title={label}
-      aria-label={label}
-      style={{
-        background: 'transparent',
-        border: 'none',
-        color: 'var(--text-secondary)',
-        cursor: 'pointer',
-        padding: '6px 8px',
-        borderRadius: '999px',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)')}
-      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+      className="flex items-center justify-center w-9 h-9 hover:bg-zinc-800 rounded-2xl transition-colors text-zinc-300 hover:text-white"
     >
       {children}
     </button>

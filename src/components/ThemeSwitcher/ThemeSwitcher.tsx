@@ -10,6 +10,7 @@ export function ThemeSwitcher() {
 
   const handleThemeChange = async (value: string) => {
     applyTheme(value as Parameters<typeof applyTheme>[0]);
+
     if (vaultPath && settings) {
       try {
         await updateSettings(vaultPath, {
@@ -17,41 +18,26 @@ export function ThemeSwitcher() {
           appearance: { ...settings.appearance, theme: value as typeof settings.appearance.theme },
         });
       } catch {
-        // Settings persistence may fail outside Tauri — theme still applied in DOM
+        // Settings persistence may fail outside Tauri — theme is still applied in DOM
       }
     }
   };
 
   return (
-    <div
-      className="flex items-center"
-      style={{
-        gap: '5px',
-        padding: '4px 8px',
-        borderRadius: '999px',
-        backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
-      }}
-    >
+    <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-3xl p-1 gap-1">
       {THEME_OPTIONS.map((opt) => {
-        // Match the current theme; default dark matches 'indigo'
-        const isActive = theme === opt.value || (opt.value === 'indigo' && (theme === 'dark' || theme === 'system'));
+        const isActive =
+          theme === opt.value || (opt.value === 'indigo' && (theme === 'dark' || theme === 'system'));
+
         return (
           <button
-            type="button"
             key={opt.value}
             onClick={() => handleThemeChange(opt.value)}
             title={opt.label}
-            style={{
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              border: isActive ? '2px solid var(--text-primary)' : '2px solid transparent',
-              background: opt.color,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              flexShrink: 0,
-            }}
+            className={`w-7 h-7 rounded-2xl flex items-center justify-center transition-all hover:scale-110 ${
+              isActive ? 'ring-2 ring-violet-400 ring-offset-2 ring-offset-zinc-900' : ''
+            }`}
+            style={{ background: opt.color }}
           />
         );
       })}

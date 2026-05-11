@@ -5,6 +5,7 @@ import App from './App';
 import './styles/globals.css';
 
 const isTauriRuntime = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
 const appTree = (
   <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
     <App />

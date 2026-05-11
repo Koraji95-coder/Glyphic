@@ -1,6 +1,6 @@
 import { Activity, BookOpen, FolderOpen, GraduationCap, Plus, Upload } from 'lucide-react';
-import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+
 import { commands, type FeTopicStats } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -56,7 +56,8 @@ export function Dashboard() {
   const fileTree = useVaultStore((s) => s.fileTree);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const openFePrep = useLayoutStore((s) => s.openFePrep);
-  const [sourcesIngested, setSourcesIngested] = useState<number>(0);
+
+  const [sourcesIngested, setSourcesIngested] = useState(0);
   const [feStats, setFeStats] = useState<FeTopicStats[]>([]);
 
   const notes = useMemo(() => flattenNotes(fileTree), [fileTree]);
@@ -82,233 +83,112 @@ export function Dashboard() {
   }, [feStats]);
 
   useEffect(() => {
-    void commands
-      .getFeStatistics()
-      .then((stats) => setFeStats(stats))
-      .catch(() => setFeStats([]));
+    void commands.getFeStatistics().then(setFeStats).catch(() => setFeStats([]));
   }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto" style={{ padding: '26px 28px 28px' }}>
-      <div className="grid" style={{ gap: '14px' }}>
-        <div
-          className="grid"
-          style={{
-            gap: '14px',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          }}
-        >
-          <StatCard label="Total notes" value={String(totalNotes)} icon={<BookOpen size={15} />} />
-          <StatCard label="Folders" value={String(totalFolders)} icon={<FolderOpen size={15} />} />
-          <StatCard label="Documents ingested" value={String(sourcesIngested)} icon={<Upload size={15} />} />
+    <div className="flex-1 overflow-y-auto p-7 bg-[#050507]">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Stats row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="Total notes" value={String(totalNotes)} icon={<BookOpen size={18} />} />
+          <StatCard label="Folders" value={String(totalFolders)} icon={<FolderOpen size={18} />} />
+          <StatCard label="Documents ingested" value={String(sourcesIngested)} icon={<Upload size={18} />} />
           <StatCard
             label="FE accuracy"
-            value={feSummary.attempts > 0 ? `${feSummary.accuracy}%` : '--'}
-            icon={<GraduationCap size={15} />}
+            value={feSummary.attempts > 0 ? `${feSummary.accuracy}%` : '—'}
+            icon={<GraduationCap size={18} />}
           />
         </div>
 
-        <div
-          className="grid"
-          style={{
-            gap: '14px',
-            gridTemplateColumns: 'minmax(280px, 1.3fr) minmax(240px, 1fr)',
-          }}
-        >
-          <section style={panelStyle}>
-            <header className="flex items-center justify-between" style={{ marginBottom: '10px' }}>
-              <h2 style={headingStyle}>Recent notes</h2>
-              <span style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>{recentNotes.length} items</span>
-            </header>
-            <div className="flex flex-col" style={{ gap: '6px' }}>
-              {recentNotes.length === 0 && (
-                <div style={{ fontSize: '12px', color: 'var(--text-ghost)' }}>No notes yet. Create one to begin.</div>
-              )}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Recent notes */}
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold text-white">Recent notes</h2>
+              <span className="text-xs text-zinc-400">{recentNotes.length} items</span>
+            </div>
+            <div className="space-y-2">
               {recentNotes.map((note) => (
                 <button
                   key={note.path}
-                  type="button"
                   onClick={() => setActiveNote(note.path, note.path)}
-                  className="flex items-center justify-between"
-                  style={listButtonStyle}
+                  className="w-full flex justify-between items-center px-5 py-4 hover:bg-zinc-800 rounded-2xl transition-colors text-left"
                 >
-                  <span className="truncate" style={{ maxWidth: '75%' }}>
-                    {note.title}
-                  </span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>
-                    {formatRelative(note.modifiedAt)}
-                  </span>
+                  <span className="text-zinc-200 truncate">{note.title}</span>
+                  <span className="text-xs text-zinc-400 font-mono">{formatRelative(note.modifiedAt)}</span>
                 </button>
               ))}
             </div>
-          </section>
+          </div>
 
-          <section style={panelStyle}>
-            <header className="flex items-center justify-between" style={{ marginBottom: '10px' }}>
-              <h2 style={headingStyle}>FE prep progress</h2>
-              <span style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>{feSummary.attempts} attempts</span>
-            </header>
-            <div className="flex flex-col" style={{ gap: '8px' }}>
+          {/* FE Prep progress */}
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold text-white">FE Prep Progress</h2>
+              <span className="text-xs text-zinc-400">{feSummary.attempts} attempts</span>
+            </div>
+            <div className="space-y-6">
               {feStats.slice(0, 5).map((topic) => (
-                <div key={topic.topic_id} style={{ display: 'grid', gap: '4px' }}>
-                  <div
-                    className="flex items-center justify-between"
-                    style={{ fontSize: '11px', color: 'var(--text-secondary)' }}
-                  >
+                <div key={topic.topic_id}>
+                  <div className="flex justify-between text-xs text-zinc-400 mb-2">
                     <span>Topic #{topic.topic_id}</span>
                     <span>{Math.round(topic.accuracy)}%</span>
                   </div>
-                  <div style={{ height: '6px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)' }}>
+                  <div className="h-2 bg-zinc-800 rounded-3xl overflow-hidden">
                     <div
-                      style={{
-                        width: `${Math.max(6, Math.min(100, Math.round(topic.accuracy)))}%`,
-                        height: '100%',
-                        borderRadius: '999px',
-                        background: 'var(--accent-gradient)',
-                      }}
+                      className="h-2 bg-gradient-to-r from-violet-400 to-cyan-400 rounded-3xl transition-all"
+                      style={{ width: `${Math.min(100, Math.round(topic.accuracy))}%` }}
                     />
                   </div>
                 </div>
               ))}
-              {feStats.length === 0 && (
-                <div style={{ fontSize: '12px', color: 'var(--text-ghost)' }}>
-                  No FE attempts yet. Start a session to track progress.
-                </div>
-              )}
             </div>
-          </section>
+          </div>
         </div>
 
-        <section style={panelStyle}>
-          <header className="flex items-center justify-between" style={{ marginBottom: '10px' }}>
-            <h2 style={headingStyle}>Quick actions</h2>
-            <Activity size={14} style={{ color: 'var(--text-ghost)' }} />
-          </header>
-          <div className="flex flex-wrap" style={{ gap: '10px' }}>
+        {/* Quick actions */}
+        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+          <h2 className="font-semibold text-white mb-5">Quick actions</h2>
+          <div className="flex flex-wrap gap-3">
             <button
-              type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('glyphic:new-note'))}
-              style={primaryActionStyle}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-cyan-400 text-white rounded-3xl font-medium hover:brightness-110 transition-all"
             >
-              <Plus size={14} /> New note
+              <Plus size={18} />
+              New note
             </button>
             <button
-              type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('glyphic:new-folder'))}
-              style={secondaryActionStyle}
+              className="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl font-medium transition-all"
             >
-              <FolderOpen size={14} /> New folder
+              <FolderOpen size={18} />
+              New folder
             </button>
             <button
-              type="button"
-              onClick={() => {
-                const path = window.prompt('Path to document:');
-                if (!path) return;
-                void commands.ingestDocument(path, []).then(() => setSourcesIngested((v) => v + 1));
-              }}
-              style={secondaryActionStyle}
+              onClick={openFePrep}
+              className="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl font-medium transition-all"
             >
-              <Upload size={14} /> Import document
-            </button>
-            <button type="button" onClick={openFePrep} style={secondaryActionStyle}>
-              <GraduationCap size={14} /> Start FE session
+              <GraduationCap size={18} />
+              Start FE session
             </button>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
+function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <div
-      className="flex items-center"
-      style={{
-        gap: '10px',
-        borderRadius: '14px',
-        border: '1px solid var(--glass-border)',
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-        padding: '12px',
-      }}
-    >
-      <div
-        className="flex items-center justify-center"
-        style={{
-          width: '30px',
-          height: '30px',
-          borderRadius: '10px',
-          color: 'var(--text-primary)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          background: 'rgba(255,255,255,0.05)',
-          flexShrink: 0,
-        }}
-      >
+    <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 flex items-center gap-4">
+      <div className="w-10 h-10 bg-zinc-800 rounded-2xl flex items-center justify-center text-violet-300">
         {icon}
       </div>
       <div>
-        <div
-          style={{ fontSize: '10px', color: 'var(--text-ghost)', textTransform: 'uppercase', letterSpacing: '0.04em' }}
-        >
-          {label}
-        </div>
-        <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1 }}>{value}</div>
+        <div className="text-xs text-zinc-400 tracking-widest">{label}</div>
+        <div className="text-3xl font-semibold text-white mt-1">{value}</div>
       </div>
     </div>
   );
 }
-
-const panelStyle: CSSProperties = {
-  borderRadius: '16px',
-  border: '1px solid var(--glass-border)',
-  background: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), var(--glass-surface)',
-  backdropFilter: 'var(--glass-blur)',
-  WebkitBackdropFilter: 'var(--glass-blur)',
-  padding: '14px',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-};
-
-const headingStyle: CSSProperties = {
-  fontSize: '16px',
-  fontWeight: 600,
-  color: 'var(--text-primary)',
-  fontFamily: 'var(--font-display)',
-};
-
-const listButtonStyle: CSSProperties = {
-  border: '1px solid var(--glass-border)',
-  background: 'rgba(255,255,255,0.03)',
-  borderRadius: '10px',
-  color: 'var(--text-secondary)',
-  padding: '8px 10px',
-  cursor: 'pointer',
-  textAlign: 'left',
-};
-
-const primaryActionStyle: CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  border: '1px solid transparent',
-  background: 'var(--accent-gradient)',
-  color: '#fff',
-  borderRadius: '10px',
-  padding: '8px 12px',
-  fontSize: '12px',
-  fontWeight: 600,
-  cursor: 'pointer',
-};
-
-const secondaryActionStyle: CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  border: '1px solid var(--glass-border)',
-  background: 'rgba(255,255,255,0.03)',
-  color: 'var(--text-secondary)',
-  borderRadius: '10px',
-  padding: '8px 12px',
-  fontSize: '12px',
-  fontWeight: 600,
-  cursor: 'pointer',
-};

@@ -1,11 +1,11 @@
-import { FolderOpen, Plus } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
+
 import { useTagsStore } from '../../stores/tagsStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
 import { FileTreeItem } from './FileTreeItem';
 
-/** Recursively keep only files in `filtered` and folders that contain at least
- *  one descendant file in `filtered`. */
+/** Recursively filter tree to only show files that match the tag filter */
 function filterTree(entries: VaultEntry[], filtered: Set<string>): VaultEntry[] {
   const out: VaultEntry[] = [];
   for (const e of entries) {
@@ -30,45 +30,20 @@ export function FileTree() {
 
   if (!fileTree || fileTree.length === 0) {
     return (
-      <div
-        className="flex flex-col items-center justify-center h-full px-4 text-center"
-        style={{ color: 'var(--text-tertiary)', gap: '6px', paddingBottom: '40px' }}
-      >
-        <span
-          style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '10px',
-            border: '1px solid var(--glass-border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--accent)',
-            background: 'rgba(255,255,255,0.03)',
-          }}
-        >
-          <FolderOpen size={16} />
-        </span>
-        <p className="text-sm" style={{ fontWeight: 500 }}>
-          No notes yet
-        </p>
-        <p className="text-xs" style={{ color: 'var(--text-ghost)', lineHeight: 1.5 }}>
-          Create your first note with{' '}
-          <strong style={{ color: 'var(--accent-warm)' }}>
-            <Plus size={11} style={{ display: 'inline', verticalAlign: '-1px' }} /> New note
-          </strong>
-        </p>
+      <div className="flex flex-col items-center justify-center h-full px-6 text-center py-12">
+        <div className="w-12 h-12 bg-zinc-800 rounded-3xl flex items-center justify-center mb-4">
+          <FolderOpen size={24} className="text-zinc-400" />
+        </div>
+        <p className="text-zinc-300 font-medium">No notes yet</p>
+        <p className="text-xs text-zinc-500 mt-1">Create your first note to get started</p>
       </div>
     );
   }
 
   if (filteredPaths && visible.length === 0) {
     return (
-      <div
-        className="flex flex-col items-center justify-center px-4 text-center"
-        style={{ color: 'var(--text-tertiary)', padding: '16px 8px' }}
-      >
-        <p className="text-sm">No notes tagged #{selectedTag}</p>
+      <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+        <p className="text-zinc-400 text-sm">No notes tagged #{selectedTag}</p>
       </div>
     );
   }

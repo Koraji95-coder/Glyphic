@@ -8,21 +8,18 @@ import { useMemo } from 'react';
  * - Parses content for math delimiters and renders with KaTeX.renderToString
  * - Non-math text is rendered as plain text nodes.
  * - All HTML is sanitized with DOMPurify before insertion.
- * - Display math ($$...$$) is centered; inline math ($...$) flows with text.
+ * - Display math ($$...$$) is centered with proper spacing.
  */
 export function MathBlock({ content }: { content: string }): React.ReactElement {
   const html = useMemo(() => {
-    // Parse content into segments: text, inline math, or display math
     const segments: Array<{ type: 'text' | 'inline' | 'display'; content: string }> = [];
 
-    // Use a regex to find display ($$...$$) and inline ($...$) math.
-    // Match $$ first (display), then $ (inline), treating everything else as text.
     const displayRegex = /\$\$(.*?)\$\$/gs;
     const inlineRegex = /\$(.*?)\$/g;
 
     let lastIndex = 0;
 
-    // First pass: extract display math
+    // Extract display math first
     const displayMatches: Array<{ start: number; end: number; content: string }> = [];
     let match = displayRegex.exec(content);
     while (match !== null) {
@@ -34,7 +31,7 @@ export function MathBlock({ content }: { content: string }): React.ReactElement 
       match = displayRegex.exec(content);
     }
 
-    // Second pass: extract inline math, being careful not to overlap with display math
+    // Extract inline math (avoiding display math ranges)
     const inlineMatches: Array<{ start: number; end: number; content: string }> = [];
     match = inlineRegex.exec(content);
     while (match !== null) {
@@ -51,10 +48,8 @@ export function MathBlock({ content }: { content: string }): React.ReactElement 
       match = inlineRegex.exec(content);
     }
 
-    // Merge and sort all matches
     const allMatches = [...displayMatches, ...inlineMatches].sort((a, b) => a.start - b.start);
 
-    // Build segments
     lastIndex = 0;
     for (const m of allMatches) {
       if (lastIndex < m.start) {
@@ -68,7 +63,6 @@ export function MathBlock({ content }: { content: string }): React.ReactElement 
       segments.push({ type: 'text', content: content.substring(lastIndex) });
     }
 
-    // Render each segment to HTML
     let html = '';
     for (const seg of segments) {
       if (seg.type === 'text') {
@@ -86,14 +80,13 @@ export function MathBlock({ content }: { content: string }): React.ReactElement 
             displayMode: true,
             throwOnError: false,
           });
-          html += `<div class="math-display" style="text-align:center;margin:0.5em 0;">${rendered}</div>`;
+          html += `<div class="math-display text-center my-3">${rendered}</div>`;
         } catch {
           html += escapeHtml(`$$${seg.content}$$`);
         }
       }
     }
 
-    // Sanitize before returning
     return DOMPurify.sanitize(html, {
       ALLOWED_TAGS: [
         'span',
@@ -149,9 +142,6 @@ export function MathBlock({ content }: { content: string }): React.ReactElement 
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-/**
- * Escape HTML special characters in text segments.
- */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
     '&': '&amp;',

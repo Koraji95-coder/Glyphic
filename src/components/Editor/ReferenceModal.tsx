@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js';
 import { Link2, Search, X } from 'lucide-react';
 import { type KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { reportError } from '../../lib/errorReporter';
 import { useEditorActionStore } from '../../stores/editorActionStore';
 import { type ReferenceMode, useEditorModalStore } from '../../stores/editorModalStore';
@@ -37,16 +38,13 @@ export function ReferenceModal() {
   const [text, setText] = useState('');
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+
   const modalRef = useRef<HTMLDivElement>(null);
   const primaryInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const fileTree = useVaultStore((s) => s.fileTree);
   const allNotes = useMemo(() => flattenEntries(fileTree), [fileTree]);
-
-  const focusPrimaryInput = useCallback(() => {
-    setTimeout(() => primaryInputRef.current?.focus(), 50);
-  }, []);
 
   const fuse = useMemo(
     () =>
@@ -55,7 +53,7 @@ export function ReferenceModal() {
         threshold: 0.4,
         includeScore: true,
       }),
-    [allNotes],
+    [allNotes]
   );
 
   const results = useMemo(() => {
@@ -63,17 +61,19 @@ export function ReferenceModal() {
     return fuse.search(query).map((r) => r.item);
   }, [query, fuse, allNotes]);
 
+  const focusPrimaryInput = useCallback(() => {
+    setTimeout(() => primaryInputRef.current?.focus(), 50);
+  }, []);
+
   useEffect(() => {
-    focusPrimaryInput();
-  }, [focusPrimaryInput]);
+    if (referenceModalOpen) focusPrimaryInput();
+  }, [referenceModalOpen, focusPrimaryInput]);
 
   useEffect(() => {
     if (!listRef.current || referenceMode !== 'backlink') return;
     const items = listRef.current.querySelectorAll<HTMLButtonElement>('button[role="option"]');
     const item = items[selectedIndex];
-    if (item && typeof item.scrollIntoView === 'function') {
-      item.scrollIntoView({ block: 'nearest' });
-    }
+    item?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex, referenceMode]);
 
   const trapFocus = (event: ReactKeyboardEvent) => {
@@ -81,8 +81,8 @@ export function ReferenceModal() {
 
     const focusables = Array.from(
       modalRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      ),
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
     ).filter((el) => !el.hasAttribute('hidden'));
 
     if (focusables.length === 0) return;
@@ -96,7 +96,6 @@ export function ReferenceModal() {
       first.focus();
       return;
     }
-
     if (event.shiftKey && active === first) {
       event.preventDefault();
       last.focus();
@@ -109,11 +108,7 @@ export function ReferenceModal() {
       onInsertLink(url.trim(), text.trim() || undefined);
       closeReferenceModal();
     } catch (error) {
-      reportError({
-        context: 'Insert reference',
-        message: 'Unable to insert link. Try reopening the editor.',
-        error,
-      });
+      reportError({ context: 'Insert reference', message: 'Unable to insert link', error });
     }
   };
 
@@ -122,11 +117,7 @@ export function ReferenceModal() {
       onInsertBacklink(title);
       closeReferenceModal();
     } catch (error) {
-      reportError({
-        context: 'Insert reference',
-        message: 'Unable to insert backlink. Try reopening the editor.',
-        error,
-      });
+      reportError({ context: 'Insert reference', message: 'Unable to insert backlink', error });
     }
   };
 
@@ -167,94 +158,47 @@ export function ReferenceModal() {
 
   if (!referenceModalOpen) return null;
 
-  const activeTint = referenceMode === 'link' ? '#3b82f6' : '#8b5cf6';
-
   return (
     <div
       onClick={closeReferenceModal}
-      onKeyDown={(e) => e.stopPropagation()}
+      className="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-label="Insert reference"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: 200,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
     >
       <div
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
-        role="document"
-        style={{
-          width: 'min(460px, 92vw)',
-          maxHeight: '76vh',
-          backgroundColor: 'var(--bg-app)',
-          border: '1px solid var(--border)',
-          borderRadius: '10px',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
+        className="w-full max-w-[460px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
       >
-        <div
-          style={{
-            padding: '12px 16px',
-            borderBottom: `1px solid color-mix(in oklab, var(--border) 75%, ${activeTint} 25%)`,
-            background: `color-mix(in oklab, var(--bg-sidebar) 86%, ${activeTint} 14%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Link2 size={14} style={{ color: 'var(--text-primary)' }} />
-            <h2 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-              Insert Reference
-            </h2>
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-zinc-700 flex items-center justify-between bg-zinc-900">
+          <div className="flex items-center gap-3">
+            <Link2 className="text-violet-400" size={18} />
+            <h2 className="text-lg font-semibold text-white">Insert Reference</h2>
           </div>
           <button
-            type="button"
             onClick={closeReferenceModal}
-            aria-label="Close"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-tertiary)',
-              padding: '4px',
-              borderRadius: '4px',
-            }}
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
           >
-            <X size={16} />
+            <X size={20} />
           </button>
         </div>
 
-        <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: '8px' }}>
+        {/* Mode tabs */}
+        <div className="flex gap-2 px-6 pt-4 pb-2 border-b border-zinc-700">
           {(['link', 'backlink'] as ReferenceMode[]).map((mode) => {
             const active = referenceMode === mode;
             return (
               <button
                 key={mode}
-                type="button"
                 onClick={() => onModeChange(mode)}
-                aria-pressed={active}
-                style={{
-                  padding: '5px 10px',
-                  borderRadius: '999px',
-                  border: '1px solid var(--border)',
-                  backgroundColor: active ? 'var(--accent-dim)' : 'var(--bg-card)',
-                  color: active ? 'var(--accent)' : 'var(--text-secondary)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
+                className={`px-5 py-2 rounded-3xl text-sm font-medium transition-all ${
+                  active
+                    ? 'bg-violet-500 text-white shadow-inner'
+                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                }`}
               >
                 {mode === 'link' ? 'External Link' : 'Vault Backlink'}
               </button>
@@ -262,111 +206,54 @@ export function ReferenceModal() {
           })}
         </div>
 
+        {/* Link mode */}
         {referenceMode === 'link' ? (
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label
-                htmlFor="reference-url-input"
-                style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}
-              >
-                URL *
-              </label>
+          <div className="p-6 space-y-6">
+            <div>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">URL</label>
               <input
-                id="reference-url-input"
                 ref={primaryInputRef}
                 type="text"
                 placeholder="https://example.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                style={{
-                  backgroundColor: 'var(--bg-input)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  padding: '6px 10px',
-                  outline: 'none',
-                }}
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-4 py-3 text-white outline-none"
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <label
-                htmlFor="reference-text-input"
-                style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}
-              >
-                Link text (optional)
-              </label>
+            <div>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">Link text (optional)</label>
               <input
-                id="reference-text-input"
                 type="text"
                 placeholder="Leave empty to use URL"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                style={{
-                  backgroundColor: 'var(--bg-input)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  padding: '6px 10px',
-                  outline: 'none',
-                }}
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-4 py-3 text-white outline-none"
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
+            <div className="flex justify-end gap-3">
               <button
-                type="button"
                 onClick={closeReferenceModal}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
+                className="px-6 py-3 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
               >
                 Cancel
               </button>
               <button
-                type="button"
                 onClick={insertLink}
                 disabled={!url.trim()}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: 'var(--accent)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  color: '#fff',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: url.trim() ? 'pointer' : 'not-allowed',
-                  opacity: url.trim() ? 1 : 0.5,
-                }}
+                className="px-6 py-3 bg-violet-500 hover:bg-violet-400 disabled:opacity-50 text-white font-medium rounded-2xl transition-colors"
               >
-                Insert
+                Insert Link
               </button>
             </div>
           </div>
         ) : (
+          /* Backlink mode */
           <>
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  backgroundColor: 'var(--bg-input)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  paddingLeft: '8px',
-                  gap: '6px',
-                }}
-              >
-                <Search size={14} style={{ color: 'var(--text-ghost)' }} />
+            <div className="px-6 pt-4 pb-3 border-b border-zinc-700">
+              <div className="flex items-center bg-zinc-800 border border-zinc-700 rounded-3xl px-4">
+                <Search size={16} className="text-zinc-400" />
                 <input
                   ref={primaryInputRef}
                   type="text"
@@ -376,63 +263,34 @@ export function ReferenceModal() {
                     setQuery(e.target.value);
                     setSelectedIndex(0);
                   }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    color: 'var(--text-primary)',
-                    fontSize: '13px',
-                    padding: '6px 8px',
-                    outline: 'none',
-                  }}
+                  className="flex-1 bg-transparent border-none px-3 py-3 text-white outline-none text-sm"
                 />
               </div>
             </div>
-            <div ref={listRef} style={{ flex: 1, overflowY: 'auto', maxHeight: 'calc(76vh - 140px)' }}>
+
+            <div ref={listRef} className="flex-1 overflow-y-auto max-h-[380px]">
               {results.length === 0 ? (
-                <div
-                  style={{ padding: '20px 16px', textAlign: 'center', color: 'var(--text-ghost)', fontSize: '13px' }}
-                >
-                  <div style={{ marginBottom: '10px' }}>No notes found</div>
+                <div className="p-8 text-center">
+                  <p className="text-zinc-400 mb-4">No notes found</p>
                   <button
-                    type="button"
                     onClick={() => onModeChange('link')}
-                    style={{
-                      padding: '5px 10px',
-                      borderRadius: '6px',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'var(--bg-card)',
-                      color: 'var(--text-secondary)',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
+                    className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-2xl text-sm"
                   >
                     Insert External Link Instead
                   </button>
                 </div>
               ) : (
-                <div role="listbox" aria-label="Backlink search results">
+                <div role="listbox" className="divide-y divide-zinc-700">
                   {results.map((note, idx) => (
                     <button
                       key={note.path}
-                      type="button"
                       role="option"
                       aria-selected={idx === selectedIndex}
                       onClick={() => insertBacklink(note.title)}
                       onMouseEnter={() => setSelectedIndex(idx)}
-                      style={{
-                        width: '100%',
-                        padding: '10px 16px',
-                        border: 'none',
-                        borderBottom: '1px solid var(--border)',
-                        backgroundColor: idx === selectedIndex ? 'var(--accent-dim)' : 'transparent',
-                        color: idx === selectedIndex ? 'var(--accent)' : 'var(--text-primary)',
-                        fontSize: '13px',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.1s',
-                      }}
+                      className={`w-full px-6 py-4 text-left transition-colors ${
+                        idx === selectedIndex ? 'bg-violet-500/10 text-violet-300' : 'hover:bg-zinc-800'
+                      }`}
                     >
                       {note.title}
                     </button>
@@ -443,17 +301,13 @@ export function ReferenceModal() {
           </>
         )}
 
-        <div
-          style={{
-            padding: '8px 12px',
-            borderTop: '1px solid var(--border)',
-            color: 'var(--text-ghost)',
-            fontSize: '11px',
-          }}
-        >
-          {referenceMode === 'link'
-            ? 'Enter to insert, Esc to close.'
-            : 'Arrow keys to move, Enter to insert, Esc to close.'}
+        {/* Footer hint */}
+        <div className="px-6 py-3 text-xs text-zinc-400 border-t border-zinc-700 flex justify-between items-center">
+          <span>
+            {referenceMode === 'link'
+              ? 'Enter to insert • Esc to close'
+              : '↑↓ to navigate • Enter to insert • Esc to close'}
+          </span>
         </div>
       </div>
     </div>

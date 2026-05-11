@@ -1,5 +1,6 @@
 import { ArrowLeft, BookOpen, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
+
 import { useEditorStore } from '../../stores/editorStore';
 import { useFlashcardReviewStore } from '../../stores/flashcardReviewStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -26,32 +27,38 @@ export function ReviewSession() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const hasNote = noteContent.trim().length > 0;
 
-  // Keyboard: Space/Enter to flip, 1=Again, 2=Good, 3=Easy, Escape to close
+  // Keyboard shortcuts
   useEffect(() => {
     if (!isOpen) return;
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         close();
         return;
       }
+
       if (sessionComplete || cards.length === 0) return;
+
       const current = cards[currentIndex];
       if (!current) return;
-      // Ignore keypresses when focus is on an interactive element (button, input, etc.)
+
       const target = e.target as HTMLElement;
       const isInteractive = target instanceof HTMLButtonElement || target instanceof HTMLInputElement;
+
       if (e.key === ' ') {
         if (isInteractive) return;
         e.preventDefault();
         if (!isFlipped) flipCard();
         return;
       }
+
       if (isFlipped) {
         if (e.key === '1') rateCard('again', activeNotePath ?? '');
         else if (e.key === '2') rateCard('good', activeNotePath ?? '');
         else if (e.key === '3') rateCard('easy', activeNotePath ?? '');
       }
     };
+
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [isOpen, sessionComplete, cards, currentIndex, isFlipped, flipCard, rateCard, close, activeNotePath]);
@@ -60,159 +67,84 @@ export function ReviewSession() {
 
   const currentCard = cards[currentIndex];
   const totalCards = cards.length;
+
   const againCount = Object.values(ratings).filter((r) => r === 'again').length;
   const goodCount = Object.values(ratings).filter((r) => r === 'good').length;
   const easyCount = Object.values(ratings).filter((r) => r === 'easy').length;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Flashcard Review Session"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 200,
-        backgroundColor: 'var(--bg-app)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-      }}
-    >
+    <div className="flex flex-col h-full bg-[#050507] overflow-hidden">
       {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 20px',
-          borderBottom: '1px solid var(--border)',
-          backgroundColor: 'var(--bg-sidebar)',
-          flexShrink: 0,
-        }}
-      >
+      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700 bg-zinc-900 shrink-0">
         <button
-          type="button"
           onClick={close}
-          aria-label="Close review session"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 10px',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border)',
-            backgroundColor: 'transparent',
-            color: 'var(--text-secondary)',
-            fontSize: '12px',
-            cursor: 'pointer',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
         >
-          <ArrowLeft size={13} />
+          <ArrowLeft size={18} />
           Back
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <BookOpen size={15} style={{ color: 'var(--accent)' }} />
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Review Session</span>
+        <div className="flex items-center gap-3">
+          <BookOpen className="text-violet-400" size={20} />
+          <span className="font-semibold text-white">Review Session</span>
         </div>
 
-        {/* Progress pill */}
         {totalCards > 0 && !sessionComplete && (
-          <span
-            style={{
-              fontSize: '11px',
-              color: 'var(--text-secondary)',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: '20px',
-              padding: '3px 10px',
-            }}
-          >
+          <div className="px-4 py-1 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-3xl">
             {currentIndex + 1} / {totalCards}
-          </span>
-        )}
-        {(totalCards === 0 || sessionComplete) && <div style={{ width: '60px' }} />}
-      </div>
-
-      {/* Body */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px 24px',
-          gap: '32px',
-        }}
-      >
-        {/* Loading state */}
-        {isLoading && (
-          <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                border: '3px solid var(--border)',
-                borderTopColor: 'var(--accent)',
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite',
-                margin: '0 auto 16px',
-              }}
-            />
-            <p style={{ fontSize: '14px' }}>Generating flashcards…</p>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
         )}
 
-        {/* Error state */}
+        {(totalCards === 0 || sessionComplete) && (
+          <div className="px-4 py-1 bg-emerald-500/10 text-emerald-300 text-sm font-medium rounded-3xl">
+            Complete
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-8 min-h-0">
+        {/* Loading */}
+        {isLoading && (
+          <div className="flex flex-col items-center gap-4 text-zinc-400">
+            <RefreshCw className="animate-spin" size={32} />
+            <p>Generating flashcards…</p>
+          </div>
+        )}
+
+        {/* Error */}
         {!isLoading && error && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '24px',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid rgba(224,112,112,0.3)',
-              backgroundColor: 'rgba(224,112,112,0.05)',
-              maxWidth: '400px',
-            }}
-          >
-            <p style={{ fontSize: '14px', color: 'var(--error)', marginBottom: '12px' }}>{error}</p>
+          <div className="max-w-md text-center">
+            <p className="text-red-400 mb-6">{error}</p>
             {hasNote && (
               <button
-                type="button"
                 onClick={() => loadCards(noteContent, activeNotePath ?? '')}
-                style={secondaryBtnStyle}
+                className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl flex items-center gap-2 mx-auto"
               >
-                <RefreshCw size={12} />
+                <RefreshCw size={16} />
                 Try again
               </button>
             )}
           </div>
         )}
 
-        {/* Empty state — no cards and not loading */}
+        {/* Empty state */}
         {!isLoading && !error && totalCards === 0 && (
-          <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-            <div style={{ fontSize: '40px', marginBottom: '16px' }}>🃏</div>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
-              No cards due
-            </p>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+          <div className="text-center max-w-md">
+            <div className="mx-auto w-16 h-16 bg-zinc-800 rounded-3xl flex items-center justify-center mb-6">
+              🃏
+            </div>
+            <p className="text-xl font-medium text-white mb-2">No cards due</p>
+            <p className="text-zinc-400 mb-8">
               {hasNote
                 ? 'Generate flashcards from the current note to start reviewing.'
                 : 'Open a note and generate flashcards from it first.'}
             </p>
             {hasNote && (
               <button
-                type="button"
                 onClick={() => loadCards(noteContent, activeNotePath ?? '')}
-                style={primaryBtnStyle}
+                className="px-8 py-3 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl flex items-center gap-2 mx-auto"
               >
-                <Sparkles size={13} />
+                <Sparkles size={18} />
                 Generate flashcards
               </button>
             )}
@@ -221,81 +153,72 @@ export function ReviewSession() {
 
         {/* Session complete */}
         {!isLoading && !error && sessionComplete && (
-          <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎉</div>
-            <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-              Session complete!
-            </p>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
-              You reviewed {totalCards} card{totalCards !== 1 ? 's' : ''}.
+          <div className="text-center max-w-md">
+            <div className="mx-auto w-16 h-16 bg-emerald-500/10 text-emerald-300 rounded-3xl flex items-center justify-center text-4xl mb-6">
+              🎉
+            </div>
+            <p className="text-2xl font-semibold text-white mb-2">Session complete!</p>
+            <p className="text-zinc-400 mb-8">
+              You reviewed {totalCards} card{totalCards !== 1 ? 's' : ''}
             </p>
 
-            {/* Summary */}
-            <div
-              style={{
-                display: 'flex',
-                gap: '12px',
-                justifyContent: 'center',
-                marginBottom: '28px',
+            <div className="flex justify-center gap-8 mb-10">
+              <SummaryPill label="Again" count={againCount} color="red" />
+              <SummaryPill label="Good" count={goodCount} color="amber" />
+              <SummaryPill label="Easy" count={easyCount} color="emerald" />
+            </div>
+
+            <button
+              onClick={() => {
+                resetSession();
+                if (hasNote) loadCards(noteContent, activeNotePath ?? '');
               }}
+              className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl flex items-center gap-2 mx-auto"
             >
-              <SummaryPill label="Again" count={againCount} color="var(--red)" />
-              <SummaryPill label="Good" count={goodCount} color="var(--accent)" />
-              <SummaryPill label="Easy" count={easyCount} color="var(--green)" />
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button type="button" onClick={resetSession} style={primaryBtnStyle}>
-                <RefreshCw size={13} />
-                Review again
-              </button>
-              {hasNote && (
-                <button
-                  type="button"
-                  onClick={() => loadCards(noteContent, activeNotePath ?? '')}
-                  style={secondaryBtnStyle}
-                >
-                  <Sparkles size={13} />
-                  Regenerate
-                </button>
-              )}
-            </div>
+              Review again
+            </button>
           </div>
         )}
 
         {/* Active card */}
         {!isLoading && !error && !sessionComplete && currentCard && (
-          <>
-            <ReviewCard card={currentCard} isFlipped={isFlipped} onFlip={flipCard} />
+          <div className="w-full max-w-2xl">
+            <ReviewCard
+              card={currentCard}
+              isFlipped={isFlipped}
+              onFlip={flipCard}
+            />
 
-            {/* Rating buttons — only show after flip */}
+            {/* Rating buttons (only after flip) */}
             {isFlipped && (
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div className="flex justify-center gap-4 mt-12">
                 <RatingButton
                   label="Again"
-                  sublabel="Tomorrow · 1"
-                  color="var(--red)"
+                  sublabel="Hard"
+                  color="#f87171"
                   onClick={() => rateCard('again', activeNotePath ?? '')}
                 />
                 <RatingButton
                   label="Good"
-                  sublabel="~3 days · 2"
-                  color="var(--accent)"
+                  sublabel="Medium"
+                  color="#fbbf24"
                   onClick={() => rateCard('good', activeNotePath ?? '')}
                 />
                 <RatingButton
                   label="Easy"
-                  sublabel="~4 days · 3"
-                  color="var(--green)"
+                  sublabel="Easy"
+                  color="#10b981"
                   onClick={() => rateCard('easy', activeNotePath ?? '')}
                 />
               </div>
             )}
 
             {!isFlipped && (
-              <p style={{ fontSize: '12px', color: 'var(--text-ghost)' }}>Space / click to reveal · Esc to close</p>
+              <p className="text-center text-zinc-400 text-sm mt-8">
+                Press <span className="font-mono bg-zinc-800 px-2 py-0.5 rounded">Space</span> or click to reveal
+              </p>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
@@ -303,7 +226,6 @@ export function ReviewSession() {
 }
 
 /* ── Sub-components ── */
-
 function RatingButton({
   label,
   sublabel,
@@ -317,77 +239,31 @@ function RatingButton({
 }) {
   return (
     <button
-      type="button"
       onClick={onClick}
+      className="px-8 py-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105 active:scale-95"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '3px',
-        padding: '10px 22px',
-        borderRadius: 'var(--radius-md)',
-        border: `1px solid ${color}44`,
-        backgroundColor: `${color}11`,
-        color,
-        fontSize: '13px',
-        fontWeight: 600,
-        cursor: 'pointer',
-        minWidth: '90px',
-        transition: 'all 0.15s',
+        backgroundColor: `${color}15`,
+        border: `2px solid ${color}40`,
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${color}22`)}
-      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = `${color}11`)}
     >
-      {label}
-      <span style={{ fontSize: '10px', fontWeight: 400, opacity: 0.7 }}>{sublabel}</span>
+      <span className="font-semibold text-lg" style={{ color }}>
+        {label}
+      </span>
+      <span className="text-xs text-zinc-400 mt-1">{sublabel}</span>
     </button>
   );
 }
 
 function SummaryPill({ label, count, color }: { label: string; count: number; color: string }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        padding: '10px 20px',
-        borderRadius: 'var(--radius-md)',
-        backgroundColor: 'var(--bg-card)',
-        border: '1px solid var(--border)',
-      }}
-    >
-      <span style={{ fontSize: '20px', fontWeight: 700, color }}>{count}</span>
-      <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{label}</span>
+    <div className="text-center">
+      <div
+        className="text-3xl font-semibold"
+        style={{ color: color === 'red' ? '#f87171' : color === 'amber' ? '#fbbf24' : '#10b981' }}
+      >
+        {count}
+      </div>
+      <div className="text-xs text-zinc-400 tracking-widest mt-1">{label}</div>
     </div>
   );
 }
-
-const primaryBtnStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  padding: '9px 18px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid transparent',
-  backgroundColor: 'var(--accent-dim)',
-  color: 'var(--accent)',
-  fontSize: '13px',
-  fontWeight: 600,
-  cursor: 'pointer',
-};
-
-const secondaryBtnStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  padding: '9px 18px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid var(--border)',
-  backgroundColor: 'var(--bg-card)',
-  color: 'var(--text-secondary)',
-  fontSize: '13px',
-  fontWeight: 600,
-  cursor: 'pointer',
-};

@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js';
 import { Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { useVault } from '../../hooks/useVault';
 import { reportError } from '../../lib/errorReporter';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -47,9 +48,8 @@ export function QuickSwitcher() {
       new Fuse(allNotes, {
         keys: ['title'],
         threshold: 0.4,
-        includeScore: true,
       }),
-    [allNotes],
+    [allNotes]
   );
 
   const results = useMemo(() => {
@@ -57,13 +57,10 @@ export function QuickSwitcher() {
     return fuse.search(query).map((r) => r.item);
   }, [query, fuse, allNotes]);
 
-  /** True when the query looks like a new note name (no matching result) */
   const canCreateNew = query.trim().length > 0 && results.length === 0;
-
-  /** Total items in the list (results + optional "Create" row) */
   const totalItems = results.length + (canCreateNew ? 1 : 0);
 
-  // Keyboard shortcut to open (Ctrl+P / Cmd+P)
+  // Keyboard shortcut Ctrl/Cmd + P
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
@@ -75,14 +72,13 @@ export function QuickSwitcher() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // Custom event to open — used by the title-bar search icon
+  // Custom event from TitleBar
   useEffect(() => {
     const handler = () => setOpen(true);
     window.addEventListener('glyphic:open-quick-switcher', handler);
     return () => window.removeEventListener('glyphic:open-quick-switcher', handler);
   }, []);
 
-  // Focus input when opened
   useEffect(() => {
     if (open) {
       setQuery('');
@@ -91,7 +87,6 @@ export function QuickSwitcher() {
     }
   }, [open]);
 
-  // Scroll selected item into view
   useEffect(() => {
     if (!listRef.current) return;
     const item = listRef.current.children[selectedIndex] as HTMLElement | undefined;
@@ -103,7 +98,7 @@ export function QuickSwitcher() {
       setActiveNote(note.path, note.path);
       setOpen(false);
     },
-    [setActiveNote],
+    [setActiveNote]
   );
 
   const handleCreateNew = useCallback(async () => {
@@ -111,9 +106,7 @@ export function QuickSwitcher() {
     if (!name) return;
     try {
       const note = await createNote('', name);
-      if (note) {
-        setActiveNote(note.path, note.path);
-      }
+      if (note) setActiveNote(note.path, note.path);
     } catch (e) {
       reportError({ context: 'Quick switcher create note', message: 'Failed to create note', error: e });
     }
@@ -145,29 +138,19 @@ export function QuickSwitcher() {
           break;
       }
     },
-    [results, selectedIndex, totalItems, canCreateNew, handleSelect, handleCreateNew],
+    [results, selectedIndex, totalItems, canCreateNew, handleSelect, handleCreateNew]
   );
 
   if (!open) return null;
 
   return (
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setOpen(false)} />
+      <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setOpen(false)} />
 
-      {/* Modal */}
-      <div
-        className="fixed z-50 top-[20%] left-1/2 -translate-x-1/2 w-full max-w-lg overflow-hidden"
-        style={{
-          backgroundColor: 'var(--bg-sidebar)',
-          border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow-lg), var(--shadow-glow)',
-          borderRadius: '14px',
-        }}
-      >
+      <div className="fixed top-[18%] left-1/2 -translate-x-1/2 w-full max-w-lg z-50 bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden">
         {/* Search input */}
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-          <Search size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-700">
+          <Search size={18} className="text-zinc-400" />
           <input
             ref={inputRef}
             type="text"
@@ -177,148 +160,58 @@ export function QuickSwitcher() {
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search notes…"
-            className="flex-1 bg-transparent text-sm outline-none"
-            style={{ color: 'var(--text-primary)' }}
+            placeholder="Search notes or create new…"
+            className="flex-1 bg-transparent text-base outline-none text-white placeholder-zinc-400"
           />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '10px',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                color: 'var(--text-ghost)',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              clear
-            </button>
-          )}
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-72 overflow-y-auto">
+        <div ref={listRef} className="max-h-[340px] overflow-y-auto py-2">
           {results.length === 0 && !canCreateNew ? (
-            <div className="px-4 py-6 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
-              No notes found
-            </div>
+            <div className="px-6 py-8 text-sm text-zinc-400 text-center">No notes found</div>
           ) : (
             <>
               {results.map((note, i) => {
                 const folder = note.path.split('/').slice(0, -1).join('/');
-                const modifiedLabel = note.modified_at ? formatRelativeDate(note.modified_at) : '';
                 return (
                   <button
-                    type="button"
                     key={note.path}
                     onClick={() => handleSelect(note)}
-                    className="flex items-center justify-between w-full px-4 py-2 text-left text-sm transition-colors"
-                    style={{
-                      backgroundColor: i === selectedIndex ? 'var(--accent-muted)' : 'transparent',
-                      color: 'var(--text-primary)',
-                    }}
                     onMouseEnter={() => setSelectedIndex(i)}
+                    className={`w-full px-6 py-3 text-left flex items-center justify-between transition-colors ${
+                      i === selectedIndex ? 'bg-zinc-800' : 'hover:bg-zinc-800/60'
+                    }`}
                   >
-                    <span className="truncate font-medium">{note.title}</span>
-                    <span className="flex items-center gap-2 ml-2 shrink-0">
-                      {modifiedLabel && (
-                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                          {modifiedLabel}
-                        </span>
-                      )}
-                      {folder && (
-                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                          {folder}
-                        </span>
-                      )}
-                    </span>
+                    <span className="font-medium text-white truncate">{note.title}</span>
+                    {folder && <span className="text-xs text-zinc-500">{folder}</span>}
                   </button>
                 );
               })}
-              {/* Create new note row */}
+
               {canCreateNew && (
                 <button
-                  type="button"
                   onClick={handleCreateNew}
-                  className="flex items-center w-full px-4 py-2 text-left text-sm transition-colors"
-                  style={{
-                    backgroundColor: selectedIndex === results.length ? 'var(--accent-muted)' : 'transparent',
-                    color: 'var(--accent)',
-                    gap: '8px',
-                  }}
                   onMouseEnter={() => setSelectedIndex(results.length)}
+                  className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors ${
+                    selectedIndex === results.length ? 'bg-zinc-800' : 'hover:bg-zinc-800/60'
+                  }`}
                 >
-                  <span style={{ fontSize: '14px' }}>✚</span>
-                  <span>
-                    Create <strong>"{query.trim()}"</strong>
-                  </span>
+                  <span className="text-violet-400">✚</span>
+                  <span className="text-violet-300">Create &quot;{query.trim()}&quot;</span>
                 </button>
               )}
             </>
           )}
         </div>
 
-        {/* Keyboard hint footer */}
-        <div
-          className="flex items-center justify-between px-4 py-2"
-          style={{
-            borderTop: '1px solid var(--border)',
-            fontSize: '10px',
-            color: 'var(--text-ghost)',
-            fontFamily: 'var(--font-mono)',
-          }}
-        >
+        {/* Footer hint */}
+        <div className="px-5 py-3 border-t border-zinc-700 text-xs text-zinc-400 font-mono flex items-center justify-between">
           <span>
-            <Kbd>↑↓</Kbd> navigate · <Kbd>Enter</Kbd> open · <Kbd>Esc</Kbd> close
+            ↑↓ navigate • Enter select • Esc close
           </span>
-          <span>{results.length} notes</span>
+          <span>{results.length} results</span>
         </div>
       </div>
     </>
   );
-}
-
-function Kbd({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      style={{
-        padding: '1px 4px',
-        borderRadius: '3px',
-        backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
-        fontSize: '9px',
-        fontFamily: 'var(--font-mono)',
-      }}
-    >
-      {children}
-    </span>
-  );
-}
-
-/** Format an ISO date string to a concise relative or short date label. */
-function formatRelativeDate(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return '';
-
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60_000);
-
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return `${diffH}h ago`;
-  const diffD = Math.floor(diffH / 24);
-  if (diffD < 7) return `${diffD}d ago`;
-
-  return date.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined,
-  });
 }

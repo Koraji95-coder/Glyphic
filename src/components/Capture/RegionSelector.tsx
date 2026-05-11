@@ -10,6 +10,7 @@ export function RegionSelector() {
   const captureMode = useCaptureStore((s) => s.captureMode);
   const setLastRegion = useCaptureStore((s) => s.setLastRegion);
   const addToQueue = useCaptureStore((s) => s.addToQueue);
+
   const [isDragging, setIsDragging] = useState(false);
   const [region, setRegion] = useState<Region | null>(null);
   const startPoint = useRef<{ x: number; y: number } | null>(null);
@@ -55,7 +56,6 @@ export function RegionSelector() {
           vaultPath ?? '',
         );
 
-        // Multi-capture: if Shift is held, keep overlay open and queue the capture
         if (e.shiftKey) {
           addToQueue(result);
           setRegion(null);
@@ -71,36 +71,30 @@ export function RegionSelector() {
 
   return (
     <div
-      className="absolute inset-0 z-10"
+      className="absolute inset-0 z-[9999] cursor-crosshair"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      {/* Selection rectangle */}
       {region && region.width > 0 && region.height > 0 && (
         <>
-          {/* Clear area inside selection */}
+          {/* Selection rectangle + outer mask */}
           <div
-            className="absolute"
+            className="absolute border-2 border-violet-400 bg-transparent shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]"
             style={{
               left: region.x,
               top: region.y,
               width: region.width,
               height: region.height,
-              border: '2px solid var(--accent)',
-              backgroundColor: 'transparent',
-              boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.3)',
             }}
           />
 
           {/* Dimension label */}
           <div
-            className="absolute px-2 py-0.5 rounded text-xs font-mono"
+            className="absolute px-3 py-1 bg-black/75 text-white text-xs font-mono rounded-2xl backdrop-blur-md border border-zinc-700 shadow-xl"
             style={{
               left: region.x,
-              top: region.y + region.height + 6,
-              backgroundColor: 'rgba(0, 0, 0, 0.75)',
-              color: '#fff',
+              top: region.y + region.height + 8,
             }}
           >
             {Math.round(region.width)} × {Math.round(region.height)}
