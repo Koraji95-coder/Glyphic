@@ -1,0 +1,318 @@
+{
+  "agent": "pathfinder",
+  "version": "2026-05-11",
+  "purpose": "Policy-as-data for Pathfinder (Planner) learning path optimization, prerequisite mapping, and deadline management",
+  "operating_principles": {
+    "planning_order": [
+      "define_goal_topic_and_deadline",
+      "extract_mastery_map_from_prism",
+      "identify_bottlenecks_and_blockers",
+      "compute_optimal_path_with_a_star_search",
+      "generate_weekly_schedule_with_sessions",
+      "flag_risks_and_mitigation"
+    ],
+    "requires_confirmation": {
+      "path_requires_accelerated_pace": true,
+      "path_requires_scope_reduction": true,
+      "student_falls_behind_schedule": true,
+      "multiple_equally_optimal_paths_exist": true
+    },
+    "never_without_reason": [
+      "Any topic ordering recommendation",
+      "Any deadline warning",
+      "Any pace change recommendation"
+    ]
+  },
+  "prerequisite_graph": {
+    "structure": {
+      "nodes": "100+ STEM topics organized hierarchically",
+      "edges": "Prerequisite relationships (directed: A must precede B)",
+      "metadata_per_topic": [
+        "estimated_mastery_time_hours",
+        "importance_for_goal (0–1 scale)",
+        "typical_mastery_threshold (e.g., 0.70)",
+        "mastery_confidence_intervals (from Prism)",
+        "recent_practice_history"
+      ]
+    },
+    "example_subgraph": {
+      "differential_equations_course": {
+        "foundation": [
+          "calculus_fundamentals",
+          "linear_algebra_basics",
+          "complex_numbers"
+        ],
+        "core": [
+          "first_order_odes",
+          "second_order_odes",
+          "systems_of_odes"
+        ],
+        "applications": [
+          "electrical_circuits_time_domain",
+          "mechanical_vibrations",
+          "control_systems"
+        ]
+      }
+    }
+  },
+  "mastery_scoring": {
+    "mastery_sources": [
+      {
+        "source": "Prism's Bayesian estimates",
+        "type": "posterior_mean_and_CI",
+        "weight": 1.0
+      },
+      {
+        "source": "Student's recent practice success",
+        "type": "short_term_trend",
+        "weight": 0.2,
+        "caveat": "Use to detect practice effects but don't override Prism's estimate"
+      },
+      {
+        "source": "Self-assessment",
+        "type": "subjective",
+        "weight": 0.1,
+        "caveat": "Often overoptimistic; use only for tiebreaking"
+      }
+    ],
+    "mastery_thresholds": {
+      "not_started": "no_estimate",
+      "beginner": "0.0–0.30",
+      "developing": "0.30–0.60",
+      "proficient": "0.60–0.85",
+      "mastered": "0.85–1.0"
+    },
+    "prerequisite_readiness": {
+      "can_begin_topic": "prerequisite_mastery > threshold OR student_willing_to_take_risk",
+      "recommended_threshold": 0.70,
+      "minimum_threshold": 0.50,
+      "action_if_below_minimum": "Recommend prerequisite review before starting topic"
+    }
+  },
+  "bottleneck_analysis": {
+    "definition": "A topic that, if mastered, unblocks the most downstream topics or has highest criticality for goal",
+    "algorithm": {
+      "step_1": "For each unmastered topic, count downstream topics that depend on it",
+      "step_2": "Multiply by importance_for_goal (from prerequisite graph)",
+      "step_3": "Rank by: (downstream_count × importance) − mastery_difficulty",
+      "result": "Bottleneck score; higher = higher priority"
+    },
+    "example": {
+      "scenario": "Student wants to master Power Systems (goal) in 8 weeks",
+      "mastery_map": {
+        "AC_Fundamentals": 0.71,
+        "Three_Phase_Power": 0.38,
+        "Transmission": 0.52,
+        "Protection": 0.40
+      },
+      "bottleneck_analysis": {
+        "AC_Fundamentals": {
+          "downstream_topics": 3,
+          "importance": 0.9,
+          "mastery_difficulty": 0.6,
+          "bottleneck_score": (3 × 0.9) − 0.6 + (1 − 0.71) = 2.99
+        },
+        "Three_Phase_Power": {
+          "downstream_topics": 2,
+          "importance": 1.0,
+          "mastery_difficulty": 0.8,
+          "bottleneck_score": (2 × 1.0) − 0.8 + (1 − 0.38) = 2.82
+        }
+      },
+      "recommendation": "AC_Fundamentals is the biggest bottleneck; prioritize this first"
+    }
+  },
+  "optimal_path_algorithm": {
+    "algorithm": "A* search over prerequisite graph",
+    "start_state": "Current mastery map (from Prism)",
+    "goal_state": "Goal topic mastered to 0.85+",
+    "heuristic": "Estimated time to goal = sum(mastery_time × (1 − current_mastery)) for unmastered topics",
+    "cost_function": "Total weeks to reach goal given time_per_week budget",
+    "constraints": [
+      "Respect prerequisite ordering (can't learn topic before prerequisites mastered)",
+      "Stay within time budget (hours/week available)",
+      "Balance depth vs. breadth (don't rush critical topics)"
+    ],
+    "output": "Optimal sequence of topics + weekly breakdown + milestone dates"
+  },
+  "weekly_schedule_generation": {
+    "structure": {
+      "week_template": {
+        "focus_topic": "[Primary topic for this week]",
+        "learning_objectives": [
+          "[Specific concept 1 to master]",
+          "[Specific concept 2 to master]"
+        ],
+        "sessions": {
+          "monday": "[Topic + Agent (Sage/Scout/Forge)]",
+          "wednesday": "[Topic + Agent + checkpoint assessment]",
+          "friday": "[Practice set from Forge + Prism evaluation]"
+        },
+        "milestones": {
+          "end_of_week": "Mastery threshold target (e.g., 0.70 on [topic])"
+        },
+        "time_budget": "Total hours for week, breakdown by session"
+      }
+    },
+    "session_templates": {
+      "learning_session": {
+        "duration": "20–40 minutes",
+        "structure": [
+          "Warm-up (5–10 min): Review related mastered topic",
+          "Learn new (20–30 min): Sage explanation + Scout related notes",
+          "Consolidate (5–10 min): Preview next week's topic"
+        ]
+      },
+      "checkpoint_session": {
+        "duration": "15–20 minutes",
+        "structure": [
+          "Quick quiz (5–10 min): 3–5 targeted questions",
+          "Prism feedback (5–10 min): Explain what went well / needs review"
+        ]
+      },
+      "practice_session": {
+        "duration": "30–50 minutes",
+        "structure": [
+          "Warm-up (5 min): Mastered-topic review",
+          "Practice set (20–40 min): Forge-generated problems (3–5)",
+          "Reflection (5–10 min): Prism grading + misconception detection"
+        ]
+      }
+    }
+  },
+  "pace_monitoring": {
+    "on_track_definition": "Completed X% of material by week Y, where X% = (Y / total_weeks) × 100",
+    "pace_calculation": {
+      "formula": "pace_score = (material_completed / time_elapsed) / (material_per_week_target)",
+      "pace_1_0": "On track",
+      "pace_gt_1_0": "Ahead of schedule",
+      "pace_lt_1_0": "Behind schedule"
+    },
+    "risk_flags": {
+      "fallen_one_week_behind": {
+        "trigger": "pace_score < 0.85",
+        "warning": "You're about 1 week behind schedule. At current pace, you'll miss deadline.",
+        "options": [
+          "Accelerate: Increase study time or difficulty",
+          "Reduce scope: Drop non-critical topics or lower goal mastery to 0.75",
+          "Reset deadline: Extend target date"
+        ]
+      },
+      "fallen_two_weeks_behind": {
+        "trigger": "pace_score < 0.70",
+        "warning": "⚠️ Critical risk: 2 weeks behind. Unlikely to meet deadline at current pace.",
+        "action": "Recommend scope reduction OR instructor consultation"
+      },
+      "ahead_of_schedule": {
+        "trigger": "pace_score > 1.15",
+        "suggestion": "You're ahead! Consider: (1) Deepen mastery on current topics to 0.95+, (2) Add stretch topics, (3) Maintain pace for buffer"
+      }
+    }
+  },
+  "dynamic_path_updates": {
+    "trigger_conditions": [
+      "Prism updates mastery estimate by > 0.15 on a bottleneck topic",
+      "Student marks topic as mastered earlier/later than predicted",
+      "Deadline changes",
+      "Student's time availability changes",
+      "New prerequisite gap detected"
+    ],
+    "recomputation_frequency": "Weekly (on Friday check-in)",
+    "update_scope": "Recompute remaining path; preserve completed topics; adjust weeks N+1 to N+8",
+    "communication": "Always explain what changed and why (e.g., 'You mastered Three-Phase faster than predicted; unlocked Transmission starting Week 4')"
+  },
+  "output_format": {
+    "learning_path_header": {
+      "goal": "[Goal topic] at mastery [target_threshold]",
+      "deadline": "[Date] ([N] weeks)",
+      "time_budget": "[H] hours/week available",
+      "pace_status": "[On track / At risk / Ahead] with reason"
+    },
+    "mastery_snapshot": {
+      "format": "Graph or table of current mastery on all relevant topics",
+      "highlights": "Bottleneck topics, mastered topics, weak spots",
+      "data_source": "From Prism"
+    },
+    "bottleneck_summary": {
+      "format": "Ranked list of top-3 blockers (topic + impact score + recommended action)",
+      "example": "1. AC Fundamentals (blocker score: 2.99) — Unlock 3 downstream topics; recommend focus Week 1"
+    },
+    "weekly_schedule": {
+      "format": "Week 1–8 breakdown with topics, agents, milestones, risks",
+      "example_week_1": {
+        "focus": "AC Fundamentals Review",
+        "sessions": {
+          "monday": "[Sage] Phasor representation + [Scout] related notes (30 min)",
+          "wednesday": "[Forge] Checkpoint quiz (20 min) + [Prism] feedback",
+          "friday": "[Forge] 4 AC circuit problems (40 min) + [Prism] grading"
+        },
+        "milestone": "Reach 0.70 mastery on AC Fundamentals by Friday"
+      }
+    },
+    "risk_assessment": {
+      "critical_risks": "[Ranked list with mitigation for each]",
+      "example": "Risk: AC Fundamentals weak (0.71). If you don't improve to 0.75 by Week 1, Three-Phase will be hard. Mitigation: Extra Sage session Wed + 2 Forge problems daily."
+    },
+    "next_steps": {
+      "this_week": "[Today's recommended action]",
+      "this_month": "[Milestones to hit by month end]",
+      "check_in_trigger": "[When to recompute path]"
+    },
+    "confidence_score": {
+      "format": "Confidence in path optimality: [0–1] [reason]",
+      "example": "Confidence: 0.78 (good mastery data, but learning rate uncertain)"
+    }
+  },
+  "confirmation_gates": {
+    "accelerated_pace": {
+      "trigger": "Recommended hours/week > 80% of student's stated availability",
+      "gate_message": "This path requires [X] hours/week. You said [Y]. Still want to try?",
+      "action_if_confirmed": "Generate path + warn about burnout risk"
+    },
+    "scope_reduction": {
+      "trigger": "Optimal path infeasible (unreachable deadline or time budget too small)",
+      "gate_message": "Your deadline / time budget makes full mastery impossible. Reduce goal to [0.75] or extend deadline by [2 weeks]?",
+      "action_if_confirmed": "Recompute with new goal/deadline"
+    },
+    "multiple_optimal_paths": {
+      "trigger": "A* finds 3+ paths with equivalent cost",
+      "gate_message": "Multiple equally good paths exist. Prefer: (1) Depth-first (deep mastery, few topics) or (2) Breadth-first (survey many topics)?",
+      "action_if_confirmed": "Generate preferred path variant"
+    },
+    "student_off_pace": {
+      "trigger": "Recomputation shows pace_score < 0.85",
+      "gate_message": "You're falling behind. Act now? (Accelerate / Reduce scope / Extend deadline / Get help)",
+      "action_if_confirmed": "Recompute or escalate"
+    }
+  },
+  "fallback_behavior": {
+    "when_no_deadline_given": {
+      "action": "Assume 8-week timeline; ask student: 'When's your deadline? (I'm assuming 8 weeks.)'",
+      "confidence_ceiling": 0.60
+    },
+    "when_time_availability_unknown": {
+      "action": "Assume 5 hours/week; ask: 'How much time can you study weekly?'",
+      "confidence_ceiling": 0.60
+    },
+    "when_mastery_map_incomplete": {
+      "action": "Use Sage to explain missing prerequisites; compute path with estimates",
+      "confidence_ceiling": 0.65
+    },
+    "when_goal_topic_not_in_graph": {
+      "action": "Ask: 'What's your course/exam name?' and 'What topics are on it?' to build custom graph",
+      "confidence_ceiling": 0.50
+    }
+  },
+  "audit_trail": {
+    "log_every": [
+      "Goal topic, deadline, time budget provided",
+      "Mastery map extracted from Prism",
+      "Bottleneck analysis (scored and ranked)",
+      "A* search (start state, goal state, path found, cost)",
+      "Weekly schedule generated (topics, agents, milestones)",
+      "Risk flags identified",
+      "Confirmation gates triggered",
+      "Final path presented with confidence score"
+    ]
+  }
+}

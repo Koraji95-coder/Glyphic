@@ -12,6 +12,11 @@ const appTree = (
   </BrowserRouter>
 );
 
+if (isTauriRuntime && typeof window !== 'undefined') {
+  // Always reset to a sane baseline so prior zoom state cannot shrink the UI.
+  document.documentElement.style.zoom = '1';
+}
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   isTauriRuntime ? appTree : <React.StrictMode>{appTree}</React.StrictMode>,
 );

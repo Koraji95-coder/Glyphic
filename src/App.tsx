@@ -13,6 +13,7 @@ import { OcrBanner } from './components/Layout/OcrBanner';
 import { StatusBar } from './components/Layout/StatusBar';
 import { TitleBar } from './components/Layout/TitleBar';
 import { Lightbox } from './components/Lightbox/Lightbox';
+import { MasteryMode } from './components/MasteryMode/MasteryMode';
 import { Onboarding } from './components/Onboarding/Onboarding';
 import { QuickSwitcher } from './components/QuickSwitcher/QuickSwitcher';
 import { SettingsModal } from './components/Settings/SettingsModal';
@@ -42,9 +43,20 @@ function MainLayout() {
   const isFePrepMode = useLayoutStore((s) => s.isFePrepMode);
   const isVaultMode = useLayoutStore((s) => s.isVaultMode);
   const isDiagramMode = useLayoutStore((s) => s.isDiagramMode);
+  const isMasteryMode = useLayoutStore((s) => s.isMasteryMode);
+  const activeNotePath = useVaultStore((s) => s.activeNotePath);
+  const isChatOpen = useChatStore((s) => s.isOpen);
+  const toggleChatPanel = useChatStore((s) => s.togglePanel);
   const referenceModalOpen = useEditorModalStore((s) => s.referenceModalOpen);
 
-  const isFullScreenMode = isFePrepMode || isVaultMode || isDiagramMode;
+  const isFullScreenMode = isFePrepMode || isVaultMode || isDiagramMode || isMasteryMode;
+  const showAiDrawer = !isFullScreenMode && !!activeNotePath;
+
+  useEffect(() => {
+    if (!showAiDrawer && isChatOpen) {
+      toggleChatPanel();
+    }
+  }, [showAiDrawer, isChatOpen, toggleChatPanel]);
 
   useGlobalShortcuts();
 
@@ -62,8 +74,9 @@ function MainLayout() {
           {isFePrepMode && <FePrepMode />}
           {isVaultMode && <VaultMode />}
           {isDiagramMode && <DiagramMode />}
+          {isMasteryMode && <MasteryMode />}
           {!isFullScreenMode && <EditorPaneGroup />}
-          {!isFullScreenMode && <AiDrawer />}
+          {showAiDrawer && <AiDrawer />}
         </div>
       </div>
 

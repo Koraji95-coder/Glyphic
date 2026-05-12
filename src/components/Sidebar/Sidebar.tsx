@@ -19,7 +19,7 @@ import { SearchBar } from './SearchBar';
 import { TagsPanel } from './TagsPanel';
 
 export function Sidebar() {
-  const [width, setWidth] = useState(260);
+  const [width, setWidth] = useState(288);
   const isResizing = useRef(false);
   const isMobile = useIsMobile();
 
@@ -128,7 +128,7 @@ export function Sidebar() {
       {/* Vault Header */}
       <div className="px-5 py-6 border-b border-zinc-800 bg-zinc-900/70 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-violet-500 via-fuchsia-500 to-cyan-400 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-inner">
+          <div className="w-9 h-9 bg-linear-to-br from-violet-500 via-fuchsia-500 to-cyan-400 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-inner">
             {initial}
           </div>
           <div className="min-w-0 flex-1">
@@ -155,7 +155,7 @@ export function Sidebar() {
           </button>
           <button
             onClick={handleNewFolder}
-            className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 transition-colors font-medium py-3 px-4 rounded-2xl text-sm"
+            className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 transition-colors font-medium py-3 px-4 rounded-2xl text-sm text-zinc-200"
           >
             <FolderOpen size={16} />
             Folder
@@ -201,31 +201,31 @@ export function Sidebar() {
       </div>
 
       {/* Footer Actions */}
-      <div className="border-t border-zinc-800 p-3 flex items-center gap-1 bg-zinc-900/70 backdrop-blur-xl">
+      <div className="border-t border-zinc-800 p-3 grid grid-cols-2 gap-2 bg-zinc-900/70 backdrop-blur-xl">
         <button
           onClick={() => useSettingsUiStore.getState().open('general')}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
         >
           <Settings size={16} />
           Settings
         </button>
         <button
           onClick={handleTrash}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
         >
           <Trash2 size={16} />
           Trash
         </button>
         <button
           onClick={() => useHelpUiStore.getState().open()}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
         >
           <HelpCircle size={16} />
           Help
         </button>
         <button
           onClick={openReview}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
+          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
         >
           <LayoutList size={16} />
           Review

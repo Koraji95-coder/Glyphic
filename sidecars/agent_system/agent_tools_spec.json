@@ -1,0 +1,230 @@
+{
+  "version": "2026-05-11",
+  "agents": {
+    "sage": {
+      "name": "Sage",
+      "title": "Conceptual Guide & Explainer",
+      "personality": "Patient, Socratic, deliberate mentor",
+      "color": "#8B7355",
+      "icon": "book-open",
+      "tools": [
+        {
+          "name": "explain_concept",
+          "type": "agent_reasoning",
+          "purpose": "Break complex topics into intuitive, learnable pieces with multiple perspectives",
+          "confidence_required": 0.75
+        },
+        {
+          "name": "retrieve_concept_prerequisites",
+          "type": "vault_query",
+          "purpose": "Fetch prerequisite topics and foundational explanations",
+          "confidence_required": 0.70
+        },
+        {
+          "name": "fetch_worked_examples",
+          "type": "vault_query",
+          "purpose": "Find worked examples for a topic, ranked by student mastery level",
+          "confidence_required": 0.70
+        },
+        {
+          "name": "flag_prerequisite_gap_for_pathfinder",
+          "type": "agent_communication",
+          "purpose": "Alert Pathfinder when a prerequisite gap is detected",
+          "requires_confirmation": false
+        }
+      ]
+    },
+    "scout": {
+      "name": "Scout",
+      "title": "Retriever & Context Gatherer",
+      "personality": "Thorough, curious, connective librarian",
+      "color": "#4CAF50",
+      "icon": "search",
+      "tools": [
+        {
+          "name": "semantic_search",
+          "type": "retrieval_engine",
+          "purpose": "Search vault by semantic meaning, not just keywords; return top-3 ranked results",
+          "confidence_required": 0.65
+        },
+        {
+          "name": "rerank_by_mastery_deficit",
+          "type": "ranking_engine",
+          "purpose": "Reorder search results to prioritize weak topics the student should review",
+          "confidence_required": 0.70
+        },
+        {
+          "name": "calculate_relevance_confidence",
+          "type": "scoring_engine",
+          "purpose": "Score each result on semantic match (50%) + mastery gap (30%) + recency (10%) + diversity (10%)",
+          "confidence_required": 0.65
+        },
+        {
+          "name": "fetch_semantic_neighbors",
+          "type": "vault_query",
+          "purpose": "Find conceptually related topics and cross-domain connections",
+          "confidence_required": 0.70
+        }
+      ]
+    },
+    "forge": {
+      "name": "Forge",
+      "title": "Problem Generator & Practice Craftsman",
+      "personality": "Precise, adaptive, relentless coach",
+      "color": "#FF6F00",
+      "icon": "hammer",
+      "tools": [
+        {
+          "name": "generate_problem_with_schema",
+          "type": "generative_reasoning",
+          "purpose": "Create a practice problem at specified difficulty, constrained to valid structure",
+          "requires_validation": true,
+          "confidence_required": 0.80
+        },
+        {
+          "name": "validate_problem_structure",
+          "type": "verification_engine",
+          "purpose": "Check that generated problem is algebraically correct, dimensionally sound, physically plausible",
+          "confidence_required": 0.85
+        },
+        {
+          "name": "estimate_problem_difficulty",
+          "type": "scoring_engine",
+          "purpose": "Predict problem difficulty based on topic and student history",
+          "confidence_required": 0.75
+        },
+        {
+          "name": "calculate_expected_learning_gain",
+          "type": "optimization_engine",
+          "purpose": "Score problem by learning value: mastery gap (60%) + cognitive load (20%) + diversity (20%)",
+          "confidence_required": 0.70
+        },
+        {
+          "name": "adapt_difficulty_on_attempt",
+          "type": "agent_reasoning",
+          "purpose": "Adjust next problem difficulty after student attempts current set",
+          "requires_confirmation": false
+        }
+      ]
+    },
+    "prism": {
+      "name": "Prism",
+      "title": "Evaluator & Misconception Detector",
+      "personality": "Analytical, compassionate, revealing assessor",
+      "color": "#9C27B0",
+      "icon": "search-check",
+      "tools": [
+        {
+          "name": "grade_problem_response",
+          "type": "evaluation_engine",
+          "purpose": "Grade student response on correctness and reasoning; assign partial credit",
+          "confidence_required": 0.80
+        },
+        {
+          "name": "detect_misconception_pattern",
+          "type": "pattern_recognition",
+          "purpose": "Identify common misconceptions from answer patterns and suggest remediation",
+          "confidence_required": 0.70
+        },
+        {
+          "name": "update_bayesian_posterior",
+          "type": "statistical_inference",
+          "purpose": "Update mastery belief for a topic based on new attempt; output posterior mean ± confidence interval",
+          "confidence_required": 0.75
+        },
+        {
+          "name": "link_misconception_to_prerequisite",
+          "type": "agent_communication",
+          "purpose": "Flag prerequisite gap to Pathfinder when misconception suggests foundational confusion",
+          "requires_confirmation": false
+        },
+        {
+          "name": "flag_for_sage_remediation",
+          "type": "agent_communication",
+          "purpose": "Alert Sage when a misconception needs explanation reinforcement",
+          "requires_confirmation": false
+        }
+      ]
+    },
+    "pathfinder": {
+      "name": "Pathfinder",
+      "title": "Planner & Strategic Guide",
+      "personality": "Forward-thinking, strategic, empowering mentor",
+      "color": "#2196F3",
+      "icon": "map",
+      "tools": [
+        {
+          "name": "build_prerequisite_graph",
+          "type": "knowledge_representation",
+          "purpose": "Construct a directed acyclic graph of topics with prerequisite edges",
+          "confidence_required": 0.80
+        },
+        {
+          "name": "compute_optimal_path",
+          "type": "optimization_engine",
+          "purpose": "Use A* pathfinding to find optimal topic sequence given start mastery, goal, deadline, time budget",
+          "confidence_required": 0.80
+        },
+        {
+          "name": "identify_bottlenecks",
+          "type": "analysis_engine",
+          "purpose": "Find critical prerequisites that block progress toward goal; flag high-priority topics",
+          "confidence_required": 0.75
+        },
+        {
+          "name": "generate_weekly_schedule",
+          "type": "planning_engine",
+          "purpose": "Create week-by-week breakdown: warm-up → review weak → challenge new",
+          "confidence_required": 0.75
+        },
+        {
+          "name": "update_path_on_mastery_shift",
+          "type": "dynamic_planning",
+          "purpose": "Recompute optimal path when Prism's mastery estimates change significantly",
+          "requires_confirmation": false
+        },
+        {
+          "name": "flag_off_pace_progress",
+          "type": "monitoring_engine",
+          "purpose": "Alert student when behind pace toward deadline; suggest acceleration or scope reduction",
+          "confidence_required": 0.70
+        }
+      ]
+    }
+  },
+  "orchestration": {
+    "routing_rules": [
+      {
+        "trigger": "user_asks_question",
+        "primary_agent": "scout",
+        "fallback": ["sage"]
+      },
+      {
+        "trigger": "user_wants_practice",
+        "primary_agent": "forge",
+        "supports": ["prism"]
+      },
+      {
+        "trigger": "student_submits_answer",
+        "primary_agent": "prism",
+        "supports": ["sage", "pathfinder"]
+      },
+      {
+        "trigger": "user_wants_study_plan",
+        "primary_agent": "pathfinder",
+        "supports": ["scout", "prism"]
+      }
+    ]
+  },
+  "safety_rules": {
+    "confidence_threshold": 0.65,
+    "fallback_behavior": "If agent confidence < threshold, suggest human review or alternative agent",
+    "fail_open_modes": {
+      "scout_unavailable": "Use full-text search fallback",
+      "sage_unavailable": "Provide reading list and suggest office hours",
+      "forge_unavailable": "Offer problem template and student self-check",
+      "prism_unavailable": "Show solution; let student self-grade",
+      "pathfinder_unavailable": "Show prerequisite graph without optimization"
+    }
+  }
+}

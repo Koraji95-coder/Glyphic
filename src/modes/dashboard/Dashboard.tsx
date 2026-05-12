@@ -86,9 +86,34 @@ export function Dashboard() {
     void commands.getFeStatistics().then(setFeStats).catch(() => setFeStats([]));
   }, []);
 
+  const hasAnyData = totalNotes > 0 || feSummary.attempts > 0 || sourcesIngested > 0;
+
   return (
     <div className="flex-1 overflow-y-auto p-7 bg-[#050507]">
       <div className="max-w-7xl mx-auto space-y-8">
+        {!hasAnyData && (
+          <section
+            className="rounded-3xl border border-zinc-700 p-7"
+            style={{
+              background:
+                'linear-gradient(145deg, rgba(124,58,237,0.16), rgba(6,182,212,0.08) 45%, rgba(24,24,27,0.88) 75%)',
+            }}
+          >
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <h1 className="text-2xl font-semibold text-white">Welcome to Glyphic</h1>
+                <p className="text-zinc-300 mt-2" style={{ maxWidth: '52ch', lineHeight: 1.55 }}>
+                  Your workspace is ready. Create your first note, organize a folder structure,
+                  then start an FE session and this dashboard will populate with live progress.
+                </p>
+              </div>
+              <div className="text-xs text-zinc-300 rounded-2xl border border-zinc-600 px-3 py-2 bg-zinc-900/60">
+                Setup takes about 2 minutes
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Stats row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Total notes" value={String(totalNotes)} icon={<BookOpen size={18} />} />
@@ -108,18 +133,26 @@ export function Dashboard() {
               <h2 className="font-semibold text-white">Recent notes</h2>
               <span className="text-xs text-zinc-400">{recentNotes.length} items</span>
             </div>
-            <div className="space-y-2">
-              {recentNotes.map((note) => (
-                <button
-                  key={note.path}
-                  onClick={() => setActiveNote(note.path, note.path)}
-                  className="w-full flex justify-between items-center px-5 py-4 hover:bg-zinc-800 rounded-2xl transition-colors text-left"
-                >
-                  <span className="text-zinc-200 truncate">{note.title}</span>
-                  <span className="text-xs text-zinc-400 font-mono">{formatRelative(note.modifiedAt)}</span>
-                </button>
-              ))}
-            </div>
+            {recentNotes.length > 0 ? (
+              <div className="space-y-2">
+                {recentNotes.map((note) => (
+                  <button
+                    key={note.path}
+                    onClick={() => setActiveNote(note.path, note.path)}
+                    className="w-full flex justify-between items-center px-5 py-4 hover:bg-zinc-800 rounded-2xl transition-colors text-left"
+                  >
+                    <span className="text-zinc-200 truncate">{note.title}</span>
+                    <span className="text-xs text-zinc-400 font-mono">{formatRelative(note.modifiedAt)}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 text-center">
+                <BookOpen size={20} className="text-zinc-400" style={{ margin: '0 auto 10px auto' }} />
+                <p className="text-zinc-300 text-sm">No recent notes yet</p>
+                <p className="text-zinc-500 text-xs mt-1">Create a note and it will appear here.</p>
+              </div>
+            )}
           </div>
 
           {/* FE Prep progress */}
@@ -128,22 +161,32 @@ export function Dashboard() {
               <h2 className="font-semibold text-white">FE Prep Progress</h2>
               <span className="text-xs text-zinc-400">{feSummary.attempts} attempts</span>
             </div>
-            <div className="space-y-6">
-              {feStats.slice(0, 5).map((topic) => (
-                <div key={topic.topic_id}>
-                  <div className="flex justify-between text-xs text-zinc-400 mb-2">
-                    <span>Topic #{topic.topic_id}</span>
-                    <span>{Math.round(topic.accuracy)}%</span>
+            {feStats.length > 0 ? (
+              <div className="space-y-6">
+                {feStats.slice(0, 5).map((topic) => (
+                  <div key={topic.topic_id}>
+                    <div className="flex justify-between text-xs text-zinc-400 mb-2">
+                      <span>Topic #{topic.topic_id}</span>
+                      <span>{Math.round(topic.accuracy)}%</span>
+                    </div>
+                    <div className="h-2 bg-zinc-800 rounded-3xl overflow-hidden">
+                      <div
+                        className="h-2 bg-linear-to-r from-violet-400 to-cyan-400 rounded-3xl transition-all"
+                        style={{ width: `${Math.min(100, Math.round(topic.accuracy))}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 bg-zinc-800 rounded-3xl overflow-hidden">
-                    <div
-                      className="h-2 bg-gradient-to-r from-violet-400 to-cyan-400 rounded-3xl transition-all"
-                      style={{ width: `${Math.min(100, Math.round(topic.accuracy))}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
+                <GraduationCap size={20} className="text-zinc-400" style={{ marginBottom: 10 }} />
+                <p className="text-zinc-300 text-sm">No FE sessions started</p>
+                <p className="text-zinc-500 text-xs mt-1">
+                  Run your first FE practice session to track topic-level accuracy.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -153,7 +196,7 @@ export function Dashboard() {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('glyphic:new-note'))}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-cyan-400 text-white rounded-3xl font-medium hover:brightness-110 transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-violet-500 to-cyan-400 text-white rounded-3xl font-medium hover:brightness-110 transition-all"
             >
               <Plus size={18} />
               New note
@@ -173,6 +216,12 @@ export function Dashboard() {
               Start FE session
             </button>
           </div>
+
+          <div className="mt-6 pt-6 border-t border-zinc-800 grid md:grid-cols-3 gap-3">
+            <ChecklistItem title="Create first note" done={totalNotes > 0} />
+            <ChecklistItem title="Organize folders" done={totalFolders > 0} />
+            <ChecklistItem title="Run FE practice" done={feSummary.attempts > 0} />
+          </div>
         </div>
       </div>
     </div>
@@ -189,6 +238,23 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
         <div className="text-xs text-zinc-400 tracking-widest">{label}</div>
         <div className="text-3xl font-semibold text-white mt-1">{value}</div>
       </div>
+    </div>
+  );
+}
+
+function ChecklistItem({ title, done }: { title: string; done: boolean }) {
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 flex items-center gap-3">
+      <div
+        className="w-5 h-5 rounded-full"
+        style={{
+          background: done ? 'rgba(34,197,94,0.25)' : 'rgba(113,113,122,0.2)',
+          border: done ? '1px solid rgba(34,197,94,0.8)' : '1px solid rgba(113,113,122,0.6)',
+        }}
+      />
+      <span className="text-sm" style={{ color: done ? '#e4e4e7' : '#a1a1aa' }}>
+        {title}
+      </span>
     </div>
   );
 }

@@ -1,7 +1,14 @@
 use chrono::Utc;
 use rusqlite::Connection;
 use std::fs;
+use std::fs::File;
+use std::io::Cursor;
 use std::path::{Path, PathBuf};
+use uuid::Uuid;
+
+use flate2::write::GzEncoder;
+use flate2::Compression;
+use tar::Builder;
 
 /// Backup metadata stored in settings
 const LAST_BACKUP_TIMESTAMP_KEY: &str = "last_backup_timestamp";
@@ -100,54 +107,47 @@ impl BackupService {
     }
 
     /// Detect all changes (first backup scenario)
-    fn detect_all_changes(
-        conn: &Connection,
-        _vault_path: &Path,
-    ) -> Result<ChangeDetectionResult, String> {
-        let notes_count: i64 = conn
-            .query_row("SELECT COUNT(*) FROM notes", [], |row| row.get(0))
-            .unwrap_or(0);
+    fn detect_all_changes(conn: &Connection, _vault_path: &Path) -> Result<ChangeDetectionResult, String> {
+        let mut notes_stmt = conn
+            .prepare("SELECT path FROM notes ORDER BY modified_at DESC")
+            .map_err(|e| format!("Failed to query note paths for first backup: {e}"))?;
 
-        let screenshots_count: i64 = conn
-            .query_row("SELECT COUNT(*) FROM screenshots", [], |row| row.get(0))
-            .unwrap_or(0);
+        let new_notes = notes_stmt
+            .query_map([], |row| row.get::<_, String>(0))
+            .map_err(|e| format!("Failed to iterate note paths for first backup: {e}"))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| format!("Failed to collect note paths for first backup: {e}"))?;
+
+        let mut screenshots_stmt = conn
+            .prepare("SELECT path FROM screenshots ORDER BY captured_at DESC")
+            .map_err(|e| format!("Failed to query screenshot paths for first backup: {e}"))?;
+
+        let new_screenshots = screenshots_stmt
+            .query_map([], |row| row.get::<_, String>(0))
+            .map_err(|e| format!("Failed to iterate screenshot paths for first backup: {e}"))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| format!("Failed to collect screenshot paths for first backup: {e}"))?;
+
+        let total_files_to_backup = new_notes.len() + new_screenshots.len();
 
         Ok(ChangeDetectionResult {
-            has_changes: notes_count > 0 || screenshots_count > 0,
-            new_notes: vec![], // Placeholder: in real impl, would query all note paths
+            has_changes: total_files_to_backup > 0,
+            new_notes,
             modified_notes: vec![],
-            new_screenshots: vec![],
+            new_screenshots,
             modified_screenshots: vec![],
-            total_files_to_backup: (notes_count + screenshots_count) as usize,
+            total_files_to_backup,
         })
     }
 
     /// Calculate total backup size (only changed files)
-    pub fn calculate_backup_size(
-        vault_path: &Path,
-        changed_files: &[String],
-    ) -> Result<i64, String> {
+    pub fn calculate_backup_size(vault_path: &Path, changed_files: &[String]) -> Result<i64, String> {
         let mut total_size: i64 = 0;
 
-        // Add note files
-        let notes_dir = vault_path.join("notes");
-        if notes_dir.exists() {
-            for file_path in changed_files.iter().filter(|p| p.ends_with(".md")) {
-                let full_path = vault_path.join(file_path);
-                if let Ok(metadata) = fs::metadata(&full_path) {
-                    total_size += metadata.len() as i64;
-                }
-            }
-        }
-
-        // Add screenshot files
-        let captures_dir = vault_path.join(".glyphic").join("captures");
-        if captures_dir.exists() {
-            for file_path in changed_files.iter().filter(|p| !p.ends_with(".md")) {
-                let full_path = vault_path.join(file_path);
-                if let Ok(metadata) = fs::metadata(&full_path) {
-                    total_size += metadata.len() as i64;
-                }
+        for relative_path in changed_files {
+            let full_path = vault_path.join(relative_path);
+            if let Ok(metadata) = fs::metadata(&full_path) {
+                total_size += metadata.len() as i64;
             }
         }
 
@@ -214,10 +214,7 @@ impl BackupService {
     }
 
     /// Enable/disable incremental backups in settings
-    pub fn set_incremental_enabled(
-        conn: &Connection,
-        enabled: bool,
-    ) -> Result<(), String> {
+    pub fn set_incremental_enabled(conn: &Connection, enabled: bool) -> Result<(), String> {
         let now = Utc::now().to_rfc3339();
         conn.execute(
             "INSERT OR REPLACE INTO backup_settings (key, value, updated_at) 
@@ -247,17 +244,17 @@ impl BackupService {
     }
 
     /// Build a list of files to include in backup based on change detection
-    pub fn build_backup_file_list(
+    pub fn build_backup_relative_file_list(
         vault_path: &Path,
         change_result: &ChangeDetectionResult,
-    ) -> Result<Vec<PathBuf>, String> {
-        let mut files = Vec::new();
+    ) -> Result<Vec<String>, String> {
+        let mut files: Vec<String> = Vec::new();
 
         // Add changed note files
         for note_path in &change_result.new_notes {
             let full_path = vault_path.join(note_path);
             if full_path.exists() && full_path.is_file() {
-                files.push(full_path);
+                files.push(note_path.clone());
             }
         }
 
@@ -265,26 +262,83 @@ impl BackupService {
         for screenshot_path in &change_result.new_screenshots {
             let full_path = vault_path.join(screenshot_path);
             if full_path.exists() && full_path.is_file() {
-                files.push(full_path);
+                files.push(screenshot_path.clone());
             }
             // Also include thumbnail if exists
             if let Some(stem) = Path::new(screenshot_path).file_stem() {
-                let thumb_path = vault_path
-                    .join(".glyphic")
-                    .join("thumbnails")
-                    .join(format!("{}.png", stem.to_string_lossy()));
-                if thumb_path.exists() {
-                    files.push(thumb_path);
+                let thumb_rel = format!(".glyphic/thumbnails/{}.png", stem.to_string_lossy());
+                let thumb_path = vault_path.join(&thumb_rel);
+                if thumb_path.exists() && thumb_path.is_file() {
+                    files.push(thumb_rel);
                 }
             }
         }
 
         // Include metadata: vault config + backup manifest
-        let config_path = vault_path.join(".glyphic").join("config.toml");
-        if config_path.exists() {
-            files.push(config_path);
+        let config_rel = ".glyphic/config.toml".to_string();
+        let config_path = vault_path.join(&config_rel);
+        if config_path.exists() && config_path.is_file() {
+            files.push(config_rel);
         }
 
+        files.sort();
+        files.dedup();
+
         Ok(files)
+    }
+
+    /// Create incremental archive with only changed files and an embedded manifest.
+    /// Returns (archive_path, size_bytes).
+    pub fn create_incremental_archive(
+        vault_path: &Path,
+        backup_id: &str,
+        files: &[String],
+    ) -> Result<(PathBuf, i64), String> {
+        let archive_name = format!("glyphic-incremental-{backup_id}.tar.gz");
+        let archive_path = std::env::temp_dir().join(archive_name);
+
+        let tar_gz = File::create(&archive_path)
+            .map_err(|e| format!("Failed to create incremental archive file: {e}"))?;
+        let encoder = GzEncoder::new(tar_gz, Compression::default());
+        let mut tar = Builder::new(encoder);
+
+        for relative_path in files {
+            let source_path = vault_path.join(relative_path);
+            if !source_path.exists() || !source_path.is_file() {
+                continue;
+            }
+
+            tar.append_path_with_name(&source_path, relative_path)
+                .map_err(|e| format!("Failed to append file to archive ({relative_path}): {e}"))?;
+        }
+
+        let manifest = serde_json::json!({
+            "backup_id": backup_id,
+            "created_at": Utc::now().to_rfc3339(),
+            "incremental": true,
+            "files": files,
+        });
+        let manifest_bytes = serde_json::to_vec_pretty(&manifest)
+            .map_err(|e| format!("Failed to serialize backup manifest: {e}"))?;
+        let mut header = tar::Header::new_gnu();
+        header.set_size(manifest_bytes.len() as u64);
+        header.set_mode(0o644);
+        header.set_cksum();
+        tar.append_data(&mut header, ".glyphic/backup-manifest.json", Cursor::new(manifest_bytes))
+            .map_err(|e| format!("Failed to append backup manifest to archive: {e}"))?;
+
+        tar.finish()
+            .map_err(|e| format!("Failed to finalize incremental archive: {e}"))?;
+
+        let size_bytes = fs::metadata(&archive_path)
+            .map_err(|e| format!("Failed to read archive metadata: {e}"))?
+            .len() as i64;
+
+        Ok((archive_path, size_bytes))
+    }
+
+    /// Build Dropbox path for backup archive.
+    pub fn build_dropbox_archive_path() -> String {
+        format!("/Glyphic/Backups/backup-{}.tar.gz", Uuid::new_v4())
     }
 }

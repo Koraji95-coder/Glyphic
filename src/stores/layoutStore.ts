@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ActiveMode = 'editor' | 'fePrep' | 'vault' | 'diagram';
+export type ActiveMode = 'editor' | 'fePrep' | 'vault' | 'diagram' | 'mastery';
 
 interface LayoutState {
   isSidebarOpen: boolean;
@@ -12,6 +12,7 @@ interface LayoutState {
   isFePrepMode: boolean;
   isVaultMode: boolean;
   isDiagramMode: boolean;
+  isMasteryMode: boolean;
   toggleSidebar: () => void;
   closeSidebar: () => void;
   toggleInkMode: () => void;
@@ -22,6 +23,8 @@ interface LayoutState {
   closeVaultMode: () => void;
   openDiagramMode: () => void;
   closeDiagramMode: () => void;
+  openMasteryMode: () => void;
+  closeMasteryMode: () => void;
 }
 
 export const useLayoutStore = create<LayoutState>((set) => {
@@ -31,6 +34,7 @@ export const useLayoutStore = create<LayoutState>((set) => {
       isFePrepMode: mode === 'fePrep',
       isVaultMode: mode === 'vault',
       isDiagramMode: mode === 'diagram',
+      isMasteryMode: mode === 'mastery',
     });
 
   return {
@@ -41,6 +45,7 @@ export const useLayoutStore = create<LayoutState>((set) => {
     isFePrepMode: false,
     isVaultMode: false,
     isDiagramMode: false,
+    isMasteryMode: false,
     toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
     closeSidebar: () => set({ isSidebarOpen: false }),
     toggleInkMode: () => set((s) => ({ isInkMode: !s.isInkMode })),
@@ -51,5 +56,7 @@ export const useLayoutStore = create<LayoutState>((set) => {
     closeVaultMode: () => setMode('editor'),
     openDiagramMode: () => setMode('diagram'),
     closeDiagramMode: () => setMode('editor'),
+    openMasteryMode: () => setMode('mastery'),
+    closeMasteryMode: () => setMode('editor'),
   };
 });

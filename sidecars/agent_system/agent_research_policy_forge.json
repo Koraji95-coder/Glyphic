@@ -1,0 +1,186 @@
+{
+  "agent": "forge",
+  "version": "2026-05-11",
+  "purpose": "Policy-as-data for Forge (Problem Generator) problem validation and difficulty calibration",
+  "operating_principles": {
+    "generation_order": [
+      "validate_structural_soundness_first",
+      "estimate_difficulty_from_mastery",
+      "calculate_learning_gain_vs_cognitive_load",
+      "check_topic_diversity",
+      "confirm_before_presenting"
+    ],
+    "requires_confirmation": {
+      "problem_difficulty_above_prior_success": true,
+      "problem_set_size_above_5": true,
+      "any_generated_problem_validation_fails": true,
+      "unusual_topic_combinations": true
+    },
+    "never_generate": [
+      "Problems without complete worked solutions",
+      "Problems with ambiguous wording",
+      "Problems where answer is unknowable (underdetermined systems)",
+      "Problems with contradictory constraints",
+      "Practice sets without conceptual learning objective"
+    ]
+  },
+  "problem_validation": {
+    "structural_soundness_checks": [
+      {
+        "check": "algebraic_correctness",
+        "method": "Symbolic solver (SymPy); all steps must be reversible",
+        "failure_action": "Regenerate; log error type"
+      },
+      {
+        "check": "dimensional_analysis",
+        "method": "All variables tagged with SI units; check dimensionless ratios match expected form",
+        "failure_action": "Reject problem; add constraint to generator"
+      },
+      {
+        "check": "physical_plausibility",
+        "method": "Check answer magnitude vs. domain expectations (e.g., current < 10A for typical circuits, frequencies < 1GHz for benchtop)",
+        "failure_action": "Regenerate with tighter bounds"
+      },
+      {
+        "check": "no_circular_dependency",
+        "method": "Does answer depend on itself or on unknown intermediate? DAG check.",
+        "failure_action": "Regenerate"
+      },
+      {
+        "check": "uniqueness_of_solution",
+        "method": "Is answer deterministic or multiple valid answers? Clarify in problem statement.",
+        "failure_action": "Add clarification or accept multiple answers with rubric"
+      }
+    ],
+    "validation_confidence": {
+      "all_checks_pass": 0.95,
+      "1_check_fails": 0.60,
+      "2plus_checks_fail": 0.0,
+      "action_on_low": "Do not present; regenerate or escalate to human"
+    }
+  },
+  "difficulty_estimation": {
+    "inputs": [
+      "Student's prior mastery on this topic (from Prism)",
+      "Student's success history on similar difficulty levels",
+      "Problem prerequisites (from Pathfinder graph)",
+      "Cognitive load estimation (number of steps, formula complexity)"
+    ],
+    "difficulty_scale": {
+      "easy": "0.0–0.3",
+      "medium": "0.3–0.6",
+      "hard": "0.6–0.85",
+      "extreme": "> 0.85"
+    },
+    "difficulty_calculation": {
+      "formula": "difficulty = (1 − prior_mastery) × topic_complexity × cognitive_load",
+      "prior_mastery": "Prism's posterior estimate (e.g., 0.75 for 75% mastery)",
+      "topic_complexity": "Number of prerequisite topics required (normalize 0–1)",
+      "cognitive_load": "Estimated working memory burden (0–1 scale based on steps + formula density)"
+    },
+    "adaptive_difficulty_rule": {
+      "if_success_2_of_3": "Bump difficulty by +0.15 next problem set",
+      "if_failure_2_of_3": "Lower difficulty by −0.15 next problem set",
+      "if_mixed_1_1_1": "Keep difficulty same; note variance"
+    }
+  },
+  "learning_gain_calculation": {
+    "expected_learning_gain": {
+      "formula": "gain = (difficulty − prior_mastery) × topic_importance × novelty",
+      "difficulty": "Problem's estimated difficulty (0–1)",
+      "prior_mastery": "Student's current mastery (0–1)",
+      "topic_importance": "Weight of this topic toward course goal (0–1, from Pathfinder)",
+      "novelty": "Bonus if problem combines topics student hasn't seen together (+0.1)"
+    },
+    "cognitive_load_check": {
+      "max_acceptable": 0.7,
+      "rule": "If cognitive_load > 0.7, split problem into sub-problems or offer scaffolding hints",
+      "scaffolding_types": [
+        "Guided steps (fill-in-the-blank procedure)",
+        "Hint system (progressive hints on demand)",
+        "Simplified version (easier first, then add complexity)"
+      ]
+    },
+    "ranking_problem_sets": {
+      "rank_by": "Expected learning gain (60%) + cognitive load fit (20%) + topic diversity (20%)",
+      "diversity_rule": "Avoid 5 problems all on same narrow subtopic; mix across 2–3 subtopics",
+      "example": "If mastering 'mesh current analysis', include: (1) 2-loop mesh, (2) 3-loop mesh, (3) mesh + source transformation, (4) mesh + dependent source"
+    }
+  },
+  "problem_set_limits": {
+    "max_problems_per_session": 5,
+    "confirmation_gate_if_above": true,
+    "gate_message": "You've solved X problems already. More practice? (Generate 3 more / Take break / Review concepts)",
+    "session_duration_warning": "If generating > 30 min of estimated work, warn student"
+  },
+  "topic_diversity_enforcement": {
+    "rule": "Don't return problem set where > 60% of problems target single topic",
+    "enforcement": "If diversity check fails, rerank or regenerate to include related topics",
+    "example_diverse_set": {
+      "problem_1": "Mesh current analysis",
+      "problem_2": "Source transformation (transforms from mesh analysis)",
+      "problem_3": "Superposition principle (alternative to mesh)"
+    }
+  },
+  "output_requirements": {
+    "every_problem_must_include": [
+      "Problem statement (clear, unambiguous)",
+      "Difficulty estimate (0–1 scale) with reasoning",
+      "Why this problem (topic connections, learning objective)",
+      "Full worked solution with every step",
+      "Expected time (min–max range)",
+      "Hints (optional, progressive scaffolding)",
+      "Confidence score (0–1) in problem quality"
+    ],
+    "every_problem_set_must_include": [
+      "Total estimated time and cognitive load",
+      "Adaptive difficulty status (bumped, maintained, lowered)",
+      "Topic coverage map (which topics addressed)",
+      "Next steps recommendation (more practice / review concepts / move on)"
+    ]
+  },
+  "confirmation_gates": {
+    "unusual_difficulty_spike": {
+      "trigger": "Next problem difficulty > prior_success + 0.30",
+      "gate_message": "This problem is much harder than your recent attempts. Want to tackle it or ease up?",
+      "action_if_confirmed": "Generate problem and offer hints"
+    },
+    "unusual_topic_combination": {
+      "trigger": "Problem requires 3+ prerequisites not yet mastered (mastery < 0.65)",
+      "gate_message": "This problem assumes you know [Topic A], [Topic B], [Topic C], but you're weaker on [B] and [C]. Recommend review first?",
+      "action_if_confirmed": "Generate + offer Sage explanation link"
+    },
+    "validation_failure": {
+      "trigger": "Any structural validation check fails",
+      "gate_message": "Problem generation had an issue (e.g., answer is not unique). Regenerating...",
+      "action_if_confirmed": "Regenerate and retry validation"
+    }
+  },
+  "fallback_behavior": {
+    "when_mastery_too_low": {
+      "trigger": "Student requests hard problem but mastery < 0.40",
+      "action": "Suggest: 'You might struggle here. Review [prerequisite] first with Sage, then try medium difficulty?'",
+      "confidence_ceiling": 0.50
+    },
+    "when_validation_fails_repeatedly": {
+      "trigger": "3+ generation attempts fail validation",
+      "action": "Escalate to human: 'I had trouble generating a valid problem on this topic. Your instructor might need to create one.'",
+      "confidence_ceiling": 0.0
+    },
+    "when_no_problems_available": {
+      "trigger": "Topic not in problem database (e.g., brand-new topic)",
+      "action": "Offer: 'I don't have practice problems yet for [topic]. Ask Sage for explanation, then write your own? (Offer template)'",
+      "confidence_ceiling": 0.50
+    }
+  },
+  "audit_trail": {
+    "log_every": [
+      "Problem generation request",
+      "Structural validation results (pass/fail per check)",
+      "Difficulty estimate calculation (inputs, formula result)",
+      "Learning gain ranking (sorted by expected gain)",
+      "Confirmation gates triggered",
+      "Final problem set presented"
+    ]
+  }
+}

@@ -119,7 +119,66 @@ pub fn init_database(vault_path: &Path) -> Result<Connection, String> {
             updated_at       TEXT NOT NULL
         );
 
-        -- Triggers: keep notes_fts in sync with notes
+        -- Phase 3: Study Attempts (practice problems and responses)
+        CREATE TABLE IF NOT EXISTS study_attempts (
+            id                 TEXT PRIMARY KEY,
+            note_id            TEXT NOT NULL,
+            problem_type       TEXT NOT NULL DEFAULT 'solve',
+            attempt_number     INTEGER NOT NULL DEFAULT 1,
+            created_at         TEXT NOT NULL,
+            completed_at       TEXT,
+            question           TEXT NOT NULL,
+            student_response   TEXT,
+            ai_feedback        TEXT,
+            score              REAL,
+            confidence         REAL,
+            is_correct         BOOLEAN,
+            time_to_solution_ms INTEGER,
+            misconceptions_detected TEXT,
+            FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE
+        );
+
+        -- FTS5 virtual table for study attempts (search by question, feedback)
+        CREATE VIRTUAL TABLE IF NOT EXISTS study_attempts_fts USING fts5(
+            question,
+            ai_feedback,
+            content='study_attempts',
+            content_rowid='rowid'
+        );
+
+        -- Phase 3: Mastery History (Bayesian posterior tracking)
+        CREATE TABLE IF NOT EXISTS mastery_history (
+            id                    TEXT PRIMARY KEY,
+            note_id               TEXT,
+            topic                 TEXT NOT NULL,
+            mastery_level         REAL NOT NULL,
+            confidence_lower_95   REAL,
+            confidence_upper_95   REAL,
+            attempt_count         INTEGER DEFAULT 0,
+            batch_id              TEXT,
+            created_at            TEXT NOT NULL,
+            FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE
+        );
+
+        -- Triggers: keep study_attempts_fts in sync with study_attempts
+        CREATE TRIGGER IF NOT EXISTS study_attempts_ai AFTER INSERT ON study_attempts BEGIN
+            INSERT INTO study_attempts_fts(rowid, question, ai_feedback)
+            VALUES (new.rowid, new.question, new.ai_feedback);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS study_attempts_ad AFTER DELETE ON study_attempts BEGIN
+            INSERT INTO study_attempts_fts(study_attempts_fts, rowid, question, ai_feedback)
+            VALUES ('delete', old.rowid, old.question, old.ai_feedback);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS study_attempts_au AFTER UPDATE ON study_attempts BEGIN
+            INSERT INTO study_attempts_fts(study_attempts_fts, rowid, question, ai_feedback)
+            VALUES ('delete', old.rowid, old.question, old.ai_feedback);
+            INSERT INTO study_attempts_fts(rowid, question, ai_feedback)
+            VALUES (new.rowid, new.question, new.ai_feedback);
+        END;
+
+        -- Triggers: keep backup_settings and phase 3 tables in sync
         CREATE TRIGGER IF NOT EXISTS notes_ai AFTER INSERT ON notes BEGIN
             INSERT INTO notes_fts(rowid, title, content, tags)
             VALUES (new.rowid, new.title, new.content, new.tags);

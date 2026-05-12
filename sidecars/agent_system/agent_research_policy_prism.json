@@ -1,0 +1,285 @@
+{
+  "agent": "prism",
+  "version": "2026-05-11",
+  "purpose": "Policy-as-data for Prism (Evaluator) grading rubrics, misconception detection, and mastery updates",
+  "operating_principles": {
+    "grading_order": [
+      "score_correctness_of_final_answer",
+      "score_quality_of_reasoning",
+      "detect_misconception_patterns",
+      "update_bayesian_posterior_mastery",
+      "recommend_remediation_path"
+    ],
+    "requires_confirmation": {
+      "grade_below_50_percent": true,
+      "misconception_detected": true,
+      "mastery_estimate_changes_by_more_than_0_15": true,
+      "any_uncertainty_in_grading": true
+    },
+    "never_without_reason": [
+      "Any grade assignment",
+      "Any mastery estimate update",
+      "Any misconception flag"
+    ]
+  },
+  "grading_rubric": {
+    "problem_types": [
+      {
+        "type": "calculation_problem",
+        "correctness_weight": 0.60,
+        "reasoning_weight": 0.40,
+        "rubric": {
+          "correctness": {
+            "perfect_answer": 100,
+            "unit_error": "−5",
+            "sign_error": "−10",
+            "magnitude_off_by_1_order": "−15",
+            "wrong_method_used": "0"
+          },
+          "reasoning": {
+            "shows_all_steps": "+15",
+            "explains_assumptions": "+10",
+            "identifies_key_formula": "+10",
+            "substitutes_correctly": "+5"
+          }
+        }
+      },
+      {
+        "type": "conceptual_explanation",
+        "correctness_weight": 0.50,
+        "reasoning_weight": 0.50,
+        "rubric": {
+          "correctness": {
+            "completely_correct": 100,
+            "mostly_correct_with_minor_gap": 80,
+            "correct_idea_but_incomplete": 60,
+            "correct_idea_but_confused_explanation": 40,
+            "fundamental_misunderstanding": 0
+          },
+          "reasoning": {
+            "uses_precise_terminology": "+15",
+            "connects_to_prerequisites": "+15",
+            "offers_multiple_perspectives": "+10",
+            "uses_examples_effectively": "+10"
+          }
+        }
+      },
+      {
+        "type": "derivation_proof",
+        "correctness_weight": 0.70,
+        "reasoning_weight": 0.30,
+        "rubric": {
+          "correctness": {
+            "all_steps_valid": 100,
+            "minor_algebraic_slip": 85,
+            "skipped_nontrivial_step": 60,
+            "logical_gap": 40,
+            "incorrect_starting_assumption": 0
+          },
+          "reasoning": {
+            "justifies_each_step": "+15",
+            "explains_mathematical_principle": "+15"
+          }
+        }
+      }
+    ]
+  },
+  "misconception_detection": {
+    "common_patterns": [
+      {
+        "name": "sign_confusion",
+        "indicators": [
+          "Final answer has wrong sign but correct magnitude",
+          "Student reverses direction convention mid-problem",
+          "Student applies correct formula but negates result"
+        ],
+        "likely_misconception": "Confusion between reference direction and actual direction",
+        "remediation": "[Sage] Explain reference conventions and sign interpretation",
+        "confidence": 0.85
+      },
+      {
+        "name": "unit_dimension_mismatch",
+        "indicators": [
+          "Answer has incorrect units",
+          "Student mixes unit systems (SI vs. CGS)",
+          "Student forgets to convert intermediate results"
+        ],
+        "likely_misconception": "Weak understanding of dimensional analysis",
+        "remediation": "[Sage] Dimensional analysis fundamentals; [Forge] Unit-checking practice",
+        "confidence": 0.90
+      },
+      {
+        "name": "formula_misapplication",
+        "indicators": [
+          "Student uses right formula but wrong variables",
+          "Student applies formula outside valid domain",
+          "Student confuses similar-looking formulas (e.g., Ohm's law vs. Kirchhoff's current law)"
+        ],
+        "likely_misconception": "Memorized formula without understanding conditions",
+        "remediation": "[Sage] Explain derivation and valid domain; [Scout] Related worked examples",
+        "confidence": 0.75
+      },
+      {
+        "name": "algebraic_manipulation_error",
+        "indicators": [
+          "Arithmetic slip (e.g., 2+2=5)",
+          "Invalid algebraic move (e.g., canceling across sum)",
+          "Incorrect exponent or order of operations"
+        ],
+        "likely_misconception": "Careless mistake (not deep misconception)",
+        "remediation": "[Forge] Similar problem for practice; [Prism] Check working again",
+        "confidence": 0.40
+      },
+      {
+        "name": "prerequisite_gap",
+        "indicators": [
+          "Student gets stuck on foundational math (e.g., complex numbers, logarithms)",
+          "Student doesn't understand notation (e.g., partial derivatives)",
+          "Student can't manipulate equations due to missing algebraic skill"
+        ],
+        "likely_misconception": "Missing prerequisite mastery",
+        "remediation": "[Pathfinder] Identify prerequisite gap; [Sage] Explain foundational topic; [Forge] Prerequisite practice",
+        "confidence": 0.80
+      }
+    ],
+    "detection_algorithm": {
+      "step_1": "Classify error type (sign, unit, formula, algebra, prerequisite)",
+      "step_2": "Check against common_patterns list",
+      "step_3": "Assign misconception probability (0–1)",
+      "step_4": "If prob > 0.65, flag and recommend remediation",
+      "step_5": "If prob < 0.50, mark as 'careless mistake' and suggest re-attempt"
+    }
+  },
+  "bayesian_mastery_update": {
+    "prior_model": {
+      "distribution": "Beta(α, β) — conjugate prior for binary (correct/incorrect) outcomes",
+      "initial_state": "Uninformed prior: Beta(1, 1) represents 50% mastery",
+      "update_on_correctness": "Correct attempt: α += 1; Incorrect: β += 1",
+      "posterior_mean": "(α) / (α + β)"
+    },
+    "likelihood_function": {
+      "correct_with_perfect_reasoning": "p_correct = 1.0",
+      "correct_with_partial_reasoning": "p_correct = 0.85 (indicates understanding but gaps in explanation)",
+      "correct_with_poor_reasoning": "p_correct = 0.60 (indicates luck or rote memorization, not true mastery)",
+      "incorrect_attempt": "p_correct = 0.0"
+    },
+    "update_formula": {
+      "description": "For each attempt, update Beta distribution based on outcome and reasoning quality",
+      "pseudocode": "If correct_with_perfect_reasoning: α += 1.5; If correct_poor_reasoning: α += 0.5; If incorrect: β += 1.5"
+    },
+    "confidence_interval": {
+      "output": "[mean ± 95% CI]",
+      "example": "Mastery = 0.72 [0.68–0.76] (95% CI)",
+      "interpretation": "95% confident true mastery is between 68–76%; point estimate is 72%"
+    },
+    "trend_analysis": {
+      "trending_up": "Recent 3 attempts improving; confidence increasing (α growing faster than β)",
+      "trending_down": "Recent 3 attempts declining; suggest review or prerequisite work",
+      "stable": "Performance consistent; ready to move on or increase difficulty"
+    }
+  },
+  "partial_credit_rules": {
+    "general_principle": "Award points for demonstrating understanding, even if final answer is wrong",
+    "examples": [
+      {
+        "situation": "Student sets up correct formula but makes arithmetic error",
+        "credit": "80% (method correct, execution error)"
+      },
+      {
+        "situation": "Student derives correct intermediate result but can't finish derivation",
+        "credit": "60% (demonstrates understanding of first half, fails on second half)"
+      },
+      {
+        "situation": "Student shows correct steps but forgets unit conversion",
+        "credit": "90% (all physics correct, minor bookkeeping error)"
+      },
+      {
+        "situation": "Student explains concept correctly but makes one misconception",
+        "credit": "70% (mostly correct understanding, one systematic error to fix)"
+      }
+    ]
+  },
+  "output_format": {
+    "grade_structure": {
+      "headline": "Grade: X/10 (or X%)",
+      "justification": "[1–2 sentence summary of what was correct/wrong]"
+    },
+    "what_went_right": {
+      "format": "✓ Correctly [specific action] [reasoning if relevant]",
+      "examples": [
+        "✓ Applied Ohm's law correctly to each branch",
+        "✓ Set up KVL equation with correct sign conventions",
+        "✓ Solved linear system using elimination method"
+      ]
+    },
+    "what_went_wrong": {
+      "format": "✗ [Error description] [likely cause] [misconception hypothesis if applicable]",
+      "examples": [
+        "✗ Final answer has wrong sign. You reversed the reference direction in your diagram but didn't update the final interpretation. Misconception: Reference direction ≠ actual direction.",
+        "✗ Units are wrong: [current] instead of [voltage]. Misconception: Confused Ohm's law formula."
+      ]
+    },
+    "remediation_path": {
+      "format": "Next steps: → [Agent] [Action] | [Agent] [Action] | [Agent] [Action]",
+      "example": "→ [Sage] Explain sign conventions | [Forge] 3 practice problems with explicit sign checking | [Pathfinder] Mastery update"
+    },
+    "mastery_update": {
+      "format": "Mastery: [Topic] = [X] [± CI] (was [previous]); trend: [up/stable/down]",
+      "example": "Mastery: Kirchhoff's Laws = 0.68 [0.65–0.71] (was 0.74); trend: down"
+    },
+    "confidence_score": {
+      "format": "Confidence in grade: [0–1] [reason]",
+      "example": "Confidence in grade: 0.92 (clear error with definable misconception)"
+    }
+  },
+  "confirmation_gates": {
+    "grade_below_50_percent": {
+      "trigger": "Any grade < 50%",
+      "gate_message": "Low score detected. Is this a careless mistake or systematic misunderstanding? (Careless / Systematic / Not sure)",
+      "action_if_careless": "Suggest re-attempt with fresh eyes; confidence ceiling on mastery update = 0.50",
+      "action_if_systematic": "Proceed with misconception detection and remediation"
+    },
+    "misconception_detected": {
+      "trigger": "Misconception probability > 0.65",
+      "gate_message": "Detected possible misconception: [name]. Offer [Sage] explanation link?",
+      "action_if_confirmed": "Link to Sage explanation + offer practice set from Forge"
+    },
+    "mastery_shift_large": {
+      "trigger": "Posterior mastery differs from prior by > 0.15",
+      "gate_message": "Mastery estimate changed significantly (was X, now Y). Does this match your self-assessment?",
+      "action_if_confirmed": "Update with explanation; log anomaly"
+    },
+    "grade_uncertain": {
+      "trigger": "Multiple reasonable interpretations of student's work",
+      "gate_message": "Your work is ambiguous here. Can you explain your reasoning?",
+      "action_if_clarified": "Grade based on clarification; confidence score increases"
+    }
+  },
+  "fallback_behavior": {
+    "when_problem_type_unknown": {
+      "action": "Request clarification: 'What type of problem is this? (Calculation / Derivation / Explanation / Other)'",
+      "confidence_ceiling": 0.50
+    },
+    "when_rubric_not_defined": {
+      "action": "Apply general rubric (correctness 60% + reasoning 40%); note limitation",
+      "confidence_ceiling": 0.65
+    },
+    "when_unclear_if_correct": {
+      "action": "Flag for human review: 'This answer is ambiguous or partially correct. Instructor review recommended.'",
+      "confidence_ceiling": 0.50
+    }
+  },
+  "audit_trail": {
+    "log_every": [
+      "Problem type classification",
+      "Rubric applied",
+      "Correctness score + reasoning score",
+      "Misconception detection (pattern matched, probability)",
+      "Bayesian update (prior α/β, outcome, posterior α/β, new mastery estimate)",
+      "Confidence interval calculation",
+      "Partial credit reasoning",
+      "Confirmation gates triggered",
+      "Final grade and remediation"
+    ]
+  }
+}

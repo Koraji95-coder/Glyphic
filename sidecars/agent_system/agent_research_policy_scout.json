@@ -1,0 +1,160 @@
+{
+  "agent": "scout",
+  "version": "2026-05-11",
+  "purpose": "Policy-as-data for Scout (Retriever) search and ranking boundaries",
+  "operating_principles": {
+    "retrieval_order": [
+      "vault_semantic_index_first",
+      "topical_recommendations_from_pathfinder",
+      "weak_topic_flagging_from_prism",
+      "temporal_relevance_weighting",
+      "fallback_to_full_text_search"
+    ],
+    "requires_confirmation": {
+      "return_results_below_0_65_confidence": true,
+      "expand_search_beyond_vault": true,
+      "return_results_older_than_6_months": true
+    },
+    "never_return": [
+      "Results below 0.50 confidence",
+      "Results marked 'archived' or 'deprecated' without explicit warning",
+      "Results from student notes with 'IGNORE' or 'ERROR' flags"
+    ]
+  },
+  "ranking_formula": {
+    "weights": {
+      "semantic_relevance": 0.50,
+      "mastery_gap_importance": 0.30,
+      "recency_freshness": 0.10,
+      "topical_diversity": 0.10
+    },
+    "semantic_relevance_scoring": {
+      "algorithm": "sentence-transformers (all-MiniLM-L6-v2)",
+      "embedding_model_size": "22MB (CPU-friendly)",
+      "similarity_metric": "cosine",
+      "threshold": 0.50
+    },
+    "mastery_gap_importance": {
+      "weak_topic_topics": {
+        "weight": "+0.15 if Prism flags as < 0.65 mastery",
+        "signal": "Prioritize results addressing known weak spots"
+      },
+      "trending_down": {
+        "weight": "+0.10 if recent attempts show declining mastery",
+        "signal": "Surface remedial content when mastery is regressing"
+      }
+    },
+    "recency_freshness": {
+      "fresh_rule": "Notes created/modified in last 7 days: +0.10",
+      "stale_penalty": "Notes untouched for > 6 months: −0.10",
+      "caveat": "Don't penalize foundational notes; only recent edits boost signal"
+    },
+    "topical_diversity": {
+      "rule": "Don't return 3 results all on same subtopic; diversify when possible",
+      "example": "If searching 'circuit analysis', return: (1) node voltage method, (2) mesh current, (3) Thévenin equivalent — not 3 results on node voltage"
+    }
+  },
+  "confidence_scoring": {
+    "high_confidence_result": {
+      "threshold": ">= 0.85",
+      "includes": "Semantic sim > 0.80 + recent + mastery-relevant",
+      "action": "Return without caveat; cite source and show snippet"
+    },
+    "medium_confidence_result": {
+      "threshold": "0.65–0.84",
+      "includes": "Semantic sim > 0.70 OR recent but not both",
+      "action": "Return with confidence label; explain why included"
+    },
+    "low_confidence_result": {
+      "threshold": "< 0.65",
+      "includes": "Semantic sim < 0.70 OR old OR misaligned with weak topics",
+      "action": "DO NOT return without explicit confirmation gate",
+      "gate_message": "Found lower-confidence result — want to see it? (Confirm / Skip)"
+    }
+  },
+  "source_catalog": {
+    "vault_semantic_index": {
+      "storage": "SQLite + sqlite-vec (vector store)",
+      "refresh_frequency": "On every note creation/edit",
+      "embeddings": "All-MiniLM-L6-v2 (22MB model)",
+      "indexed_fields": [
+        "note_title",
+        "note_body_text",
+        "student_tags",
+        "concept_mentions"
+      ]
+    },
+    "vault_full_text_search": {
+      "storage": "SQLite FTS5",
+      "fallback_to": "When semantic search returns < 3 results",
+      "instructions": "Use as backup, not primary; report 'semantic search found N results, supplementing with keyword search'"
+    },
+    "pathfinder_recommendations": {
+      "signal": "Topics in current week's learning path",
+      "boost": "+0.15 to ranking if result matches Pathfinder's recommended topic",
+      "caveat": "Only boost if topic match; don't force irrelevant results"
+    },
+    "prism_weak_spots": {
+      "signal": "Topics where mastery < 0.65",
+      "boost": "+0.10 if result addresses flagged weak topic",
+      "fallback": "Suggest Sage explanation if Scout finds no high-confidence results on weak topic"
+    },
+    "external_sources": {
+      "policy": "Scout does NOT retrieve external sources; only vault + recommendations",
+      "referral": "If student asks 'search the web', respond: 'I search your vault and recommend topics. For external sources, I'll ask Sage or Pathfinder.'"
+    }
+  },
+  "output_format": {
+    "result_template": {
+      "rank": "1, 2, 3",
+      "confidence_score": "0–1",
+      "title": "Note title or snippet",
+      "snippet": "20–50 word excerpt",
+      "relevance_reason": "Why this result matches your query",
+      "mastery_signal": "If weak topic: ⚠️ You're weaker here; if strong: ✓ Builds on your strength",
+      "action_button": "[View full note] [Ask Sage for help] [Generate practice with Forge]"
+    },
+    "summary_line": "Found N results; top match is [Title] with [X]% confidence",
+    "fallback_suggestion": "If all results < 0.65, offer: 'I didn't find strong vault matches. Let me ask Sage to explain this, or check your weekly plan with Pathfinder.'"
+  },
+  "confirmation_gates": {
+    "expand_beyond_vault": {
+      "trigger": "User asks 'search everywhere' or 'I can't find notes on X'",
+      "gate_message": "Found X vault results. Want me to suggest this to Sage for a synthesis explanation instead?",
+      "action_if_confirmed": "Trigger Sage with Scout's results as context"
+    },
+    "return_old_results": {
+      "trigger": "Best match is older than 6 months",
+      "gate_message": "Found relevant note from [Date]. It's old — want to use it anyway?",
+      "action_if_confirmed": "Return result + caveat: 'This is from [Date]; check if course material has changed'"
+    },
+    "return_low_confidence": {
+      "trigger": "All matches < 0.65 confidence",
+      "gate_message": "Only found weak matches. Suggest help from Sage? Or try different keywords?",
+      "action_if_confirmed": "Escalate to Sage for explanation"
+    }
+  },
+  "fallback_behavior": {
+    "when_vault_empty_on_topic": {
+      "action": "Report 'No vault notes on [topic] yet. Suggestions: (1) Ask Sage for explanation, (2) Check Pathfinder for learning path, (3) Create new note after learning.'",
+      "confidence_ceiling": 0.50
+    },
+    "when_semantic_search_fails": {
+      "action": "Fall back to FTS5 keyword search; report 'Using keyword search instead of semantic match'",
+      "confidence_ceiling": 0.65
+    },
+    "when_all_results_irrelevant": {
+      "action": "Say 'Your vault doesn't contain strong matches for this query. Try Sage or refine keywords.'",
+      "confidence_ceiling": 0.40
+    }
+  },
+  "audit_trail": {
+    "log_every": [
+      "Query received",
+      "Ranking weights applied",
+      "Confidence scores assigned to each result",
+      "Confirmation gates triggered",
+      "Final result set returned"
+    ]
+  }
+}
