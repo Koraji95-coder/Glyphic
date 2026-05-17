@@ -2,11 +2,14 @@ import { invoke } from '@tauri-apps/api/core';
 import type { AiConfig, Flashcard } from '../../types/ai';
 import type { CaptureResult, WindowInfo } from '../../types/capture';
 import type { Backlink, SearchResult } from '../../types/editor';
+import type { MasteryLevelDto, StudyAttemptDto, TopicRelationshipCountsDto } from '../../types/mastery.types';
 import type {
-  MasteryLevelDto,
-  StudyAttemptDto,
-  TopicRelationshipCountsDto,
-} from '../../types/mastery.types';
+  CompleteStudyPlanSessionInput,
+  StudyPlan,
+  StudyPlanOverview,
+  StudyPlanSession,
+  UpsertStudyPlanInput,
+} from '../../types/studyPlan';
 import type { TagInfo } from '../../types/tags';
 import type { NoteFile, VaultConfig, VaultEntry } from '../../types/vault';
 
@@ -216,6 +219,15 @@ export interface RestoreResultResponse {
 }
 
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+const emptyStudyPlanOverview = (): StudyPlanOverview => ({
+  plan: null,
+  today_session: null,
+  upcoming_sessions: [],
+  completed_this_week: 0,
+  planned_minutes_this_week: 0,
+  completed_minutes_this_week: 0,
+});
 
 export const commands = {
   // Vault
@@ -523,6 +535,21 @@ export const commands = {
       : Promise.reject('Not in Tauri'),
   feHandbookQA: (question: string) =>
     isTauri ? invoke<HandbookQAResult>('fe_handbook_qa', { question }) : Promise.reject('Not in Tauri'),
+
+  // Study plan workflow
+  getActiveStudyPlan: () => (isTauri ? invoke<StudyPlan | null>('get_active_study_plan') : Promise.resolve(null)),
+  upsertStudyPlan: (input: UpsertStudyPlanInput) =>
+    isTauri ? invoke<StudyPlan>('upsert_study_plan', { input }) : Promise.reject('Not in Tauri'),
+  getStudyPlanOverview: () =>
+    isTauri ? invoke<StudyPlanOverview>('get_study_plan_overview') : Promise.resolve(emptyStudyPlanOverview()),
+  generateTodayStudySession: () =>
+    isTauri ? invoke<StudyPlanSession>('generate_today_study_session') : Promise.reject('Not in Tauri'),
+  startStudyPlanSession: (sessionId: number) =>
+    isTauri ? invoke<StudyPlanSession>('start_study_plan_session', { sessionId }) : Promise.reject('Not in Tauri'),
+  completeStudyPlanSession: (input: CompleteStudyPlanSessionInput) =>
+    isTauri ? invoke<StudyPlanSession>('complete_study_plan_session', { input }) : Promise.reject('Not in Tauri'),
+  skipStudyPlanSession: (sessionId: number) =>
+    isTauri ? invoke<StudyPlanSession>('skip_study_plan_session', { sessionId }) : Promise.reject('Not in Tauri'),
 
   // Backup & Dropbox
   backupNow: (vaultPath: string) =>
