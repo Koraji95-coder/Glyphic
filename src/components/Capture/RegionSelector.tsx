@@ -91,7 +91,7 @@ export function RegionSelector() {
 
           {/* Dimension label */}
           <div
-            className="absolute px-3 py-1 bg-black/75 text-white text-xs font-mono rounded-2xl backdrop-blur-md border border-zinc-700 shadow-xl"
+            className="absolute px-3 py-1 bg-black/75 text-white text-xs font-mono rounded-md backdrop-blur-md border border-zinc-700 shadow-sm"
             style={{
               left: region.x,
               top: region.y + region.height + 8,

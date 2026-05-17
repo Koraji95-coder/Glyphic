@@ -112,7 +112,7 @@ export function FreeformSelector() {
       {/* Point count indicator */}
       {points.length > 0 && (
         <div
-          className="absolute px-3 py-1 bg-black/80 text-white text-xs font-mono rounded-3xl border border-zinc-700 backdrop-blur-md shadow-2xl"
+          className="absolute px-3 py-1 bg-black/80 text-white text-xs font-mono rounded-lg border border-zinc-700 backdrop-blur-md shadow-2xl"
           style={{
             left: points[points.length - 1].x + 16,
             top: points[points.length - 1].y + 16,
