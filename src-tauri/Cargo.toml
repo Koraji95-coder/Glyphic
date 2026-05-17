@@ -17,6 +17,7 @@ tauri = { version = "2", features = ["tray-icon", "protocol-asset"] }
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-dialog = "2"
+desktop-toolkit = { git = "https://github.com/chamber-19/desktop-toolkit", tag = "v2.5.0" }
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
@@ -43,3 +44,7 @@ trash = "5"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 xcap = "0.0.14"
+
+[package.metadata.desktop-toolkit]
+library-tag = "v2.5.0"
+shim-tag    = "v2.5.0"

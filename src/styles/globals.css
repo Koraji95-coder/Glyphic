@@ -120,9 +120,16 @@
   --shadow-glow: 0 0 40px rgba(163, 116, 247, 0.15);
 
   /* Typography */
-  --font-body: "DM Sans", system-ui, sans-serif;
-  --font-display: "DM Serif Display", serif;
-  --font-mono: "JetBrains Mono", monospace;
+  /* Font stacks bridge to desktop-toolkit --ch-font-* tokens (set by the
+     toolkit Activation flow / future ThemeProvider adoption). The hex /
+     string fallbacks preserve Glyphic's bespoke Midnight Eclipse palette --
+     Glyphic does NOT adopt ToolkitThemeProvider because its rich
+     multi-accent palette would clash with the toolkit's single-palette
+     contract. Font axis alone is enough to join the toolkit's 10-font-mode
+     system without touching colors. */
+  --font-body: var(--ch-font-ui, "DM Sans"), system-ui, sans-serif;
+  --font-display: var(--ch-font-display, "DM Serif Display"), serif;
+  --font-mono: var(--ch-font-mono, "JetBrains Mono"), monospace;
 
   /* Layout */
   --sidebar-width: 260px;
