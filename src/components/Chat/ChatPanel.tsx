@@ -125,23 +125,23 @@ export function ChatPanel() {
 
   return (
     <div
-      className="flex flex-col shrink-0 h-full bg-[#050507] border-l border-zinc-700"
+      className="flex flex-col shrink-0 h-full bg-zinc-950 border-l border-zinc-700"
       style={{ width: isMobile ? '100%' : '360px' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 h-12 border-b border-zinc-700 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white text-xs font-bold">
+          <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-md flex items-center justify-center text-white text-xs font-bold">
             G
           </div>
-          <span className="font-semibold text-violet-300">ScribeAI</span>
+          <span className="font-semibold text-blue-300">ScribeAI</span>
 
           <div className="relative" ref={pinMenuRef}>
             <button
               onClick={openPinMenu}
-              className={`flex items-center gap-1 px-3 py-1 text-[10px] font-mono rounded-3xl border transition-colors ${
+              className={`flex items-center gap-1 px-3 py-1 text-[10px] font-mono rounded-lg border transition-colors ${
                 modelSource === 'note'
-                  ? 'bg-violet-500/10 border-violet-500/30 text-violet-300'
+                  ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
                   : 'bg-zinc-800 border-zinc-600 text-zinc-400'
               }`}
             >
@@ -150,7 +150,7 @@ export function ChatPanel() {
             </button>
 
             {showPinMenu && activeNotePath && (
-              <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl py-2 w-52 z-50">
+              <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl py-2 w-52 z-50">
                 <div className="px-4 py-2 text-xs font-medium text-zinc-400 tracking-widest">PIN MODEL TO NOTE</div>
 
                 {activeNoteAiModel && (
@@ -168,7 +168,7 @@ export function ChatPanel() {
                     key={m}
                     onClick={() => handlePinModel(m)}
                     className={`w-full px-4 py-2.5 flex items-center gap-2 text-sm ${
-                      m === activeNoteAiModel ? 'bg-violet-500/10 text-violet-300' : 'text-zinc-200 hover:bg-zinc-800'
+                      m === activeNoteAiModel ? 'bg-blue-500/10 text-blue-300' : 'text-zinc-200 hover:bg-zinc-800'
                     }`}
                   >
                     {m === activeNoteAiModel && <Pin size={14} />}
@@ -183,19 +183,19 @@ export function ChatPanel() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => useSettingsUiStore.getState().open('ai')}
-            className="p-2 hover:bg-zinc-800 rounded-2xl text-zinc-400 hover:text-violet-300"
+            className="p-2 hover:bg-zinc-800 rounded-md text-zinc-400 hover:text-blue-300"
           >
             <Settings size={18} />
           </button>
           <button
             onClick={clearChat}
-            className="px-4 py-1 text-xs hover:bg-zinc-800 rounded-3xl text-zinc-400 hover:text-white"
+            className="px-4 py-1 text-xs hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white"
           >
             Clear
           </button>
           <button
             onClick={togglePanel}
-            className="p-2 hover:bg-zinc-800 rounded-2xl text-zinc-400 hover:text-red-400"
+            className="p-2 hover:bg-zinc-800 rounded-md text-zinc-400 hover:text-red-400"
           >
             {isMobile ? <ArrowLeft size={18} /> : <X size={18} />}
           </button>
@@ -215,7 +215,7 @@ export function ChatPanel() {
       <div className="flex-1 overflow-y-auto p-5 space-y-6">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-2xl flex items-center justify-center text-2xl text-white mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-md flex items-center justify-center text-2xl text-white mb-4">
               G
             </div>
             <p className="text-zinc-400">Ask ScribeAI anything</p>
@@ -226,7 +226,7 @@ export function ChatPanel() {
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
               <div
-                className={`px-4 py-3 rounded-3xl text-sm leading-relaxed ${
+                className={`px-4 py-3 rounded-lg text-sm leading-relaxed ${
                   msg.role === 'user'
                     ? 'bg-gradient-to-br from-violet-500 to-cyan-400 text-white'
                     : 'bg-zinc-800 text-zinc-100'
@@ -284,15 +284,15 @@ export function ChatPanel() {
       {/* Input */}
       <div className="p-4 border-t border-zinc-700 bg-zinc-900">
         {includeNoteContext && activeNoteTitle && (
-          <div className="flex items-center gap-2 text-xs mb-2 text-violet-300">
+          <div className="flex items-center gap-2 text-xs mb-2 text-blue-300">
             <span>Context: {activeNoteTitle}</span>
-            <button onClick={() => setIncludeNoteContext(false)} className="text-violet-400 hover:text-white">
+            <button onClick={() => setIncludeNoteContext(false)} className="text-blue-400 hover:text-white">
               ✕
             </button>
           </div>
         )}
 
-        <div className="flex items-end gap-2 bg-zinc-800 border border-zinc-700 rounded-3xl px-4 py-2">
+        <div className="flex items-end gap-2 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2">
           <textarea
             ref={textareaRef}
             value={input}
@@ -306,7 +306,7 @@ export function ChatPanel() {
           {isLoading ? (
             <button
               onClick={cancelStream}
-              className="w-9 h-9 bg-red-500 hover:bg-red-600 text-white rounded-2xl flex items-center justify-center transition-colors"
+              className="w-9 h-9 bg-red-500 hover:bg-red-600 text-white rounded-md flex items-center justify-center transition-colors"
             >
               <Square size={14} fill="currentColor" />
             </button>
@@ -314,7 +314,7 @@ export function ChatPanel() {
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+              className={`w-9 h-9 rounded-md flex items-center justify-center transition-all ${
                 input.trim()
                   ? 'bg-gradient-to-r from-violet-500 to-cyan-400 text-white'
                   : 'bg-zinc-700 text-zinc-400'
@@ -332,9 +332,9 @@ export function ChatPanel() {
 function ContextChip({ label, icon, active = false }: { label: string; icon?: ReactNode; active?: boolean }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-3xl border ${
+      className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-lg border ${
         active
-          ? 'bg-violet-500/10 border-violet-500/30 text-violet-300'
+          ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
           : 'bg-zinc-800 border-zinc-700 text-zinc-400'
       }`}
     >
@@ -358,9 +358,9 @@ function QuickActionCard({
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 flex flex-col items-start p-4 rounded-3xl bg-zinc-800/70 border border-zinc-700 hover:border-violet-500/30 hover:bg-zinc-800 transition-all w-28"
+      className="flex-shrink-0 flex flex-col items-start p-4 rounded-lg bg-zinc-800/70 border border-zinc-700 hover:border-blue-500/30 hover:bg-zinc-800 transition-all w-28"
     >
-      <div className="w-8 h-8 bg-zinc-900 rounded-2xl flex items-center justify-center mb-3 text-violet-300">
+      <div className="w-8 h-8 bg-zinc-900 rounded-md flex items-center justify-center mb-3 text-blue-300">
         {icon}
       </div>
       <div className="text-xs font-medium text-white">{title}</div>
