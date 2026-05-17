@@ -44,7 +44,7 @@ export function TagsPanel() {
             <button
               type="button"
               onClick={() => selectTag(null)}
-              className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-3xl text-zinc-300 transition-all"
+              className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-300 transition-all"
               title="Clear filter"
             >
               <X size={12} />
@@ -63,7 +63,7 @@ export function TagsPanel() {
                 key={tag.name}
                 type="button"
                 onClick={() => handleClick(tag.name)}
-                className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-3xl border transition-all ${
+                className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg border transition-all ${
                   isActive
                     ? 'bg-cyan-500/10 border-cyan-400 text-cyan-300'
                     : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-zinc-300 hover:text-white'
