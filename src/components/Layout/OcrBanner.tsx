@@ -22,9 +22,9 @@ export function OcrBanner() {
   if (!show) return null;
 
   return (
-    <div className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm shrink-0 bg-amber-500/10 border-b border-amber-500/20 text-amber-300">
+    <div className="flex shrink-0 items-center justify-between gap-3 border-b border-amber-500/20 bg-amber-500/5 px-5 py-2 text-xs text-amber-300">
       <span className="flex-1">
-        OCR is unavailable — screenshot text won't be searchable. Install{' '}
+        OCR is unavailable -- screenshot text won't be searchable. Install{' '}
         <span className="font-mono text-amber-200">tesseract</span> on your system.
       </span>
 
@@ -34,7 +34,7 @@ export function OcrBanner() {
           localStorage.setItem(DISMISS_KEY, '1');
           setShow(false);
         }}
-        className="px-3 py-1 text-xs font-medium rounded-2xl hover:bg-amber-500/20 transition-colors"
+        className="rounded-md px-2.5 py-1 text-[11px] font-medium text-amber-200 transition-colors hover:bg-amber-500/15"
       >
         Dismiss
       </button>
