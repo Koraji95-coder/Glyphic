@@ -42,15 +42,15 @@ export function AnnotationToolbar({
   const { activeTool, setActiveTool, color, setColor, strokeWidth, setStrokeWidth } = useAnnotationStore();
 
   return (
-    <div className="flex items-center gap-3 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 shadow-2xl rounded-3xl px-5 py-3">
+    <div className="flex items-center gap-3 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 shadow-2xl rounded-lg px-5 py-3">
       {/* Tools */}
       {TOOLS.map(({ type, icon: Icon, label }) => (
         <button
           key={type}
           onClick={() => setActiveTool(type)}
           title={label}
-          className={`p-3 rounded-3xl transition-all ${
-            activeTool === type ? 'bg-violet-500 text-white shadow-inner' : 'hover:bg-zinc-800 text-zinc-300'
+          className={`p-3 rounded-lg transition-all ${
+            activeTool === type ? 'bg-blue-500 text-white' : 'hover:bg-zinc-800 text-zinc-300'
           }`}
         >
           <Icon size={20} />
@@ -65,8 +65,8 @@ export function AnnotationToolbar({
           <button
             key={c}
             onClick={() => setColor(c)}
-            className={`w-6 h-6 rounded-2xl border-2 transition-transform hover:scale-110 ${
-              c === color ? 'border-white shadow-inner scale-110' : 'border-zinc-600'
+            className={`w-6 h-6 rounded-md border-2 transition-transform hover:scale-110 ${
+              c === color ? 'border-white scale-110' : 'border-zinc-600'
             }`}
             style={{ backgroundColor: c }}
           />
@@ -92,10 +92,10 @@ export function AnnotationToolbar({
       <div className="w-px h-8 bg-zinc-700 mx-2" />
 
       {/* Undo / Redo */}
-      <button onClick={onUndo} disabled={!canUndo} className="p-3 hover:bg-zinc-800 rounded-3xl disabled:opacity-30">
+      <button onClick={onUndo} disabled={!canUndo} className="p-3 hover:bg-zinc-800 rounded-lg disabled:opacity-30">
         <Undo2 size={20} />
       </button>
-      <button onClick={onRedo} disabled={!canRedo} className="p-3 hover:bg-zinc-800 rounded-3xl disabled:opacity-30">
+      <button onClick={onRedo} disabled={!canRedo} className="p-3 hover:bg-zinc-800 rounded-lg disabled:opacity-30">
         <Redo2 size={20} />
       </button>
 
@@ -104,7 +104,7 @@ export function AnnotationToolbar({
       {/* Save & Discard */}
       <button
         onClick={onSave}
-        className="flex items-center gap-2 px-6 py-3 bg-violet-500 hover:bg-violet-400 text-white font-medium rounded-3xl transition-colors"
+        className="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-300 text-white font-medium rounded-lg transition-colors"
       >
         <Save size={18} />
         Save
@@ -112,7 +112,7 @@ export function AnnotationToolbar({
 
       <button
         onClick={onDiscard}
-        className="p-3 hover:bg-red-500/10 text-zinc-300 hover:text-red-300 rounded-3xl transition-colors"
+        className="p-3 hover:bg-red-500/10 text-zinc-300 hover:text-red-300 rounded-lg transition-colors"
       >
         <X size={20} />
       </button>

@@ -47,7 +47,7 @@ export function WindowSelector() {
   );
 
   return (
-    <div className="flex flex-col h-full bg-[#050507]">
+    <div className="flex flex-col h-full bg-zinc-950">
       <div className="px-6 py-4 border-b border-zinc-700 flex items-center justify-between bg-zinc-900">
         <span className="font-semibold text-white">Select Window</span>
       </div>
@@ -59,14 +59,14 @@ export function WindowSelector() {
             onClick={(e) => handleWindowClick(win, e)}
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(null)}
-            className={`group relative flex flex-col items-center justify-center p-6 rounded-3xl border transition-all ${
+            className={`group relative flex flex-col items-center justify-center p-6 rounded-lg border transition-all ${
               hoveredIndex === i
-                ? 'border-violet-500 bg-zinc-900 shadow-xl scale-105'
+                ? 'border-violet-500 bg-zinc-900 shadow-sm scale-105'
                 : 'border-zinc-700 bg-zinc-900 hover:border-zinc-600'
             }`}
           >
             {/* Window preview placeholder */}
-            <div className="w-40 h-28 bg-zinc-800 rounded-2xl mb-4 flex items-center justify-center border border-zinc-700 group-hover:border-violet-400 transition-colors">
+            <div className="w-40 h-28 bg-zinc-800 rounded-md mb-4 flex items-center justify-center border border-zinc-700 group-hover:border-violet-400 transition-colors">
               <span className="text-zinc-400 text-xs font-mono">WINDOW</span>
             </div>
             <div className="text-sm font-medium text-white text-center line-clamp-2">{win.title || 'Untitled Window'}</div>
