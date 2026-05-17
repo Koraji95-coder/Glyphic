@@ -14,3 +14,4 @@ pub mod vault_commands;
 pub mod vault_study;
 pub mod diagram_commands;
 pub mod fe_commands;
+pub mod study_plan_commands;
