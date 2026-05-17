@@ -1,7 +1,16 @@
-import { Activity, BookOpen, FolderOpen, GraduationCap, Plus, Upload } from 'lucide-react';
+import Activity from 'lucide-react/dist/esm/icons/activity';
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle';
+import BookOpen from 'lucide-react/dist/esm/icons/book-open';
+import CheckCircle2 from 'lucide-react/dist/esm/icons/check-circle-2';
+import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
+import FolderOpen from 'lucide-react/dist/esm/icons/folder-open';
+import GraduationCap from 'lucide-react/dist/esm/icons/graduation-cap';
+import Plus from 'lucide-react/dist/esm/icons/plus';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
-import { commands, type FeTopicStats } from '../../lib/tauri/commands';
+import { commands, type FeTopicStats, type FeWeakTopic } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import type { VaultEntry } from '../../types/vault';
@@ -52,13 +61,18 @@ function formatRelative(dateIso: string | null): string {
   return `${days}d ago`;
 }
 
+function clampAccuracy(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
 export function Dashboard() {
   const fileTree = useVaultStore((s) => s.fileTree);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
   const openFePrep = useLayoutStore((s) => s.openFePrep);
+  const openMasteryMode = useLayoutStore((s) => s.openMasteryMode);
 
-  const [sourcesIngested, setSourcesIngested] = useState(0);
   const [feStats, setFeStats] = useState<FeTopicStats[]>([]);
+  const [weakTopics, setWeakTopics] = useState<FeWeakTopic[]>([]);
 
   const notes = useMemo(() => flattenNotes(fileTree), [fileTree]);
   const totalNotes = notes.length;
@@ -75,168 +89,273 @@ export function Dashboard() {
   }, [notes]);
 
   const feSummary = useMemo(() => {
-    if (feStats.length === 0) return { attempts: 0, accuracy: 0 };
+    if (feStats.length === 0) return { attempts: 0, accuracy: 0, strongest: null as FeTopicStats | null };
     const attempts = feStats.reduce((sum, s) => sum + s.attempts, 0);
     const correct = feStats.reduce((sum, s) => sum + s.correct, 0);
     const accuracy = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
-    return { attempts, accuracy };
+    const strongest = [...feStats].sort((a, b) => b.accuracy - a.accuracy)[0] ?? null;
+    return { attempts, accuracy, strongest };
   }, [feStats]);
 
+  const nextFocus = weakTopics[0] ?? null;
+  const hasAnyData = totalNotes > 0 || feSummary.attempts > 0;
+
   useEffect(() => {
-    void commands.getFeStatistics().then(setFeStats).catch(() => setFeStats([]));
+    void Promise.all([commands.getFeStatistics(), commands.getWeakFeTopics()])
+      .then(([stats, weak]) => {
+        setFeStats(stats);
+        setWeakTopics(weak);
+      })
+      .catch(() => {
+        setFeStats([]);
+        setWeakTopics([]);
+      });
   }, []);
 
-  const hasAnyData = totalNotes > 0 || feSummary.attempts > 0 || sourcesIngested > 0;
-
   return (
-    <div className="flex-1 overflow-y-auto p-7 bg-[#050507]">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="flex-1 overflow-y-auto" style={{ background: 'var(--bg-app)', padding: '28px' }}>
+      <div className="mx-auto" style={{ maxWidth: 1180 }}>
+        <header className="flex items-start justify-between gap-6" style={{ marginBottom: 24 }}>
+          <div>
+            <p style={eyebrowStyle}>Study workspace</p>
+            <h1 style={{ color: 'var(--text-primary)', fontSize: 30, lineHeight: 1.12, fontWeight: 700 }}>
+              Glyphic study dashboard
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: 660, marginTop: 8, lineHeight: 1.55 }}>
+              Plan the next session, reopen recent notes, and move straight into FE Electrical practice or review.
+            </p>
+          </div>
+          <button type="button" onClick={openFePrep} style={primaryButtonStyle}>
+            <GraduationCap size={17} />
+            Start FE Prep
+          </button>
+        </header>
+
         {!hasAnyData && (
-          <section
-            className="rounded-3xl border border-zinc-700 p-7"
-            style={{
-              background:
-                'linear-gradient(145deg, rgba(124,58,237,0.16), rgba(6,182,212,0.08) 45%, rgba(24,24,27,0.88) 75%)',
-            }}
-          >
-            <div className="flex items-start justify-between gap-6">
-              <div>
-                <h1 className="text-2xl font-semibold text-white">Welcome to Glyphic</h1>
-                <p className="text-zinc-300 mt-2" style={{ maxWidth: '52ch', lineHeight: 1.55 }}>
-                  Your workspace is ready. Create your first note, organize a folder structure,
-                  then start an FE session and this dashboard will populate with live progress.
-                </p>
-              </div>
-              <div className="text-xs text-zinc-300 rounded-2xl border border-zinc-600 px-3 py-2 bg-zinc-900/60">
-                Setup takes about 2 minutes
-              </div>
+          <section style={noticeStyle}>
+            <div>
+              <h2 style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 700 }}>Set up your study loop</h2>
+              <p style={{ color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.55 }}>
+                Create a note, organize one folder, then run an FE practice session. This dashboard will turn those
+                actions into a visible review queue.
+              </p>
             </div>
+            <span style={statusPillStyle}>Local-first</span>
           </section>
         )}
 
-        {/* Stats row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <section
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          aria-label="Study metrics"
+          style={{ marginBottom: 20 }}
+        >
           <StatCard label="Total notes" value={String(totalNotes)} icon={<BookOpen size={18} />} />
           <StatCard label="Folders" value={String(totalFolders)} icon={<FolderOpen size={18} />} />
-          <StatCard label="Documents ingested" value={String(sourcesIngested)} icon={<Upload size={18} />} />
+          <StatCard label="FE attempts" value={String(feSummary.attempts)} icon={<ClipboardList size={18} />} />
           <StatCard
             label="FE accuracy"
-            value={feSummary.attempts > 0 ? `${feSummary.accuracy}%` : '—'}
-            icon={<GraduationCap size={18} />}
+            value={feSummary.attempts > 0 ? `${feSummary.accuracy}%` : '-'}
+            icon={<TrendingUp size={18} />}
           />
+        </section>
+
+        <div className="grid md:grid-cols-2 gap-5" style={{ marginBottom: 20 }}>
+          <Section title="Today's study focus" actionLabel="Open FE Prep" onAction={openFePrep}>
+            {nextFocus ? (
+              <div style={focusPanelStyle}>
+                <div className="flex items-center gap-3">
+                  <div style={warningIconStyle}>
+                    <AlertTriangle size={17} />
+                  </div>
+                  <div>
+                    <p style={{ color: 'var(--text-primary)', fontWeight: 700 }}>Review {nextFocus.name}</p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 2 }}>
+                      {nextFocus.category} · {nextFocus.attempts} attempts · {clampAccuracy(nextFocus.accuracy)}%
+                      accuracy
+                    </p>
+                  </div>
+                </div>
+                <p style={{ color: 'var(--text-secondary)', lineHeight: 1.55, marginTop: 16 }}>
+                  Start here before adding new material. Weak-topic review keeps FE practice from becoming random drill
+                  work.
+                </p>
+              </div>
+            ) : (
+              <EmptyState
+                icon={<Activity size={18} />}
+                title="No weak topics yet"
+                body="Run an FE practice session and Glyphic will surface the first topics that need review."
+              />
+            )}
+          </Section>
+
+          <Section title="Quick actions">
+            <div className="grid gap-3">
+              <QuickAction
+                icon={<Plus size={17} />}
+                label="New note"
+                onClick={() => dispatchGlyphicEvent('glyphic:new-note')}
+              />
+              <QuickAction
+                icon={<FolderOpen size={17} />}
+                label="New folder"
+                onClick={() => dispatchGlyphicEvent('glyphic:new-folder')}
+              />
+              <QuickAction icon={<GraduationCap size={17} />} label="Start FE Prep" onClick={openFePrep} />
+              <QuickAction icon={<CheckCircle2 size={17} />} label="Open Mastery" onClick={openMasteryMode} />
+            </div>
+          </Section>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Recent notes */}
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-white">Recent notes</h2>
-              <span className="text-xs text-zinc-400">{recentNotes.length} items</span>
-            </div>
+        <div className="grid md:grid-cols-2 gap-5">
+          <Section title="Recent notes">
             {recentNotes.length > 0 ? (
-              <div className="space-y-2">
+              <div className="grid gap-2">
                 {recentNotes.map((note) => (
                   <button
                     key={note.path}
+                    type="button"
                     onClick={() => setActiveNote(note.path, note.path)}
-                    className="w-full flex justify-between items-center px-5 py-4 hover:bg-zinc-800 rounded-2xl transition-colors text-left"
+                    style={noteButtonStyle}
                   >
-                    <span className="text-zinc-200 truncate">{note.title}</span>
-                    <span className="text-xs text-zinc-400 font-mono">{formatRelative(note.modifiedAt)}</span>
+                    <span className="truncate" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                      {note.title}
+                    </span>
+                    <span style={{ color: 'var(--text-ghost)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+                      {formatRelative(note.modifiedAt)}
+                    </span>
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 text-center">
-                <BookOpen size={20} className="text-zinc-400" style={{ margin: '0 auto 10px auto' }} />
-                <p className="text-zinc-300 text-sm">No recent notes yet</p>
-                <p className="text-zinc-500 text-xs mt-1">Create a note and it will appear here.</p>
-              </div>
+              <EmptyState
+                icon={<BookOpen size={18} />}
+                title="No notes yet"
+                body="Create an FE concept note or import material into the vault to start building context."
+              />
             )}
-          </div>
+          </Section>
 
-          {/* FE Prep progress */}
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold text-white">FE Prep Progress</h2>
-              <span className="text-xs text-zinc-400">{feSummary.attempts} attempts</span>
-            </div>
-            {feStats.length > 0 ? (
-              <div className="space-y-6">
-                {feStats.slice(0, 5).map((topic) => (
-                  <div key={topic.topic_id}>
-                    <div className="flex justify-between text-xs text-zinc-400 mb-2">
-                      <span>Topic #{topic.topic_id}</span>
-                      <span>{Math.round(topic.accuracy)}%</span>
-                    </div>
-                    <div className="h-2 bg-zinc-800 rounded-3xl overflow-hidden">
-                      <div
-                        className="h-2 bg-linear-to-r from-violet-400 to-cyan-400 rounded-3xl transition-all"
-                        style={{ width: `${Math.min(100, Math.round(topic.accuracy))}%` }}
-                      />
-                    </div>
-                  </div>
+          <Section title="Weak topic review" actionLabel="Practice" onAction={openFePrep}>
+            {weakTopics.length > 0 ? (
+              <div className="grid gap-3">
+                {weakTopics.slice(0, 4).map((topic) => (
+                  <ProgressRow
+                    key={topic.topic_id}
+                    label={topic.name}
+                    detail={`${topic.category} · ${topic.attempts} attempts`}
+                    value={clampAccuracy(topic.accuracy)}
+                  />
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
-                <GraduationCap size={20} className="text-zinc-400" style={{ marginBottom: 10 }} />
-                <p className="text-zinc-300 text-sm">No FE sessions started</p>
-                <p className="text-zinc-500 text-xs mt-1">
-                  Run your first FE practice session to track topic-level accuracy.
-                </p>
-              </div>
+              <EmptyState
+                icon={<AlertTriangle size={18} />}
+                title="No review queue"
+                body="Weak areas will appear after enough FE attempts are recorded."
+              />
             )}
-          </div>
+          </Section>
         </div>
 
-        {/* Quick actions */}
-        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
-          <h2 className="font-semibold text-white mb-5">Quick actions</h2>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('glyphic:new-note'))}
-              className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-violet-500 to-cyan-400 text-white rounded-3xl font-medium hover:brightness-110 transition-all"
-            >
-              <Plus size={18} />
-              New note
-            </button>
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('glyphic:new-folder'))}
-              className="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl font-medium transition-all"
-            >
-              <FolderOpen size={18} />
-              New folder
-            </button>
-            <button
-              onClick={openFePrep}
-              className="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl font-medium transition-all"
-            >
-              <GraduationCap size={18} />
-              Start FE session
-            </button>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-zinc-800 grid md:grid-cols-3 gap-3">
+        <section style={{ ...panelStyle, marginTop: 20 }} aria-label="Study readiness checklist">
+          <div className="grid md:grid-cols-3 gap-3">
             <ChecklistItem title="Create first note" done={totalNotes > 0} />
             <ChecklistItem title="Organize folders" done={totalFolders > 0} />
             <ChecklistItem title="Run FE practice" done={feSummary.attempts > 0} />
           </div>
-        </div>
+          {feSummary.strongest && (
+            <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 16 }}>
+              Strongest current topic: Topic #{feSummary.strongest.topic_id} at{' '}
+              {clampAccuracy(feSummary.strongest.accuracy)}% accuracy.
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
+function dispatchGlyphicEvent(name: string) {
+  window.dispatchEvent(new CustomEvent(name));
+}
+
+function StatCard({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 flex items-center gap-4">
-      <div className="w-10 h-10 bg-zinc-800 rounded-2xl flex items-center justify-center text-violet-300">
-        {icon}
-      </div>
+    <div style={statCardStyle}>
+      <div style={metricIconStyle}>{icon}</div>
       <div>
-        <div className="text-xs text-zinc-400 tracking-widest">{label}</div>
-        <div className="text-3xl font-semibold text-white mt-1">{value}</div>
+        <div
+          style={{ color: 'var(--text-secondary)', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase' }}
+        >
+          {label}
+        </div>
+        <div style={{ color: 'var(--text-primary)', fontSize: 28, fontWeight: 700, marginTop: 3 }}>{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  actionLabel,
+  onAction,
+  children,
+}: {
+  title: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <section style={panelStyle}>
+      <div className="flex items-center justify-between gap-4" style={{ marginBottom: 16 }}>
+        <h2 style={{ color: 'var(--text-primary)', fontSize: 16, fontWeight: 700 }}>{title}</h2>
+        {actionLabel && onAction && (
+          <button type="button" onClick={onAction} style={secondaryButtonStyle}>
+            {actionLabel}
+          </button>
+        )}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EmptyState({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
+  return (
+    <div style={emptyStateStyle}>
+      <div style={mutedIconStyle}>{icon}</div>
+      <p style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{title}</p>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.5, marginTop: 4 }}>{body}</p>
+    </div>
+  );
+}
+
+function QuickAction({ icon, label, onClick }: { icon: ReactNode; label: string; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} style={quickActionStyle}>
+      <span className="flex items-center gap-3">
+        <span style={mutedIconStyle}>{icon}</span>
+        {label}
+      </span>
+      <span style={{ color: 'var(--text-ghost)' }}>Open</span>
+    </button>
+  );
+}
+
+function ProgressRow({ label, detail, value }: { label: string; detail: string; value: number }) {
+  return (
+    <div>
+      <div className="flex justify-between gap-4" style={{ marginBottom: 8 }}>
+        <div>
+          <p style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{label}</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 12, marginTop: 2 }}>{detail}</p>
+        </div>
+        <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>{value}%</span>
+      </div>
+      <div style={progressTrackStyle}>
+        <div style={{ ...progressFillStyle, width: `${value}%` }} />
       </div>
     </div>
   );
@@ -244,17 +363,181 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
 
 function ChecklistItem({ title, done }: { title: string; done: boolean }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-3 flex items-center gap-3">
+    <div style={checklistItemStyle}>
       <div
-        className="w-5 h-5 rounded-full"
         style={{
-          background: done ? 'rgba(34,197,94,0.25)' : 'rgba(113,113,122,0.2)',
-          border: done ? '1px solid rgba(34,197,94,0.8)' : '1px solid rgba(113,113,122,0.6)',
+          width: 18,
+          height: 18,
+          borderRadius: '999px',
+          background: done ? 'var(--accent-mastery-dim)' : 'var(--bg-hover)',
+          border: done ? '1px solid var(--accent-mastery)' : '1px solid var(--border)',
         }}
       />
-      <span className="text-sm" style={{ color: done ? '#e4e4e7' : '#a1a1aa' }}>
-        {title}
-      </span>
+      <span style={{ color: done ? 'var(--text-primary)' : 'var(--text-secondary)', fontSize: 14 }}>{title}</span>
     </div>
   );
 }
+
+const eyebrowStyle = {
+  color: 'var(--accent)',
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: '0.08em',
+  marginBottom: 8,
+  textTransform: 'uppercase' as const,
+};
+
+const panelStyle = {
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius-md)',
+  padding: 20,
+};
+
+const statCardStyle = {
+  ...panelStyle,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 14,
+};
+
+const noticeStyle = {
+  ...panelStyle,
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  gap: 18,
+  marginBottom: 20,
+  background: 'linear-gradient(135deg, var(--accent-dim), var(--bg-card))',
+};
+
+const statusPillStyle = {
+  color: 'var(--text-secondary)',
+  border: '1px solid var(--border)',
+  borderRadius: '999px',
+  padding: '6px 10px',
+  fontSize: 12,
+  whiteSpace: 'nowrap' as const,
+};
+
+const primaryButtonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  minHeight: 40,
+  padding: '0 14px',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--accent)',
+  color: 'white',
+  fontWeight: 700,
+  cursor: 'pointer',
+};
+
+const secondaryButtonStyle = {
+  minHeight: 32,
+  padding: '0 10px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--border)',
+  background: 'var(--bg-hover)',
+  color: 'var(--text-secondary)',
+  fontSize: 12,
+  fontWeight: 700,
+  cursor: 'pointer',
+};
+
+const quickActionStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 14,
+  width: '100%',
+  minHeight: 48,
+  padding: '0 14px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--border)',
+  background: 'var(--bg-hover)',
+  color: 'var(--text-primary)',
+  fontWeight: 700,
+  cursor: 'pointer',
+  textAlign: 'left' as const,
+};
+
+const noteButtonStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 16,
+  width: '100%',
+  minHeight: 48,
+  padding: '0 14px',
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--bg-hover)',
+  color: 'var(--text-primary)',
+  cursor: 'pointer',
+  textAlign: 'left' as const,
+};
+
+const metricIconStyle = {
+  display: 'grid',
+  placeItems: 'center',
+  width: 40,
+  height: 40,
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--accent-dim)',
+  color: 'var(--accent)',
+  flex: '0 0 auto',
+};
+
+const mutedIconStyle = {
+  display: 'grid',
+  placeItems: 'center',
+  width: 32,
+  height: 32,
+  borderRadius: 'var(--radius-sm)',
+  background: 'var(--bg-hover)',
+  color: 'var(--text-secondary)',
+  flex: '0 0 auto',
+};
+
+const warningIconStyle = {
+  ...mutedIconStyle,
+  background: 'var(--bg-review-panel)',
+  color: 'var(--accent-review)',
+};
+
+const focusPanelStyle = {
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius-md)',
+  padding: 16,
+  background: 'var(--bg-hover)',
+};
+
+const emptyStateStyle = {
+  border: '1px solid var(--border-subtle)',
+  borderRadius: 'var(--radius-md)',
+  padding: 18,
+  background: 'rgba(255,255,255,0.025)',
+};
+
+const progressTrackStyle = {
+  height: 8,
+  borderRadius: '999px',
+  background: 'var(--bg-hover)',
+  overflow: 'hidden',
+};
+
+const progressFillStyle = {
+  height: '100%',
+  borderRadius: '999px',
+  background: 'var(--accent)',
+};
+
+const checklistItemStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  border: '1px solid var(--border-subtle)',
+  borderRadius: 'var(--radius-sm)',
+  padding: '12px 14px',
+  background: 'var(--bg-hover)',
+};

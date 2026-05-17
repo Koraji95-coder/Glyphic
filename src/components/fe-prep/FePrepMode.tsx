@@ -572,6 +572,8 @@ function TopicBrowser({
               }}
             >
               <input
+                id="fe-session-mode-practice"
+                name="fe-session-mode"
                 type="radio"
                 checked={sessionMode === 'practice'}
                 onChange={() => onSessionModeChange('practice')}
@@ -587,7 +589,13 @@ function TopicBrowser({
                 color: 'var(--text-primary)',
               }}
             >
-              <input type="radio" checked={sessionMode === 'exam'} onChange={() => onSessionModeChange('exam')} />
+              <input
+                id="fe-session-mode-exam"
+                name="fe-session-mode"
+                type="radio"
+                checked={sessionMode === 'exam'}
+                onChange={() => onSessionModeChange('exam')}
+              />
               Timed Exam
             </label>
             <label
@@ -600,6 +608,8 @@ function TopicBrowser({
               }}
             >
               <input
+                id="fe-session-mode-question-bank"
+                name="fe-session-mode"
                 type="radio"
                 checked={sessionMode === 'question-bank'}
                 onChange={() => onSessionModeChange('question-bank')}
@@ -645,7 +655,10 @@ function TopicBrowser({
               </button>
               {examPresetMinutes === 'custom' && (
                 <input
+                  id="fe-custom-exam-minutes"
+                  name="fe-custom-exam-minutes"
                   type="number"
+                  aria-label="Custom exam duration in minutes"
                   min={1}
                   step={1}
                   value={customExamMinutes}
@@ -1182,9 +1195,12 @@ function PracticeSession({
         {!session.finalized && !session.revealed && !generating && (
           <>
             <textarea
+              id="fe-session-answer"
+              name="fe-session-answer"
               ref={answerRef}
               value={session.userAnswer}
               onChange={(e) => onUserAnswerChange(e.target.value)}
+              aria-label="FE session answer"
               placeholder="Type your answer here…"
               rows={4}
               style={{
