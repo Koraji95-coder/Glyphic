@@ -36,11 +36,11 @@ export function NoteTagChips({ notePath, refreshKey }: NoteTagChipsProps) {
   if (tags.length === 0) return null;
 
   return (
-    <div className="flex items-center flex-wrap gap-2 px-8 py-3 bg-[#050507] border-b border-zinc-800">
+    <div className="flex items-center flex-wrap gap-2 px-8 py-3 bg-zinc-950 border-b border-zinc-800">
       {tags.map((tag) => (
         <span
           key={tag}
-          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-gradient-to-r from-violet-500/10 to-cyan-400/10 border border-violet-500/30 text-violet-300 rounded-3xl"
+          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-gradient-to-r from-violet-500/10 to-cyan-400/10 border border-blue-500/30 text-blue-300 rounded-lg"
         >
           <Hash size={13} />
           {tag}

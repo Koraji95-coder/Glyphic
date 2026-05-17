@@ -79,7 +79,7 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
   return (
     <NodeViewWrapper
       as="div"
-      className="mermaid-block my-4 rounded-3xl border border-zinc-700 bg-zinc-900/70 backdrop-blur-xl overflow-hidden"
+      className="mermaid-block my-4 rounded-lg border border-zinc-700 bg-zinc-900/70 backdrop-blur-xl overflow-hidden"
     >
       {/* Editable source */}
       {editor.isEditable && (

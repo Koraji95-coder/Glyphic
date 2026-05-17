@@ -56,7 +56,7 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl backdrop-blur-2xl py-2 z-50"
+      className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl backdrop-blur-2xl py-2 z-50"
     >
       {items.map((item, index) => (
         <button
@@ -67,7 +67,7 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
             index === selectedIndex ? 'bg-zinc-800' : 'hover:bg-zinc-800/60'
           }`}
         >
-          <div className="w-8 h-8 flex items-center justify-center bg-zinc-800 rounded-2xl text-violet-300">
+          <div className="w-8 h-8 flex items-center justify-center bg-zinc-800 rounded-md text-blue-300">
             {item.icon}
           </div>
           <div className="min-w-0 flex-1">
