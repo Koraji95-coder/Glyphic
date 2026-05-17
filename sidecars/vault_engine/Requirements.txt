@@ -22,7 +22,7 @@ Pillow==12.2.0
 pytesseract==0.3.10
 
 # URL ingestion
-requests==2.33.0
+requests==2.34.2
 beautifulsoup4==4.12.3
 
 # Required by beautifulsoup4 for HTML parsing
