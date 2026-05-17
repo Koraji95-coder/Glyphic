@@ -13,6 +13,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
+use desktop_toolkit::activation;
 use tauri::Manager;
 
 use commands::{
@@ -51,6 +52,11 @@ pub fn run() {
             // ← No invoke_handler inside setup — that was the syntax error
         })
         .invoke_handler(tauri::generate_handler![
+            // activation (toolkit-owned: PIN entry, machine-bound HMAC token, bearer for backend HTTP)
+            activation::commands::toolkit_check_activation,
+            activation::commands::toolkit_activate_with_pin,
+            activation::commands::toolkit_deactivate,
+            activation::commands::toolkit_get_bearer_token,
             // capture
             capture_commands::start_capture,
             capture_commands::finish_capture,
