@@ -190,14 +190,14 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
   };
 
   return (
-    <div className={embedded ? 'flex flex-col gap-8' : 'fixed inset-0 bg-[#050507] z-50 flex flex-col'}>
+    <div className={embedded ? 'flex flex-col gap-8' : 'fixed inset-0 bg-zinc-950 z-50 flex flex-col'}>
       {/* Header (only when not embedded) */}
       {!embedded && (
         <div className="flex items-center justify-between px-6 h-12 border-b border-zinc-700 shrink-0">
           <span className="font-semibold text-white">AI Settings</span>
           <button
             onClick={onClose}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -206,16 +206,16 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
       <div className={embedded ? '' : 'flex-1 overflow-y-auto p-6 space-y-8'}>
         {/* Provider Selector */}
-        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
           <div className="text-xs font-medium text-zinc-400 tracking-widest mb-4">PROVIDER</div>
           <div className="flex gap-2">
             {(['ollama', 'open_ai'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => setConfig((c) => ({ ...c, provider: p }))}
-                className={`flex-1 py-3 rounded-3xl text-sm font-medium transition-all ${
+                className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${
                   config.provider === p
-                    ? 'bg-violet-500 text-white shadow-inner'
+                    ? 'bg-blue-500 text-white'
                     : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                 }`}
               >
@@ -227,7 +227,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
         {/* Ollama Config */}
         {isOllama && (
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 space-y-6">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 space-y-6">
             <div className="text-xs font-medium text-zinc-400 tracking-widest">OLLAMA</div>
             <div>
               <label className="text-xs font-medium text-zinc-400 block mb-2">Endpoint</label>
@@ -240,7 +240,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     ollama: { ...c.ollama, endpoint: e.target.value },
                   }))
                 }
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
               />
             </div>
             <div>
@@ -254,7 +254,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     ollama: { ...c.ollama, model: e.target.value },
                   }))
                 }
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
                 placeholder="llama3.1:8b"
               />
             </div>
@@ -263,7 +263,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
         {/* OpenAI Config */}
         {config.provider === 'open_ai' && (
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 space-y-6">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 space-y-6">
             <div className="text-xs font-medium text-zinc-400 tracking-widest">OPENAI</div>
             <div>
               <label className="text-xs font-medium text-zinc-400 block mb-2">API Key</label>
@@ -276,7 +276,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     openai: { ...c.openai, api_key: e.target.value },
                   }))
                 }
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
                 placeholder="sk-..."
               />
             </div>
@@ -291,7 +291,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     openai: { ...c.openai, model: e.target.value },
                   }))
                 }
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
                 placeholder="gpt-4o-mini"
               />
             </div>
@@ -306,7 +306,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     openai: { ...c.openai, endpoint: e.target.value },
                   }))
                 }
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
               />
             </div>
           </div>
@@ -314,7 +314,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
 
         {/* Pull New Model (Ollama only) */}
         {isOllama && isTauri && (
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 space-y-6">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 space-y-6">
             <div className="text-xs font-medium text-zinc-400 tracking-widest">PULL NEW MODEL</div>
 
             {/* Recommended models */}
@@ -331,7 +331,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                 return (
                   <div
                     key={name}
-                    className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-3xl px-5 py-4"
+                    className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-lg px-5 py-4"
                   >
                     <div>
                       <div className="font-medium text-white">{name}</div>
@@ -340,12 +340,12 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     <button
                       onClick={() => void handlePull(name)}
                       disabled={isPulling || isInstalled}
-                      className={`px-6 py-2 rounded-3xl text-sm font-medium transition-all ${
+                      className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
                         isInstalled
                           ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
                           : isPulling
-                            ? 'bg-violet-500/10 text-violet-300'
-                            : 'bg-violet-500 hover:bg-violet-400 text-white'
+                            ? 'bg-blue-500/10 text-blue-300'
+                            : 'bg-blue-500 hover:bg-blue-300 text-white'
                       }`}
                     >
                       {isInstalled ? '✓ Installed' : isPulling ? (pct != null ? `${pct}%` : 'Pulling…') : 'Pull'}
@@ -363,12 +363,12 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                 onChange={(e) => setPullInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handlePull(pullInput)}
                 placeholder="e.g. llama3.2:3b"
-                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
               />
               <button
                 onClick={() => void handlePull(pullInput)}
                 disabled={!pullInput.trim() || pullingModels.has(pullInput.trim())}
-                className="px-8 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium disabled:opacity-50"
+                className="px-8 bg-blue-500 hover:bg-blue-300 text-white rounded-lg font-medium disabled:opacity-50"
               >
                 Pull
               </button>
@@ -377,7 +377,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
         )}
 
         {/* Model Routing */}
-        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <div className="text-xs font-medium text-zinc-400 tracking-widest">MODEL ROUTING</div>
             {isOllama && (
@@ -410,7 +410,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                       model_routing: { ...c.model_routing, [key]: e.target.value },
                     }))
                   }
-                  className="bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-3 text-white outline-none"
+                  className="bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-3 text-white outline-none"
                 >
                   {models.length > 0
                     ? models.map((m) => (
@@ -434,7 +434,7 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           <button
             onClick={runTest}
             disabled={testResult.kind === 'testing'}
-            className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl text-sm font-medium flex items-center gap-2"
+            className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium flex items-center gap-2"
           >
             {testResult.kind === 'testing' && <Loader2 size={16} className="animate-spin" />}
             Test Connection
@@ -453,14 +453,14 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       <div className="px-6 py-6 border-t border-zinc-700 flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="px-8 py-3 text-zinc-400 hover:bg-zinc-800 rounded-3xl font-medium"
+          className="px-8 py-3 text-zinc-400 hover:bg-zinc-800 rounded-lg font-medium"
         >
           Cancel
         </button>
         <button
           onClick={handleSave}
           disabled={isSaving || !vaultPath}
-          className="px-8 py-3 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium flex items-center gap-2 disabled:opacity-50"
+          className="px-8 py-3 bg-blue-500 hover:bg-blue-300 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-50"
         >
           {isSaving && <Loader2 size={16} className="animate-spin" />}
           {saveSuccess ? 'Saved!' : 'Save Changes'}

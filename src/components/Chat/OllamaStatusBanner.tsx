@@ -53,7 +53,7 @@ export function OllamaStatusBanner() {
         <button
           onClick={checkNow}
           disabled={checking}
-          className="px-4 py-1 text-xs font-medium bg-transparent border border-amber-400 text-amber-300 hover:bg-amber-500/10 rounded-2xl transition-colors disabled:opacity-50"
+          className="px-4 py-1 text-xs font-medium bg-transparent border border-amber-400 text-amber-300 hover:bg-amber-500/10 rounded-md transition-colors disabled:opacity-50"
         >
           {checking ? 'Checking…' : 'Retry'}
         </button>
@@ -64,14 +64,14 @@ export function OllamaStatusBanner() {
   // Connected but model not installed
   if (connected === true && modelInstalled === false && model) {
     return (
-      <div className="flex items-center justify-between gap-3 px-6 py-3 text-sm shrink-0 bg-violet-500/10 border-b border-violet-500/20 text-violet-300">
+      <div className="flex items-center justify-between gap-3 px-6 py-3 text-sm shrink-0 bg-blue-500/10 border-b border-violet-500/20 text-blue-300">
         <span>
           Model <span className="font-medium text-violet-200">{model}</span> is not installed
         </span>
         <button
           onClick={checkNow}
           disabled={checking}
-          className="px-4 py-1 text-xs font-medium bg-transparent border border-violet-400 text-violet-300 hover:bg-violet-500/10 rounded-2xl transition-colors disabled:opacity-50"
+          className="px-4 py-1 text-xs font-medium bg-transparent border border-violet-400 text-blue-300 hover:bg-blue-500/10 rounded-md transition-colors disabled:opacity-50"
         >
           {checking ? 'Checking…' : 'Recheck'}
         </button>

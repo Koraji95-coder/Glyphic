@@ -13,7 +13,7 @@ export function AiDrawer() {
         <button
           onClick={togglePanel}
           title="Ask AI (Ctrl+Shift+A)"
-          className="fixed bottom-8 right-8 z-50 flex items-center gap-3 px-6 h-12 bg-gradient-to-r from-violet-600 to-cyan-400 hover:brightness-110 text-white font-semibold rounded-3xl shadow-2xl shadow-violet-500/40 transition-all active:scale-95"
+          className="fixed bottom-8 right-8 z-50 flex items-center gap-3 px-6 h-12 bg-gradient-to-r from-violet-600 to-cyan-400 hover:brightness-110 text-white font-semibold rounded-lg shadow-2xl shadow-violet-500/40 transition-all active:scale-95"
         >
           <MessageSquare size={20} />
           <span>Ask AI</span>
@@ -32,7 +32,7 @@ export function AiDrawer() {
 
           {/* Drawer */}
           <div
-            className="fixed top-0 bottom-0 right-0 w-[420px] max-w-[92vw] bg-[#050507] border-l border-zinc-700 shadow-2xl z-50 flex flex-col transition-transform duration-300"
+            className="fixed top-0 bottom-0 right-0 w-[420px] max-w-[92vw] bg-zinc-950 border-l border-zinc-700 shadow-2xl z-50 flex flex-col transition-transform duration-300"
             style={{ transform: isOpen ? 'translateX(0)' : 'translateX(100%)' }}
           >
             <ChatPanel />
