@@ -1,3 +1,11 @@
+// TitleBar -- top app chrome.
+//
+// Rewritten for Phase 2 of the deep-dive UI rewrite. Same features as
+// before (window controls, workspace switcher, open-note tabs, search,
+// focus + AI toggles) but restyled with the calmer zinc palette and
+// smaller rounded radii. No gradient logo, no shadow-inner, no
+// violet/cyan accent borders on active states.
+
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import {
   FileText,
@@ -14,6 +22,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { cn } from '../../lib/cn';
 import { useChatStore } from '../../stores/chatStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useLayoutStore } from '../../stores/layoutStore';
@@ -43,16 +52,15 @@ export function TitleBar() {
 
   const [isMaximized, setIsMaximized] = useState(false);
   const isMobile = useIsMobile();
-
   const appWindow = getCurrentWindow();
 
   const activeWorkspace = isVaultMode
     ? 'vault'
     : isDiagramMode
-    ? 'diagram'
-    : isFePrepMode
-    ? 'study'
-    : 'dashboard';
+      ? 'diagram'
+      : isFePrepMode
+        ? 'study'
+        : 'dashboard';
 
   const workspaceItems = useMemo(
     () => [
@@ -61,21 +69,11 @@ export function TitleBar() {
       { key: 'diagram' as const, label: 'Diagrams', icon: Workflow, onClick: openDiagramMode },
       { key: 'study' as const, label: 'FE Prep', icon: GraduationCap, onClick: openFePrep },
     ],
-    [closeFePrep, openVaultMode, openDiagramMode, openFePrep]
+    [closeFePrep, openVaultMode, openDiagramMode, openFePrep],
   );
 
-  // Window maximize state
   useEffect(() => {
-    const checkMaximized = async () => {
-      try {
-        const isMax = await appWindow.isMaximized();
-        setIsMaximized(isMax);
-      } catch {
-        setIsMaximized(false);
-      }
-    };
-
-    void checkMaximized();
+    void appWindow.isMaximized().then(setIsMaximized).catch(() => setIsMaximized(false));
   }, [appWindow]);
 
   const handleCloseTab = (e: React.MouseEvent, path: string) => {
@@ -86,110 +84,96 @@ export function TitleBar() {
   return (
     <div
       data-tauri-drag-region
-      className="flex flex-col shrink-0 bg-[#050507] border-b border-zinc-800 shadow-xl"
+      className="flex shrink-0 flex-col border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-md"
     >
-      {/* Main Title Bar */}
-      <div className="h-12 flex items-center px-3 gap-2">
-        {/* Window Controls / Mobile Menu */}
+      {/* -- Row 1 -- window + brand + search + actions -- */}
+      <div className="flex h-12 items-center gap-2 px-3">
+        {/* Window controls */}
         {!isMobile ? (
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => appWindow.minimize()}
-              className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-colors"
-            >
-              <Minimize2 size={15} />
-            </button>
-            <button
-              onClick={() => appWindow.toggleMaximize()}
-              className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-colors"
-            >
-              {isMaximized ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-            </button>
-            <button
-              onClick={() => appWindow.close()}
-              className="w-8 h-8 flex items-center justify-center text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
-            >
-              <X size={15} />
-            </button>
+          <div className="flex items-center gap-0.5">
+            <WindowButton onClick={() => appWindow.minimize()}>
+              <Minimize2 size={14} />
+            </WindowButton>
+            <WindowButton onClick={() => appWindow.toggleMaximize()}>
+              {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            </WindowButton>
+            <WindowButton danger onClick={() => appWindow.close()}>
+              <X size={14} />
+            </WindowButton>
           </div>
         ) : (
-          <button onClick={toggleSidebar} className="p-2 text-zinc-400 hover:text-white">
-            <Menu size={20} />
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="rounded-md p-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+          >
+            <Menu size={18} />
           </button>
         )}
 
-        {/* Logo */}
-        <div className="flex items-center gap-2 ml-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-violet-500 via-fuchsia-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-inner">
-            G
-          </div>
-          <div className="font-semibold tracking-tighter text-xl text-white">Glyphic</div>
+        {/* Brand */}
+        <div className="ml-3 flex items-center gap-2">
+          <span className="font-mono text-sm font-semibold tracking-tight text-zinc-100">
+            Glyphic
+          </span>
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
         </div>
 
-        {/* Global Search */}
+        {/* Global search */}
         {!isMobile && (
           <button
+            type="button"
             onClick={() => window.dispatchEvent(new CustomEvent('glyphic:open-quick-switcher'))}
-            className="flex-1 mx-6 h-9 flex items-center gap-3 px-5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-600 rounded-3xl text-sm text-zinc-400 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+            className={cn(
+              'mx-6 flex h-8 flex-1 items-center gap-2.5 rounded-md border border-zinc-800 bg-zinc-900 px-3.5',
+              'text-sm text-zinc-500 transition-colors',
+              'hover:border-zinc-700 hover:bg-zinc-800/60 hover:text-zinc-300',
+            )}
           >
-            <Search size={17} />
-            <span className="flex-1 text-left truncate">Search notes or ask anything...</span>
-            <span className="text-xs px-2.5 py-0.5 bg-zinc-800 rounded-lg font-mono text-zinc-500">⌘K</span>
+            <Search size={14} />
+            <span className="flex-1 truncate text-left">Search notes or ask anything...</span>
+            <kbd className="rounded border border-zinc-700 bg-zinc-800/60 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400">
+              ⌘K
+            </kbd>
           </button>
         )}
 
-        {/* Right side actions */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleFocusMode}
-            className={`px-4 h-9 flex items-center gap-2 text-sm rounded-2xl transition-all ${
-              isFocusMode
-                ? 'bg-violet-500/10 text-violet-300 border border-violet-500/30'
-                : 'hover:bg-zinc-800 text-zinc-400'
-            }`}
-          >
-            {isFocusMode ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-            <span className="hidden sm:inline">Focus</span>
-          </button>
-
-          <button
-            onClick={togglePanel}
-            className={`px-4 h-9 flex items-center gap-2 text-sm rounded-2xl transition-all ${
-              chatOpen
-                ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
-                : 'hover:bg-zinc-800 text-zinc-400'
-            }`}
-          >
-            <MessageSquare size={17} />
-            <span className="hidden sm:inline">AI</span>
-          </button>
+        {/* Right actions */}
+        <div className="flex items-center gap-1">
+          <ToggleButton active={isFocusMode} onClick={toggleFocusMode} label="Focus">
+            {isFocusMode ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </ToggleButton>
+          <ToggleButton active={chatOpen} onClick={togglePanel} label="AI">
+            <MessageSquare size={14} />
+          </ToggleButton>
         </div>
       </div>
 
-      {/* Workspace + Open Note Tabs */}
-      <div className="h-11 bg-zinc-900/50 border-t border-zinc-800 flex items-center px-2 gap-1 overflow-x-auto">
+      {/* -- Row 2 -- workspace tabs + open note tabs -- */}
+      <div className="flex h-10 items-center gap-1 border-t border-zinc-800 px-2">
         {workspaceItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeWorkspace === item.key;
           return (
             <button
               key={item.key}
+              type="button"
               onClick={item.onClick}
-              className={`flex items-center gap-2 px-5 h-8 text-sm font-medium rounded-2xl whitespace-nowrap transition-all ${
+              className={cn(
+                'flex h-7 items-center gap-1.5 whitespace-nowrap rounded-md px-3 text-xs font-medium transition-colors',
                 isActive
-                  ? 'bg-zinc-800 text-white shadow-inner'
-                  : 'text-zinc-400 hover:bg-zinc-800/70'
-              }`}
+                  ? 'bg-zinc-800 text-zinc-100'
+                  : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200',
+              )}
             >
-              <Icon size={16} />
+              <Icon size={13} />
               {item.label}
             </button>
           );
         })}
 
-        {/* Open Notes Tabs */}
         {openNotes.length > 0 && (
-          <div className="flex-1 flex items-center gap-1 ml-6 border-l border-zinc-700 pl-6 overflow-x-auto">
+          <div className="ml-3 flex flex-1 items-center gap-0.5 overflow-x-auto border-l border-zinc-800 pl-3">
             {openNotes.map((path) => {
               const name = path.replace(/\.md$/, '').split('/').pop() || path;
               const isActive = path === activeNotePath;
@@ -197,20 +181,27 @@ export function TitleBar() {
                 <div
                   key={path}
                   onClick={() => setActiveNote(path, path)}
-                  className={`group flex items-center gap-2 px-4 h-8 rounded-2xl text-sm cursor-pointer transition-all whitespace-nowrap border ${
+                  className={cn(
+                    'group flex h-7 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-xs transition-colors',
                     isActive
-                      ? 'bg-zinc-800 text-white border-zinc-600'
-                      : 'bg-zinc-900/50 text-zinc-400 border-transparent hover:border-zinc-700'
-                  }`}
+                      ? 'bg-zinc-800 text-zinc-100'
+                      : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200',
+                  )}
                 >
-                  <FileText size={14} />
+                  <FileText size={12} />
                   <span className="max-w-[160px] truncate">{name}</span>
-                  {isDirty && isActive && <span className="text-amber-400 text-xs">•</span>}
+                  {isDirty && isActive && (
+                    <span className="text-amber-400" aria-label="Unsaved changes">
+                      •
+                    </span>
+                  )}
                   <button
+                    type="button"
                     onClick={(e) => handleCloseTab(e, path)}
-                    className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-colors"
+                    className="ml-1 text-zinc-600 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
+                    aria-label={`Close ${name}`}
                   >
-                    <X size={13} />
+                    <X size={12} />
                   </button>
                 </div>
               );
@@ -219,5 +210,55 @@ export function TitleBar() {
         )}
       </div>
     </div>
+  );
+}
+
+// -- Sub-components ----------------------------------------------------
+
+interface WindowButtonProps {
+  onClick: () => void;
+  danger?: boolean;
+  children: React.ReactNode;
+}
+
+function WindowButton({ onClick, danger, children }: WindowButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+        danger
+          ? 'text-zinc-400 hover:bg-red-500/10 hover:text-red-400'
+          : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200',
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+interface ToggleButtonProps {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
+}
+
+function ToggleButton({ active, onClick, label, children }: ToggleButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors',
+        active
+          ? 'bg-zinc-800 text-zinc-100'
+          : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200',
+      )}
+    >
+      {children}
+      <span className="hidden sm:inline">{label}</span>
+    </button>
   );
 }
