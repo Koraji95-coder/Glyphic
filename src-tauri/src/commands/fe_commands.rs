@@ -33,7 +33,7 @@ fn fe_db_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
 // ── Schema ────────────────────────────────────────────────────────────────────
 
 /// Ensure all FE tables exist. Call before any FE command.
-fn ensure_schema(conn: &Connection) -> rusqlite::Result<()> {
+pub(crate) fn ensure_schema(conn: &Connection) -> rusqlite::Result<()> {
     conn.execute_batch(
         "CREATE TABLE IF NOT EXISTS topics (
             id          INTEGER PRIMARY KEY,
@@ -191,7 +191,7 @@ fn ensure_schema(conn: &Connection) -> rusqlite::Result<()> {
 
 /// Seed the official NCEES FE Electrical & Computer topics.
 /// Uses INSERT OR IGNORE so it is safe to call on every startup.
-fn seed_fe_topics(conn: &Connection) -> rusqlite::Result<()> {
+pub(crate) fn seed_fe_topics(conn: &Connection) -> rusqlite::Result<()> {
     // (name, category, subcategory, description)
     let topics: &[(&str, &str, &str, &str)] = &[
         // Mathematics

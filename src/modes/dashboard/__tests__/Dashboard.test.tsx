@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLayoutStore } from '../../../stores/layoutStore';
+import { useStudyPlanStore } from '../../../stores/studyPlanStore';
 import { useVaultStore } from '../../../stores/vaultStore';
 import { Dashboard } from '../Dashboard';
 
@@ -15,6 +16,14 @@ vi.mock('../../../lib/tauri/commands', () => ({
       .mockResolvedValue([
         { topic_id: 2, name: 'Circuit analysis', category: 'Electrical', attempts: 4, accuracy: 25 },
       ]),
+    getStudyPlanOverview: vi.fn().mockResolvedValue({
+      plan: null,
+      today_session: null,
+      upcoming_sessions: [],
+      completed_this_week: 0,
+      planned_minutes_this_week: 0,
+      completed_minutes_this_week: 0,
+    }),
   },
 }));
 
@@ -46,6 +55,7 @@ describe('Dashboard', () => {
       isDiagramMode: false,
       isMasteryMode: false,
     });
+    useStudyPlanStore.getState().reset();
   });
 
   afterEach(() => {

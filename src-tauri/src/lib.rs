@@ -148,6 +148,14 @@ pub fn run() {
             commands::fe_commands::fe_formula_lookup,
             commands::fe_commands::fe_unit_convert,
             commands::fe_commands::fe_handbook_qa,
+            // Study plan workflow
+            commands::study_plan_commands::get_active_study_plan,
+            commands::study_plan_commands::upsert_study_plan,
+            commands::study_plan_commands::get_study_plan_overview,
+            commands::study_plan_commands::generate_today_study_session,
+            commands::study_plan_commands::start_study_plan_session,
+            commands::study_plan_commands::complete_study_plan_session,
+            commands::study_plan_commands::skip_study_plan_session,
             // Flashcard SRS
             commands::flashcards::record_flashcard_review,
             commands::flashcards::get_due_flashcards,
