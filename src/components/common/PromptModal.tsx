@@ -34,9 +34,9 @@ export function PromptModal() {
 
   return (
     <div className="fixed inset-0 z-10000 flex items-center justify-center bg-black/70">
-      <div className="bg-[var(--bg-card)] rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="bg-(--bg-card) rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
         <div className="p-6">
-          <h2 className="text-lg font-semibold text-[var(--text-primary)]">{config.title}</h2>
+          <h2 className="text-lg font-semibold text-(color:--text-primary)">{config.title}</h2>
 
           {!config.isConfirm && (
             <input
@@ -45,25 +45,25 @@ export function PromptModal() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={config.placeholder}
-              className="w-full mt-4 px-4 py-3 bg-[var(--bg-input)] border border-[var(--border)] rounded-xl focus:outline-none focus:border-[var(--accent)] text-[var(--text-primary)]"
+              className="w-full mt-4 px-4 py-3 bg-(--bg-input) border border-[var(--border)] rounded-xl focus:outline-none focus:border-[var(--accent)] text-(color:--text-primary)"
             />
           )}
 
-          {config.isConfirm && <p className="mt-4 text-[var(--text-secondary)]">This action cannot be undone.</p>}
+          {config.isConfirm && <p className="mt-4 text-(color:--text-secondary)">This action cannot be undone.</p>}
         </div>
 
         <div className="flex border-t border-[var(--border)]">
           <button
             type="button"
             onClick={handleCancel}
-            className="flex-1 py-4 text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] font-medium transition-colors"
+            className="flex-1 py-4 text-(color:--text-secondary) hover:bg-(--bg-hover) font-medium transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleConfirm}
-            className="flex-1 py-4 text-white font-medium transition-colors bg-[var(--accent)] hover:brightness-110"
+            className="flex-1 py-4 text-white font-medium transition-colors bg-(--accent) hover:brightness-110"
           >
             {config.confirmLabel || (config.isConfirm ? 'Delete' : 'Create')}
           </button>
