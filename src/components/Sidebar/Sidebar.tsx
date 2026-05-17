@@ -2,6 +2,7 @@ import { FileText, FolderOpen, HelpCircle, LayoutList, PinOff, Plus, Settings, T
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { cn } from '../../lib/cn';
 import { useVault } from '../../hooks/useVault';
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
@@ -125,66 +126,77 @@ export function Sidebar() {
 
   const sidebarContent = (
     <>
-      {/* Vault Header */}
-      <div className="px-5 py-6 border-b border-zinc-800 bg-zinc-900/70 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-linear-to-br from-violet-500 via-fuchsia-500 to-cyan-400 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-inner">
-            {initial}
+      {/* Vault header -- monospace wordmark + small emerald presence dot */}
+      <div className="flex items-center gap-2.5 border-b border-zinc-800 px-4 py-4">
+        <div className="flex h-7 w-7 items-center justify-center rounded-md border border-zinc-800 bg-zinc-900 font-mono text-sm font-semibold text-zinc-100">
+          {initial}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-semibold tracking-tight text-zinc-100">
+            {vaultName}
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-semibold text-lg tracking-tight truncate text-white">{vaultName}</div>
-            <div className="text-xs text-zinc-400">
-              {noteCount} notes • {folderCount} folders
-            </div>
+          <div className="font-mono text-[10px] text-zinc-500">
+            {noteCount} notes · {folderCount} folders
           </div>
         </div>
       </div>
 
       <SearchBar />
 
-      {/* Quick Actions */}
-      <div className="px-4 py-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 mb-3 px-2">Quick Actions</div>
-        <div className="flex gap-2">
+      {/* Quick actions -- primary new-note in accent blue, secondary in zinc */}
+      <div className="px-3 py-3">
+        <div className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+          Quick actions
+        </div>
+        <div className="flex gap-1.5">
           <button
+            type="button"
             onClick={() => handleNewNote()}
-            className="flex-1 flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 transition-colors text-white font-medium py-3 px-4 rounded-2xl text-sm shadow-inner"
+            className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md bg-blue-500 px-3 text-xs font-medium text-white transition-colors hover:bg-blue-400"
           >
-            <Plus size={16} />
-            New Note
+            <Plus size={13} />
+            New note
           </button>
           <button
+            type="button"
             onClick={handleNewFolder}
-            className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 transition-colors font-medium py-3 px-4 rounded-2xl text-sm text-zinc-200"
+            className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md border border-zinc-800 px-3 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-800"
           >
-            <FolderOpen size={16} />
+            <FolderOpen size={13} />
             Folder
           </button>
         </div>
       </div>
 
-      {/* Pinned Notes */}
+      {/* Pinned -- amber layer dot + flatter rows */}
       {pinnedNotes.length > 0 && (
-        <div className="px-4 pb-4">
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 mb-2 px-2">Pinned</div>
+        <div className="px-3 pb-3">
+          <div className="mb-1 flex items-center gap-1.5 px-2 pb-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+              Pinned
+            </span>
+          </div>
           {pinnedNotes.map((path) => {
             const name = path.replace(/\.md$/, '').split('/').pop() || path;
             return (
               <div
                 key={path}
                 onClick={() => setActiveNote(path, path)}
-                className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-800 rounded-xl cursor-pointer group"
+                className="group flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 transition-colors hover:bg-zinc-800/60"
               >
-                <FileText size={15} className="text-zinc-400" />
-                <span className="flex-1 truncate text-sm text-white">{name}</span>
+                <FileText size={13} className="text-zinc-500" />
+                <span className="flex-1 truncate text-sm text-zinc-300">{name}</span>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     unpinNote(path);
                   }}
-                  className="opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-400 transition-all"
+                  className="text-zinc-600 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
+                  aria-label={"Unpin ${name}"}
                 >
-                  <PinOff size={14} />
+                  <PinOff size={12} />
                 </button>
               </div>
             );
@@ -200,36 +212,24 @@ export function Sidebar() {
         <FileTree />
       </div>
 
-      {/* Footer Actions */}
-      <div className="border-t border-zinc-800 p-3 grid grid-cols-2 gap-2 bg-zinc-900/70 backdrop-blur-xl">
-        <button
-          onClick={() => useSettingsUiStore.getState().open('general')}
-          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
-        >
-          <Settings size={16} />
-          Settings
-        </button>
-        <button
-          onClick={handleTrash}
-          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
-        >
-          <Trash2 size={16} />
-          Trash
-        </button>
-        <button
-          onClick={() => useHelpUiStore.getState().open()}
-          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
-        >
-          <HelpCircle size={16} />
-          Help
-        </button>
-        <button
-          onClick={openReview}
-          className="flex items-center justify-center gap-2 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-all text-sm"
-        >
-          <LayoutList size={16} />
-          Review
-        </button>
+      {/* Footer actions -- 2x2 grid of slim icon-label buttons */}
+      <div className="grid grid-cols-2 gap-1 border-t border-zinc-800 bg-zinc-950 p-2">
+        {[
+          { label: 'Settings', icon: Settings, onClick: () => useSettingsUiStore.getState().open('general') },
+          { label: 'Trash', icon: Trash2, onClick: handleTrash },
+          { label: 'Help', icon: HelpCircle, onClick: () => useHelpUiStore.getState().open() },
+          { label: 'Review', icon: LayoutList, onClick: openReview },
+        ].map(({ label, icon: Icon, onClick }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={onClick}
+            className="flex h-8 items-center justify-center gap-1.5 rounded-md text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+          >
+            <Icon size={13} />
+            {label}
+          </button>
+        ))}
       </div>
 
       <ReviewSession />
@@ -245,7 +245,7 @@ export function Sidebar() {
           <div className="fixed inset-0 bg-black/60 z-40" onClick={closeSidebar} />
         )}
         <aside
-          className="fixed top-0 bottom-0 left-0 w-72 bg-[#050507] border-r border-zinc-800 z-50 flex flex-col transition-transform duration-300"
+          className="fixed top-0 bottom-0 left-0 w-72 z-50 flex flex-col border-r border-zinc-800 bg-zinc-950 transition-transform duration-300"
           style={{ transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)' }}
         >
           {sidebarContent}
@@ -256,7 +256,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col h-full relative border-r border-zinc-800 bg-[#050507]"
+      className="relative flex h-full flex-col border-r border-zinc-800 bg-zinc-950"
       style={{ width: `${width}px` }}
     >
       {sidebarContent}
@@ -264,7 +264,7 @@ export function Sidebar() {
       {/* Resize Handle */}
       <div
         onMouseDown={handleMouseDown}
-        className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-violet-500/30 transition-colors z-10"
+        className="absolute right-0 top-0 z-10 h-full w-1 cursor-col-resize transition-colors hover:bg-blue-500/30"
       />
     </aside>
   );

@@ -54,7 +54,7 @@ export function SearchBar() {
   return (
     <div className="relative px-4 py-3 border-b border-zinc-800">
       {/* Search Input */}
-      <div className="flex items-center gap-3 bg-zinc-900/70 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-600 backdrop-blur-xl rounded-3xl px-4 py-2 transition-all">
+      <div className="flex items-center gap-3 bg-zinc-900/70 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-600 backdrop-blur-xl rounded-lg px-4 py-2 transition-all">
         <Search size={17} className="text-zinc-400" />
         <input
           ref={inputRef}
@@ -86,7 +86,7 @@ export function SearchBar() {
 
       {/* Results Dropdown */}
       {query && (
-        <div className="absolute left-4 right-4 mt-2 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl z-50 max-h-72 overflow-y-auto py-2">
+        <div className="absolute left-4 right-4 mt-2 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-lg shadow-2xl z-50 max-h-72 overflow-y-auto py-2">
           {isSearching ? (
             <div className="px-6 py-8 text-center text-sm text-zinc-400">Searching...</div>
           ) : results.length === 0 ? (

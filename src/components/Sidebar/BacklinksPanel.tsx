@@ -71,7 +71,7 @@ export function BacklinksPanel() {
               <button
                 key={`${backlink.source_id}:${backlink.source_path}`}
                 onClick={() => setActiveNote(backlink.source_path, backlink.source_path)}
-                className="flex items-start gap-3 w-full px-4 py-3 text-left rounded-3xl hover:bg-zinc-800/70 transition-all group"
+                className="flex items-start gap-3 w-full px-4 py-3 text-left rounded-lg hover:bg-zinc-800/70 transition-all group"
               >
                 <Link2 size={16} className="text-zinc-400 group-hover:text-cyan-400 mt-0.5 shrink-0" />
                 <div className="min-w-0 flex-1">

@@ -31,7 +31,7 @@ export function FileTree() {
   if (!fileTree || fileTree.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full px-6 text-center py-12">
-        <div className="w-12 h-12 bg-zinc-800 rounded-3xl flex items-center justify-center mb-4">
+        <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center mb-4">
           <FolderOpen size={24} className="text-zinc-400" />
         </div>
         <p className="text-zinc-300 font-medium">No notes yet</p>
