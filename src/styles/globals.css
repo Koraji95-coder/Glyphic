@@ -71,6 +71,39 @@
   --radius:     8px;
   --radius-lg:  12px;
   --radius-xl:  16px;
+
+  /* -- Legacy compatibility aliases ----------------------------------- */
+  /* The previous Midnight Eclipse palette used different token names.
+     Code throughout src/ still references them (~300 sites). Aliases
+     here let those references resolve correctly to the new zinc-based
+     tokens. Removing these aliases requires a per-token sweep across
+     every component first. */
+
+  --bg-app:        var(--bg);
+  --bg-secondary:  var(--bg-card);
+  --bg-sidebar:    var(--bg-card);
+  --bg-editor:     var(--bg);
+  --bg-hover:      var(--bg-card-hover);
+  --bg-input:      var(--bg-card);
+
+  --text-primary:   var(--text);
+  --text-tertiary:  var(--text-muted);
+  --text-ghost:     var(--text-faint);
+
+  --border-subtle:  var(--border);
+
+  --radius-md:      var(--radius);
+
+  /* Accent variants from the old palette mapped to closest semantic */
+  --accent-dim:           rgba(59, 130, 246, 0.18);   /* blue 18% */
+  --accent-muted:         rgba(161, 161, 170, 0.45);  /* zinc-400 45% */
+  --accent-mastery:       var(--accent-emerald);
+  --accent-mastery-dim:   rgba(16, 185, 129, 0.18);
+  --accent-struggle:      var(--accent-red);
+  --accent-struggle-dim:  rgba(239, 68, 68, 0.18);
+  --accent-review:        var(--accent-amber);
+  --bg-review-panel:      rgba(245, 158, 11, 0.12);
+  --accent-review-dim:    rgba(245, 158, 11, 0.18);
 }
 
 /* -- Reset ------------------------------------------------------------- */
