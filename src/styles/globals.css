@@ -1,780 +1,149 @@
+/*
+ * Glyphic -- Design System
+ *
+ * Rewritten to match the Deep-Dive-Claude-Code aesthetic:
+ *   - Tailwind v4 utility layer (zinc-based palette with semantic accents)
+ *   - Calm, technical, breathable -- lots of zinc-grey + sharp text-zinc-500
+ *     secondary labels + small tasteful framer-motion entries
+ *   - Card pattern with 0.25s cubic-bezier hover transitions
+ *
+ * The previous "Midnight Eclipse" palette (purple-primary + multi-accent
+ * gradients + mastery/struggle/review semantic colors) is retired. Glyphic
+ * still preserves its bespoke palette in the sense that color choices here
+ * are local to Glyphic (NOT bridged to toolkit --ch-* color tokens), but the
+ * specific colors and structural rules now match the deep-dive reference.
+ *
+ * Font tokens (--font-body / --font-display / --font-mono) bridge to toolkit
+ * --ch-font-* so Glyphic still joins the 10-font-mode axis.
+ */
+
 @import "katex/dist/katex.min.css";
+@import "tailwindcss";
 
-/* ══════════════════════════════════════
-   Glyphic — Midnight Eclipse Theme
-   ══════════════════════════════════════ */
+/* -- Design tokens ----------------------------------------------------- */
 
-/* ── Reset ── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* ── Midnight Eclipse Background (deep space with subtle aurora) ── */
-@keyframes glyphic-bg-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes glyphic-aurora {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: scale(1) rotate(0deg);
-  }
-  33% {
-    opacity: 0.65;
-    transform: scale(1.06) rotate(2deg);
-  }
-  66% {
-    opacity: 0.4;
-    transform: scale(0.95) rotate(-2deg);
-  }
-}
-
-/* ── Root Variables — Midnight Eclipse ── */
 :root {
-  /* Backgrounds */
-  --bg-app: #050507;
-  --bg-sidebar: rgba(16, 13, 26, 0.85);
-  --bg-editor: #050507;
-  --bg-hover: rgba(255, 255, 255, 0.06);
-  --bg-active: rgba(255, 255, 255, 0.1);
-  --bg-elevated: rgba(30, 24, 48, 0.92);
-  --bg-input: rgba(255, 255, 255, 0.06);
-  --bg-card: rgba(255, 255, 255, 0.04);
-
-  /* Glassmorphism */
-  --glass-surface: rgba(14, 11, 26, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: blur(28px);
+  /* Surfaces -- zinc scale */
+  --bg:            #09090b;   /* page */
+  --bg-card:       #18181b;   /* primary card / panel */
+  --bg-card-hover: #27272a;   /* hover-state card */
+  --bg-input:      #18181b;   /* form controls */
+  --bg-elev:       #1f1f23;   /* elevated panels (modals, drawers) */
 
   /* Text */
-  --text-primary: #f0eef8;
-  --text-secondary: #a09ab8;
-  --text-tertiary: #6b6085;
-  --text-ghost: rgba(255, 255, 255, 0.35);
+  --text:           #fafafa;
+  --text-secondary: #a1a1aa;  /* zinc-400 */
+  --text-muted:     #71717a;  /* zinc-500 */
+  --text-faint:     #52525b;  /* zinc-600 */
 
   /* Borders */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border:         #27272a;  /* zinc-800 */
+  --border-strong:  #3f3f46;  /* zinc-700 */
+  --border-subtle:  rgba(255, 255, 255, 0.06);
 
-  /* Accents — Electric Violet → Cyan */
-  --accent: #a374f7;
-  --accent-hover: #c084fc;
-  --accent-dim: rgba(163, 116, 247, 0.12);
-  --accent-glow: rgba(163, 116, 247, 0.08);
-  --accent-gradient: linear-gradient(135deg, #a374f7, #06b67f);
+  /* Semantic accents (Deep-Dive parity) */
+  --accent-blue:   #3b82f6;
+  --accent-emerald:#10b981;
+  --accent-purple: #8b5cf6;
+  --accent-amber:  #f59e0b;
+  --accent-red:    #ef4444;
+  --accent-cyan:   #06b6d4;
 
-  /* Warm accent for CTAs */
-  --accent-warm: #f97655;
-  --accent-warm-gradient: linear-gradient(135deg, #f97655, #fb923c);
+  /* Primary accent alias -- defaults to blue (deep-dive's primary).
+     Override per-mode by setting --accent on a parent element. */
+  --accent:        var(--accent-blue);
 
-  /* Status */
-  --green: #34d399;
-  --red: #f87171;
-  --blue: #60a5fa;
-  --warning: #fbbf24;
+  /* Font tokens -- bridge to toolkit --ch-font-* so Glyphic joins the
+     10-font-mode axis without ceding color control. */
+  --font-body:    var(--ch-font-ui, "DM Sans"), -apple-system, BlinkMacSystemFont,
+                  "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-display: var(--ch-font-display, "DM Serif Display"), Georgia, serif;
+  --font-mono:    var(--ch-font-mono, "JetBrains Mono"), "SF Mono", Consolas, monospace;
 
-  /* Phase 3: Mastery & Progress Tokens */
-  --accent-mastery: #34d399;
-  --accent-mastery-dim: rgba(52, 211, 153, 0.12);
-  --accent-mastery-glow: rgba(52, 211, 153, 0.08);
-  --bg-mastery-panel: rgba(52, 211, 153, 0.06);
-  --accent-struggle: #f87171;
-  --accent-struggle-dim: rgba(248, 113, 113, 0.12);
-  --bg-struggle-panel: rgba(248, 113, 113, 0.06);
-  --accent-review: #fbbf24;
-  --accent-review-dim: rgba(251, 191, 36, 0.12);
-  --bg-review-panel: rgba(251, 191, 36, 0.06);
+  /* Easings + durations -- consistent motion language */
+  --ease-standard:  cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:       150ms;
+  --dur-base:       250ms;
+  --dur-slow:       450ms;
 
-  /* Accessibility: Focus rings */
-  --focus-ring: 2px solid var(--accent);
-  --focus-offset: 2px;
-
-  /* Animation durations */
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-
-  /* Shape */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius: 8px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 6px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 40px rgba(163, 116, 247, 0.15);
-
-  /* Typography */
-  /* Font stacks bridge to desktop-toolkit --ch-font-* tokens (set by the
-     toolkit Activation flow / future ThemeProvider adoption). The hex /
-     string fallbacks preserve Glyphic's bespoke Midnight Eclipse palette --
-     Glyphic does NOT adopt ToolkitThemeProvider because its rich
-     multi-accent palette would clash with the toolkit's single-palette
-     contract. Font axis alone is enough to join the toolkit's 10-font-mode
-     system without touching colors. */
-  --font-body: var(--ch-font-ui, "DM Sans"), system-ui, sans-serif;
-  --font-display: var(--ch-font-display, "DM Serif Display"), serif;
-  --font-mono: var(--ch-font-mono, "JetBrains Mono"), monospace;
-
-  /* Layout */
-  --sidebar-width: 260px;
-  --titlebar-height: 42px;
-  --toolbar-height: 44px;
+  /* Radii */
+  --radius-sm:  6px;
+  --radius:     8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
 }
 
-/* ── Light theme override ── */
-[data-theme="light"] {
-  --bg-app: #faf7ff;
-  --bg-sidebar: rgba(244, 240, 255, 0.95);
-  --bg-editor: #ffffff;
-  --bg-hover: rgba(0, 0, 0, 0.04);
-  --bg-card: rgba(0, 0, 0, 0.02);
-  --glass-surface: rgba(255, 252, 255, 0.85);
-  --glass-border: rgba(163, 116, 247, 0.2);
-  --text-primary: #1a1528;
-  --text-secondary: #5a4f78;
-  --text-tertiary: #9a90b8;
-  --accent: #7c4df5;
-  --accent-gradient: linear-gradient(135deg, #7c4df5, #f472b6);
-}
+/* -- Reset ------------------------------------------------------------- */
 
-/* ── Body & Root ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root { height: 100%; }
+
 body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg-app);
-  color: var(--text-primary);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-body);
-  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
-  position: relative;
-  isolation: isolate;
-  height: 100vh;
-}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-/* Subtle animated background */
-#root::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background:
-    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(163, 116, 247, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 50% at 80% 80%, rgba(6, 182, 127, 0.15) 0%, transparent 65%), #050507;
-  background-size: 200% 200%;
-  animation: glyphic-bg-shift 28s ease infinite;
-  pointer-events: none;
-}
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
+input, select, textarea { font: inherit; color: inherit; }
 
-/* ── Custom Scrollbars ── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+::selection { background: rgba(59, 130, 246, 0.30); color: var(--text); }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+/* Slim custom scrollbar matching deep-dive */
+::-webkit-scrollbar              { width: 6px; height: 6px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover  { background: var(--text-muted); }
 
-::-webkit-scrollbar-thumb {
-  background: var(--text-ghost);
-  border-radius: 3px;
-}
+/* -- Card primitive (consumed by .card class + <Card /> component) ----- */
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
-}
-
-/* ── Global interactive styles ── */
-button,
-[role="button"] {
-  appearance: none;
-  border: none;
-  background: none;
-  color: inherit;
-  font: inherit;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ── Focus Visible (Accessibility) ── */
-:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: var(--focus-offset);
-}
-
-/* Remove default focus outline */
-:focus {
-  outline: none;
-}
-
-/* ── Reduced Motion Support ── */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  @keyframes glyphic-bg-shift {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  @keyframes glyphic-aurora {
-    0%, 100% {
-      opacity: 0.45;
-      transform: none;
-    }
-  }
-}
-
-/* ── ProseMirror (editor) styling ── */
-.ProseMirror {
-  outline: none;
-  min-height: 100%;
-  padding: 2.5rem 2.5rem;
-  font-size: 15.5px;
-  line-height: 1.75;
-  font-weight: 400;
-  color: var(--text-primary);
-  max-width: 720px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-
-/* All other ProseMirror styles remain the same but now use Tailwind variables where possible */
-.ProseMirror h1,
-.ProseMirror h2,
-.ProseMirror h3 {
-  color: var(--accent);
-}
-.ProseMirror code {
-  background: rgba(163, 116, 247, 0.12);
-  color: var(--accent);
-}
-.ProseMirror pre {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--glass-border);
-}
-
-/* ── Tailwind utility classes (kept for consistency) ── */
-.flex {
-  display: flex;
-}
-.grid {
-  display: grid;
-}
-.inline-flex {
-  display: inline-flex;
-}
-.flex-col {
-  flex-direction: column;
-}
-.flex-1 {
-  flex: 1 1 0%;
-}
-.items-center {
-  align-items: center;
-}
-.items-start {
-  align-items: flex-start;
-}
-.items-end {
-  align-items: flex-end;
-}
-.justify-center {
-  justify-content: center;
-}
-.justify-between {
-  justify-content: space-between;
-}
-.w-full {
-  width: 100%;
-}
-.w-1 {
-  width: 0.25rem;
-}
-.w-5 {
-  width: 1.25rem;
-}
-.w-9 {
-  width: 2.25rem;
-}
-.w-10 {
-  width: 2.5rem;
-}
-.w-12 {
-  width: 3rem;
-}
-.w-72 {
-  width: 18rem;
-}
-.w-screen {
-  width: 100vw;
-}
-.h-full {
-  height: 100%;
-}
-.h-1 {
-  height: 0.25rem;
-}
-.h-2 {
-  height: 0.5rem;
-}
-.h-5 {
-  height: 1.25rem;
-}
-.h-9 {
-  height: 2.25rem;
-}
-.h-10 {
-  height: 2.5rem;
-}
-.h-12 {
-  height: 3rem;
-}
-.h-screen {
-  height: 100vh;
-}
-.min-w-0 {
-  min-width: 0;
-}
-.min-h-0 {
-  min-height: 0;
-}
-.overflow-hidden {
-  overflow: hidden;
-}
-.overflow-y-auto {
-  overflow-y: auto;
-}
-.overflow-x-hidden {
-  overflow-x: hidden;
-}
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.relative {
-  position: relative;
-}
-.absolute {
-  position: absolute;
-}
-.fixed {
-  position: fixed;
-}
-.inset-0 {
-  inset: 0;
-}
-.top-0 {
-  top: 0;
-}
-.bottom-0 {
-  bottom: 0;
-}
-.left-0 {
-  left: 0;
-}
-.right-0 {
-  right: 0;
-}
-.z-10 {
-  z-index: 10;
-}
-.z-40 {
-  z-index: 40;
-}
-.z-50 {
-  z-index: 50;
-}
-.border {
-  border-width: 1px;
-}
-.border-l {
-  border-left-width: 1px;
-}
-.border-r {
-  border-right-width: 1px;
-}
-.border-t {
-  border-top-width: 1px;
-}
-.border-b {
-  border-bottom-width: 1px;
-}
-.text-left {
-  text-align: left;
-}
-.text-center {
-  text-align: center;
-}
-.p-3 {
-  padding: 0.75rem;
-}
-.p-4 {
-  padding: 1rem;
-}
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-.p-6 {
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
-}
-.p-8 {
-  padding: 2rem;
-}
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-.px-8 {
-  padding-left: 2rem;
-  padding-right: 2rem;
-}
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-.py-1\.5 {
-  padding-top: 0.375rem;
-  padding-bottom: 0.375rem;
-}
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-.py-2\.5 {
-  padding-top: 0.625rem;
-  padding-bottom: 0.625rem;
-}
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-.py-4 {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-.py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
-}
-.py-6 {
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-.rounded-xl {
-  border-radius: 0.75rem;
-}
-.rounded-2xl {
-  border-radius: 1rem;
-}
-.rounded-full {
-  border-radius: 9999px;
-}
-.text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-.tracking-tight {
-  letter-spacing: -0.01em;
-}
-.tracking-widest {
-  letter-spacing: 0.1em;
-}
-.uppercase {
-  text-transform: uppercase;
-}
-.font-medium {
-  font-weight: 500;
-}
-.font-semibold {
-  font-weight: 600;
-}
-.font-bold {
-  font-weight: 700;
-}
-.gap-2 {
-  gap: 0.5rem;
-}
-.gap-1 {
-  gap: 0.25rem;
-}
-.gap-3 {
-  gap: 0.75rem;
-}
-.gap-4 {
-  gap: 1rem;
-}
-.gap-5 {
-  gap: 1.25rem;
-}
-.gap-6 {
-  gap: 1.5rem;
-}
-.gap-8 {
-  gap: 2rem;
-}
-.space-y-3 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.75rem;
-}
-.space-y-6 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 1.5rem;
-}
-.space-y-8 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 2rem;
-}
-.mb-1 {
-  margin-bottom: 0.25rem;
-}
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-.mb-3 {
-  margin-bottom: 0.75rem;
-}
-.mb-4 {
-  margin-bottom: 1rem;
-}
-.mb-6 {
-  margin-bottom: 1.5rem;
-}
-.mb-7 {
-  margin-bottom: 1.75rem;
-}
-.mt-1 {
-  margin-top: 0.25rem;
-}
-.mt-2 {
-  margin-top: 0.5rem;
-}
-.mt-3 {
-  margin-top: 0.75rem;
-}
-.mb-5 {
-  margin-bottom: 1.25rem;
-}
-.pt-2 {
-  padding-top: 0.5rem;
-}
-.pt-3 {
-  padding-top: 0.75rem;
-}
-.pt-6 {
-  padding-top: 1.5rem;
-}
-.ml-1 {
-  margin-left: 0.25rem;
-}
-.ml-auto {
-  margin-left: auto;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.cursor-pointer {
-  cursor: pointer;
-}
-.shadow-sm {
-  box-shadow: var(--shadow-sm);
-}
-.shadow-md {
-  box-shadow: var(--shadow-md);
-}
-.shadow-lg {
-  box-shadow: var(--shadow-lg);
-}
-.rounded-3xl {
-  border-radius: 1.5rem;
-}
-.bg-zinc-900 {
-  background-color: #18181b;
-}
-.bg-zinc-900\/70 {
-  background-color: rgb(24 24 27 / 0.7);
-}
-.bg-zinc-800 {
-  background-color: #27272a;
-}
-.bg-zinc-700 {
-  background-color: #3f3f46;
-}
-.bg-black\/60 {
-  background-color: rgb(0 0 0 / 0.6);
-}
-.border-zinc-700 {
-  border-color: #3f3f46;
-}
-.border-zinc-800 {
-  border-color: #27272a;
-}
-.text-zinc-200 {
-  color: #e4e4e7;
-}
-.text-zinc-300 {
-  color: #d4d4d8;
-}
-.text-zinc-400 {
-  color: #a1a1aa;
-}
-.text-zinc-500 {
-  color: #71717a;
-}
-.hover\:text-white:hover {
-  color: #fff;
-}
-.hover\:text-red-400:hover {
-  color: #f87171;
-}
-.hover\:bg-zinc-700:hover {
-  background-color: #3f3f46;
-}
-.hover\:bg-zinc-800:hover {
-  background-color: #27272a;
-}
-.hover\:bg-violet-500:hover {
-  background-color: #8b5cf6;
-}
-.bg-violet-600 {
-  background-color: #7c3aed;
-}
-.from-violet-500 {
-  --tw-gradient-from: #8b5cf6;
-}
-.via-fuchsia-500 {
-  --tw-gradient-via: #d946ef;
-}
-.to-cyan-400 {
-  --tw-gradient-to: #22d3ee;
-}
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to));
-}
-.bg-gradient-to-r {
-  background-image: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to));
-}
-.bg-linear-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to));
-}
-.bg-linear-to-r {
-  background-image: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to));
-}
-.hover\:brightness-110:hover {
-  filter: brightness(1.1);
-}
-.transition-colors {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-}
-.transition-all {
-  transition-property: all;
-}
-.transition-transform {
-  transition-property: transform;
-}
-.duration-300 {
-  transition-duration: 300ms;
-}
-.max-w-7xl {
-  max-width: 80rem;
-}
-.grid-cols-1 {
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-.grid-cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.grid-cols-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  transition: background var(--dur-base) var(--ease-standard),
+              border-color var(--dur-base) var(--ease-standard);
+}
+.card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
 }
 
-@media (min-width: 768px) {
-  .md\:grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-  .md\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .md\:grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .md\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .md\:p-7 {
-    padding: 1.75rem;
-  }
-}
-.backdrop-blur-xl {
-  backdrop-filter: blur(24px);
-}
-.text-white {
-  color: #fff;
-}
-/* ... (all other utilities you already use are preserved) */
+/* -- Sidebar layer dot (consumed by <Sidebar /> component) -------------- */
 
-/* ── Final touch: smooth transitions everywhere ── */
-* {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+.dot          { width: 8px; height: 8px; border-radius: 9999px; display: inline-block; }
+.dot--blue    { background: var(--accent-blue); }
+.dot--emerald { background: var(--accent-emerald); }
+.dot--purple  { background: var(--accent-purple); }
+.dot--amber   { background: var(--accent-amber); }
+.dot--red     { background: var(--accent-red); }
+.dot--cyan    { background: var(--accent-cyan); }
+
+/* -- Animations -------------------------------------------------------- */
+
+@keyframes glyphic-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: glyphic-fade-up var(--dur-base) var(--ease-standard) both;
+}
+
+@keyframes glyphic-pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+.pulse-soft {
+  animation: glyphic-pulse-soft 1.6s var(--ease-standard) infinite;
 }
