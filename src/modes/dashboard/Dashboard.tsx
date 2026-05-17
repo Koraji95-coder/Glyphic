@@ -10,6 +10,7 @@ import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { StudyPlanCard } from '../../components/study-plan/StudyPlanCard';
 import { commands, type FeTopicStats, type FeWeakTopic } from '../../lib/tauri/commands';
 import { useLayoutStore } from '../../stores/layoutStore';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -158,6 +159,8 @@ export function Dashboard() {
             icon={<TrendingUp size={18} />}
           />
         </section>
+
+        <StudyPlanCard />
 
         <div className="grid md:grid-cols-2 gap-5" style={{ marginBottom: 20 }}>
           <Section title="Today's study focus" actionLabel="Open FE Prep" onAction={openFePrep}>
