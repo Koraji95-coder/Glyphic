@@ -147,7 +147,7 @@ export function QuickSwitcher() {
     <>
       <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setOpen(false)} />
 
-      <div className="fixed top-[18%] left-1/2 -translate-x-1/2 w-full max-w-lg z-50 bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="fixed top-[18%] left-1/2 -translate-x-1/2 w-full max-w-lg z-50 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl overflow-hidden">
         {/* Search input */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-700">
           <Search size={18} className="text-zinc-400" />
@@ -196,8 +196,8 @@ export function QuickSwitcher() {
                     selectedIndex === results.length ? 'bg-zinc-800' : 'hover:bg-zinc-800/60'
                   }`}
                 >
-                  <span className="text-violet-400">✚</span>
-                  <span className="text-violet-300">Create &quot;{query.trim()}&quot;</span>
+                  <span className="text-blue-400">✚</span>
+                  <span className="text-blue-300">Create &quot;{query.trim()}&quot;</span>
                 </button>
               )}
             </>

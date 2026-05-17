@@ -179,7 +179,7 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
 
   if (!status) {
     return (
-      <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
         <p className="text-zinc-400">Loading backup status...</p>
       </div>
     );
@@ -188,24 +188,24 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
   return (
     <div className="space-y-6">
       {/* Backup status card */}
-      <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <HardDrive className="text-violet-400" size={20} />
+            <HardDrive className="text-blue-400" size={20} />
             <h3 className="text-lg font-semibold text-white">Backup Status</h3>
           </div>
-          {status.is_backing_up && <div className="animate-spin text-violet-400"><RefreshCw size={18} /></div>}
+          {status.is_backing_up && <div className="animate-spin text-blue-400"><RefreshCw size={18} /></div>}
         </div>
 
         {/* Status summary */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-zinc-800 rounded-2xl p-4">
+          <div className="bg-zinc-800 rounded-md p-4">
             <div className="text-xs text-zinc-400 uppercase tracking-widest">Dropbox</div>
             <div className="text-lg font-semibold text-white mt-1">
               {status.dropbox_enabled ? '✓ Connected' : '✗ Not connected'}
             </div>
           </div>
-          <div className="bg-zinc-800 rounded-2xl p-4">
+          <div className="bg-zinc-800 rounded-md p-4">
             <div className="text-xs text-zinc-400 uppercase tracking-widest">Status</div>
             <div className="text-lg font-semibold text-white mt-1">
               {status.is_backing_up ? 'In Progress...' : 'Ready'}
@@ -215,7 +215,7 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
 
         {/* Change detection summary */}
         {changeDetection && (
-          <div className="bg-zinc-800/50 rounded-2xl p-4 mb-6">
+          <div className="bg-zinc-800/50 rounded-md p-4 mb-6">
             <div className="flex items-start gap-3">
               {changeDetection.has_changes ? (
                 <>
@@ -249,7 +249,7 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
 
         {/* Size warning */}
         {changeDetection?.size_warning && (
-          <div className="bg-amber-950 border border-amber-700 rounded-2xl p-4 mb-6 flex gap-3">
+          <div className="bg-amber-950 border border-amber-700 rounded-md p-4 mb-6 flex gap-3">
             <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
             <div>
               <div className="text-sm font-medium text-amber-200">Large backup detected</div>
@@ -262,14 +262,14 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
 
         {/* Error message */}
         {loadError && (
-          <div className="bg-emerald-950 border border-emerald-700 rounded-2xl p-4 mb-6">
+          <div className="bg-emerald-950 border border-emerald-700 rounded-md p-4 mb-6">
             <div className="text-sm text-emerald-300">{loadError}</div>
           </div>
         )}
 
         {/* Last backup info */}
         {status.last_backup && (
-          <div className="bg-zinc-800/50 rounded-2xl p-4 mb-6">
+          <div className="bg-zinc-800/50 rounded-md p-4 mb-6">
             <div className="flex items-start gap-3">
               <Clock size={16} className="text-zinc-400 mt-1 shrink-0" />
               <div className="min-w-0 flex-1">
@@ -294,14 +294,14 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
           <button
             onClick={handleBackupNow}
             disabled={isLoading || isBackingUp || !status.dropbox_enabled}
-            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-violet-500 hover:bg-violet-400 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-3xl font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-blue-500 hover:bg-blue-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg font-medium transition-colors"
           >
             <Download size={16} />
             {isLoading || isBackingUp ? 'Backing up...' : 'Backup Now'}
           </button>
           <button
             disabled={!status.dropbox_enabled}
-            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded-3xl font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-300 rounded-lg font-medium transition-colors"
           >
             <RefreshCw size={16} />
             Auto Sync (24h)
@@ -311,11 +311,11 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
 
       {/* Backup history */}
       {history.length > 0 && (
-        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Backup History</h3>
           <div className="space-y-2">
             {history.map((entry) => (
-              <div key={entry.id} className="flex items-center justify-between px-4 py-3 bg-zinc-800 rounded-2xl text-sm">
+              <div key={entry.id} className="flex items-center justify-between px-4 py-3 bg-zinc-800 rounded-md text-sm">
                 <div className="min-w-0 flex-1">
                   <div className="text-white font-mono text-xs">{formatDate(entry.timestamp)}</div>
                   <div
@@ -337,11 +337,11 @@ export function BackupStatusPanel({ vaultPath }: BackupStatusPanelProps) {
 
       {/* Restore point browser */}
       {restorePoints.length > 0 && (
-        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Restore Points</h3>
           <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
             {restorePoints.map((point) => (
-              <div key={point.id} className="px-4 py-3 bg-zinc-800 rounded-2xl text-sm">
+              <div key={point.id} className="px-4 py-3 bg-zinc-800 rounded-md text-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-white font-mono text-xs">{formatDate(point.timestamp)}</div>

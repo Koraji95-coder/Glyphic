@@ -71,7 +71,7 @@ export function SettingsModal() {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[940px] h-[660px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden flex"
+        className="w-full max-w-[940px] h-[660px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-lg shadow-2xl overflow-hidden flex"
       >
         {/* Sidebar Navigation */}
         <nav className="w-56 bg-zinc-900/70 border-r border-zinc-700 p-6 flex flex-col">
@@ -84,9 +84,9 @@ export function SettingsModal() {
               <button
                 key={item.id}
                 onClick={() => setSection(item.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm mb-1 transition-all ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm mb-1 transition-all ${
                   active
-                    ? 'bg-zinc-800 text-white shadow-inner'
+                    ? 'bg-zinc-800 text-white'
                     : 'text-zinc-400 hover:bg-zinc-800/70'
                 }`}
               >
@@ -112,7 +112,7 @@ export function SettingsModal() {
               )}
               <button
                 onClick={close}
-                className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+                className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
               >
                 <X size={20} />
               </button>
@@ -200,12 +200,12 @@ function GeneralSection({ draft, onChange, vaultPath }: SectionProps) {
               setSwitchError(null);
               setSwitchDone(false);
             }}
-            className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+            className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
           />
           <button
             type="button"
             onClick={handleBrowse}
-            className="px-6 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl text-zinc-300 transition-colors"
+            className="px-6 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-md text-zinc-300 transition-colors"
           >
             Browse
           </button>
@@ -214,7 +214,7 @@ function GeneralSection({ draft, onChange, vaultPath }: SectionProps) {
           <button
             onClick={handleSwitch}
             disabled={switching}
-            className="mt-4 px-6 py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-2xl text-white font-medium transition-colors"
+            className="mt-4 px-6 py-3 bg-blue-500 hover:bg-blue-500 disabled:opacity-50 rounded-md text-white font-medium transition-colors"
           >
             {switching ? 'Switching…' : 'Switch to this vault'}
           </button>
@@ -229,7 +229,7 @@ function GeneralSection({ draft, onChange, vaultPath }: SectionProps) {
           type="text"
           value={draft.vault.name}
           onChange={(e) => onChange({ ...draft, vault: { ...draft.vault, name: e.target.value } })}
-          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
         />
       </div>
 
@@ -243,7 +243,7 @@ function GeneralSection({ draft, onChange, vaultPath }: SectionProps) {
               appearance: { ...draft.appearance, theme: e.target.value as any },
             })
           }
-          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
         >
           <option value="system">System</option>
           <option value="light">Light</option>
@@ -272,7 +272,7 @@ function GeneralSection({ draft, onChange, vaultPath }: SectionProps) {
           type="color"
           value={draft.appearance.accent_color}
           onChange={(e) => onChange({ ...draft, appearance: { ...draft.appearance, accent_color: e.target.value } })}
-          className="h-10 w-20 bg-transparent border border-zinc-700 rounded-2xl p-1"
+          className="h-10 w-20 bg-transparent border border-zinc-700 rounded-md p-1"
         />
       </div>
     </div>
@@ -288,7 +288,7 @@ function EditorSection({ draft, onChange }: SectionProps) {
         <select
           value={e.font_family}
           onChange={(ev) => onChange({ ...draft, editor: { ...e, font_family: ev.target.value } })}
-          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
         >
           <option value="Inter, sans-serif">Inter</option>
           <option value="-apple-system, sans-serif">System Default</option>
@@ -385,7 +385,7 @@ function CaptureSection({ draft, onChange, vaultPath }: SectionProps) {
         <select
           value={c.default_mode}
           onChange={(e) => onChange({ ...draft, capture: { ...c, default_mode: e.target.value as any } })}
-          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
         >
           <option value="region">Region</option>
           <option value="window">Window</option>
@@ -409,7 +409,7 @@ function LectureSection({ draft, onChange }: SectionProps) {
         <select
           value={l.timestamp_format}
           onChange={(e) => onChange({ ...draft, lecture_mode: { ...l, timestamp_format: e.target.value } })}
-          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+          className="w-full bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
         >
           <option value="%H:%M:%S">HH:mm:ss</option>
           <option value="%M:%S">mm:ss</option>

@@ -61,12 +61,12 @@ export function Onboarding() {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-[250] flex items-center justify-center">
-      <div className="w-full max-w-[520px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-[520px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-lg shadow-2xl overflow-hidden">
         {/* Step 1: Welcome + Vault */}
         {step === 'welcome' && (
           <div className="p-8 flex flex-col gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
+              <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-md flex items-center justify-center text-white font-bold text-2xl">
                 G
               </div>
               <div>
@@ -86,25 +86,25 @@ export function Onboarding() {
                   type="text"
                   value={vaultPath}
                   onChange={(e) => setVaultPath(e.target.value)}
-                  className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
+                  className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-md px-4 py-3 text-white outline-none"
                 />
                 <button
                   type="button"
                   onClick={handleBrowse}
-                  className="px-6 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl text-zinc-300 transition-colors"
+                  className="px-6 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-md text-zinc-300 transition-colors"
                 >
                   Browse
                 </button>
               </div>
             </div>
 
-            {error && <div className="text-red-400 text-sm p-3 bg-red-500/10 rounded-2xl">{error}</div>}
+            {error && <div className="text-red-400 text-sm p-3 bg-red-500/10 rounded-md">{error}</div>}
 
             <div className="flex justify-end">
               <button
                 onClick={handleContinue}
                 disabled={busy || !vaultPath.trim()}
-                className="px-8 py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-2xl text-white font-medium flex items-center gap-2 transition-colors"
+                className="px-8 py-3 bg-blue-500 hover:bg-blue-500 disabled:opacity-50 rounded-md text-white font-medium flex items-center gap-2 transition-colors"
               >
                 {busy ? 'Opening…' : 'Continue'}
                 {!busy && <ArrowRight size={16} />}
@@ -135,7 +135,7 @@ export function Onboarding() {
             <div className="flex justify-end">
               <button
                 onClick={finish}
-                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-2xl text-white font-medium flex items-center gap-2"
+                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-md text-white font-medium flex items-center gap-2"
               >
                 Get started
               </button>
@@ -149,8 +149,8 @@ export function Onboarding() {
 
 function Tip({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
-    <div className="flex gap-4 bg-zinc-800/50 border border-zinc-700 rounded-3xl p-5">
-      <div className="text-violet-400 mt-0.5">{icon}</div>
+    <div className="flex gap-4 bg-zinc-800/50 border border-zinc-700 rounded-lg p-5">
+      <div className="text-blue-400 mt-0.5">{icon}</div>
       <div>
         <div className="font-medium text-white">{title}</div>
         <div className="text-zinc-400 text-sm mt-1">{body}</div>
@@ -220,7 +220,7 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
   return (
     <div className="p-8 flex flex-col gap-6">
       <div className="flex items-center gap-3">
-        <Cpu size={20} className="text-violet-400" />
+        <Cpu size={20} className="text-blue-400" />
         <div>
           <h2 className="text-2xl font-semibold text-white">Set up local AI</h2>
           <p className="text-zinc-400 text-sm">Glyphic uses Ollama — no cloud, no API key.</p>
@@ -228,14 +228,14 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
       </div>
 
       {state.kind === 'checking' && (
-        <div className="flex items-center gap-3 px-4 py-6 bg-zinc-800/50 border border-zinc-700 rounded-3xl">
+        <div className="flex items-center gap-3 px-4 py-6 bg-zinc-800/50 border border-zinc-700 rounded-lg">
           <Loader2 size={18} className="animate-spin text-zinc-400" />
           <span className="text-zinc-300">Checking for Ollama…</span>
         </div>
       )}
 
       {state.kind === 'ok' && (
-        <div className="px-4 py-6 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl">
+        <div className="px-4 py-6 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
           <div className="flex items-center gap-2 text-emerald-300">
             <Check size={18} />
             <span className="font-medium">Ollama is running</span>
@@ -249,7 +249,7 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
       )}
 
       {state.kind === 'fail' && (
-        <div className="px-4 py-6 bg-red-500/10 border border-red-500/30 rounded-3xl">
+        <div className="px-4 py-6 bg-red-500/10 border border-red-500/30 rounded-lg">
           <div className="flex items-center gap-2 text-red-300">
             <X size={18} />
             <span className="font-medium">Ollama is not running</span>
@@ -261,7 +261,7 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
             </a>
             , then run:
           </div>
-          <pre className="mt-3 bg-zinc-900 p-3 rounded-2xl text-xs font-mono text-zinc-200 overflow-auto">
+          <pre className="mt-3 bg-zinc-900 p-3 rounded-md text-xs font-mono text-zinc-200 overflow-auto">
             {installCmd}
           </pre>
         </div>
@@ -271,20 +271,20 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
         {state.kind === 'fail' && (
           <button
             onClick={runCheck}
-            className="px-6 py-3 text-zinc-300 hover:bg-zinc-800 rounded-2xl transition-colors"
+            className="px-6 py-3 text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors"
           >
             Retry
           </button>
         )}
         <button
           onClick={onContinue}
-          className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl transition-colors"
+          className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-md transition-colors"
         >
           Skip for now
         </button>
         <button
           onClick={onContinue}
-          className="px-8 py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-2xl transition-colors flex items-center gap-2"
+          className="px-8 py-3 bg-blue-500 hover:bg-blue-500 text-white rounded-md transition-colors flex items-center gap-2"
         >
           Continue
           <ArrowRight size={16} />

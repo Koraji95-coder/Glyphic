@@ -34,7 +34,7 @@ export function PromptModal() {
 
   return (
     <div className="fixed inset-0 z-10000 flex items-center justify-center bg-black/70">
-      <div className="bg-(--bg-card) rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="bg-(--bg-card) rounded-md shadow-sm w-full max-w-md mx-4 overflow-hidden">
         <div className="p-6">
           <h2 className="text-lg font-semibold text-(color:--text-primary)">{config.title}</h2>
 

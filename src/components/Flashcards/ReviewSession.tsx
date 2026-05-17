@@ -73,7 +73,7 @@ export function ReviewSession() {
   const easyCount = Object.values(ratings).filter((r) => r === 'easy').length;
 
   return (
-    <div className="flex flex-col h-full bg-[#050507] overflow-hidden">
+    <div className="flex flex-col h-full bg-zinc-950 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700 bg-zinc-900 shrink-0">
         <button
@@ -85,18 +85,18 @@ export function ReviewSession() {
         </button>
 
         <div className="flex items-center gap-3">
-          <BookOpen className="text-violet-400" size={20} />
+          <BookOpen className="text-blue-400" size={20} />
           <span className="font-semibold text-white">Review Session</span>
         </div>
 
         {totalCards > 0 && !sessionComplete && (
-          <div className="px-4 py-1 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-3xl">
+          <div className="px-4 py-1 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-lg">
             {currentIndex + 1} / {totalCards}
           </div>
         )}
 
         {(totalCards === 0 || sessionComplete) && (
-          <div className="px-4 py-1 bg-emerald-500/10 text-emerald-300 text-sm font-medium rounded-3xl">
+          <div className="px-4 py-1 bg-emerald-500/10 text-emerald-300 text-sm font-medium rounded-lg">
             Complete
           </div>
         )}
@@ -118,7 +118,7 @@ export function ReviewSession() {
             {hasNote && (
               <button
                 onClick={() => loadCards(noteContent, activeNotePath ?? '')}
-                className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl flex items-center gap-2 mx-auto"
+                className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg flex items-center gap-2 mx-auto"
               >
                 <RefreshCw size={16} />
                 Try again
@@ -130,7 +130,7 @@ export function ReviewSession() {
         {/* Empty state */}
         {!isLoading && !error && totalCards === 0 && (
           <div className="text-center max-w-md">
-            <div className="mx-auto w-16 h-16 bg-zinc-800 rounded-3xl flex items-center justify-center mb-6">
+            <div className="mx-auto w-16 h-16 bg-zinc-800 rounded-lg flex items-center justify-center mb-6">
               🃏
             </div>
             <p className="text-xl font-medium text-white mb-2">No cards due</p>
@@ -142,7 +142,7 @@ export function ReviewSession() {
             {hasNote && (
               <button
                 onClick={() => loadCards(noteContent, activeNotePath ?? '')}
-                className="px-8 py-3 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl flex items-center gap-2 mx-auto"
+                className="px-8 py-3 bg-blue-500 hover:bg-blue-300 text-white rounded-lg flex items-center gap-2 mx-auto"
               >
                 <Sparkles size={18} />
                 Generate flashcards
@@ -154,7 +154,7 @@ export function ReviewSession() {
         {/* Session complete */}
         {!isLoading && !error && sessionComplete && (
           <div className="text-center max-w-md">
-            <div className="mx-auto w-16 h-16 bg-emerald-500/10 text-emerald-300 rounded-3xl flex items-center justify-center text-4xl mb-6">
+            <div className="mx-auto w-16 h-16 bg-emerald-500/10 text-emerald-300 rounded-lg flex items-center justify-center text-4xl mb-6">
               🎉
             </div>
             <p className="text-2xl font-semibold text-white mb-2">Session complete!</p>
@@ -173,7 +173,7 @@ export function ReviewSession() {
                 resetSession();
                 if (hasNote) loadCards(noteContent, activeNotePath ?? '');
               }}
-              className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-3xl flex items-center gap-2 mx-auto"
+              className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg flex items-center gap-2 mx-auto"
             >
               Review again
             </button>
@@ -240,7 +240,7 @@ function RatingButton({
   return (
     <button
       onClick={onClick}
-      className="px-8 py-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105 active:scale-95"
+      className="px-8 py-4 rounded-lg flex flex-col items-center transition-all hover:scale-105 active:scale-95"
       style={{
         backgroundColor: `${color}15`,
         border: `2px solid ${color}40`,

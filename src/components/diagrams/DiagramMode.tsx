@@ -238,16 +238,16 @@ export function DiagramMode() {
   const usedFallback = generateWarnings.some((warning) => warning.toLowerCase().includes('fallback applied'));
 
   return (
-    <div className="flex flex-col h-full bg-[#050507] overflow-hidden">
+    <div className="flex flex-col h-full bg-zinc-950 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700 bg-zinc-900 shrink-0">
         <div className="flex items-center gap-3">
-          <GitBranch className="text-violet-400" size={20} />
+          <GitBranch className="text-blue-400" size={20} />
           <span className="text-lg font-semibold text-white">Diagram Studio</span>
         </div>
         <button
           onClick={closeDiagramMode}
-          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
         >
           <X size={20} />
         </button>
@@ -262,9 +262,9 @@ export function DiagramMode() {
               <button
                 key={t.value}
                 onClick={() => handleTypeChange(t.value)}
-                className={`px-5 py-2 text-sm font-medium rounded-3xl transition-all ${
+                className={`px-5 py-2 text-sm font-medium rounded-lg transition-all ${
                   diagramType === t.value
-                    ? 'bg-violet-500 text-white shadow-inner'
+                    ? 'bg-blue-500 text-white'
                     : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                 }`}
               >
@@ -278,8 +278,8 @@ export function DiagramMode() {
           {/* Natural language toggle */}
           <button
             onClick={() => setNlMode((v) => !v)}
-            className={`px-5 py-2 text-sm font-medium rounded-3xl transition-all flex items-center gap-2 ${
-              nlMode ? 'bg-violet-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+            className={`px-5 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${
+              nlMode ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
             }`}
           >
             ✨ Describe
@@ -289,7 +289,7 @@ export function DiagramMode() {
             <>
               <button
                 onClick={handleExportSvg}
-                className="flex items-center gap-2 px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-3xl text-sm transition-colors"
+                className="flex items-center gap-2 px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-sm transition-colors"
               >
                 <Download size={16} />
                 Export SVG
@@ -301,7 +301,7 @@ export function DiagramMode() {
                 }}
                 disabled={!canExportPng}
                 title={!canExportPng ? 'PNG export is unavailable for Mermaid diagrams. Use Export SVG.' : 'Export diagram as PNG'}
-                className={`flex items-center gap-2 px-5 py-2 rounded-3xl text-sm transition-colors ${
+                className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm transition-colors ${
                   canExportPng
                     ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                     : 'bg-zinc-900 text-zinc-500 cursor-not-allowed border border-zinc-700'
@@ -316,7 +316,7 @@ export function DiagramMode() {
           <button
             onClick={handleRender}
             disabled={isBusy}
-            className={`flex items-center gap-2 px-7 py-2.5 rounded-3xl font-semibold text-sm transition-all ${
+            className={`flex items-center gap-2 px-7 py-2.5 rounded-lg font-semibold text-sm transition-all ${
               isBusy
                 ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
                 : 'bg-linear-to-r from-violet-500 to-cyan-400 text-white hover:brightness-110'
@@ -336,7 +336,7 @@ export function DiagramMode() {
               onChange={(e) => setNlPrompt(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRender()}
               placeholder="Describe the diagram you want (press Enter)"
-              className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+              className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
             />
           </div>
         )}
@@ -352,7 +352,7 @@ export function DiagramMode() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               spellCheck={false}
-              className="flex-1 bg-[#050507] text-zinc-200 font-mono text-sm p-6 outline-none resize-none leading-relaxed"
+              className="flex-1 bg-zinc-950 text-zinc-200 font-mono text-sm p-6 outline-none resize-none leading-relaxed"
             />
           </div>
 
@@ -361,7 +361,7 @@ export function DiagramMode() {
             <div className="px-6 py-3 bg-zinc-900 border-b border-zinc-700 text-xs font-medium tracking-widest text-zinc-400 uppercase">
               Preview
             </div>
-            <div className="flex-1 overflow-auto p-8 bg-[#050507] flex items-start justify-center">
+            <div className="flex-1 overflow-auto p-8 bg-zinc-950 flex items-start justify-center">
               {rendering && (
                 <div className="text-zinc-400 flex items-center gap-3">
                   <RefreshCw className="animate-spin" size={18} />
@@ -371,17 +371,17 @@ export function DiagramMode() {
 
               {!rendering && !result && !generateError && (
                 <div className="text-center text-zinc-400">
-                  <p>Click <span className="font-semibold text-violet-300">Render</span> to see the diagram</p>
+                  <p>Click <span className="font-semibold text-blue-300">Render</span> to see the diagram</p>
                   {stageLabel && <p className="mt-2 text-xs text-zinc-500">{stageLabel}...</p>}
                 </div>
               )}
 
               {!rendering && generateError && (
-                <div className="max-w-md text-red-400 bg-red-500/10 border border-red-500/30 rounded-3xl p-6">
+                <div className="max-w-md text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg p-6">
                   Generation failed: {generateError}
                   <button
                     onClick={handleRender}
-                    className="mt-4 flex items-center gap-2 text-violet-300 hover:text-white"
+                    className="mt-4 flex items-center gap-2 text-blue-300 hover:text-white"
                   >
                     <RefreshCw size={14} /> Regenerate
                   </button>
@@ -389,12 +389,12 @@ export function DiagramMode() {
               )}
 
               {!rendering && result?.error && (
-                <div className="max-w-md text-red-400 bg-red-500/10 border border-red-500/30 rounded-3xl p-6">
+                <div className="max-w-md text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg p-6">
                   {result.error}
                   {nlMode && nlPrompt.trim() && (
                     <button
                       onClick={handleRender}
-                      className="mt-4 flex items-center gap-2 text-violet-300 hover:text-white"
+                      className="mt-4 flex items-center gap-2 text-blue-300 hover:text-white"
                     >
                       <RefreshCw size={14} /> Regenerate
                     </button>
@@ -403,7 +403,7 @@ export function DiagramMode() {
               )}
 
               {!rendering && generateWarnings.length > 0 && (
-                <div className="max-w-2xl mb-6 self-start text-amber-200 bg-amber-500/10 border border-amber-400/30 rounded-3xl p-5">
+                <div className="max-w-2xl mb-6 self-start text-amber-200 bg-amber-500/10 border border-amber-400/30 rounded-lg p-5">
                   <p className="text-sm font-semibold mb-2">Generation notes</p>
                   <ul className="list-disc pl-5 text-sm space-y-1">
                     {generateWarnings.map((warning) => (
@@ -435,7 +435,7 @@ export function DiagramMode() {
               )}
 
               {!rendering && mermaidError && (
-                <div className="max-w-md text-red-400 bg-red-500/10 border border-red-500/30 rounded-3xl p-6">
+                <div className="max-w-md text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg p-6">
                   Mermaid error: {mermaidError}
                 </div>
               )}

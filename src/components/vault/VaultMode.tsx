@@ -164,16 +164,16 @@ export function VaultMode() {
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-[#050507] overflow-hidden">
+    <div className="flex flex-col h-full bg-zinc-950 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700 bg-zinc-900 shrink-0">
         <div className="flex items-center gap-3">
-          <Database className="text-violet-400" size={20} />
+          <Database className="text-blue-400" size={20} />
           <span className="text-lg font-semibold text-white">Knowledge Vault</span>
         </div>
         <button
           onClick={closeVaultMode}
-          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
         >
           <X size={20} />
         </button>
@@ -182,7 +182,7 @@ export function VaultMode() {
       <div className="flex-1 overflow-y-auto p-6 space-y-10">
         <div className="max-w-4xl mx-auto space-y-10">
           {/* Ingest Section */}
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
             <div className="text-xs font-medium text-zinc-400 tracking-widest mb-4">ADD TO VAULT</div>
 
             {/* Drag & Drop */}
@@ -194,8 +194,8 @@ export function VaultMode() {
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-3xl p-12 text-center transition-all cursor-pointer mb-6 ${
-                dragOver ? 'border-violet-400 bg-violet-500/5' : 'border-zinc-700 hover:border-zinc-600'
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition-all cursor-pointer mb-6 ${
+                dragOver ? 'border-violet-400 bg-blue-500/5' : 'border-zinc-700 hover:border-zinc-600'
               }`}
             >
               <Upload size={32} className="mx-auto mb-4 text-zinc-400" />
@@ -218,12 +218,12 @@ export function VaultMode() {
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleIngestUrl()}
                 placeholder="https://example.com/article"
-                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
               />
               <button
                 onClick={handleIngestUrl}
                 disabled={ingestBusy || !urlInput.trim()}
-                className="px-8 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium disabled:opacity-50"
+                className="px-8 bg-blue-500 hover:bg-blue-300 text-white rounded-lg font-medium disabled:opacity-50"
               >
                 Ingest
               </button>
@@ -233,7 +233,7 @@ export function VaultMode() {
           </div>
 
           {/* Semantic Search */}
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
             <div className="text-xs font-medium text-zinc-400 tracking-widest mb-4">SEMANTIC SEARCH</div>
             <div className="flex gap-3">
               <input
@@ -242,12 +242,12 @@ export function VaultMode() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleQuery()}
                 placeholder="Ask anything about your documents…"
-                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-lg px-5 py-4 text-white outline-none"
               />
               <button
                 onClick={handleQuery}
                 disabled={searching || !query.trim()}
-                className="px-8 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium disabled:opacity-50 flex items-center gap-2"
+                className="px-8 bg-blue-500 hover:bg-blue-300 text-white rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
               >
                 <Search size={16} />
                 Search
@@ -259,8 +259,8 @@ export function VaultMode() {
             {queryResults.length > 0 && (
               <div className="mt-6 space-y-4">
                 {queryResults.map((chunk, i) => (
-                  <div key={i} className="bg-zinc-800 border border-zinc-700 rounded-3xl p-5">
-                    <div className="text-xs text-violet-300 mb-2">{chunk.source_label}</div>
+                  <div key={i} className="bg-zinc-800 border border-zinc-700 rounded-lg p-5">
+                    <div className="text-xs text-blue-300 mb-2">{chunk.source_label}</div>
                     <p className="text-zinc-200 text-sm leading-relaxed">{chunk.text}</p>
                   </div>
                 ))}
@@ -269,7 +269,7 @@ export function VaultMode() {
           </div>
 
           {/* Sources list */}
-          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="text-xs font-medium text-zinc-400 tracking-widest">INGESTED SOURCES ({sources.length})</div>
             </div>
@@ -279,7 +279,7 @@ export function VaultMode() {
             ) : (
               <div className="space-y-3">
                 {sources.map((src) => (
-                  <div key={src.id} className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-3xl px-6 py-4">
+                  <div key={src.id} className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-lg px-6 py-4">
                     <div className="flex-1">
                       <div className="font-medium text-white">{src.label}</div>
                       <div className="text-xs text-zinc-400">{src.chunks} chunks</div>
@@ -289,7 +289,7 @@ export function VaultMode() {
                       <button
                         onClick={() => void handleGenerateFlashcards(src.id)}
                         disabled={flashcardBusy === src.id}
-                        className="flex items-center gap-2 px-5 py-2 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 rounded-3xl text-sm font-medium"
+                        className="flex items-center gap-2 px-5 py-2 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 rounded-lg text-sm font-medium"
                       >
                         <Zap size={14} />
                         {flashcardBusy === src.id ? 'Generating…' : 'Flashcards'}

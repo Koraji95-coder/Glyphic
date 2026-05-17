@@ -34,7 +34,7 @@ export function LectureModeToggle() {
         <button
           type="button"
           onClick={toggleLectureMode}
-          className="p-1 hover:bg-emerald-500/20 rounded-2xl transition-colors"
+          className="p-1 hover:bg-emerald-500/20 rounded-md transition-colors"
           title="Stop Lecture Mode"
         >
           <X size={16} />
