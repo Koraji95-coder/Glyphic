@@ -28,16 +28,16 @@ export function ShortcutHelp() {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-lg shadow-2xl overflow-hidden"
       >
         <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-700">
           <div className="flex items-center gap-3">
-            <Keyboard size={20} className="text-violet-400" />
+            <Keyboard size={20} className="text-blue-400" />
             <h2 className="text-lg font-semibold text-white">Keyboard Shortcuts</h2>
           </div>
           <button
             onClick={close}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>

@@ -24,7 +24,7 @@ export function ThemeSwitcher() {
   };
 
   return (
-    <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-3xl p-1 gap-1">
+    <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg p-1 gap-1">
       {THEME_OPTIONS.map((opt) => {
         const isActive =
           theme === opt.value || (opt.value === 'indigo' && (theme === 'dark' || theme === 'system'));
@@ -34,7 +34,7 @@ export function ThemeSwitcher() {
             key={opt.value}
             onClick={() => handleThemeChange(opt.value)}
             title={opt.label}
-            className={`w-7 h-7 rounded-2xl flex items-center justify-center transition-all hover:scale-110 ${
+            className={`w-7 h-7 rounded-md flex items-center justify-center transition-all hover:scale-110 ${
               isActive ? 'ring-2 ring-violet-400 ring-offset-2 ring-offset-zinc-900' : ''
             }`}
             style={{ background: opt.color }}

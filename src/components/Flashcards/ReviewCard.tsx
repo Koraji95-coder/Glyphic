@@ -18,14 +18,14 @@ export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
     >
       {/* Card container */}
       <div
-        className={`absolute inset-0 rounded-3xl border border-zinc-700 shadow-2xl overflow-hidden transition-all ${
+        className={`absolute inset-0 rounded-lg border border-zinc-700 shadow-2xl overflow-hidden transition-all ${
           isFlipped ? 'rotate-y-180' : ''
         }`}
         style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
       >
         {/* Front - Question */}
         <div className="absolute inset-0 bg-zinc-900 flex flex-col p-8">
-          <div className="text-xs font-medium tracking-widest text-violet-300 mb-2">QUESTION</div>
+          <div className="text-xs font-medium tracking-widest text-blue-300 mb-2">QUESTION</div>
           <div className="flex-1 flex items-center justify-center text-center text-xl leading-relaxed text-white">
             {card.front}
           </div>

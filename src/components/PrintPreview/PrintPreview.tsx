@@ -62,7 +62,7 @@ export function PrintPreview() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#050507] text-red-400 text-sm">
+      <div className="flex items-center justify-center h-screen bg-zinc-950 text-red-400 text-sm">
         Error: {error}
       </div>
     );
@@ -70,7 +70,7 @@ export function PrintPreview() {
 
   if (!html) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#050507] text-zinc-400 text-sm">
+      <div className="flex items-center justify-center h-screen bg-zinc-950 text-zinc-400 text-sm">
         Preparing print preview…
       </div>
     );

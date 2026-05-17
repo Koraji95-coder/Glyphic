@@ -47,7 +47,7 @@ export const KpiPanel: FC<KpiPanelProps> = ({
   return (
     <section
       className={`
-        p-6 md:p-7 rounded-2xl border border-(--border-subtle)
+        p-6 md:p-7 rounded-md border border-(--border-subtle)
         bg-linear-to-br from-(--bg-mastery-panel) via-(--bg-card) to-(--bg-card)
         shadow-lg
       `}

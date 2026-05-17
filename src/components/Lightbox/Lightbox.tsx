@@ -104,7 +104,7 @@ export function Lightbox() {
       {/* Controls Bar */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-zinc-900/90 backdrop-blur-2xl border border-zinc-700 rounded-3xl px-2 py-2 shadow-2xl z-50"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-zinc-900/90 backdrop-blur-2xl border border-zinc-700 rounded-lg px-2 py-2 shadow-2xl z-50"
       >
         <ToolbarBtn label="Zoom out" onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.25))}>
           <ZoomOut size={16} />
@@ -143,7 +143,7 @@ export function Lightbox() {
       <button
         type="button"
         onClick={close}
-        className="absolute top-6 right-6 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-white p-3 rounded-3xl transition-colors z-50"
+        className="absolute top-6 right-6 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-white p-3 rounded-lg transition-colors z-50"
       >
         <X size={20} />
       </button>
@@ -165,7 +165,7 @@ function ToolbarBtn({
       type="button"
       onClick={onClick}
       title={label}
-      className="flex items-center justify-center w-9 h-9 hover:bg-zinc-800 rounded-2xl transition-colors text-zinc-300 hover:text-white"
+      className="flex items-center justify-center w-9 h-9 hover:bg-zinc-800 rounded-md transition-colors text-zinc-300 hover:text-white"
     >
       {children}
     </button>

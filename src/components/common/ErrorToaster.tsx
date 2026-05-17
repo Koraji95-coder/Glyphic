@@ -48,7 +48,7 @@ export function ErrorToaster() {
         <div
           key={item.id}
           role="status"
-          className="rounded-3xl border bg-zinc-900/95 backdrop-blur-2xl px-5 py-4 shadow-2xl border-red-500/30 text-white"
+          className="rounded-lg border bg-zinc-900/95 backdrop-blur-2xl px-5 py-4 shadow-2xl border-red-500/30 text-white"
         >
           <div className="text-xs font-semibold uppercase tracking-widest text-red-400">
             {item.context}

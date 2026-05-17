@@ -24,7 +24,7 @@ export function ShortcutsList() {
                 return (
                   <div
                     key={`${shortcut.combo}-${activeCombo}`}
-                    className="flex items-center justify-between px-4 py-3 bg-zinc-800/50 hover:bg-zinc-800 rounded-2xl transition-colors"
+                    className="flex items-center justify-between px-4 py-3 bg-zinc-800/50 hover:bg-zinc-800 rounded-md transition-colors"
                   >
                     <span className="text-zinc-300">{shortcut.description}</span>
                     <div className="flex items-center gap-2">
