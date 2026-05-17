@@ -2,6 +2,11 @@ import { invoke } from '@tauri-apps/api/core';
 import type { AiConfig, Flashcard } from '../../types/ai';
 import type { CaptureResult, WindowInfo } from '../../types/capture';
 import type { Backlink, SearchResult } from '../../types/editor';
+import type {
+  MasteryLevelDto,
+  StudyAttemptDto,
+  TopicRelationshipCountsDto,
+} from '../../types/mastery.types';
 import type { TagInfo } from '../../types/tags';
 import type { NoteFile, VaultConfig, VaultEntry } from '../../types/vault';
 
@@ -164,6 +169,50 @@ export interface GeneratedDiagramCode {
   language: string;
   diagram_type: string;
   warnings: string[];
+}
+
+// ── Backup types ──────────────────────────────────────────────────────────────
+export interface BackupHistoryEntry {
+  id: string;
+  timestamp: string;
+  status: string;
+  error_message?: string;
+  dropbox_path?: string;
+  size_bytes: number;
+  notes_count: number;
+  screenshots_count: number;
+  created_at: string;
+}
+
+export interface BackupStatusResponse {
+  last_backup?: BackupHistoryEntry;
+  is_backing_up: boolean;
+  dropbox_enabled: boolean;
+}
+
+export interface ChangeDetectionResponse {
+  has_changes: boolean;
+  notes_changed: number;
+  screenshots_changed: number;
+  total_files: number;
+  estimated_size_bytes: number;
+  size_warning: boolean;
+}
+
+export interface RestorePointResponse {
+  id: string;
+  timestamp: string;
+  size_bytes: number;
+  files_count: number;
+  notes_changed: number;
+  screenshots_changed: number;
+  dropbox_path?: string;
+}
+
+export interface RestoreResultResponse {
+  backup_id: string;
+  files_restored: number;
+  restored_at: string;
 }
 
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
@@ -474,4 +523,44 @@ export const commands = {
       : Promise.reject('Not in Tauri'),
   feHandbookQA: (question: string) =>
     isTauri ? invoke<HandbookQAResult>('fe_handbook_qa', { question }) : Promise.reject('Not in Tauri'),
+
+  // Backup & Dropbox
+  backupNow: (vaultPath: string) =>
+    isTauri ? invoke<BackupHistoryEntry>('backup_now', { vaultPath }) : Promise.reject('Not in Tauri'),
+  getBackupStatus: (vaultPath: string) =>
+    isTauri ? invoke<BackupStatusResponse>('get_backup_status', { vaultPath }) : Promise.reject('Not in Tauri'),
+  setDropboxToken: (vaultPath: string, token: string) =>
+    isTauri ? invoke<void>('set_dropbox_token', { vaultPath, token }) : Promise.reject('Not in Tauri'),
+  getBackupHistory: (vaultPath: string, limit?: number) =>
+    isTauri
+      ? invoke<BackupHistoryEntry[]>('get_backup_history', { vaultPath, limit: limit ?? 10 })
+      : Promise.reject('Not in Tauri'),
+  detectChanges: (vaultPath: string) =>
+    isTauri ? invoke<ChangeDetectionResponse>('detect_changes', { vaultPath }) : Promise.reject('Not in Tauri'),
+  getRestorePoints: (vaultPath: string, limit?: number) =>
+    isTauri
+      ? invoke<RestorePointResponse[]>('get_restore_points', { vaultPath, limit: limit ?? 25 })
+      : Promise.reject('Not in Tauri'),
+  restoreFromPoint: (vaultPath: string, restorePointId: string) =>
+    isTauri
+      ? invoke<RestoreResultResponse>('restore_from_point', { vaultPath, restorePointId })
+      : Promise.reject('Not in Tauri'),
+
+  // MasteryMode dashboard
+  getMasteryHistory: () =>
+    isTauri ? invoke<MasteryLevelDto[]>('get_mastery_history') : Promise.resolve([] as MasteryLevelDto[]),
+  getRecentAttempts: (limit?: number) =>
+    isTauri
+      ? invoke<StudyAttemptDto[]>('get_recent_attempts', { limit: limit ?? 50 })
+      : Promise.resolve([] as StudyAttemptDto[]),
+  getMasteryByTopics: (topics: string[]) =>
+    isTauri
+      ? invoke<MasteryLevelDto[]>('get_mastery_by_topics', { topics })
+      : Promise.resolve([] as MasteryLevelDto[]),
+  getTopicPrerequisites: (topic: string) =>
+    isTauri ? invoke<string[]>('get_topic_prerequisites', { topic }) : Promise.resolve([] as string[]),
+  getTopicRelationshipCounts: (topics: string[]) =>
+    isTauri
+      ? invoke<TopicRelationshipCountsDto[]>('get_topic_relationship_counts', { topics })
+      : Promise.resolve([] as TopicRelationshipCountsDto[]),
 };

@@ -19,21 +19,17 @@ export function CaptureOverlay() {
   const captureDelay = useCaptureStore((s) => s.captureDelay);
   const cycleDelay = useCaptureStore((s) => s.cycleDelay);
   const vaultPath = useVaultStore((s) => s.vaultPath);
-  // Screenshot background state
+
   const [screenshotBg, setScreenshotBg] = useState<string | null>(null);
   const [delayCountdown, setDelayCountdown] = useState<number | null>(null);
   const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // On mount, read the frozen screenshot path from the URL query param and load it.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const bg = params.get('bg');
-    if (bg) {
-      setScreenshotBg(convertFileSrc(bg));
-    }
+    if (bg) setScreenshotBg(convertFileSrc(bg));
   }, []);
 
-  /** Execute a capture action after applying the configured delay. */
   const withDelay = useCallback(
     (action: () => void) => {
       if (captureDelay === 0) {
@@ -57,7 +53,6 @@ export function CaptureOverlay() {
     [captureDelay],
   );
 
-  // Clean up delay timer on unmount
   useEffect(() => {
     return () => {
       if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
@@ -76,27 +71,13 @@ export function CaptureOverlay() {
     withDelay(doCapture);
   }, [vaultPath, withDelay]);
 
-  // Handle keyboard shortcuts for mode switching and escape
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      // Ignore during countdown
       if (delayCountdown !== null) return;
-
       const key = e.key.toLowerCase();
-      const modeKeys: Record<string, CaptureMode> = {
-        r: 'region',
-        w: 'window',
-        f: 'freeform',
-        s: 'fullscreen',
-      };
 
       if (key === 'escape') {
-        // Cancel the capture session (hides overlay and cleans up temp file).
-        commands.cancelCapture().catch((e) => {
-          reportError({ context: 'Capture overlay', message: 'Failed to cancel capture', error: e });
-        });
-        // If there are queued multi-captures, they were already emitted as events
-        // and inserted by the editor; just clear the queue and close
+        commands.cancelCapture().catch(() => {});
         clearQueue();
         window.history.back();
         return;
@@ -107,13 +88,11 @@ export function CaptureOverlay() {
         return;
       }
 
+      const modeKeys: Record<string, CaptureMode> = { r: 'region', w: 'window', f: 'freeform', s: 'fullscreen' };
       if (key in modeKeys) {
         const newMode = modeKeys[key];
-        if (newMode === 'fullscreen') {
-          handleFullscreenCapture();
-        } else {
-          setCaptureMode(newMode);
-        }
+        if (newMode === 'fullscreen') handleFullscreenCapture();
+        else setCaptureMode(newMode);
       }
     },
     [setCaptureMode, handleFullscreenCapture, clearQueue, cycleDelay, delayCountdown],
@@ -124,21 +103,15 @@ export function CaptureOverlay() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // If mode is set to fullscreen, trigger immediately
   useEffect(() => {
-    if (captureMode === 'fullscreen') {
-      handleFullscreenCapture();
-    }
+    if (captureMode === 'fullscreen') handleFullscreenCapture();
   }, [captureMode, handleFullscreenCapture]);
 
-  // Don't render overlay UI if fullscreen mode (capture happens immediately)
-  if (captureMode === 'fullscreen') {
-    return null;
-  }
+  if (captureMode === 'fullscreen') return null;
 
   return (
     <div
-      className="fixed inset-0 z-9999"
+      className="fixed inset-0 z-[9999]"
       style={{
         cursor: 'crosshair',
         backgroundImage: screenshotBg ? `url(${screenshotBg})` : undefined,
@@ -147,18 +120,12 @@ export function CaptureOverlay() {
       }}
     >
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/40" />
 
       {/* Delay countdown */}
       {delayCountdown !== null && (
         <div className="absolute inset-0 z-30 flex items-center justify-center">
-          <div
-            className="text-7xl font-bold"
-            style={{
-              color: 'rgba(255, 255, 255, 0.9)',
-              textShadow: '0 2px 16px rgba(0, 0, 0, 0.6)',
-            }}
-          >
+          <div className="text-[180px] font-bold text-white/90 tracking-[-0.05em] drop-shadow-2xl">
             {delayCountdown}
           </div>
         </div>
@@ -167,7 +134,7 @@ export function CaptureOverlay() {
       {/* Toolbar */}
       <CaptureToolbar onFullscreen={handleFullscreenCapture} captureCount={multiCaptureQueue.length} />
 
-      {/* Mode-specific selectors (disabled during countdown) */}
+      {/* Mode-specific selectors */}
       {delayCountdown === null && (
         <>
           {captureMode === 'region' && <RegionSelector />}
@@ -176,7 +143,7 @@ export function CaptureOverlay() {
         </>
       )}
 
-      {/* Magnifier loupe for region and freeform modes */}
+      {/* Magnifier */}
       {(captureMode === 'region' || captureMode === 'freeform') && <Magnifier screenshotSrc={screenshotBg} />}
     </div>
   );

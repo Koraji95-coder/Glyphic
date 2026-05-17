@@ -1,6 +1,8 @@
 import { convertFileSrc } from '@tauri-apps/api/core';
+import type { UnlistenFn } from '@tauri-apps/api/event';
 import { EditorContent, useEditor as useTiptapEditor } from '@tiptap/react';
 import { lazy, Suspense, useCallback, useEffect } from 'react';
+
 import { useEditor } from '../../hooks/useEditor';
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
@@ -13,14 +15,13 @@ import { useAnnotationStore } from '../../stores/annotationStore';
 import { useEditorActionStore } from '../../stores/editorActionStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { useVaultStore } from '../../stores/vaultStore';
+
 import { LectureModeToggle } from '../LectureMode/LectureModeToggle';
 import { EditorToolbar } from './EditorToolbar';
 import { NoteTagChips } from './NoteTagChips';
 
-// Fabric.js (~330 kB min) is only needed when the user actually opens an
-// annotation overlay, so split it into its own chunk and load on demand.
 const AnnotationOverlay = lazy(() =>
-  import('../Annotation/AnnotationOverlay').then((m) => ({ default: m.AnnotationOverlay })),
+  import('../Annotation/AnnotationOverlay').then((m) => ({ default: m.AnnotationOverlay }))
 );
 
 export function Editor({
@@ -32,9 +33,11 @@ export function Editor({
 } = {}) {
   const globalActivePath = useVaultStore((s) => s.activeNotePath);
   const activeNotePath = notePathProp !== undefined ? notePathProp : globalActivePath;
+
   const lectureModeActive = useEditorStore((s) => s.lectureModeActive);
   const lectureModeStartedAt = useEditorStore((s) => s.lectureModeStartedAt);
   const setCursorPosition = useEditorStore((s) => s.setCursorPosition);
+
   const { handleContentChange, loadNote, forceSave } = useEditor();
 
   const editor = useTiptapEditor({
@@ -42,12 +45,10 @@ export function Editor({
     editable: !readOnly,
     editorProps: {
       attributes: {
-        class: 'ProseMirror focus:outline-none min-h-full',
+        class: 'ProseMirror focus:outline-none min-h-full px-8 py-6',
       },
       handleKeyDown: (_view, event) => {
-        // In lecture mode, auto-insert timestamp on Enter (new paragraph)
         if (!readOnly && lectureModeActive && lectureModeStartedAt && event.key === 'Enter' && !event.shiftKey) {
-          // Let TipTap handle Enter first, then insert timestamp
           setTimeout(() => {
             if (!editor) return;
             const elapsed = formatElapsed(lectureModeStartedAt);
@@ -79,9 +80,6 @@ export function Editor({
     onSelectionUpdate: ({ editor: ed }) => {
       if (readOnly) return;
       const { from } = ed.state.selection;
-      // Compute line/col by counting newlines in the text before the cursor.
-      // textBetween(0, pos, '\n') inserts a '\n' between every block boundary,
-      // giving an accurate position for a markdown (flat-ish) document.
       const textBefore = ed.state.doc.textBetween(0, from, '\n');
       const lines = textBefore.split('\n');
       const line = lines.length;
@@ -90,12 +88,10 @@ export function Editor({
     },
   });
 
-  // Keep `editable` in sync if the prop changes after mount.
   useEffect(() => {
     editor?.setEditable(!readOnly);
   }, [editor, readOnly]);
 
-  // Register editor action callbacks used by keyboard shortcuts and modals.
   useEffect(() => {
     const actionStore = useEditorActionStore.getState();
     if (!editor || readOnly) return;
@@ -121,19 +117,16 @@ export function Editor({
     };
   }, [editor, readOnly]);
 
-  // Load active note content
   useEffect(() => {
     if (!editor || !activeNotePath) return;
 
     let cancelled = false;
     const load = async () => {
       try {
-        // In read-only mode, bypass `loadNote`'s save-flushing side effects so
-        // we don't disturb the primary editor's pending-save state.
         let raw: string;
         if (readOnly) {
           const vp = useVaultStore.getState().vaultPath;
-          if (!vp) return; // No vault open yet — nothing to load.
+          if (!vp) return;
           raw = await commands.readNote(vp, activeNotePath);
         } else {
           raw = await loadNote(activeNotePath);
@@ -152,37 +145,30 @@ export function Editor({
     };
   }, [editor, activeNotePath, readOnly, loadNote]);
 
-  // Listen for captured screenshots to insert images
   const insertImage = useCallback(
     (result: { path: string }) => {
       if (!editor || readOnly) return;
-      // Tauri webviews can't load raw OS paths via <img src>; route them through
-      // the asset: protocol so the file actually renders in the editor.
       const src = convertFileSrc(result.path);
       editor.chain().focus().setImage({ src }).run();
     },
-    [editor, readOnly],
+    [editor, readOnly]
   );
 
   useEffect(() => {
-    let cleanup: (() => void) | undefined;
-    const result = events.onScreenshotCaptured(insertImage);
-    if (result && typeof (result as Promise<() => void>).then === 'function') {
-      (result as Promise<() => void>).then((fn) => {
-        cleanup = fn;
-      });
-    } else if (typeof result === 'function') {
-      cleanup = result as () => void;
-    }
-    return () => cleanup?.();
+    let unsubscribe: UnlistenFn | null = null;
+
+    void (async () => {
+      unsubscribe = await events.onScreenshotCaptured(insertImage);
+    })();
+
+    return () => {
+      if (unsubscribe) void unsubscribe();
+    };
   }, [insertImage]);
 
-  // Listen for force-save requests dispatched by Ctrl+S handler in App.tsx
   useEffect(() => {
     if (readOnly) return;
-    const handler = () => {
-      void forceSave();
-    };
+    const handler = () => void forceSave();
     window.addEventListener('glyphic:force-save', handler);
     return () => window.removeEventListener('glyphic:force-save', handler);
   }, [readOnly, forceSave]);
@@ -191,66 +177,35 @@ export function Editor({
     return <Dashboard />;
   }
 
-  // Build breadcrumb parts from the note path
   const pathParts = activeNotePath.replace(/\.md$/, '').split('/').filter(Boolean);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0 bg-[#050507]">
       {!readOnly && <EditorToolbar editor={editor} />}
       {!readOnly && <LectureModeToggle />}
       <NoteTagChips notePath={activeNotePath} />
-      {/* Breadcrumb bar */}
+
       {pathParts.length > 1 && (
-        <div
-          className="flex items-center shrink-0"
-          style={{
-            gap: '3px',
-            padding: '5px 28px',
-            fontSize: '11px',
-            color: 'var(--text-ghost)',
-            backgroundColor: 'var(--bg-editor)',
-          }}
-        >
+        <div className="flex items-center px-8 py-2 text-xs text-zinc-400 border-b border-zinc-800 bg-zinc-900/50">
           {pathParts.map((part, i) => (
-            <span key={part}>
-              {i > 0 && <span style={{ margin: '0 1px' }}>/</span>}
-              <span
-                style={{
-                  color: i === pathParts.length - 1 ? 'var(--text-tertiary)' : 'var(--text-ghost)',
-                }}
-              >
-                {part}
-              </span>
+            <span key={part} className="flex items-center">
+              {i > 0 && <span className="mx-1 text-zinc-600">/</span>}
+              <span className={i === pathParts.length - 1 ? 'text-zinc-200' : ''}>{part}</span>
             </span>
           ))}
         </div>
       )}
-      <div
-        className="flex-1 overflow-y-auto"
-        style={{
-          background:
-            'radial-gradient(circle at top center, rgba(163,116,247,0.06), transparent 32%), radial-gradient(circle at bottom right, rgba(249,118,85,0.05), transparent 24%), rgba(13,11,22,0.45)',
-        }}
-      >
+
+      <div className="flex-1 overflow-y-auto p-8 bg-[#050507]">
         <EditorContent editor={editor} />
       </div>
-      {!readOnly && <AnnotationOverlayLazy />}
-    </div>
-  );
-}
 
-/**
- * Only mount the lazy-loaded `AnnotationOverlay` when the annotation overlay is
- * actually open. This way Fabric.js stays out of the runtime cost when notes
- * are merely being read or edited.
- */
-function AnnotationOverlayLazy() {
-  const isOpen = useAnnotationStore((s) => s.isOpen);
-  if (!isOpen) return null;
-  return (
-    <Suspense fallback={null}>
-      <AnnotationOverlay />
-    </Suspense>
+      {!readOnly && (
+        <Suspense fallback={null}>
+          <AnnotationOverlay />
+        </Suspense>
+      )}
+    </div>
   );
 }
 

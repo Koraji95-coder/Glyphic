@@ -1,5 +1,6 @@
 import { Search, X } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
+
 import { useSearch } from '../../hooks/useSearch';
 import { useVaultStore } from '../../stores/vaultStore';
 
@@ -7,6 +8,7 @@ export function SearchBar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { query, results, isSearching, handleQueryChange, clearSearch } = useSearch();
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const handleOpenResult = useCallback(
@@ -16,7 +18,7 @@ export function SearchBar() {
       setSelectedIndex(-1);
       inputRef.current?.blur();
     },
-    [setActiveNote, clearSearch],
+    [setActiveNote, clearSearch]
   );
 
   const handleKeyDown = useCallback(
@@ -46,42 +48,17 @@ export function SearchBar() {
           break;
       }
     },
-    [query, results, selectedIndex, clearSearch, handleOpenResult],
+    [query, results, selectedIndex, clearSearch, handleOpenResult]
   );
 
   return (
-    <div className="relative">
-      {/* Input container */}
-      <div
-        className="flex items-center gap-2 px-2.5 py-2 rounded-md transition-all"
-        style={{
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.04)',
-          border: '1px solid var(--glass-border)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-          transition: 'all 0.2s',
-          cursor: 'text',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background =
-            'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%), rgba(255,255,255,0.06)';
-          e.currentTarget.style.borderColor = 'rgba(163,116,247,0.35)';
-          e.currentTarget.style.boxShadow = '0 0 0 4px rgba(163,116,247,0.08)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background =
-            'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%), rgba(255,255,255,0.04)';
-          e.currentTarget.style.borderColor = 'var(--glass-border)';
-          e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.04)';
-        }}
-      >
-        <Search size={14} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
+    <div className="relative px-4 py-3 border-b border-zinc-800">
+      {/* Search Input */}
+      <div className="flex items-center gap-3 bg-zinc-900/70 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-600 backdrop-blur-xl rounded-3xl px-4 py-2 transition-all">
+        <Search size={17} className="text-zinc-400" />
         <input
           ref={inputRef}
           id="sidebar-search-input"
-          name="sidebarSearch"
           type="text"
           value={query}
           onChange={(e) => {
@@ -90,8 +67,7 @@ export function SearchBar() {
           }}
           onKeyDown={handleKeyDown}
           placeholder="Search notes..."
-          className="flex-1 bg-transparent text-sm outline-none"
-          style={{ color: 'var(--text-primary)', border: 'none', boxShadow: 'none' }}
+          className="flex-1 bg-transparent text-sm outline-none text-white placeholder-zinc-400"
         />
         {query && (
           <button
@@ -101,69 +77,40 @@ export function SearchBar() {
               setSelectedIndex(-1);
               inputRef.current?.focus();
             }}
-            className="shrink-0 p-0.5 rounded transition-colors"
-            style={{ color: 'var(--text-tertiary)' }}
+            className="text-zinc-400 hover:text-zinc-200 transition-colors"
           >
-            <X size={14} />
+            <X size={16} />
           </button>
         )}
       </div>
 
-      {/* Results dropdown */}
+      {/* Results Dropdown */}
       {query && (
-        <div
-          className="absolute left-3 right-3 mt-1 rounded-md max-h-72 overflow-y-auto z-40"
-          style={{
-            backgroundColor: 'rgba(14,11,26,0.88)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid var(--glass-border)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-            padding: '4px',
-          }}
-        >
+        <div className="absolute left-4 right-4 mt-2 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl z-50 max-h-72 overflow-y-auto py-2">
           {isSearching ? (
-            <div className="px-3 py-4 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
-              Searching...
-            </div>
+            <div className="px-6 py-8 text-center text-sm text-zinc-400">Searching...</div>
           ) : results.length === 0 ? (
-            <div className="px-3 py-4 text-sm text-center" style={{ color: 'var(--text-tertiary)' }}>
-              No results found
-            </div>
+            <div className="px-6 py-8 text-center text-sm text-zinc-400">No results found</div>
           ) : (
             results.map((result, i) => {
               const folder = result.path.split('/').slice(0, -1).join('/');
               return (
                 <button
-                  type="button"
                   key={result.id}
                   onClick={() => handleOpenResult(result.id, result.path)}
-                  className="flex flex-col w-full px-3 py-2 text-left transition-colors"
-                  style={{
-                    background:
-                      i === selectedIndex
-                        ? 'linear-gradient(135deg, rgba(163,116,247,0.14), rgba(249,118,85,0.06))'
-                        : 'transparent',
-                    borderRadius: '10px',
-                  }}
                   onMouseEnter={() => setSelectedIndex(i)}
+                  className={`w-full px-6 py-3 text-left transition-all ${
+                    i === selectedIndex ? 'bg-zinc-800' : 'hover:bg-zinc-800/50'
+                  }`}
                 >
-                  <span className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-                    {result.title}
-                  </span>
+                  <div className="text-sm font-medium text-white truncate">{result.title}</div>
                   {result.snippet && (
-                    <span
-                      className="text-xs truncate mt-0.5 search-snippet"
-                      style={{ color: 'var(--text-tertiary)' }}
-                      // biome-ignore lint/security/noDangerouslySetInnerHtml: FTS5 snippets contain <mark> highlights; sanitizeSnippet strips all other tags
+                    <div
+                      className="text-xs text-zinc-400 mt-1 line-clamp-2"
                       dangerouslySetInnerHTML={{ __html: sanitizeSnippet(result.snippet) }}
                     />
                   )}
-                  {folder && (
-                    <span className="text-xs truncate mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
-                      {folder}
-                    </span>
-                  )}
+                  {folder && <div className="text-xs text-zinc-500 mt-1">{folder}</div>}
                 </button>
               );
             })
@@ -174,14 +121,8 @@ export function SearchBar() {
   );
 }
 
-/**
- * Sanitize FTS5 snippet HTML — only allow <mark> tags for highlighting.
- * Strips all other HTML tags to prevent XSS, and escapes raw ampersands
- * that are not already part of valid HTML entities.
- */
+/** Sanitize FTS5 snippet HTML */
 function sanitizeSnippet(html: string): string {
-  // Strip all tags except <mark> and </mark>
   const stripped = html.replace(/<(?!\/?mark\b)[^>]*>/gi, '');
-  // Escape ampersands that aren't part of valid HTML entities (named or numeric)
   return stripped.replace(/&(?!(?:amp|lt|gt|quot|#\d{1,5}|#x[\da-fA-F]{1,4}|[a-zA-Z]{2,8});)/g, '&amp;');
 }

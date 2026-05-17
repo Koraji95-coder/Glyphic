@@ -1,13 +1,9 @@
 import { Keyboard, X } from 'lucide-react';
 import { useEffect } from 'react';
+
 import { useHelpUiStore } from '../../stores/helpUiStore';
 import { ShortcutsList } from './ShortcutsList';
 
-/**
- * Global keyboard shortcut reference modal. Triggered by Ctrl+/, Ctrl+? or
- * the Help footer button. Renders the same `ShortcutsList` used by the
- * Settings modal so the two views never disagree.
- */
 export function ShortcutHelp() {
   const { isOpen, close } = useHelpUiStore();
 
@@ -28,68 +24,26 @@ export function ShortcutHelp() {
   return (
     <div
       onClick={close}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') close();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Keyboard shortcuts"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: 110,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
+      className="fixed inset-0 bg-black/70 z-[220] flex items-center justify-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        role="document"
-        style={{
-          width: 'min(560px, 92vw)',
-          maxHeight: '80vh',
-          backgroundColor: 'var(--bg-app)',
-          border: '1px solid var(--border)',
-          borderRadius: '10px',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
+        className="w-full max-w-lg bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden"
       >
-        <header
-          className="flex items-center justify-between shrink-0"
-          style={{
-            padding: '12px 18px',
-            borderBottom: '1px solid var(--border)',
-          }}
-        >
-          <div className="flex items-center" style={{ gap: '8px' }}>
-            <Keyboard size={16} style={{ color: 'var(--accent)' }} />
-            <h2 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-              Keyboard Shortcuts
-            </h2>
+        <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-700">
+          <div className="flex items-center gap-3">
+            <Keyboard size={20} className="text-violet-400" />
+            <h2 className="text-lg font-semibold text-white">Keyboard Shortcuts</h2>
           </div>
           <button
-            type="button"
             onClick={close}
-            aria-label="Close shortcuts help"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-tertiary)',
-              padding: '4px',
-              borderRadius: '4px',
-            }}
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
           >
-            <X size={16} />
+            <X size={20} />
           </button>
         </header>
-        <div className="flex-1 overflow-y-auto" style={{ padding: '14px 18px' }}>
+
+        <div className="p-6 max-h-[520px] overflow-y-auto">
           <ShortcutsList />
         </div>
       </div>

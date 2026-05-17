@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type SettingsSection = 'general' | 'editor' | 'capture' | 'lecture' | 'ai' | 'shortcuts';
+type SettingsSection = 'general' | 'editor' | 'capture' | 'lecture' | 'backup' | 'ai' | 'shortcuts';
 
 interface SettingsUiState {
   isOpen: boolean;

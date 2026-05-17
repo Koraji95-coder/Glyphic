@@ -1,4 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
 import {
   ChevronDown,
   ChevronRight,
@@ -14,6 +13,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { useVault } from '../../hooks/useVault';
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
@@ -36,6 +36,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     const childCount = entry.children?.length ?? 0;
     return childCount > 0 && childCount <= 25;
   });
+
   const [visibleChildrenCount, setVisibleChildrenCount] = useState(INITIAL_CHILDREN_BATCH);
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
   const ctxRef = useRef<HTMLDivElement>(null);
@@ -46,6 +47,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   const pinnedNotes = useVaultStore((s) => s.pinnedNotes);
   const pinNote = useVaultStore((s) => s.pinNote);
   const unpinNote = useVaultStore((s) => s.unpinNote);
+
   const { openPrompt } = usePromptModalStore();
   const { createNote, deleteNote, deleteFolder } = useVault();
 
@@ -53,6 +55,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
   const isActive = !isFolder && activeNotePath === entry.path;
   const isPinned = !isFolder && pinnedNotes.includes(entry.path);
   const title = entry.name.replace(/\.md$/, '');
+
   const totalChildren = entry.children?.length ?? 0;
   const visibleChildren = entry.children?.slice(0, visibleChildrenCount) ?? [];
   const remainingChildren = Math.max(0, totalChildren - visibleChildren.length);
@@ -73,7 +76,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     setCtxMenu({ x: e.clientX, y: e.clientY });
   }, []);
 
-  // Close context menu on outside click
+  // Close context menu when clicking outside
   useEffect(() => {
     if (!ctxMenu) return;
     const close = (e: MouseEvent) => {
@@ -85,13 +88,9 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
     return () => document.removeEventListener('mousedown', close);
   }, [ctxMenu]);
 
-  // Reset incremental rendering window when collapsing/expanding or changing folders.
+  // Reset incremental loading when collapsing/expanding
   useEffect(() => {
     if (!isFolder) return;
-    if (!expanded) {
-      setVisibleChildrenCount(INITIAL_CHILDREN_BATCH);
-      return;
-    }
     setVisibleChildrenCount(INITIAL_CHILDREN_BATCH);
   }, [expanded, isFolder]);
 
@@ -182,39 +181,36 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
       <div
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        className="flex items-center gap-1 py-0.5 px-2 rounded cursor-pointer text-sm select-none group"
-        style={{
-          paddingLeft: `${depth * 16 + 8}px`,
-          backgroundColor: isActive ? 'rgba(163,116,247,0.18)' : 'transparent',
-          color: isActive ? 'var(--accent)' : 'var(--text-primary)',
-          borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
-          transition: 'background-color 0.12s, border-color 0.12s',
-        }}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = isActive ? 'rgba(163,116,247,0.18)' : 'transparent';
-        }}
+        className={`flex items-center gap-1 py-1 px-2 rounded-xl cursor-pointer text-sm select-none group transition-all ${
+          isActive ? 'bg-violet-500/10 text-white' : 'hover:bg-zinc-800/70 text-zinc-300'
+        }`}
+        style={{ paddingLeft: `${depth * 16 + 12}px` }}
       >
-        {/* Expand chevron or spacer */}
+        {/* Chevron / Spacer */}
         {isFolder ? (
-          <span className="shrink-0" style={{ color: 'var(--text-tertiary)' }}>
-            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <span className="shrink-0 text-zinc-400 group-hover:text-zinc-200">
+            {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
           </span>
         ) : (
           <span className="w-3.5 shrink-0" />
         )}
 
         {/* Icon */}
-        <span className="shrink-0" style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>
-          {isFolder ? expanded ? <FolderOpen size={15} /> : <Folder size={15} /> : <File size={15} />}
+        <span className="shrink-0">
+          {isFolder
+            ? expanded
+              ? <FolderOpen size={16} className="text-amber-300" />
+              : <Folder size={16} className="text-amber-300" />
+            : <File size={16} className={isActive ? 'text-violet-300' : 'text-zinc-400'} />}
         </span>
 
         {/* Name */}
-        <span className="truncate">{title}</span>
+        <span className="truncate flex-1">{title}</span>
+
+        {/* Pin indicator */}
+        {!isFolder && isPinned && (
+          <Pin size={13} className="text-violet-400 shrink-0" />
+        )}
       </div>
 
       {/* Children */}
@@ -223,6 +219,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
           {visibleChildren.map((child) => (
             <FileTreeItem key={child.path} entry={child} depth={depth + 1} />
           ))}
+
           {remainingChildren > 0 && (
             <button
               type="button"
@@ -230,17 +227,7 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
                 e.stopPropagation();
                 setVisibleChildrenCount((prev) => Math.min(prev + CHILDREN_BATCH_STEP, totalChildren));
               }}
-              style={{
-                marginLeft: `${(depth + 1) * 16 + 8}px`,
-                marginTop: '2px',
-                background: 'transparent',
-                border: '1px solid var(--border)',
-                borderRadius: '6px',
-                color: 'var(--text-tertiary)',
-                fontSize: '11px',
-                padding: '2px 8px',
-                cursor: 'pointer',
-              }}
+              className="ml-[calc((depth+1)*16px+12px)] mt-1 text-xs text-zinc-400 hover:text-zinc-200 px-3 py-1 rounded-2xl hover:bg-zinc-800 transition-colors"
             >
               Show {Math.min(CHILDREN_BATCH_STEP, remainingChildren)} more ({remainingChildren} remaining)
             </button>
@@ -248,18 +235,12 @@ export function FileTreeItem({ entry, depth }: FileTreeItemProps) {
         </div>
       )}
 
-      {/* Context menu */}
+      {/* Context Menu */}
       {ctxMenu && (
         <div
           ref={ctxRef}
-          className="fixed z-50 py-1 min-w-[160px] rounded"
-          style={{
-            left: ctxMenu.x,
-            top: ctxMenu.y,
-            backgroundColor: 'var(--bg-secondary)',
-            border: '1px solid var(--border)',
-            boxShadow: 'var(--shadow-md)',
-          }}
+          className="fixed z-50 py-1 min-w-[180px] bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl backdrop-blur-xl"
+          style={{ left: ctxMenu.x, top: ctxMenu.y }}
         >
           <CtxItem icon={FilePlus} label="New Note" onClick={handleNewNote} />
           {isFolder && <CtxItem icon={FolderPlus} label="New Folder" onClick={handleNewFolder} />}
@@ -296,9 +277,9 @@ function CtxItem({
   icon: Icon,
   label,
   onClick,
-  danger,
+  danger = false,
 }: {
-  icon: LucideIcon;
+  icon: React.ComponentType<{ size?: number }>;
   label: string;
   onClick: () => void;
   danger?: boolean;
@@ -307,16 +288,11 @@ function CtxItem({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-left transition-colors"
-      style={{ color: danger ? 'var(--error)' : 'var(--text-primary)' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
+      className={`flex items-center gap-3 w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-zinc-800 rounded-3xl mx-1 ${
+        danger ? 'text-red-400 hover:text-red-300' : 'text-zinc-200'
+      }`}
     >
-      <Icon size={14} />
+      <Icon size={16} />
       {label}
     </button>
   );

@@ -1,13 +1,10 @@
 import { ArrowRight, Check, Cpu, Folder, Keyboard, Loader2, Mic, Sparkles, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+
 import { useVault } from '../../hooks/useVault';
 import { commands } from '../../lib/tauri/commands';
 import { useOnboardingStore } from '../../stores/onboardingStore';
 
-/**
- * First-launch onboarding: welcome → pick vault → quickstart tips.
- * Triggered from `App.tsx` when `get_recent_vaults` returns an empty list.
- */
 export function Onboarding() {
   const { isOpen, step, setStep, finish } = useOnboardingStore();
   const [vaultPath, setVaultPath] = useState('');
@@ -18,6 +15,7 @@ export function Onboarding() {
   useEffect(() => {
     if (isOpen !== true) return;
     if (vaultPath) return;
+
     (async () => {
       try {
         const { homeDir } = await import('@tauri-apps/api/path');
@@ -52,11 +50,7 @@ export function Onboarding() {
       } catch {
         await createVault(vaultPath, 'Glyphic');
       }
-      try {
-        await commands.addRecentVault(vaultPath);
-      } catch {
-        // Non-fatal: state file write may fail on locked-down filesystems.
-      }
+      await commands.addRecentVault(vaultPath).catch(() => {});
       setStep('ai');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -66,202 +60,87 @@ export function Onboarding() {
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Welcome to Glyphic"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        zIndex: 250,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: 'min(520px, 92vw)',
-          maxHeight: '88vh',
-          backgroundColor: 'var(--glass-surface)',
-          backdropFilter: 'var(--glass-blur)',
-          WebkitBackdropFilter: 'var(--glass-blur)',
-          border: '1px solid var(--glass-border)',
-          borderRadius: '20px',
-          boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
-          padding: '32px 28px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          overflow: 'auto',
-        }}
-      >
+    <div className="fixed inset-0 bg-black/70 z-[250] flex items-center justify-center">
+      <div className="w-full max-w-[520px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden">
+        {/* Step 1: Welcome + Vault */}
         {step === 'welcome' && (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  background: 'var(--accent-gradient)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: '18px',
-                }}
-              >
+          <div className="p-8 flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
                 G
               </div>
               <div>
-                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  Welcome to Glyphic
-                </h2>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-tertiary)' }}>Let's set up your vault.</p>
+                <h1 className="text-2xl font-semibold text-white">Welcome to Glyphic</h1>
+                <p className="text-zinc-400 text-sm">Let's set up your first vault.</p>
               </div>
             </div>
 
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Your vault is the folder where Glyphic stores notes, screenshots, and settings. You can change this later
-              in Settings → General.
+            <p className="text-zinc-300 text-sm leading-relaxed">
+              Your vault is where all your notes, screenshots, and data live. You can change this anytime in Settings.
             </p>
 
-            <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>Vault location</span>
-              <div style={{ display: 'flex', gap: '6px' }}>
+            <div>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">Vault location</label>
+              <div className="flex gap-3">
                 <input
                   type="text"
                   value={vaultPath}
                   onChange={(e) => setVaultPath(e.target.value)}
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'var(--bg-input)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '6px',
-                    color: 'var(--text-primary)',
-                    fontSize: '13px',
-                    padding: '8px 10px',
-                    outline: 'none',
-                  }}
+                  className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-zinc-500 rounded-2xl px-4 py-3 text-white outline-none"
                 />
                 <button
                   type="button"
                   onClick={handleBrowse}
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '6px',
-                    color: 'var(--text-secondary)',
-                    fontSize: '12px',
-                    padding: '0 12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
+                  className="px-6 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl text-zinc-300 transition-colors"
                 >
-                  <Folder size={13} />
-                  Browse…
+                  Browse
                 </button>
               </div>
-            </label>
+            </div>
 
-            {error && (
-              <div
-                style={{
-                  fontSize: '12px',
-                  color: 'var(--red, #f87171)',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  padding: '8px 10px',
-                }}
-              >
-                {error}
-              </div>
-            )}
+            {error && <div className="text-red-400 text-sm p-3 bg-red-500/10 rounded-2xl">{error}</div>}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+            <div className="flex justify-end">
               <button
-                type="button"
-                disabled={busy || !vaultPath.trim()}
                 onClick={handleContinue}
-                style={{
-                  background: 'var(--accent)',
-                  border: 'none',
-                  color: '#fff',
-                  padding: '8px 16px',
-                  borderRadius: '7px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: busy ? 'wait' : 'pointer',
-                  opacity: busy || !vaultPath.trim() ? 0.6 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                disabled={busy || !vaultPath.trim()}
+                className="px-8 py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-2xl text-white font-medium flex items-center gap-2 transition-colors"
               >
                 {busy ? 'Opening…' : 'Continue'}
-                {!busy && <ArrowRight size={14} />}
+                {!busy && <ArrowRight size={16} />}
               </button>
             </div>
-          </>
+          </div>
         )}
 
+        {/* Step 2: AI Setup */}
         {step === 'ai' && <AiSetupStep onContinue={() => setStep('quickstart')} />}
 
+        {/* Step 3: Quickstart Tips */}
         {step === 'quickstart' && (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Check size={20} style={{ color: 'var(--accent)' }} />
-              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                You're all set
-              </h2>
-            </div>
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Three things to try first:
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <Tip
-                icon={<Keyboard size={14} />}
-                title="Capture screenshots"
-                body="Press Ctrl+Shift+S anywhere to grab a region. Captures are inserted into the active note."
-              />
-              <Tip
-                icon={<Sparkles size={14} />}
-                title="Slash menu"
-                body="Type / inside a note to insert headings, callouts, code blocks, and more."
-              />
-              <Tip
-                icon={<Mic size={14} />}
-                title="Lecture mode"
-                body="Toggle lecture mode (Ctrl+Shift+L) to auto-stamp every new line with elapsed time."
-              />
+          <div className="p-8 flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <Check size={24} className="text-emerald-400" />
+              <h2 className="text-2xl font-semibold text-white">You're all set!</h2>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+            <p className="text-zinc-300">Here are three things to try first:</p>
+
+            <div className="space-y-4">
+              <Tip icon={<Keyboard size={18} />} title="Capture screenshots" body="Press Ctrl+Shift+S anywhere to grab a region." />
+              <Tip icon={<Sparkles size={18} />} title="Slash menu" body="Type / inside a note to insert headings, callouts, etc." />
+              <Tip icon={<Mic size={18} />} title="Lecture mode" body="Toggle lecture mode (Ctrl+Shift+L) to auto-stamp every new line." />
+            </div>
+
+            <div className="flex justify-end">
               <button
-                type="button"
                 onClick={finish}
-                style={{
-                  background: 'var(--accent)',
-                  border: 'none',
-                  color: '#fff',
-                  padding: '8px 16px',
-                  borderRadius: '7px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
+                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-2xl text-white font-medium flex items-center gap-2"
               >
                 Get started
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
@@ -270,20 +149,11 @@ export function Onboarding() {
 
 function Tip({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: '10px',
-        padding: '10px 12px',
-        backgroundColor: 'var(--bg-card)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-      }}
-    >
-      <span style={{ color: 'var(--accent)', marginTop: '1px' }}>{icon}</span>
+    <div className="flex gap-4 bg-zinc-800/50 border border-zinc-700 rounded-3xl p-5">
+      <div className="text-violet-400 mt-0.5">{icon}</div>
       <div>
-        <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{title}</div>
-        <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' }}>{body}</div>
+        <div className="font-medium text-white">{title}</div>
+        <div className="text-zinc-400 text-sm mt-1">{body}</div>
       </div>
     </div>
   );
@@ -295,19 +165,14 @@ const AI_CHECK_TIMEOUT_MS = 8000;
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
   return await new Promise<T>((resolve, reject) => {
-    const timer = window.setTimeout(() => {
-      reject(new Error(timeoutMessage));
-    }, timeoutMs);
-
-    promise
-      .then((value) => {
-        window.clearTimeout(timer);
-        resolve(value);
-      })
-      .catch((error) => {
-        window.clearTimeout(timer);
-        reject(error);
-      });
+    const timer = window.setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+    promise.then((value) => {
+      window.clearTimeout(timer);
+      resolve(value);
+    }).catch((error) => {
+      window.clearTimeout(timer);
+      reject(error);
+    });
   });
 }
 
@@ -320,7 +185,7 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
       const ok = await withTimeout(
         commands.aiCheckConnection(),
         AI_CHECK_TIMEOUT_MS,
-        'Timed out while checking Ollama connection.',
+        'Timed out while checking Ollama connection.'
       );
       if (!ok) {
         setState({ kind: 'fail', error: 'Ollama is not reachable on http://localhost:11434.' });
@@ -330,7 +195,7 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
         const models = await withTimeout(
           commands.aiListModels(),
           AI_CHECK_TIMEOUT_MS,
-          'Timed out while listing Ollama models.',
+          'Timed out while listing Ollama models.'
         );
         setState({ kind: 'ok', models });
       } catch {
@@ -345,198 +210,86 @@ function AiSetupStep({ onContinue }: { onContinue: () => void }) {
     void runCheck();
   }, [runCheck]);
 
-  // Detect platform for a friendlier install command.
   const platform = typeof navigator !== 'undefined' ? navigator.platform.toLowerCase() : '';
   const installCmd = platform.includes('mac')
     ? 'brew install ollama'
     : platform.includes('win')
-      ? 'winget install Ollama.Ollama'
-      : 'curl -fsSL https://ollama.com/install.sh | sh';
+    ? 'winget install Ollama.Ollama'
+    : 'curl -fsSL https://ollama.com/install.sh | sh';
 
   return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <Cpu size={20} style={{ color: 'var(--accent)' }} />
+    <div className="p-8 flex flex-col gap-6">
+      <div className="flex items-center gap-3">
+        <Cpu size={20} className="text-violet-400" />
         <div>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-            Set up local AI
-          </h2>
-          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-tertiary)' }}>
-            Glyphic uses Ollama to run language models on your machine — no cloud, no key.
-          </p>
+          <h2 className="text-2xl font-semibold text-white">Set up local AI</h2>
+          <p className="text-zinc-400 text-sm">Glyphic uses Ollama — no cloud, no API key.</p>
         </div>
       </div>
 
       {state.kind === 'checking' && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 12px',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-            fontSize: '12px',
-            color: 'var(--text-secondary)',
-          }}
-        >
-          <Loader2 size={14} className="animate-spin" />
-          Checking for Ollama…
+        <div className="flex items-center gap-3 px-4 py-6 bg-zinc-800/50 border border-zinc-700 rounded-3xl">
+          <Loader2 size={18} className="animate-spin text-zinc-400" />
+          <span className="text-zinc-300">Checking for Ollama…</span>
         </div>
       )}
 
       {state.kind === 'ok' && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '6px',
-            padding: '10px 12px',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--accent-muted, var(--accent))',
-            borderRadius: '8px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: 'var(--accent)',
-            }}
-          >
-            <Check size={14} /> Ollama detected on http://localhost:11434
+        <div className="px-4 py-6 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl">
+          <div className="flex items-center gap-2 text-emerald-300">
+            <Check size={18} />
+            <span className="font-medium">Ollama is running</span>
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+          <div className="text-sm text-zinc-400 mt-2">
             {state.models.length > 0
-              ? `${state.models.length} model${state.models.length === 1 ? '' : 's'} installed: ${state.models.slice(0, 3).join(', ')}${state.models.length > 3 ? ', …' : ''}`
-              : 'No models installed yet — pull one from Settings → AI after onboarding (e.g. llama3.1:8b for chat, qwen2.5:7b for math).'}
+              ? `${state.models.length} model${state.models.length === 1 ? '' : 's'} ready`
+              : 'No models installed yet — you can pull one later in Settings → AI'}
           </div>
         </div>
       )}
 
       {state.kind === 'fail' && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            padding: '10px 12px',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-            }}
-          >
-            <X size={14} /> Ollama isn't running
+        <div className="px-4 py-6 bg-red-500/10 border border-red-500/30 rounded-3xl">
+          <div className="flex items-center gap-2 text-red-300">
+            <X size={18} />
+            <span className="font-medium">Ollama is not running</span>
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-            Install it from{' '}
-            <a
-              href="https://ollama.com/download"
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: 'var(--accent)', textDecoration: 'underline' }}
-            >
+          <div className="text-sm text-zinc-400 mt-3">
+            Install from{' '}
+            <a href="https://ollama.com/download" target="_blank" rel="noreferrer" className="underline text-emerald-300">
               ollama.com/download
             </a>
-            , or run:
+            , then run:
           </div>
-          <pre
-            style={{
-              margin: 0,
-              padding: '8px 10px',
-              background: 'var(--bg-input)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              fontFamily: 'var(--font-mono, monospace)',
-              fontSize: '12px',
-              color: 'var(--text-primary)',
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all',
-            }}
-          >
+          <pre className="mt-3 bg-zinc-900 p-3 rounded-2xl text-xs font-mono text-zinc-200 overflow-auto">
             {installCmd}
           </pre>
-          <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-            Then start Ollama and click <strong>Retry</strong>. You can also skip this and configure AI later in
-            Settings.
-          </div>
         </div>
       )}
 
-      <div
-        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', gap: '8px' }}
-      >
-        {state.kind === 'fail' ? (
+      <div className="flex justify-end gap-3 mt-4">
+        {state.kind === 'fail' && (
           <button
-            type="button"
-            onClick={() => void runCheck()}
-            style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-secondary)',
-              padding: '8px 14px',
-              borderRadius: '7px',
-              fontSize: '12px',
-              cursor: 'pointer',
-            }}
+            onClick={runCheck}
+            className="px-6 py-3 text-zinc-300 hover:bg-zinc-800 rounded-2xl transition-colors"
           >
             Retry
           </button>
-        ) : (
-          <span />
         )}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            type="button"
-            onClick={onContinue}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--border)',
-              color: 'var(--text-secondary)',
-              padding: '8px 14px',
-              borderRadius: '7px',
-              fontSize: '12px',
-              cursor: 'pointer',
-            }}
-          >
-            Skip for now
-          </button>
-          <button
-            type="button"
-            onClick={onContinue}
-            style={{
-              background: 'var(--accent)',
-              border: 'none',
-              color: '#fff',
-              padding: '8px 16px',
-              borderRadius: '7px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            Continue
-            <ArrowRight size={14} />
-          </button>
-        </div>
+        <button
+          onClick={onContinue}
+          className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl transition-colors"
+        >
+          Skip for now
+        </button>
+        <button
+          onClick={onContinue}
+          className="px-8 py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-2xl transition-colors flex items-center gap-2"
+        >
+          Continue
+          <ArrowRight size={16} />
+        </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronRight, Hash, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
 import { useTagsStore } from '../../stores/tagsStore';
 import { useVaultStore } from '../../stores/vaultStore';
 
@@ -22,80 +23,56 @@ export function TagsPanel() {
   };
 
   return (
-    <div style={{ padding: '4px 10px 6px' }}>
+    <div className="px-4 py-3 border-b border-zinc-800">
+      {/* Header */}
       <button
         type="button"
         onClick={() => setExpanded((p) => !p)}
-        className="flex items-center w-full"
-        style={{
-          gap: '4px',
-          padding: '4px 4px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '10px',
-          fontWeight: 600,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-          color: 'var(--text-ghost)',
-        }}
+        className="flex items-center w-full text-xs font-semibold uppercase tracking-widest text-zinc-400 hover:text-zinc-200 transition-colors"
       >
-        {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-        <span>Tags</span>
-        {tags.length > 0 && <span style={{ marginLeft: 'auto', color: 'var(--text-ghost)' }}>{tags.length}</span>}
+        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        <span className="ml-2">Tags</span>
+        {tags.length > 0 && (
+          <span className="ml-auto text-zinc-500">{tags.length}</span>
+        )}
       </button>
 
       {expanded && (
-        <div className="flex flex-wrap" style={{ gap: '4px', padding: '4px 4px 0' }}>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {/* Clear filter pill */}
           {selectedTag && (
             <button
               type="button"
               onClick={() => selectTag(null)}
-              className="flex items-center"
-              style={{
-                gap: '3px',
-                padding: '2px 6px',
-                borderRadius: '999px',
-                fontSize: '10px',
-                cursor: 'pointer',
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--bg-card)',
-                color: 'var(--text-tertiary)',
-              }}
+              className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-3xl text-zinc-300 transition-all"
               title="Clear filter"
             >
-              <X size={10} />
-              clear
+              <X size={12} />
+              Clear
             </button>
           )}
+
           {tags.length === 0 && !isLoading && (
-            <span style={{ fontSize: '10px', color: 'var(--text-ghost)', padding: '2px 4px' }}>No tags yet</span>
+            <span className="text-xs text-zinc-500 px-3 py-1">No tags yet</span>
           )}
-          {tags.map((t) => {
-            const active = selectedTag === t.name;
+
+          {tags.map((tag) => {
+            const isActive = selectedTag === tag.name;
             return (
               <button
+                key={tag.name}
                 type="button"
-                key={t.name}
-                onClick={() => handleClick(t.name)}
-                className="flex items-center"
-                style={{
-                  gap: '2px',
-                  padding: '2px 6px',
-                  borderRadius: '999px',
-                  fontSize: '10px',
-                  fontWeight: active ? 600 : 500,
-                  cursor: 'pointer',
-                  border: `1px solid ${active ? 'var(--accent-teal)' : 'var(--glass-border)'}`,
-                  backgroundColor: active ? 'rgba(45,212,191,0.15)' : 'rgba(255,255,255,0.05)',
-                  color: active ? 'var(--accent-teal)' : 'var(--text-secondary)',
-                  transition: 'all 0.15s',
-                }}
-                title={`${t.count} note${t.count === 1 ? '' : 's'} tagged #${t.name}`}
+                onClick={() => handleClick(tag.name)}
+                className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-3xl border transition-all ${
+                  isActive
+                    ? 'bg-cyan-500/10 border-cyan-400 text-cyan-300'
+                    : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-zinc-300 hover:text-white'
+                }`}
+                title={`${tag.count} note${tag.count === 1 ? '' : 's'}`}
               >
-                <Hash size={10} />
-                {t.name}
-                <span style={{ color: 'var(--text-ghost)', marginLeft: '2px' }}>{t.count}</span>
+                <Hash size={13} />
+                {tag.name}
+                <span className="text-zinc-400 text-[10px]">{tag.count}</span>
               </button>
             );
           })}

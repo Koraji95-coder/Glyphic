@@ -46,6 +46,11 @@ export interface VaultIngestProgressPayload {
   progress?: number;
 }
 
+export interface DiagramGenerateProgressPayload {
+  event: 'progress';
+  stage: 'prompting' | 'generating' | 'validating';
+}
+
 export const events = {
   onScreenshotCaptured: (handler: (result: CaptureResult) => void): Promise<UnlistenFn> =>
     safeListen<CaptureResult>('screenshot-captured', handler),
@@ -72,4 +77,7 @@ export const events = {
 
   onVaultIngestProgress: (handler: (payload: VaultIngestProgressPayload) => void): Promise<UnlistenFn> =>
     safeListen<VaultIngestProgressPayload>('vault-ingest-progress', handler),
+
+  onDiagramGenerateProgress: (handler: (payload: DiagramGenerateProgressPayload) => void): Promise<UnlistenFn> =>
+    safeListen<DiagramGenerateProgressPayload>('diagram://generate-code/progress', handler),
 };

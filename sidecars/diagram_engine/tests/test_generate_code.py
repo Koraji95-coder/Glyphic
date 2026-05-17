@@ -78,13 +78,14 @@ def test_generate_code_missing_description(diagram_engine_module):
 
 def test_generate_code_llm_unavailable(diagram_engine_module, mocked_ollama):
     with mocked_ollama(side_effect=RuntimeError("connection refused")):
-        events, code = _run_generate_expect_exit(
+        events = _run_generate(
             diagram_engine_module,
             {"action": "generate_code", "description": "flow", "diagram_type": "mermaid"},
         )
-    assert code == 1
-    assert events[-1]["event"] == "error"
-    assert "connection refused" in events[-1]["message"]
+    assert events[-1]["event"] == "final"
+    assert events[-1]["diagram_type"] == "mermaid"
+    assert "flowchart TD" in events[-1]["code"]
+    assert any("connection refused" in warning for warning in events[-1]["warnings"])
 
 
 def test_generate_code_validation_retry_success(diagram_engine_module, mocked_ollama):
@@ -101,10 +102,12 @@ def test_generate_code_validation_retry_success(diagram_engine_module, mocked_ol
 
 
 def test_generate_code_validation_retry_failure(diagram_engine_module, mocked_ollama):
-    with mocked_ollama(side_effect=["still wrong", "still wrong again"]):
-        events, code = _run_generate_expect_exit(
+    with mocked_ollama(side_effect=["still wrong", "still wrong again", "wrong 3", "wrong 4"]):
+        events = _run_generate(
             diagram_engine_module,
             {"action": "generate_code", "description": "flow from A to B", "diagram_type": "mermaid"},
         )
-    assert code == 1
-    assert events[-1]["event"] == "error"
+    assert events[-1]["event"] == "final"
+    assert events[-1]["diagram_type"] == "mermaid"
+    assert "flowchart TD" in events[-1]["code"]
+    assert any("fallback applied" in warning for warning in events[-1]["warnings"])

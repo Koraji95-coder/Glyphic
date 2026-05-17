@@ -1,0 +1,471 @@
+
+=== DIRECTORY TREE (max depth 3, source files only) ===
+.github
+.github\copilot-setup-steps.yml
+.github\dependabot.yml
+.github\workflows
+.github\workflows\ci.yml
+.github\workflows\copilot-instructions.md
+.gitignore
+.npmrc
+AGENT_INTEGRATION_TEST_SUITE.md
+AGENTS.md
+backend
+backend\sidecars
+backend\sidecars\agent_orchestrator
+backend\sidecars\agent_orchestrator\tests
+backend\sidecars\embedding_engine
+backend\sidecars\embedding_engine\config.py
+backend\sidecars\embedding_engine\embedding.py
+backend\sidecars\embedding_engine\main.py
+backend\sidecars\embedding_engine\README.md
+backend\sidecars\embedding_engine\requirements.txt
+backend\sidecars\embedding_engine\tests
+backend\sidecars\mastery_engine
+backend\sidecars\mastery_engine\main.py
+backend\sidecars\mastery_engine\model.py
+backend\sidecars\mastery_engine\README.md
+backend\sidecars\mastery_engine\requirements.txt
+backend\sidecars\search_orchestrator
+backend\sidecars\search_orchestrator\tests
+BASELINE.md
+biome.json
+build.log
+CHATGPT_DIAGNOSTIC_PROMPT.md
+DEPLOYMENT_RELEASE_GUIDE.md
+docs
+docs\BIOME_ORG_WORKFLOW_MANUAL.md
+docs\codebase
+docs\codebase\.codebase-scan.txt
+docs\codebase\ARCHITECTURE.md
+docs\codebase\CONCERNS.md
+docs\codebase\CONVENTIONS.md
+docs\codebase\INTEGRATIONS.md
+docs\codebase\STACK.md
+docs\codebase\STRUCTURE.md
+docs\codebase\TESTING.md
+docs\E2E_CHECKLIST.md
+docs\shortcut-audit-2026-05.md
+docs\state-assessment-2026-05.md
+frontend
+frontend\src
+frontend\src\types
+frontend\src-tauri
+frontend\src-tauri\__tests__
+frontend\src-tauri\__tests__\commands_integration.rs
+index.html
+lint-full.txt
+lint-output.txt
+lint-output2.txt
+MASTERYMODE_DESIGN_SYSTEM.md
+MASTERYMODE_FRONTEND_SUMMARY.md
+MASTERYMODE_USER_GUIDE.md
+mockups
+mockups\01-welcome-screen.html
+mockups\02-sidebar-redesign.html
+mockups\03-editor-toolbar.html
+mockups\04-chat-panel.html
+mockups\05-full-layout.html
+mockups\README.md
+package-lock.json
+package.json
+PERFORMANCE_DIAGNOSTIC_CHECKLIST.md
+PHASE_1_IMPLEMENTATION_PLAN.md
+PHASE_2_BACKEND_SUMMARY.md
+PHASE_2_IMPLEMENTATION_PLAN.md
+README.md
+sidecars
+sidecars\agent_system
+sidecars\agent_system\agent_profiles.md
+sidecars\agent_system\agent_research_policy_forge.json
+sidecars\agent_system\agent_research_policy_pathfinder.json
+sidecars\agent_system\agent_research_policy_prism.json
+sidecars\agent_system\agent_research_policy_sage.json
+sidecars\agent_system\agent_research_policy_scout.json
+sidecars\agent_system\agent_system_prompts.json
+sidecars\agent_system\agent_tools_spec.json
+sidecars\agent_system\deploy-checklist.md
+sidecars\diagram_engine
+sidecars\diagram_engine\.pytest_cache
+sidecars\diagram_engine\.pytest_cache\.gitignore
+sidecars\diagram_engine\.pytest_cache\CACHEDIR.TAG
+sidecars\diagram_engine\.pytest_cache\README.md
+sidecars\diagram_engine\.pytest_cache\v
+sidecars\diagram_engine\main.py
+sidecars\diagram_engine\Requirements.txt
+sidecars\diagram_engine\tests
+sidecars\diagram_engine\tests\conftest.py
+sidecars\diagram_engine\tests\test_export_png.py
+sidecars\diagram_engine\tests\test_generate_code.py
+sidecars\fe_engine
+sidecars\fe_engine\formulas.json
+sidecars\fe_engine\main.py
+sidecars\fe_engine\Requirements.txt
+sidecars\fe_engine\SIDECAR.md
+sidecars\fe_engine\tests
+sidecars\fe_engine\tests\conftest.py
+sidecars\fe_engine\tests\test_formula_lookup.py
+sidecars\fe_engine\tests\test_handbook_qa.py
+sidecars\fe_engine\tests\test_unit_convert.py
+sidecars\install_deps.sh
+sidecars\study_engine
+sidecars\study_engine\.pytest_cache
+sidecars\study_engine\.pytest_cache\.gitignore
+sidecars\study_engine\.pytest_cache\CACHEDIR.TAG
+sidecars\study_engine\.pytest_cache\README.md
+sidecars\study_engine\.pytest_cache\v
+sidecars\study_engine\main.py
+sidecars\study_engine\Requirements.txt
+sidecars\study_engine\seed_questions
+sidecars\study_engine\seed_questions\ac_circuits.json
+sidecars\study_engine\seed_questions\antennas.json
+sidecars\study_engine\seed_questions\bjt_amplifiers.json
+sidecars\study_engine\seed_questions\complex_numbers.json
+sidecars\study_engine\seed_questions\dc_circuits.json
+sidecars\study_engine\seed_questions\differential_equations.json
+sidecars\study_engine\seed_questions\digital_logic.json
+sidecars\study_engine\seed_questions\diodes.json
+sidecars\study_engine\seed_questions\embedded_systems.json
+sidecars\study_engine\seed_questions\filters.json
+sidecars\study_engine\seed_questions\fourier_series.json
+sidecars\study_engine\seed_questions\laplace_transforms.json
+sidecars\study_engine\seed_questions\linear_algebra.json
+sidecars\study_engine\seed_questions\maxwells_equations.json
+sidecars\study_engine\seed_questions\microprocessors.json
+sidecars\study_engine\seed_questions\modulation.json
+sidecars\study_engine\seed_questions\numerical_methods.json
+sidecars\study_engine\seed_questions\op_amps.json
+sidecars\study_engine\seed_questions\probability_statistics.json
+sidecars\study_engine\seed_questions\three_phase_circuits.json
+sidecars\study_engine\seed_questions\transient_response.json
+sidecars\study_engine\seed_questions\transmission_lines.json
+sidecars\study_engine\seed_questions\z_transforms.json
+sidecars\study_engine\tests
+sidecars\study_engine\tests\__init__.py
+sidecars\study_engine\tests\conftest.py
+sidecars\study_engine\tests\test_generate_problems.py
+sidecars\study_engine\tests\test_solve_math.py
+sidecars\study_engine\tests\test_study_engine.py
+sidecars\study_engine\tests\test_validators.py
+sidecars\vault_engine
+sidecars\vault_engine\main.py
+sidecars\vault_engine\Requirements.txt
+skills
+skills\add-sidecar-action.md
+skills\add-vertical-slice.md
+skills\backfill-sidecar-tests.md
+skills\extract-llm-to-sidecar.md
+src
+src\__tests__
+src\__tests__\frontmatter.test.ts
+src\__tests__\phaseD.test.ts
+src\__tests__\shortcuts.test.tsx
+src\__tests__\smoke.test.ts
+src\App.tsx
+src\components
+src\components\Annotation
+src\components\Annotation\AnnotationOverlay.tsx
+src\components\Annotation\AnnotationToolbar.tsx
+src\components\Capture
+src\components\Capture\AnnotationOverlay.tsx
+src\components\Capture\CaptureOverlay.tsx
+src\components\Capture\CaptureToolbar.tsx
+src\components\Capture\FreeformSelector.tsx
+src\components\Capture\Magnifier.tsx
+src\components\Capture\RegionSelector.tsx
+src\components\Capture\WindowSelector.tsx
+src\components\Chat
+src\components\Chat\AiDrawer.tsx
+src\components\Chat\AiSettingsPanel.tsx
+src\components\Chat\ChatPanel.tsx
+src\components\Chat\OllamaStatusBanner.tsx
+src\components\common
+src\components\common\ErrorToast.tsx
+src\components\common\ErrorToaster.tsx
+src\components\common\Math.tsx
+src\components\common\PromptModal.tsx
+src\components\diagrams
+src\components\diagrams\__tests__
+src\components\diagrams\DiagramMode.tsx
+src\components\Editor
+src\components\Editor\__tests__
+src\components\Editor\Editor.tsx
+src\components\Editor\EditorPaneGroup.tsx
+src\components\Editor\EditorToolbar.tsx
+src\components\Editor\MermaidBlock.tsx
+src\components\Editor\NoteTagChips.tsx
+src\components\Editor\ReferenceModal.tsx
+src\components\Editor\SlashCommand
+src\components\fe-prep
+src\components\fe-prep\__tests__
+src\components\fe-prep\FePrepMode.tsx
+src\components\fe-prep\QuestionBankPanel.tsx
+
+=== STACK DETECTION (manifest files) ===
+
+--- package-lock.json ---
+{
+  "name": "glyphic",
+  "version": "1.0.0",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "glyphic",
+      "version": "1.0.0",
+      "dependencies": {
+        "@tauri-apps/api": "2.10.1",
+        "@tauri-apps/plugin-clipboard-manager": "^2",
+        "@tauri-apps/plugin-dialog": "^2",
+        "@tauri-apps/plugin-fs": "^2",
+        "@tauri-apps/plugin-global-shortcut": "^2",
+        "@tauri-apps/plugin-shell": "^2",
+        "@tiptap/extension-code-block-lowlight": "^2",
+        "@tiptap/extension-highlight": "^2",
+        "@tiptap/extension-image": "^2",
+        "@tiptap/extension-link": "^2",
+        "@tiptap/extension-mathematics": "^2.27.2",
+        "@tiptap/extension-placeholder": "^2",
+        "@tiptap/extension-task-item": "^2",
+        "@tiptap/extension-task-list": "^2",
+        "@tiptap/pm": "^2",
+        "@tiptap/react": "^2",
+        "@tiptap/starter-kit": "^2",
+        "@tiptap/suggestion": "^2.27.2",
+        "@types/recharts": "^1.8.29",
+        "date-fns": "^3",
+        "dompurify": "^3.4.1",
+        "fabric": "^7.2.0",
+        "fuse.js": "^7",
+        "katex": "^0.16.45",
+        "lowlight": "^3",
+        "lucide-react": "^0.460.0",
+        "mermaid": "^11.14.0",
+        "react": "^19",
+        "react-dom": "^19",
+        "react-router-dom": "^6",
+        "recharts": "^3.8.1",
+        "zustand": "^4"
+      },
+      "devDependencies": {
+        "@biomejs/biome": "^2",
+        "@tauri-apps/cli": "2.10.0",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@types/dompurify": "^3.0.5",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@vitejs/plugin-react": "^6",
+        "@vitest/ui": "^4.1.4",
+        "jsdom": "^29.0.2",
+        "typescript": "^5",
+        "vite": "^8",
+        "vitest": "^4.1.4"
+      }
+    },
+    "node_modules/@adobe/css-tools": {
+      "version": "4.4.4",
+      "resolved": "https://registry.npmjs.org/@adobe/css-tools/-/css-tools-4.4.4.tgz",
+      "integrity": "sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==",
+      "dev": true,
+      "license": "MIT"
+    },
+    "node_modules/@antfu/install-pkg": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@antfu/install-pkg/-/install-pkg-1.1.0.tgz",
+      "integrity": "sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==",
+      "license": "MIT",
+      "dependencies": {
+        "package-manager-detector": "^1.3.0",
+        "tinyexec": "^1.0.1"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/antfu"
+      }
+    },
+    "node_modules/@asamuzakjp/css-color": {
+
+[TRUNCATED] Showing first 80 of 6191 lines.
+--- package.json ---
+{
+  "name": "glyphic",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "desktop": "tauri dev",
+    "lint:fix": "biome check --write .",
+    "lint": "biome check src",
+    "format": "biome format --write src",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.10.1",
+    "@tauri-apps/plugin-clipboard-manager": "^2",
+    "@tauri-apps/plugin-dialog": "^2",
+    "@tauri-apps/plugin-fs": "^2",
+    "@tauri-apps/plugin-global-shortcut": "^2",
+    "@tauri-apps/plugin-shell": "^2",
+    "@tiptap/extension-code-block-lowlight": "^2",
+    "@tiptap/extension-highlight": "^2",
+    "@tiptap/extension-image": "^2",
+    "@tiptap/extension-link": "^2",
+    "@tiptap/extension-mathematics": "^2.27.2",
+    "@tiptap/extension-placeholder": "^2",
+    "@tiptap/extension-task-item": "^2",
+    "@tiptap/extension-task-list": "^2",
+    "@tiptap/pm": "^2",
+    "@tiptap/react": "^2",
+    "@tiptap/starter-kit": "^2",
+    "@tiptap/suggestion": "^2.27.2",
+    "@types/recharts": "^1.8.29",
+    "date-fns": "^3",
+    "dompurify": "^3.4.1",
+    "fabric": "^7.2.0",
+    "fuse.js": "^7",
+    "katex": "^0.16.45",
+    "lowlight": "^3",
+    "lucide-react": "^0.460.0",
+    "mermaid": "^11.14.0",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-router-dom": "^6",
+    "recharts": "^3.8.1",
+    "zustand": "^4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2",
+    "@tauri-apps/cli": "2.10.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/dompurify": "^3.0.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6",
+    "@vitest/ui": "^4.1.4",
+    "jsdom": "^29.0.2",
+    "typescript": "^5",
+    "vite": "^8",
+    "vitest": "^4.1.4"
+  }
+}
+
+
+=== ENTRY POINTS ===
+No common entry points found. Check 'main' or 'scripts.start' in manifest files above.
+
+=== LINTING AND FORMATTING CONFIG ===
+Found: tsconfig.json
+Found: biome.json
+
+=== ENVIRONMENT VARIABLE TEMPLATES ===
+No .env.example or .env.template found. Identify required environment variables by searching the code and config for environment variable reads.
+
+=== TODO / FIXME / HACK (production code only, test dirs excluded) ===
+src\components\MasteryMode\MasteryMode.tsx:335: console.log('TODO: Navigate to study for topic', id);
+src\components\MasteryMode\MasteryMode.tsx:338: console.log('TODO: Show learning path for topic', id);
+src\components\MasteryMode\MasteryMode.tsx:365: console.log('TODO: Show attempt details for', id);
+src\components\Sidebar\Sidebar.tsx:89: // TODO: Implement trash functionality later
+src-tauri\src\commands\ai_commands.rs:686: // TODO: Parse confidence markers from model response
+src-tauri\src\commands\ai_commands.rs:687: // TODO: Track tool calls and map to source notes
+src-tauri\src\commands\ai_commands.rs:688: // TODO: Compute relevance scores for attribution
+src-tauri\src\commands\ai_commands.rs:695: confidence: 0.85,  // TODO: Compute from response analysis
+src-tauri\src\commands\ai_commands.rs:696: sources: vec![],   // TODO: Extract from tool calls
+src-tauri\src\commands\ai_commands.rs:698: tool_calls: vec![],  // TODO: Track tool execution
+src-tauri\src\commands\backup_commands.rs:126: // TODO: Return size warning to UI — user can confirm or cancel
+src-tauri\src\commands\backup_commands.rs:436: /// TODO: Implement full Dropbox API integration
+src-tauri\src\commands\mastery_commands.rs:157: topic: "Unknown".to_string(), // TODO: extract from question or add topic column
+src-tauri\src\commands\search_commands.rs:89: // Phase 3 TODO: Implement semantic search
+src-tauri\src\commands\search_commands.rs:108: mastery_gap: 0.0,  // TODO: Get from Prism mastery model
+src-tauri\src\commands\search_commands.rs:109: recency_score: 0.5,  // TODO: Compute from modified_at
+src-tauri\src\commands\search_commands.rs:110: combined_rank: 0.75,  // TODO: Compute weighted formula
+
+=== GIT RECENT COMMITS (last 20) ===
+5086c17 Add platform templates for UI/UX Pro Max skill
+7bb0fd8 feat: add detectChanges command for change detection preview
+761dc91 feat: implement backup service with change detection & incremental backup logic
+18b4cb3 feat: Phase 1 Dropbox backup scaffolding â€” backup commands, schema, UI panel
+d835246 feat: Midnight Eclipse UI redesign â€” standardized styling, rounded corners, theme variables
+5878ddd Refactor components for improved readability and consistency; update prompt modal handling and add Biome user manual
+c47d53d feat: implement PromptModal for user input, refactor note and folder creation to use modal, and optimize TitleBar interactions
+3edd555 feat: enhance Python command handling for vault operations, add folder deletion functionality, and improve folder path management
+8db0749 feat: add AI drawer component, enhance dashboard with statistics, and optimize Python command handling for Windows
+605cd1e feat: enhance Sidebar and TagsPanel with new workspace actions and improved UI
+cc04a58 CORE OPTIMIZATIONS - Reduce Ollama HTTP burst traffic by 5-20x during chat streaming   * ollama.rs: batch stream chunks per HTTP byte-chunk instead of per-token   * Dramatically reduces PostMessage queue pressure during generation
+2760981 feat: fix PostMessage queue pressure, eliminate redundant Ollama calls, add FE Prep validators
+4781f4e Merge pull request #89 from Koraji95-coder/copilot/add-fe-prep-schema-migration
+1db7149 feat: add FE Prep schema migration to ensure_schema
+028c770 Initial plan
+e46c8a0 Merge pull request #87 from Koraji95-coder/copilot/feat-natural-language-diagram-generation
+a9fc430 fix: add type annotation to clickButton helper in DiagramMode test
+86bcee9 feat(diagram): add export_png action, wire NL mode to generateCode, add Export PNG + Regenerate buttons
+4cb60a3 Initial plan
+0d7b1a7 Merge pull request #85 from Koraji95-coder/copilot/feat-study-engine-dedicated-sidecar
+
+=== HIGH-CHURN FILES (last 90 days, top 20) ===
+  29 src-tauri/src/lib.rs
+  28 src/App.tsx
+  28 src/lib/tauri/commands.ts
+  26 src/components/Sidebar/Sidebar.tsx
+  21 src/components/Chat/ChatPanel.tsx
+  17 src/components/Editor/Editor.tsx
+  16 src/components/Chat/AiSettingsPanel.tsx
+  15 src/components/Editor/EditorToolbar.tsx
+  15 package-lock.json
+  14 src-tauri/src/commands/ai_commands.rs
+  14 package.json
+  14 src/stores/chatStore.ts
+  13 src/components/Layout/TitleBar.tsx
+  12 src/lib/tiptap/markdownParser.ts
+  11 src/styles/globals.css
+  11 src/components/Sidebar/FileTreeItem.tsx
+  10 src-tauri/src/commands/mod.rs
+  10 src/components/Layout/StatusBar.tsx
+  10 src-tauri/tauri.conf.json
+   9 src/components/Settings/SettingsModal.tsx
+
+=== MONOREPO SIGNALS ===
+No monorepo signals detected.
+
+=== CODE METRICS ===
+Total files scanned: 638
+Total lines of code: 83858
+
+Files by language:
+  Other: 395
+  TypeScript: 74
+  TypeScript/React: 65
+  Rust: 53
+  Python: 51
+
+Top 10 largest files:
+ui-ux-pro-max-skill-main\screenshots\website.png: 1102.9KB
+ui-ux-pro-max-skill-main\cli\assets\data\google-fonts.csv: 727.7KB
+ui-ux-pro-max-skill-main\src\ui-ux-pro-max\data\google-fonts.csv: 727.7KB
+src-tauri\gen\schemas\linux-schema.json: 415.3KB
+src-tauri\gen\schemas\desktop-schema.json: 409.1KB
+src-tauri\gen\schemas\windows-schema.json: 409.1KB
+package-lock.json: 226.0KB
+ui-ux-pro-max-skill-main\.claude\skills\ui-styling\canvas-fonts\WorkSans-Bold.ttf: 186.8KB
+ui-ux-pro-max-skill-main\.claude\skills\ui-styling\canvas-fonts\WorkSans-Regular.ttf: 184.5KB
+src-tauri\Cargo.lock: 173.0KB
+
+=== CI/CD PIPELINES ===
+CI/CD: GitHub Actions
+
+=== CONTAINERS & ORCHESTRATION ===
+No containerization configs detected.
+
+=== SECURITY & COMPLIANCE ===
+No security configs detected.
+
+=== PERFORMANCE & TESTING ===
+No performance testing configs detected.
+
+=== SCAN COMPLETE ===

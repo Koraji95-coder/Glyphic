@@ -3,18 +3,6 @@ import DOMPurify from 'dompurify';
 import mermaid from 'mermaid';
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * React node view for Mermaid diagram code blocks.
- *
- * When the code block's language attribute is "mermaid", this component:
- *   - Shows an editable code area (via NodeViewContent) while in edit mode.
- *   - Renders a live SVG preview below the code area using mermaid.render().
- *   - Displays any parse errors inline (no thrown exceptions propagate).
- *   - Themes the diagram using the app's CSS custom properties.
- *
- * For all other languages the component falls back to a plain <pre><code>
- * wrapper so syntax-highlighting decorations from CodeBlockLowlight still apply.
- */
 export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
   const language = (node.attrs.language as string) ?? '';
   const isMermaid = language === 'mermaid';
@@ -22,17 +10,13 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
 
   const [svg, setSvg] = useState<string>('');
   const [renderError, setRenderError] = useState<string | null>(null);
-  // Monotonic counter used to produce unique element IDs for each render call.
   const renderCount = useRef(0);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isMermaid) return;
 
-    // Clear any in-flight debounce.
-    if (debounceTimer.current !== null) {
-      clearTimeout(debounceTimer.current);
-    }
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
     if (!source.trim()) {
       setSvg('');
@@ -41,11 +25,10 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
     }
 
     debounceTimer.current = setTimeout(() => {
-      // Read CSS variables at render time so the diagram matches the current theme.
       const style = getComputedStyle(document.documentElement);
-      const accent = style.getPropertyValue('--accent').trim() || '#7c6df0';
+      const accent = style.getPropertyValue('--accent').trim() || '#a78bfa';
       const textPrimary = style.getPropertyValue('--text-primary').trim() || '#e2e2e2';
-      const bgTertiary = style.getPropertyValue('--bg-tertiary').trim() || '#1e1f26';
+      const bgTertiary = style.getPropertyValue('--bg-tertiary').trim() || '#18181b';
 
       mermaid.initialize({
         startOnLoad: false,
@@ -70,12 +53,7 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
       mermaid
         .render(id, source.trim())
         .then(({ svg: renderedSvg }) => {
-          // Sanitize the SVG produced by Mermaid before injecting into the DOM.
-          // Mermaid already applies its own DOMPurify pass with securityLevel:'strict',
-          // but a second pass here provides defense-in-depth against any regressions.
-          const clean = DOMPurify.sanitize(renderedSvg, {
-            USE_PROFILES: { svg: true, svgFilters: true },
-          });
+          const clean = DOMPurify.sanitize(renderedSvg, { USE_PROFILES: { svg: true, svgFilters: true } });
           setSvg(clean);
           setRenderError(null);
         })
@@ -83,16 +61,13 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
           setRenderError(err instanceof Error ? err.message : String(err));
           setSvg('');
         });
-    }, 300);
+    }, 280);
 
     return () => {
-      if (debounceTimer.current !== null) {
-        clearTimeout(debounceTimer.current);
-      }
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [isMermaid, source]);
 
-  // Non-mermaid code blocks: plain wrapper so lowlight decorations still apply.
   if (!isMermaid) {
     return (
       <NodeViewWrapper as="pre">
@@ -101,59 +76,30 @@ export function MermaidBlock({ node, editor }: ReactNodeViewProps) {
     );
   }
 
-  const isEditable = editor.isEditable;
-
   return (
     <NodeViewWrapper
       as="div"
-      className="mermaid-block"
-      style={{
-        margin: '8px 0',
-        borderRadius: '6px',
-        border: '1px solid var(--border)',
-        overflow: 'hidden',
-      }}
+      className="mermaid-block my-4 rounded-3xl border border-zinc-700 bg-zinc-900/70 backdrop-blur-xl overflow-hidden"
     >
-      {/* Editable source — shown while in edit mode */}
-      {isEditable && (
-        <pre
-          style={{
-            margin: 0,
-            padding: '10px 14px',
-            background: 'var(--bg-tertiary)',
-            borderBottom: svg || renderError ? '1px solid var(--border)' : undefined,
-            fontSize: '13px',
-            fontFamily: 'monospace',
-          }}
-        >
+      {/* Editable source */}
+      {editor.isEditable && (
+        <pre className="m-0 px-5 py-4 bg-zinc-950 border-b border-zinc-700 text-sm font-mono">
           <NodeViewContent as="code" className="language-mermaid" />
         </pre>
       )}
 
-      {/* Rendered SVG diagram */}
+      {/* Rendered diagram */}
       {svg && (
         <div
-          className="mermaid-svg"
-          style={{ padding: '12px', background: 'var(--bg-tertiary)', overflowX: 'auto' }}
+          className="p-6 bg-zinc-900/70"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG is produced by Mermaid and sanitized by DOMPurify
           dangerouslySetInnerHTML={{ __html: svg }}
         />
       )}
 
-      {/* Inline parse error */}
+      {/* Error */}
       {renderError && (
-        <div
-          className="mermaid-error"
-          style={{
-            color: 'var(--error, #f87171)',
-            background: 'rgba(248,113,113,0.08)',
-            borderTop: '1px solid rgba(248,113,113,0.3)',
-            padding: '8px 14px',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
+        <div className="px-5 py-4 text-xs text-red-400 bg-red-500/10 border-t border-red-500/20">
           Mermaid error: {renderError}
         </div>
       )}

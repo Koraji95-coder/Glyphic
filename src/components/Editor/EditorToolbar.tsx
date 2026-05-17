@@ -16,6 +16,7 @@ import {
   Strikethrough,
 } from 'lucide-react';
 import { useState } from 'react';
+
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLectureMode } from '../../hooks/useLectureMode';
 import { reportError } from '../../lib/errorReporter';
@@ -91,12 +92,10 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     }
   };
 
-  // On mobile, use minimum 44px touch targets per Apple HIG
   const btnSize = isMobile ? '44px' : undefined;
   const iconSize = isMobile ? 18 : 15;
 
   const groups: ToolbarButton[][] = [
-    // Formatting
     [
       {
         icon: Bold,
@@ -123,7 +122,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive: () => editor.isActive('code'),
       },
     ],
-    // Headings
     [
       {
         icon: Heading1,
@@ -144,7 +142,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         isActive: () => editor.isActive('heading', { level: 3 }),
       },
     ],
-    // Lists + highlight
     [
       {
         icon: List,
@@ -168,77 +165,27 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   ];
 
   return (
-    <div
-      className="flex items-center shrink-0"
-      style={{
-        height: isMobile ? '52px' : 'var(--toolbar-height)',
-        background:
-          'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%), var(--glass-surface)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        borderBottom: '1px solid var(--glass-border)',
-        boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
-        paddingLeft: '12px',
-        paddingRight: '12px',
-        gap: '5px',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        className="flex items-center flex-1 min-w-0"
-        style={{
-          gap: '5px',
-          overflowX: 'auto',
-          overscrollBehavior: 'contain',
-          paddingBottom: '1px',
-        }}
-      >
-        {/* Button groups — pill-style groups */}
+    <div className="flex items-center shrink-0 h-12 bg-[#050507] border-b border-zinc-800 px-4 gap-2">
+      <div className="flex items-center flex-1 min-w-0 gap-1 overflow-x-auto">
         {groups.map((group) => (
           <div
             key={`group-${group[0]?.label}`}
-            className="flex items-center shrink-0"
-            style={{
-              gap: '1px',
-              padding: '2px',
-              borderRadius: '10px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--glass-border)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-            }}
+            className="flex items-center shrink-0 gap-px p-1 bg-zinc-900/70 border border-zinc-700 rounded-3xl"
           >
             {group.map((btn) => {
               const active = btn.isActive?.() ?? false;
               const Icon = btn.icon;
               return (
                 <button
-                  type="button"
                   key={btn.label}
                   onClick={btn.action}
                   title={btn.label}
-                  className="rounded transition-colors text-xs font-medium"
+                  className={`flex items-center justify-center rounded-2xl transition-all ${
+                    active ? 'bg-violet-500/10 text-violet-300' : 'hover:bg-zinc-800 text-zinc-400'
+                  }`}
                   style={{
-                    background: active
-                      ? 'linear-gradient(135deg, rgba(163,116,247,0.2), rgba(249,118,85,0.08))'
-                      : 'transparent',
-                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    width: isMobile ? '44px' : '28px',
-                    height: isMobile ? '44px' : '28px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0',
-                    flexShrink: 0,
-                    borderRadius: '6px',
-                    border: 'none',
-                    boxShadow: active ? '0 8px 20px rgba(163,116,247,0.14)' : 'none',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!active) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = active ? 'var(--accent-dim)' : 'transparent';
+                    width: isMobile ? '44px' : '32px',
+                    height: isMobile ? '44px' : '32px',
                   }}
                 >
                   <Icon size={iconSize} />
@@ -249,232 +196,71 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         ))}
       </div>
 
-      <div className="flex items-center shrink-0" style={{ gap: '5px', paddingLeft: '8px' }}>
-        {/* Draw / Ink mode toggle — hero button style */}
+      <div className="flex items-center shrink-0 gap-2">
+        {/* Ink Mode */}
         <button
-          type="button"
           onClick={toggleInkMode}
-          title="Draw Mode"
-          className="flex items-center shrink-0 transition-colors"
-          style={{
-            gap: '5px',
-            padding: '5px 10px',
-            borderRadius: '999px',
-            fontSize: '11px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            border: '1px solid rgba(96,165,250,0.18)',
-            background: isInkMode
-              ? 'linear-gradient(135deg, rgba(96,165,250,0.24), rgba(163,116,247,0.12))'
-              : 'rgba(96,165,250,0.12)',
-            color: 'var(--blue)',
-            boxShadow: isInkMode ? '0 12px 26px rgba(96,165,250,0.16)' : 'none',
-            minHeight: btnSize,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(91, 141, 240, 0.18)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = isInkMode ? 'rgba(91, 141, 240, 0.18)' : 'var(--blue-dim)';
-          }}
+          className={`flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium transition-all ${
+            isInkMode ? 'bg-violet-500/10 text-violet-300 border border-violet-500/30' : 'hover:bg-zinc-800 text-zinc-400'
+          }`}
         >
-          <Pencil size={isMobile ? 16 : 13} />
+          <Pencil size={16} />
           Draw
         </button>
 
-        <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
-
-        {/* Lecture mode toggle — hero button style */}
+        {/* Lecture Mode */}
         <button
-          type="button"
           onClick={toggleLectureMode}
-          title="Lecture Mode"
-          className="flex items-center shrink-0 transition-colors"
-          style={{
-            gap: '5px',
-            padding: '5px 10px',
-            borderRadius: '999px',
-            fontSize: '11px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            background: lectureModeActive
-              ? 'linear-gradient(135deg, rgba(52,211,153,0.22), rgba(45,212,191,0.12))'
-              : 'rgba(52,211,153,0.12)',
-            color: 'var(--green)',
-            border: '1px solid rgba(94, 196, 158, 0.15)',
-            boxShadow: lectureModeActive ? '0 12px 26px rgba(52,211,153,0.16)' : 'none',
-            minHeight: btnSize,
-          }}
+          className={`flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium transition-all ${
+            lectureModeActive
+              ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+              : 'hover:bg-zinc-800 text-zinc-400'
+          }`}
         >
-          <span
-            className={lectureModeActive ? 'lecture-pulse' : ''}
-            style={{
-              display: 'inline-block',
-              width: '5px',
-              height: '5px',
-              borderRadius: '50%',
-              backgroundColor: lectureModeActive ? 'var(--green)' : 'var(--text-tertiary)',
-            }}
-          />
-          {lectureModeActive ? `Lecture — ${getElapsedTime()}` : 'Lecture'}
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          Lecture
+          {lectureModeActive && <span className="font-mono text-xs">{getElapsedTime()}</span>}
         </button>
 
-        <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
-
-        {/* Export menu */}
-        <div className="relative shrink-0">
+        {/* Export */}
+        <div className="relative">
           <button
-            type="button"
-            onClick={() => setExportMenuOpen((v) => !v)}
-            title="Export note"
-            className="flex items-center shrink-0 transition-colors"
-            style={{
-              gap: '5px',
-              padding: '5px 10px',
-              borderRadius: '999px',
-              fontSize: '11px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: '1px solid var(--border-subtle)',
-              background: exportMenuOpen ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
-              color: 'var(--text-secondary)',
-              minHeight: btnSize,
-            }}
+            onClick={() => setExportMenuOpen(!exportMenuOpen)}
+            className="flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium hover:bg-zinc-800 text-zinc-400 transition-all"
           >
-            <Download size={isMobile ? 16 : 13} />
+            <Download size={16} />
             Export
           </button>
+
           {exportMenuOpen && (
-            <>
-              {/* Click-away catcher */}
+            <div className="absolute top-full right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl py-2 z-50">
               <button
-                type="button"
-                aria-label="Close export menu"
-                onClick={() => setExportMenuOpen(false)}
-                style={{
-                  position: 'fixed',
-                  inset: 0,
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'default',
-                  zIndex: 40,
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 4px)',
-                  right: 0,
-                  minWidth: '180px',
-                  padding: '4px',
-                  borderRadius: '12px',
-                  background: 'rgba(14,11,26,0.88)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid var(--glass-border)',
-                  boxShadow: '0 18px 36px rgba(0,0,0,0.35)',
-                  zIndex: 50,
-                }}
+                onClick={handleExportMarkdown}
+                className="w-full px-5 py-3 text-left hover:bg-zinc-800 text-sm text-zinc-200"
               >
-                <button
-                  type="button"
-                  onClick={handleExportMarkdown}
-                  className="flex items-center"
-                  style={{
-                    width: '100%',
-                    gap: '8px',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--text-primary)',
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                >
-                  Export as Markdown…
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportPdf}
-                  className="flex items-center"
-                  style={{
-                    width: '100%',
-                    gap: '8px',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--text-primary)',
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                >
-                  Export as PDF…
-                </button>
-              </div>
-            </>
-          )}
-          {exportStatus && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 4px)',
-                right: 0,
-                padding: '6px 10px',
-                borderRadius: '6px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                fontSize: '11px',
-                color: 'var(--text-secondary)',
-                whiteSpace: 'nowrap',
-                zIndex: 50,
-              }}
-            >
-              {exportStatus}
+                Export as Markdown
+              </button>
+              <button
+                onClick={handleExportPdf}
+                className="w-full px-5 py-3 text-left hover:bg-zinc-800 text-sm text-zinc-200"
+              >
+                Export as PDF
+              </button>
             </div>
           )}
         </div>
 
-        <div className="h-5 mx-1 shrink-0" style={{ width: '1px', backgroundColor: 'var(--border)' }} />
-
-        {/* Capture button — gradient hero */}
+        {/* Capture Button */}
         <button
-          type="button"
           onClick={() =>
             commands.startCapture().catch((e) => {
               reportError({ context: 'Capture', message: 'Failed to start capture', error: e });
             })
           }
-          title="Capture screenshot (⌘⇧S)"
-          className="flex items-center shrink-0 transition-colors"
-          style={{
-            gap: '5px',
-            padding: '5px 10px',
-            borderRadius: '999px',
-            fontSize: '11px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            border: 'none',
-            background: 'var(--accent-gradient)',
-            color: '#fff',
-            boxShadow: '0 14px 32px rgba(249,118,85,0.26)',
-            minHeight: btnSize,
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
-          onMouseLeave={(e) => (e.currentTarget.style.filter = 'none')}
+          className="flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium bg-gradient-to-r from-violet-500 to-cyan-400 text-white shadow-lg hover:brightness-110 transition-all"
         >
-          <Camera size={isMobile ? 16 : 13} />
+          <Camera size={16} />
           Capture
-          {!isMobile && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', opacity: 0.6 }}>⌘⇧S</span>}
         </button>
       </div>
     </div>

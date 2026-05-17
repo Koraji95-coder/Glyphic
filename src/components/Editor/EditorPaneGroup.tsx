@@ -1,15 +1,10 @@
 import { Columns2, Rows2, X } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
+
 import { useSplitStore } from '../../stores/splitStore';
 import { useVaultStore } from '../../stores/vaultStore';
 import { Editor } from './Editor';
 
-/**
- * Renders the primary `<Editor />` and, when a split is active, a read-only
- * secondary `<Editor />` separated by a draggable divider. The split layout
- * is intentionally minimal (one extra pane, not recursive) — the primary
- * editor remains the single writer to disk to avoid save-race complexity.
- */
 export function EditorPaneGroup() {
   const { secondaryNotePath, direction, primarySize, setPrimarySize, closeSplit, setSecondaryNote } = useSplitStore();
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
@@ -23,7 +18,7 @@ export function EditorPaneGroup() {
       document.body.style.cursor = direction === 'vertical' ? 'col-resize' : 'row-resize';
       document.body.style.userSelect = 'none';
     },
-    [direction],
+    [direction]
   );
 
   useEffect(() => {
@@ -34,23 +29,22 @@ export function EditorPaneGroup() {
         direction === 'vertical' ? (e.clientX - rect.left) / rect.width : (e.clientY - rect.top) / rect.height;
       setPrimarySize(fraction);
     };
+
     const onUp = () => {
       if (!isResizing.current) return;
       isResizing.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
+
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
+
     return () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
     };
   }, [direction, setPrimarySize]);
-
-  // If the user opens a different note, swap it into the active pane.
-  // We always treat the primary pane as the editing target, so
-  // `activeNotePath` is already wired correctly to it.
 
   if (!secondaryNotePath) {
     return (
@@ -70,6 +64,7 @@ export function EditorPaneGroup() {
       className="flex-1 flex min-h-0 min-w-0"
       style={{ flexDirection: isVertical ? 'row' : 'column' }}
     >
+      {/* Primary Pane */}
       <div
         className="flex flex-col min-h-0 min-w-0"
         style={isVertical ? { width: primaryPct } : { height: primaryPct }}
@@ -80,19 +75,12 @@ export function EditorPaneGroup() {
       {/* Divider */}
       <div
         onMouseDown={onMouseDown}
-        style={{
-          flexShrink: 0,
-          width: isVertical ? '4px' : '100%',
-          height: isVertical ? '100%' : '4px',
-          cursor: isVertical ? 'col-resize' : 'row-resize',
-          backgroundColor: 'var(--border)',
-          transition: 'background-color 0.15s',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-dim)')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--border)')}
+        className={`flex-shrink-0 bg-zinc-700 hover:bg-violet-500 transition-colors ${
+          isVertical ? 'w-1 cursor-col-resize' : 'h-1 cursor-row-resize'
+        }`}
       />
 
-      {/* Secondary pane */}
+      {/* Secondary Pane */}
       <div
         className="flex flex-col min-h-0 min-w-0"
         style={isVertical ? { width: secondaryPct } : { height: secondaryPct }}
@@ -127,71 +115,32 @@ function SecondaryPaneHeader({
   onClose: () => void;
 }) {
   const title = notePath.replace(/\.md$/, '').split('/').pop() ?? notePath;
+
   return (
-    <div
-      className="flex items-center shrink-0"
-      style={{
-        gap: '6px',
-        padding: '4px 10px',
-        fontSize: '11px',
-        color: 'var(--text-tertiary)',
-        backgroundColor: 'var(--glass-surface)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        borderBottom: '1px solid var(--glass-border)',
-      }}
-    >
+    <div className="flex items-center shrink-0 h-10 bg-zinc-900 border-b border-zinc-700 px-4 text-xs text-zinc-400">
       {direction === 'vertical' ? (
-        <Columns2 size={11} style={{ color: 'var(--text-ghost)' }} />
+        <Columns2 size={16} className="mr-3 text-zinc-500" />
       ) : (
-        <Rows2 size={11} style={{ color: 'var(--text-ghost)' }} />
+        <Rows2 size={16} className="mr-3 text-zinc-500" />
       )}
-      <span style={{ flex: 1 }} className="truncate" title={notePath}>
-        {title}
-      </span>
-      <span
-        style={{
-          fontSize: '9px',
-          padding: '1px 5px',
-          borderRadius: '3px',
-          backgroundColor: 'var(--bg-card)',
-          color: 'var(--text-ghost)',
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-        }}
-      >
-        Read-only
-      </span>
+      <span className="flex-1 truncate font-medium text-white">{title}</span>
+
+      <span className="px-3 py-1 text-[10px] bg-zinc-800 border border-zinc-600 rounded-3xl text-zinc-400">Read-only</span>
+
       <button
-        type="button"
         onClick={onSwapInActive}
-        title="Show current note in this pane"
-        style={{
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '10px',
-          color: 'var(--text-ghost)',
-          padding: '2px 6px',
-          borderRadius: '4px',
-        }}
+        title="Swap current note into this pane"
+        className="ml-4 px-3 py-1 hover:bg-zinc-800 rounded-2xl transition-colors text-zinc-400 hover:text-white"
       >
         ⇆
       </button>
+
       <button
-        type="button"
         onClick={onClose}
-        title="Close split (Ctrl+W)"
-        style={{
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--text-ghost)',
-          padding: '2px',
-          borderRadius: '4px',
-        }}
+        title="Close split pane"
+        className="ml-2 px-3 py-1 hover:bg-zinc-800 rounded-2xl transition-colors text-zinc-400 hover:text-white"
       >
-        <X size={12} />
+        <X size={16} />
       </button>
     </div>
   );

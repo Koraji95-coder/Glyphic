@@ -2,7 +2,6 @@ import {
   ArrowUpRight,
   Eraser,
   Highlighter,
-  type MousePointer2,
   PenTool,
   Redo2,
   Save,
@@ -14,16 +13,7 @@ import {
 import { useAnnotationStore } from '../../stores/annotationStore';
 import type { AnnotationToolType } from '../../types/annotation';
 
-interface AnnotationToolbarProps {
-  onUndo: () => void;
-  onRedo: () => void;
-  onSave: () => void;
-  onDiscard: () => void;
-  canUndo: boolean;
-  canRedo: boolean;
-}
-
-const TOOLS: { type: AnnotationToolType; icon: typeof MousePointer2; label: string }[] = [
+const TOOLS: { type: AnnotationToolType; icon: React.ComponentType<{ size?: number }>; label: string }[] = [
   { type: 'arrow', icon: ArrowUpRight, label: 'Arrow' },
   { type: 'rect', icon: Square, label: 'Rectangle' },
   { type: 'highlight', icon: Highlighter, label: 'Highlight' },
@@ -34,122 +24,97 @@ const TOOLS: { type: AnnotationToolType; icon: typeof MousePointer2; label: stri
 
 const COLORS = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff', '#000000'];
 
-export function AnnotationToolbar({ onUndo, onRedo, onSave, onDiscard, canUndo, canRedo }: AnnotationToolbarProps) {
+export function AnnotationToolbar({
+  onUndo,
+  onRedo,
+  onSave,
+  onDiscard,
+  canUndo,
+  canRedo,
+}: {
+  onUndo: () => void;
+  onRedo: () => void;
+  onSave: () => void;
+  onDiscard: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+}) {
   const { activeTool, setActiveTool, color, setColor, strokeWidth, setStrokeWidth } = useAnnotationStore();
 
   return (
-    <div
-      className="flex items-center gap-2 px-3 py-2 rounded-lg"
-      style={{
-        backgroundColor: 'var(--bg-secondary)',
-        border: '1px solid var(--border)',
-        boxShadow: 'var(--shadow-md)',
-      }}
-    >
-      {/* Tool buttons */}
+    <div className="flex items-center gap-3 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 shadow-2xl rounded-3xl px-5 py-3">
+      {/* Tools */}
       {TOOLS.map(({ type, icon: Icon, label }) => (
         <button
-          type="button"
           key={type}
           onClick={() => setActiveTool(type)}
           title={label}
-          className="p-1.5 rounded transition-colors"
-          style={{
-            backgroundColor: activeTool === type ? 'var(--accent-muted)' : 'transparent',
-            color: activeTool === type ? 'var(--accent)' : 'var(--text-secondary)',
-          }}
+          className={`p-3 rounded-3xl transition-all ${
+            activeTool === type ? 'bg-violet-500 text-white shadow-inner' : 'hover:bg-zinc-800 text-zinc-300'
+          }`}
         >
-          <Icon size={18} />
+          <Icon size={20} />
         </button>
       ))}
 
-      {/* Separator */}
-      <div className="w-px h-6 mx-1" style={{ backgroundColor: 'var(--border)' }} />
+      <div className="w-px h-8 bg-zinc-700 mx-2" />
 
       {/* Color picker */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {COLORS.map((c) => (
           <button
-            type="button"
             key={c}
             onClick={() => setColor(c)}
-            className="w-5 h-5 rounded-full border-2 transition-transform"
-            style={{
-              backgroundColor: c,
-              borderColor: c === color ? 'var(--accent)' : 'var(--border)',
-              transform: c === color ? 'scale(1.2)' : 'scale(1)',
-            }}
+            className={`w-6 h-6 rounded-2xl border-2 transition-transform hover:scale-110 ${
+              c === color ? 'border-white shadow-inner scale-110' : 'border-zinc-600'
+            }`}
+            style={{ backgroundColor: c }}
           />
         ))}
       </div>
 
-      {/* Separator */}
-      <div className="w-px h-6 mx-1" style={{ backgroundColor: 'var(--border)' }} />
+      <div className="w-px h-8 bg-zinc-700 mx-2" />
 
       {/* Stroke width */}
-      <label className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-        Width
+      <div className="flex items-center gap-3 text-xs text-zinc-400">
+        <span className="font-medium">Width</span>
         <input
           type="range"
           min={1}
-          max={8}
+          max={12}
           value={strokeWidth}
           onChange={(e) => setStrokeWidth(Number(e.target.value))}
-          className="w-16 h-1 accent-current"
-          style={{ accentColor: 'var(--accent)' }}
+          className="w-24 accent-violet-400"
         />
-      </label>
+        <span className="tabular-nums w-6">{strokeWidth}</span>
+      </div>
 
-      {/* Separator */}
-      <div className="w-px h-6 mx-1" style={{ backgroundColor: 'var(--border)' }} />
+      <div className="w-px h-8 bg-zinc-700 mx-2" />
 
-      {/* Undo/Redo */}
-      <button
-        type="button"
-        onClick={onUndo}
-        disabled={!canUndo}
-        title="Undo (Ctrl+Z)"
-        className="p-1.5 rounded transition-colors disabled:opacity-30"
-        style={{ color: 'var(--text-secondary)' }}
-      >
-        <Undo2 size={18} />
+      {/* Undo / Redo */}
+      <button onClick={onUndo} disabled={!canUndo} className="p-3 hover:bg-zinc-800 rounded-3xl disabled:opacity-30">
+        <Undo2 size={20} />
       </button>
-      <button
-        type="button"
-        onClick={onRedo}
-        disabled={!canRedo}
-        title="Redo (Ctrl+Shift+Z)"
-        className="p-1.5 rounded transition-colors disabled:opacity-30"
-        style={{ color: 'var(--text-secondary)' }}
-      >
-        <Redo2 size={18} />
+      <button onClick={onRedo} disabled={!canRedo} className="p-3 hover:bg-zinc-800 rounded-3xl disabled:opacity-30">
+        <Redo2 size={20} />
       </button>
 
-      {/* Separator */}
-      <div className="w-px h-6 mx-1" style={{ backgroundColor: 'var(--border)' }} />
+      <div className="w-px h-8 bg-zinc-700 mx-2" />
 
       {/* Save & Discard */}
       <button
-        type="button"
         onClick={onSave}
-        title="Save annotations"
-        className="flex items-center gap-1 px-2.5 py-1 rounded text-sm font-medium transition-colors"
-        style={{
-          backgroundColor: 'var(--accent)',
-          color: '#fff',
-        }}
+        className="flex items-center gap-2 px-6 py-3 bg-violet-500 hover:bg-violet-400 text-white font-medium rounded-3xl transition-colors"
       >
-        <Save size={14} />
+        <Save size={18} />
         Save
       </button>
+
       <button
-        type="button"
         onClick={onDiscard}
-        title="Discard changes (Esc)"
-        className="p-1.5 rounded transition-colors"
-        style={{ color: 'var(--text-secondary)' }}
+        className="p-3 hover:bg-red-500/10 text-zinc-300 hover:text-red-300 rounded-3xl transition-colors"
       >
-        <X size={18} />
+        <X size={20} />
       </button>
     </div>
   );

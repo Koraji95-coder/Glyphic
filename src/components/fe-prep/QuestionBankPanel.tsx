@@ -1,5 +1,6 @@
 import { AlertCircle, Edit3, Flag, Plus, Upload } from 'lucide-react';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { reportError } from '../../lib/errorReporter';
 import type { QuestionDetail, QuestionListItem, TopicWithQuestionCount } from '../../lib/tauri/commands';
 import { commands } from '../../lib/tauri/commands';
@@ -67,17 +68,23 @@ export function QuestionBankPanel({ onExit }: QuestionBankPanelProps) {
   const importRef = useRef<HTMLInputElement>(null);
 
   const loadTopics = useCallback(async () => {
-    const t = await commands.listTopicsWithQuestionCounts();
-    setTopics(t);
-    if (t.length > 0 && !selectedTopicId) {
-      setSelectedTopicId(t[0].id);
+    try {
+      const t = await commands.listTopicsWithQuestionCounts();
+      setTopics(t);
+      if (t.length > 0 && !selectedTopicId) setSelectedTopicId(t[0].id);
+    } catch (e) {
+      reportError({ context: 'Question bank topics', message: 'Failed to load topics', error: e });
     }
   }, [selectedTopicId]);
 
   const loadQuestions = useCallback(async (topicId: number) => {
-    const q = await commands.listQuestionsByTopic(topicId);
-    setQuestions(q);
-    setPage(1);
+    try {
+      const q = await commands.listQuestionsByTopic(topicId);
+      setQuestions(q);
+      setPage(1);
+    } catch (e) {
+      reportError({ context: 'Question bank list', message: 'Failed to load questions', error: e });
+    }
   }, []);
 
   // Load topics with counts on mount

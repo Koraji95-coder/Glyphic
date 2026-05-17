@@ -88,7 +88,54 @@ _BLOCKED_PATTERNS = [
     "vars(",
 ]
 
-MAX_GENERATION_ATTEMPTS = 2
+MAX_GENERATION_ATTEMPTS = 4
+
+
+def _fallback_payload(diagram_type: str, description: str) -> tuple[str, str, str, list[str]]:
+    prompt_hint = description.strip()[:120] or "user request"
+    if diagram_type == "mermaid":
+        code = (
+            "flowchart TD\n"
+            "    U[User Request] --> I[Intent Parse]\n"
+            "    I --> P[Plan Diagram]\n"
+            "    P --> R[Render Output]\n"
+            "    R --> V[Verify and Edit]\n"
+            f"    V --> N[Original Prompt: {prompt_hint}]"
+        )
+        return code, "mermaid", "mermaid", [
+            "LLM generation fallback applied after repeated validation failures.",
+            "Edit this template to match the requested structure.",
+        ]
+    if diagram_type == "schemdraw":
+        code = (
+            "import schemdraw.elements as elm\n"
+            "d = schemdraw.Drawing()\n"
+            "d += elm.SourceV().up().label('Vin')\n"
+            "d += elm.Resistor().right().label('R1')\n"
+            "d += elm.Capacitor().down().label('C1')\n"
+            "d += elm.Line().left()\n"
+            "d += elm.Ground()"
+        )
+        return code, "python", "schemdraw", [
+            "LLM generation fallback applied after repeated validation failures.",
+            "Template circuit inserted so rendering can continue immediately.",
+        ]
+
+    code = (
+        "import numpy as np\n"
+        "t = np.linspace(0, 2*np.pi, 300)\n"
+        "y = np.sin(t)\n"
+        "plt.plot(t, y, label='signal')\n"
+        "plt.xlabel('x')\n"
+        "plt.ylabel('y')\n"
+        "plt.title('Fallback plot template')\n"
+        "plt.grid(True, alpha=0.3)\n"
+        "plt.legend()"
+    )
+    return code, "python", "matplotlib", [
+        "LLM generation fallback applied after repeated validation failures.",
+        "Template plot inserted so rendering can continue immediately.",
+    ]
 
 
 def _check_code_safety(code: str) -> str | None:
@@ -128,14 +175,21 @@ def _canonical_generate_diagram_type(diagram_type: str) -> str:
     )
 
 
-def _build_generate_prompt(description: str, diagram_type: str, feedback: str | None = None) -> str:
+def _build_generate_prompt(
+    description: str,
+    diagram_type: str,
+    feedback: str | None = None,
+    attempt: int = 1,
+) -> str:
     if diagram_type == "mermaid":
         type_hint = "Return only valid Mermaid diagram syntax, no other text."
     elif diagram_type in {"schemdraw", "matplotlib"}:
         type_hint = (
             "Return only valid Python code. For schemdraw: assign the schemdraw.Drawing() "
-            "to a variable named 'd'. For matplotlib plots: use plt (already available) to create "
-            "the figure. No plt.show(). No other text or explanation."
+            "to a variable named 'd', include explicit component orientation (right/left/up/down), "
+            "and keep signal flow readable from source to load when relevant. For matplotlib plots: "
+            "use plt (already available), set labels/title, and avoid plt.show(). "
+            "No markdown fences and no explanation text."
         )
     else:
         type_hint = (
@@ -148,12 +202,17 @@ def _build_generate_prompt(description: str, diagram_type: str, feedback: str | 
 
     prompt = (
         "You are Glyphic's diagram code generator.\n"
+        f"Generation attempt: {attempt}\n"
         f"User request: {description}\n"
         f"Requested diagram_type: {diagram_type}\n"
         f"{type_hint}"
     )
     if feedback:
-        prompt += f"\nPrevious output failed validation with: {feedback}\nReturn corrected output only."
+        prompt += (
+            "\nPrevious output failed validation with: "
+            f"{feedback}\n"
+            "Correct that exact issue. Return corrected output only, no surrounding prose."
+        )
     return prompt
 
 
@@ -270,6 +329,15 @@ def _validate_generated_code(code: str, diagram_type: str) -> None:
             raise ValueError("mermaid validation failed: no known diagram keyword found")
         return
     compile(code, "", "exec")
+    lowered = code.lower()
+    if diagram_type == "schemdraw":
+        if "d = schemdraw.drawing()" not in lowered and "d=schemdraw.drawing()" not in lowered:
+            raise ValueError("schemdraw validation failed: code must assign drawing to variable 'd'")
+        if "schemdraw.elements" not in lowered and "elm." not in lowered:
+            raise ValueError("schemdraw validation failed: missing schemdraw elements usage")
+    if diagram_type == "matplotlib":
+        if "plt." not in lowered:
+            raise ValueError("matplotlib validation failed: code must use plt APIs")
 
 
 def handle_generate_code(req: dict[str, Any]) -> None:
@@ -289,7 +357,12 @@ def handle_generate_code(req: dict[str, Any]) -> None:
 
     for attempt in range(MAX_GENERATION_ATTEMPTS):
         emit_event("progress", stage="prompting")
-        prompt = _build_generate_prompt(description, requested_type, validation_error)
+        prompt = _build_generate_prompt(
+            description,
+            requested_type,
+            validation_error,
+            attempt + 1,
+        )
         emit_event("progress", stage="generating")
 
         try:
@@ -313,10 +386,41 @@ def handle_generate_code(req: dict[str, Any]) -> None:
         except Exception as e:
             validation_error = str(e)
             if attempt < MAX_GENERATION_ATTEMPTS - 1:
-                warnings.append(f"first attempt failed validation or generation: {validation_error}")
+                warnings.append(
+                    f"attempt {attempt + 1} failed validation or generation: {validation_error}"
+                )
                 continue
-            emit_event("error", message=validation_error)
-            raise SystemExit(1) from e
+
+            fallback_type = requested_type
+            if fallback_type == "auto":
+                hint = description.lower()
+                if any(
+                    token in hint
+                    for token in ["flowchart", "sequence", "state", "mermaid", "graph"]
+                ):
+                    fallback_type = "mermaid"
+                elif any(
+                    token in hint
+                    for token in ["circuit", "resistor", "diode", "op amp", "schematic"]
+                ):
+                    fallback_type = "schemdraw"
+                else:
+                    fallback_type = "matplotlib"
+
+            fallback_code, fallback_language, fallback_diagram_type, fallback_warnings = _fallback_payload(
+                fallback_type,
+                description,
+            )
+            warnings.extend(fallback_warnings)
+            warnings.append(f"last generation error: {validation_error}")
+            emit_event(
+                "final",
+                code=fallback_code,
+                language=fallback_language,
+                diagram_type=fallback_diagram_type,
+                warnings=warnings,
+            )
+            return
 
 
 # ── Schemdraw ─────────────────────────────────────────────────────────────────

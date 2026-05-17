@@ -21,6 +21,7 @@ export function ErrorToaster() {
 
   useEffect(() => {
     if (items.length === 0) return;
+
     const now = Date.now();
     const nextExpiry = Math.min(...items.map((item) => item.expiresAt));
     const delay = Math.max(0, nextExpiry - now + 8);
@@ -41,23 +42,18 @@ export function ErrorToaster() {
     <div
       aria-live="polite"
       aria-atomic="false"
-      className="pointer-events-none fixed top-4 right-4 z-9999 flex w-[min(92vw,380px)] flex-col gap-2"
+      className="pointer-events-none fixed top-4 right-4 z-[9999] flex w-[min(92vw,380px)] flex-col gap-3"
     >
       {visible.map((item) => (
         <div
           key={item.id}
           role="status"
-          className="rounded-md border px-3 py-2 shadow-lg"
-          style={{
-            background: 'color-mix(in oklab, var(--bg-card) 92%, #ffb3b3 8%)',
-            borderColor: 'color-mix(in oklab, var(--border) 70%, #ef4444 30%)',
-            color: 'var(--text-primary)',
-          }}
+          className="rounded-3xl border bg-zinc-900/95 backdrop-blur-2xl px-5 py-4 shadow-2xl border-red-500/30 text-white"
         >
-          <div className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+          <div className="text-xs font-semibold uppercase tracking-widest text-red-400">
             {item.context}
           </div>
-          <div className="mt-1 text-sm">{item.message}</div>
+          <div className="mt-1 text-sm leading-tight">{item.message}</div>
         </div>
       ))}
     </div>

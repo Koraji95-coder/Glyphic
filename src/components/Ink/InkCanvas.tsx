@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { useStylus } from '../../hooks/useStylus';
 import type { InkPoint, InkStroke } from '../../types/ink';
 
@@ -12,7 +13,7 @@ interface InkCanvasProps {
   tool?: 'pen' | 'highlighter' | 'eraser';
 }
 
-function strokeToPath(points: InkPoint[], _baseWidth: number): string {
+function strokeToPath(points: InkPoint[], baseWidth: number): string {
   if (points.length < 2) return '';
   let d = `M ${points[0].x} ${points[0].y}`;
   for (let i = 1; i < points.length; i++) {
@@ -28,7 +29,6 @@ function strokeToPath(points: InkPoint[], _baseWidth: number): string {
 }
 
 function pressureToWidth(pressure: number, baseWidth: number): number {
-  // Map pressure 0.0–1.0 to width range [baseWidth * 0.5, baseWidth * 2.5]
   return baseWidth * (0.5 + pressure * 2);
 }
 
@@ -38,7 +38,7 @@ export function InkCanvas({
   isActive,
   onStrokesChange,
   initialStrokes = [],
-  color = 'var(--accent)',
+  color = '#a78bfa',
   tool = 'pen',
 }: InkCanvasProps) {
   const [strokes, setStrokes] = useState<InkStroke[]>(initialStrokes);
@@ -48,65 +48,62 @@ export function InkCanvas({
 
   const { isPenActive, pointerType } = useStylus(containerRef);
 
-  // Allow drawing with pen always, or with any pointer when isActive
-  const _canDraw = isActive && (pointerType === 'pen' || isPenActive || pointerType === 'mouse');
-
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isActive) return;
       if (e.pointerType === 'touch' && isPenActive) return; // palm rejection
+
       isDrawingRef.current = true;
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
+
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
       setCurrentPoints([{ x, y, pressure: e.pressure || 0.5 }]);
       e.currentTarget.setPointerCapture(e.pointerId);
     },
-    [isActive, isPenActive],
+    [isActive, isPenActive]
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isDrawingRef.current || !isActive) return;
-      if (e.pointerType === 'touch' && isPenActive) return; // palm rejection
+      if (e.pointerType === 'touch' && isPenActive) return;
+
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
+
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
       setCurrentPoints((pts) => [...pts, { x, y, pressure: e.pressure || 0.5 }]);
     },
-    [isActive, isPenActive],
+    [isActive, isPenActive]
   );
 
-  const handlePointerUp = useCallback(
-    (_e: React.PointerEvent<HTMLDivElement>) => {
-      if (!isDrawingRef.current) return;
-      isDrawingRef.current = false;
+  const handlePointerUp = useCallback(() => {
+    if (!isDrawingRef.current) return;
+    isDrawingRef.current = false;
 
-      setCurrentPoints((pts) => {
-        if (pts.length < 2) return [];
-        if (tool !== 'eraser') {
-          const id =
-            typeof crypto !== 'undefined' && crypto.randomUUID
-              ? crypto.randomUUID()
-              : Math.random().toString(36).slice(2);
-          const newStroke: InkStroke = {
-            id,
-            points: pts,
-            color,
-            width: 2,
-            tool,
-          };
-          const updated = [...strokes, newStroke];
-          setStrokes(updated);
-          onStrokesChange?.(updated);
-        }
-        return [];
-      });
-    },
-    [strokes, color, tool, onStrokesChange],
-  );
+    setCurrentPoints((pts) => {
+      if (pts.length < 2) return [];
+      if (tool !== 'eraser') {
+        const id = crypto.randomUUID?.() || Math.random().toString(36).slice(2);
+        const newStroke: InkStroke = {
+          id,
+          points: pts,
+          color,
+          width: 2,
+          tool,
+        };
+        const updated = [...strokes, newStroke];
+        setStrokes(updated);
+        onStrokesChange?.(updated);
+      }
+      return [];
+    });
+  }, [strokes, color, tool, onStrokesChange]);
 
   const handleEraseStroke = useCallback(
     (id: string) => {
@@ -114,7 +111,7 @@ export function InkCanvas({
       setStrokes(updated);
       onStrokesChange?.(updated);
     },
-    [strokes, onStrokesChange],
+    [strokes, onStrokesChange]
   );
 
   // Sync initial strokes
@@ -125,9 +122,8 @@ export function InkCanvas({
   return (
     <div
       ref={containerRef}
+      className="absolute inset-0"
       style={{
-        position: 'absolute',
-        inset: 0,
         width,
         height,
         pointerEvents: isActive ? 'all' : 'none',
@@ -139,12 +135,7 @@ export function InkCanvas({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      <svg
-        width={width}
-        height={height}
-        aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, overflow: 'visible' }}
-      >
+      <svg width={width} height={height} aria-hidden="true" className="absolute inset-0 overflow-visible">
         {/* Committed strokes */}
         {strokes.map((stroke) => (
           <path
@@ -155,7 +146,7 @@ export function InkCanvas({
               stroke.points.length > 0
                 ? pressureToWidth(
                     stroke.points.reduce((sum, p) => sum + p.pressure, 0) / stroke.points.length,
-                    stroke.width,
+                    stroke.width
                   )
                 : stroke.width
             }
@@ -175,7 +166,10 @@ export function InkCanvas({
             stroke={color}
             strokeWidth={
               currentPoints.length > 0
-                ? pressureToWidth(currentPoints.reduce((sum, p) => sum + p.pressure, 0) / currentPoints.length, 2)
+                ? pressureToWidth(
+                    currentPoints.reduce((sum, p) => sum + p.pressure, 0) / currentPoints.length,
+                    2
+                  )
                 : 2
             }
             strokeLinecap="round"

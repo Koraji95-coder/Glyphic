@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronRight, Link2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useVaultStore } from '../../stores/vaultStore';
@@ -8,6 +9,7 @@ import type { Backlink } from '../../types/editor';
 export function BacklinksPanel() {
   const activeNotePath = useVaultStore((s) => s.activeNotePath);
   const setActiveNote = useVaultStore((s) => s.setActiveNote);
+
   const [expanded, setExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [backlinks, setBacklinks] = useState<Backlink[]>([]);
@@ -44,74 +46,40 @@ export function BacklinksPanel() {
   }, [activeNotePath]);
 
   return (
-    <div style={{ padding: '4px 10px 6px' }}>
+    <div className="px-4 py-3 border-b border-zinc-800">
+      {/* Header */}
       <button
         type="button"
         onClick={() => setExpanded((p) => !p)}
-        className="flex items-center w-full"
-        style={{
-          gap: '4px',
-          padding: '4px 4px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '10px',
-          fontWeight: 600,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-          color: 'var(--text-ghost)',
-        }}
+        className="flex items-center w-full text-xs font-semibold uppercase tracking-widest text-zinc-400 hover:text-zinc-200 transition-colors"
       >
-        {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-        <span>Backlinks</span>
+        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        <span className="ml-2">Backlinks</span>
         {backlinks.length > 0 && (
-          <span style={{ marginLeft: 'auto', color: 'var(--text-ghost)' }}>{backlinks.length}</span>
+          <span className="ml-auto text-zinc-500">{backlinks.length}</span>
         )}
       </button>
 
       {expanded && (
-        <div className="flex flex-col" style={{ gap: '4px', padding: '4px 4px 0' }}>
+        <div className="flex flex-col gap-1 mt-3">
           {isLoading ? (
-            <span style={{ fontSize: '10px', color: 'var(--text-ghost)', padding: '2px 4px' }}>Loading...</span>
+            <div className="px-3 py-6 text-xs text-zinc-400 text-center">Loading backlinks...</div>
           ) : backlinks.length === 0 ? (
-            <span style={{ fontSize: '10px', color: 'var(--text-ghost)', padding: '2px 4px' }}>No backlinks yet</span>
+            <div className="px-3 py-6 text-xs text-zinc-400 text-center">No backlinks yet</div>
           ) : (
             backlinks.map((backlink) => (
               <button
-                type="button"
-                key={`${backlink.source_id}:${backlink.source_path}:${backlink.context}`}
+                key={`${backlink.source_id}:${backlink.source_path}`}
                 onClick={() => setActiveNote(backlink.source_path, backlink.source_path)}
-                className="flex items-start"
-                style={{
-                  gap: '6px',
-                  width: '100%',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--bg-card)',
-                  color: 'var(--text-secondary)',
-                  transition: 'all 0.12s',
-                  textAlign: 'left',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                }}
+                className="flex items-start gap-3 w-full px-4 py-3 text-left rounded-3xl hover:bg-zinc-800/70 transition-all group"
               >
-                <Link2 size={10} style={{ marginTop: '1px', flexShrink: 0 }} />
-                <span className="flex flex-col" style={{ minWidth: 0, gap: '1px' }}>
-                  <span className="truncate" style={{ fontSize: '11px', fontWeight: 600 }}>
-                    {backlink.source_title}
-                  </span>
-                  <span className="truncate" style={{ fontSize: '10px', color: 'var(--text-ghost)' }}>
-                    {backlink.context}
-                  </span>
-                </span>
+                <Link2 size={16} className="text-zinc-400 group-hover:text-cyan-400 mt-0.5 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-white truncate">{backlink.source_title}</div>
+                  {backlink.context && (
+                    <div className="text-xs text-zinc-400 line-clamp-2 mt-1">{backlink.context}</div>
+                  )}
+                </div>
               </button>
             ))
           )}

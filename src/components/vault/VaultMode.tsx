@@ -1,11 +1,10 @@
 import { Database, Search, Trash2, Upload, X, Zap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { events } from '../../lib/tauri/events';
 import { useLayoutStore } from '../../stores/layoutStore';
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface VaultSource {
   id: string;
@@ -28,8 +27,6 @@ interface IngestResult {
   error?: string;
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
-
 export function VaultMode() {
   const closeVaultMode = useLayoutStore((s) => s.closeVaultMode);
 
@@ -45,7 +42,7 @@ export function VaultMode() {
   const [flashcardResult, setFlashcardResult] = useState<{ sourceId: string; cards: unknown[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Subscribe to ingest progress events
+  // Ingest progress listener
   useEffect(() => {
     let unlisten: (() => void) | undefined;
     events
@@ -54,9 +51,6 @@ export function VaultMode() {
       })
       .then((fn) => {
         unlisten = fn;
-      })
-      .catch(() => {
-        // Not in Tauri
       });
     return () => unlisten?.();
   }, []);
@@ -66,7 +60,7 @@ export function VaultMode() {
       const result = (await commands.listVaultSources()) as { sources?: VaultSource[] };
       setSources(result?.sources ?? []);
     } catch {
-      // Sidecar not running — show empty state
+      // Sidecar not running
     }
   }, []);
 
@@ -89,19 +83,17 @@ export function VaultMode() {
         setTimeout(() => setIngestProgress(''), 3000);
       }
     },
-    [loadSources],
+    [loadSources]
   );
 
   const handleFilePickerChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      // In Tauri, use the file's `name` — Tauri provides the actual path via
-      // dialog plugin; for the file input we use the name as a best-effort.
       await ingestFile(file.name);
       if (fileInputRef.current) fileInputRef.current.value = '';
     },
-    [ingestFile],
+    [ingestFile]
   );
 
   const handleDrop = useCallback(
@@ -111,7 +103,7 @@ export function VaultMode() {
       const file = e.dataTransfer.files[0];
       if (file) void ingestFile(file.name);
     },
-    [ingestFile],
+    [ingestFile]
   );
 
   const handleIngestUrl = useCallback(async () => {
@@ -172,53 +164,28 @@ export function VaultMode() {
   }, []);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        backgroundColor: 'var(--bg-app)',
-        overflow: 'hidden',
-      }}
-    >
+    <div className="flex flex-col h-full bg-[#050507] overflow-hidden">
       {/* Header */}
-      <div
-        style={{
-          padding: '14px 20px',
-          borderBottom: '1px solid var(--border)',
-          backgroundColor: 'var(--bg-sidebar)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Database size={18} style={{ color: 'var(--accent)' }} />
-          <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>Knowledge Vault</span>
+      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700 bg-zinc-900 shrink-0">
+        <div className="flex items-center gap-3">
+          <Database className="text-violet-400" size={20} />
+          <span className="text-lg font-semibold text-white">Knowledge Vault</span>
         </div>
         <button
-          type="button"
           onClick={closeVaultMode}
-          style={{
-            padding: '4px',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-ghost)',
-            cursor: 'pointer',
-          }}
+          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
         >
-          <X size={16} />
+          <X size={20} />
         </button>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {/* Ingest panel */}
-          <section>
-            <SectionTitle>Add to Vault</SectionTitle>
+      <div className="flex-1 overflow-y-auto p-6 space-y-10">
+        <div className="max-w-4xl mx-auto space-y-10">
+          {/* Ingest Section */}
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+            <div className="text-xs font-medium text-zinc-400 tracking-widest mb-4">ADD TO VAULT</div>
 
-            {/* Drag-and-drop zone */}
+            {/* Drag & Drop */}
             <div
               onDragOver={(e) => {
                 e.preventDefault();
@@ -227,329 +194,121 @@ export function VaultMode() {
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              style={{
-                border: `2px dashed ${dragOver ? 'var(--accent)' : 'var(--border)'}`,
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: dragOver ? 'var(--accent-dim)' : 'var(--bg-card)',
-                padding: '32px 20px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                marginBottom: '12px',
-              }}
+              className={`border-2 border-dashed rounded-3xl p-12 text-center transition-all cursor-pointer mb-6 ${
+                dragOver ? 'border-violet-400 bg-violet-500/5' : 'border-zinc-700 hover:border-zinc-600'
+              }`}
             >
-              <Upload
-                size={28}
-                style={{ color: dragOver ? 'var(--accent)' : 'var(--text-ghost)', margin: '0 auto 10px' }}
-              />
-              <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 4px' }}>
-                Drop PDF, Word, or image file here
-              </p>
-              <p style={{ fontSize: '11px', color: 'var(--text-ghost)', margin: 0 }}>or click to browse</p>
+              <Upload size={32} className="mx-auto mb-4 text-zinc-400" />
+              <p className="font-medium text-white">Drop PDF, DOCX, or image here</p>
+              <p className="text-sm text-zinc-400">or click to browse</p>
               <input
                 ref={fileInputRef}
-                id="vault-file-ingest-input"
-                name="vaultFileIngest"
                 type="file"
                 accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg"
-                style={{ display: 'none' }}
+                className="hidden"
                 onChange={handleFilePickerChange}
               />
             </div>
 
             {/* URL ingest */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="flex gap-3">
               <input
-                id="vault-url-input"
-                name="vaultUrl"
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="https://… (paste a URL to ingest)"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') void handleIngestUrl();
-                }}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--bg-editor)',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  fontFamily: 'inherit',
-                }}
+                onKeyDown={(e) => e.key === 'Enter' && handleIngestUrl()}
+                placeholder="https://example.com/article"
+                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
               />
-              <PrimaryButton onClick={handleIngestUrl} disabled={ingestBusy || !urlInput.trim()}>
+              <button
+                onClick={handleIngestUrl}
+                disabled={ingestBusy || !urlInput.trim()}
+                className="px-8 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium disabled:opacity-50"
+              >
                 Ingest
-              </PrimaryButton>
+              </button>
             </div>
 
-            {/* Progress indicator */}
-            {ingestProgress && (
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>{ingestProgress}</p>
-            )}
-          </section>
+            {ingestProgress && <p className="text-xs text-zinc-400 mt-3">{ingestProgress}</p>}
+          </div>
 
-          {/* Semantic search */}
-          <section>
-            <SectionTitle>Semantic Search</SectionTitle>
-            <div style={{ display: 'flex', gap: '8px' }}>
+          {/* Semantic Search */}
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+            <div className="text-xs font-medium text-zinc-400 tracking-widest mb-4">SEMANTIC SEARCH</div>
+            <div className="flex gap-3">
               <input
-                id="vault-query-input"
-                name="vaultQuery"
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ask a question or enter keywords…"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') void handleQuery();
-                }}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--bg-editor)',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  fontFamily: 'inherit',
-                }}
+                onKeyDown={(e) => e.key === 'Enter' && handleQuery()}
+                placeholder="Ask anything about your documents…"
+                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
               />
-              <PrimaryButton onClick={handleQuery} disabled={searching || !query.trim()}>
-                <Search size={14} />
+              <button
+                onClick={handleQuery}
+                disabled={searching || !query.trim()}
+                className="px-8 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium disabled:opacity-50 flex items-center gap-2"
+              >
+                <Search size={16} />
                 Search
-              </PrimaryButton>
+              </button>
             </div>
 
-            {searching && (
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>Searching…</p>
-            )}
+            {searching && <p className="text-xs text-zinc-400 mt-4">Searching vault…</p>}
 
             {queryResults.length > 0 && (
-              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {queryResults.map((chunk) => (
-                  <div
-                    key={`${chunk.source_label}:${chunk.text.slice(0, 30)}`}
-                    style={{
-                      padding: '14px 16px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'var(--bg-card)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        color: 'var(--accent)',
-                        marginBottom: '6px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.06em',
-                      }}
-                    >
-                      {chunk.source_label}
-                      {chunk.distance !== undefined && (
-                        <span style={{ marginLeft: '8px', color: 'var(--text-ghost)', fontWeight: 400 }}>
-                          score: {(1 - chunk.distance).toFixed(3)}
-                        </span>
-                      )}
-                    </div>
-                    <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-primary)', margin: 0 }}>
-                      {chunk.text}
-                    </p>
+              <div className="mt-6 space-y-4">
+                {queryResults.map((chunk, i) => (
+                  <div key={i} className="bg-zinc-800 border border-zinc-700 rounded-3xl p-5">
+                    <div className="text-xs text-violet-300 mb-2">{chunk.source_label}</div>
+                    <p className="text-zinc-200 text-sm leading-relaxed">{chunk.text}</p>
                   </div>
                 ))}
               </div>
             )}
+          </div>
 
-            {!searching && query && queryResults.length === 0 && (
-              <p style={{ fontSize: '12px', color: 'var(--text-ghost)', marginTop: '8px' }}>
-                No results. Try a different query or ingest more documents.
-              </p>
-            )}
-          </section>
-
-          {/* Source list */}
-          <section>
-            <SectionTitle>Ingested Sources ({sources.length})</SectionTitle>
+          {/* Sources list */}
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-xs font-medium text-zinc-400 tracking-widest">INGESTED SOURCES ({sources.length})</div>
+            </div>
 
             {sources.length === 0 ? (
-              <div style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text-ghost)', fontSize: '13px' }}>
-                No documents ingested yet. Drop a file or paste a URL above.
-              </div>
+              <div className="text-center py-12 text-zinc-400">No documents yet. Start by ingesting something above.</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div className="space-y-3">
                 {sources.map((src) => (
-                  <div
-                    key={src.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'var(--bg-card)',
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          color: 'var(--text-primary)',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {src.label}
-                      </div>
-                      {src.chunks !== undefined && (
-                        <div style={{ fontSize: '11px', color: 'var(--text-ghost)' }}>{src.chunks} chunks</div>
-                      )}
+                  <div key={src.id} className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-3xl px-6 py-4">
+                    <div className="flex-1">
+                      <div className="font-medium text-white">{src.label}</div>
+                      <div className="text-xs text-zinc-400">{src.chunks} chunks</div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => void handleGenerateFlashcards(src.id)}
-                      disabled={flashcardBusy === src.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        padding: '4px 10px',
-                        borderRadius: 'var(--radius-sm)',
-                        border: '1px solid transparent',
-                        backgroundColor: 'var(--accent-dim)',
-                        color: 'var(--accent)',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        cursor: flashcardBusy === src.id ? 'not-allowed' : 'pointer',
-                        opacity: flashcardBusy === src.id ? 0.6 : 1,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Zap size={12} />
-                      {flashcardBusy === src.id ? 'Generating…' : 'Flashcards'}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => void handleGenerateFlashcards(src.id)}
+                        disabled={flashcardBusy === src.id}
+                        className="flex items-center gap-2 px-5 py-2 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 rounded-3xl text-sm font-medium"
+                      >
+                        <Zap size={14} />
+                        {flashcardBusy === src.id ? 'Generating…' : 'Flashcards'}
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => void handleDelete(src.id)}
-                      style={{
-                        padding: '4px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-ghost)',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                      }}
-                      title="Remove source"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                      <button
+                        onClick={() => void handleDelete(src.id)}
+                        className="p-2 text-zinc-400 hover:text-red-400 transition-colors"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-          </section>
-
-          {/* Flashcard result panel */}
-          {flashcardResult && flashcardResult.cards.length > 0 && (
-            <section>
-              <div
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}
-              >
-                <SectionTitle style={{ margin: 0 }}>Generated Flashcards ({flashcardResult.cards.length})</SectionTitle>
-                <button
-                  type="button"
-                  onClick={() => setFlashcardResult(null)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--text-ghost)', cursor: 'pointer' }}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {(flashcardResult.cards as Array<{ question?: string; answer?: string }>).map((card) => (
-                  <div
-                    key={card.question ?? card.answer ?? 'card'}
-                    style={{
-                      padding: '14px 16px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border)',
-                      backgroundColor: 'var(--bg-card)',
-                    }}
-                  >
-                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 6px' }}>
-                      Q: {card.question ?? '—'}
-                    </p>
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
-                      A: {card.answer ?? '—'}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-// ── Small helpers ─────────────────────────────────────────────────────────────
-
-function SectionTitle({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return (
-    <div
-      style={{
-        fontSize: '11px',
-        fontWeight: 700,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-        color: 'var(--text-ghost)',
-        marginBottom: '10px',
-        ...style,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function PrimaryButton({
-  children,
-  onClick,
-  disabled,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '5px',
-        padding: '8px 14px',
-        borderRadius: 'var(--radius-sm)',
-        border: '1px solid transparent',
-        backgroundColor: disabled ? 'var(--bg-hover)' : 'var(--accent)',
-        color: disabled ? 'var(--text-ghost)' : '#fff',
-        fontSize: '13px',
-        fontWeight: 600,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        flexShrink: 0,
-        transition: 'background-color 0.15s',
-      }}
-    >
-      {children}
-    </button>
   );
 }

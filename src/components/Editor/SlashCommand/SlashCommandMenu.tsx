@@ -10,12 +10,10 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: items is a prop — prop reference changes do trigger re-renders
   useEffect(() => {
     setSelectedIndex(0);
   }, [items]);
 
-  // Scroll selected item into view
   useLayoutEffect(() => {
     const menu = menuRef.current;
     if (!menu) return;
@@ -44,7 +42,7 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
       }
       return false;
     },
-    [items, selectedIndex, command],
+    [items, selectedIndex, command]
   );
 
   useEffect(() => {
@@ -58,41 +56,23 @@ export function SlashCommandMenu({ items, command }: SlashCommandMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="rounded-lg overflow-hidden overflow-y-auto"
-      style={{
-        backgroundColor: 'var(--bg-secondary)',
-        border: '1px solid var(--border)',
-        boxShadow: 'var(--shadow-md)',
-        maxHeight: '320px',
-        width: '280px',
-      }}
+      className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl backdrop-blur-2xl py-2 z-50"
     >
       {items.map((item, index) => (
         <button
-          type="button"
           key={item.title}
           onClick={() => command(item)}
-          className="flex items-center gap-3 w-full px-3 py-2 text-left text-sm transition-colors"
-          style={{
-            backgroundColor: index === selectedIndex ? 'var(--bg-hover)' : 'transparent',
-            color: 'var(--text-primary)',
-          }}
           onMouseEnter={() => setSelectedIndex(index)}
+          className={`flex items-center gap-3 w-full px-5 py-3 text-left transition-all ${
+            index === selectedIndex ? 'bg-zinc-800' : 'hover:bg-zinc-800/60'
+          }`}
         >
-          <span
-            className="w-8 h-8 flex items-center justify-center rounded text-sm font-medium shrink-0"
-            style={{
-              backgroundColor: 'var(--bg-tertiary)',
-              color: 'var(--text-secondary)',
-            }}
-          >
+          <div className="w-8 h-8 flex items-center justify-center bg-zinc-800 rounded-2xl text-violet-300">
             {item.icon}
-          </span>
-          <div className="min-w-0">
-            <div className="font-medium truncate">{item.title}</div>
-            <div className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>
-              {item.description}
-            </div>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-white truncate">{item.title}</div>
+            <div className="text-xs text-zinc-400 truncate">{item.description}</div>
           </div>
         </button>
       ))}

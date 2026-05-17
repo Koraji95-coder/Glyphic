@@ -1,6 +1,7 @@
 import { listen } from '@tauri-apps/api/event';
 import { Check, Loader2, RefreshCw, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { reportError } from '../../lib/errorReporter';
 import { commands } from '../../lib/tauri/commands';
 import { useChatStore } from '../../stores/chatStore';
@@ -40,7 +41,6 @@ type TestResult =
 
 interface AiSettingsPanelProps {
   onClose: () => void;
-  /** When true, renders inline (no absolute overlay or header) for embedding in the Settings modal. */
   embedded?: boolean;
 }
 
@@ -60,23 +60,25 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       vision: 'llava:7b',
     },
   });
+
   const [isSaving, setIsSaving] = useState(false);
-  const [testResult, setTestResult] = useState<TestResult>({ kind: 'idle' });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [testResult, setTestResult] = useState<TestResult>({ kind: 'idle' });
   const [models, setModels] = useState<string[]>([]);
   const [loadingModels, setLoadingModels] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
 
-  // --- Pull-model state ---
+  // Pull model state
   const [pullInput, setPullInput] = useState('');
   const [pullingModels, setPullingModels] = useState<Set<string>>(new Set());
   const [pullProgress, setPullProgress] = useState<Record<string, ModelPullState>>({});
   const [pullErrors, setPullErrors] = useState<Record<string, string>>({});
   const unlistenPullRef = useRef<(() => void) | null>(null);
 
-  const isOllama = (config.provider ?? '').toLowerCase() === 'ollama';
+  const isOllama = config.provider === 'ollama';
 
   const refreshModels = useCallback(async () => {
+    if (!isOllama) return;
     setLoadingModels(true);
     setModelsError(null);
     try {
@@ -88,65 +90,49 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
     } finally {
       setLoadingModels(false);
     }
+  }, [isOllama]);
+
+  useEffect(() => {
+    commands.aiGetConfig().then(setConfig).catch(console.error);
   }, []);
 
   useEffect(() => {
-    commands
-      .aiGetConfig()
-      .then(setConfig)
-      .catch((e) => {
-        reportError({ context: 'AI settings', message: 'Failed to load AI config', error: e });
-      });
-  }, []);
-
-  useEffect(() => {
-    if (isOllama) {
-      void refreshModels();
-    }
+    if (isOllama) void refreshModels();
   }, [refreshModels, isOllama]);
 
-  // Listen for Ollama pull-progress events (Tauri only).
+  // Listen for Ollama pull progress
   useEffect(() => {
     if (!isTauri) return;
     let cancelled = false;
 
     listen<PullProgressPayload>('ollama-pull-progress', (event) => {
       const { model, status, completed, total } = event.payload;
-      setPullProgress((prev) => {
-        const prevModel = prev[model];
-        const safeCompleted =
-          completed != null && prevModel?.completed != null && prevModel.total === total
-            ? Math.max(prevModel.completed, completed)
-            : completed;
-        return { ...prev, [model]: { status, completed: safeCompleted, total } };
-      });
+      setPullProgress((prev) => ({
+        ...prev,
+        [model]: { status, completed, total },
+      }));
       if (status === 'success') {
         setPullingModels((prev) => {
           const next = new Set(prev);
           next.delete(model);
           return next;
         });
-        // Clear the completed model's progress after a brief display delay.
-        setTimeout(
-          () =>
-            setPullProgress((prev) => {
-              const next = { ...prev };
-              delete next[model];
-              return next;
-            }),
-          1500,
-        );
+        setTimeout(() => {
+          setPullProgress((prev) => {
+            const next = { ...prev };
+            delete next[model];
+            return next;
+          });
+        }, 1500);
         void refreshModels();
       }
     }).then((fn) => {
-      if (cancelled) fn();
-      else unlistenPullRef.current = fn;
+      if (!cancelled) unlistenPullRef.current = fn;
     });
 
     return () => {
       cancelled = true;
       unlistenPullRef.current?.();
-      unlistenPullRef.current = null;
     };
   }, [refreshModels]);
 
@@ -161,11 +147,11 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       return next;
     });
     setPullProgress((prev) => ({ ...prev, [name]: { status: 'starting…' } }));
+
     try {
       await commands.pullModel(name);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setPullErrors((prev) => ({ ...prev, [name]: msg }));
+      setPullErrors((prev) => ({ ...prev, [name]: e instanceof Error ? e.message : String(e) }));
     } finally {
       setPullingModels((prev) => {
         const next = new Set(prev);
@@ -183,15 +169,8 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
         setTestResult({ kind: 'fail', error: 'Connection check returned false.' });
         return;
       }
-      try {
-        const modelList = await commands.aiListModels();
-        setTestResult({ kind: 'ok', models: modelList });
-      } catch (e) {
-        setTestResult({
-          kind: 'fail',
-          error: `Connected but failed to list models: ${e instanceof Error ? e.message : String(e)}`,
-        });
-      }
+      const modelList = await commands.aiListModels();
+      setTestResult({ kind: 'ok', models: modelList });
     } catch (e) {
       setTestResult({ kind: 'fail', error: e instanceof Error ? e.message : String(e) });
     }
@@ -203,126 +182,42 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
       await updateConfig(vaultPath ?? '', config);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
-    } catch {
-      // Errors are surfaced through connection status.
+    } catch (e) {
+      reportError({ context: 'AI settings', message: 'Failed to save', error: e });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const inputStyle: React.CSSProperties = {
-    backgroundColor: 'var(--bg-input)',
-    border: '1px solid var(--border)',
-    borderRadius: '6px',
-    color: 'var(--text-primary)',
-    fontFamily: 'var(--font-body)',
-    fontSize: '12px',
-    padding: '6px 8px',
-    width: '100%',
-    outline: 'none',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    color: 'var(--text-secondary)',
-    fontFamily: 'var(--font-body)',
-    fontSize: '11px',
-    marginBottom: '4px',
-    display: 'block',
-  };
-
-  const sectionStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    padding: '12px',
-    backgroundColor: 'var(--bg-elevated)',
-    borderRadius: '8px',
-    border: '1px solid var(--border-subtle)',
-  };
-
-  const getModelOptions = (currentValue: string): string[] =>
-    models.includes(currentValue) ? models : [currentValue, ...models].filter(Boolean);
-
   return (
-    <div
-      style={
-        embedded
-          ? { display: 'flex', flexDirection: 'column', gap: '12px' }
-          : {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'var(--bg-editor)',
-              zIndex: 10,
-              display: 'flex',
-              flexDirection: 'column',
-            }
-      }
-    >
-      {/* Header — only shown when not embedded inside a host container that already has its own. */}
+    <div className={embedded ? 'flex flex-col gap-8' : 'fixed inset-0 bg-[#050507] z-50 flex flex-col'}>
+      {/* Header (only when not embedded) */}
       {!embedded && (
-        <div
-          className="flex items-center justify-between px-4 shrink-0"
-          style={{
-            height: 'var(--toolbar-height)',
-            borderBottom: '1px solid var(--border)',
-            backgroundColor: 'var(--bg-sidebar)',
-          }}
-        >
-          <span
-            className="text-sm font-semibold"
-            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}
-          >
-            AI Settings
-          </span>
+        <div className="flex items-center justify-between px-6 h-12 border-b border-zinc-700 shrink-0">
+          <span className="font-semibold text-white">AI Settings</span>
           <button
-            type="button"
             onClick={onClose}
-            className="p-1.5 rounded"
-            style={{ color: 'var(--text-tertiary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
           >
-            <X size={14} />
+            <X size={20} />
           </button>
         </div>
       )}
 
-      {/* Content */}
-      <div className={embedded ? 'flex flex-col gap-3' : 'flex-1 overflow-y-auto p-3 flex flex-col gap-3'}>
-        {/* Provider selector */}
-        <div style={sectionStyle}>
-          <span
-            style={{
-              color: 'var(--text-secondary)',
-              fontFamily: 'var(--font-display)',
-              fontSize: '11px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
-            Provider
-          </span>
+      <div className={embedded ? '' : 'flex-1 overflow-y-auto p-6 space-y-8'}>
+        {/* Provider Selector */}
+        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+          <div className="text-xs font-medium text-zinc-400 tracking-widest mb-4">PROVIDER</div>
           <div className="flex gap-2">
             {(['ollama', 'open_ai'] as const).map((p) => (
               <button
-                type="button"
                 key={p}
                 onClick={() => setConfig((c) => ({ ...c, provider: p }))}
-                style={{
-                  flex: 1,
-                  padding: '6px 0',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-body)',
-                  border: `1px solid ${config.provider === p ? 'var(--accent)' : 'var(--border)'}`,
-                  backgroundColor: config.provider === p ? 'var(--bg-active)' : 'var(--bg-input)',
-                  color: config.provider === p ? 'var(--accent)' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                }}
+                className={`flex-1 py-3 rounded-3xl text-sm font-medium transition-all ${
+                  config.provider === p
+                    ? 'bg-violet-500 text-white shadow-inner'
+                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                }`}
               >
                 {p === 'ollama' ? 'Ollama (Local)' : 'OpenAI (Cloud)'}
               </button>
@@ -330,27 +225,13 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
           </div>
         </div>
 
-        {/* Ollama config */}
+        {/* Ollama Config */}
         {isOllama && (
-          <div style={sectionStyle}>
-            <span
-              style={{
-                color: 'var(--text-secondary)',
-                fontFamily: 'var(--font-display)',
-                fontSize: '11px',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Ollama
-            </span>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 space-y-6">
+            <div className="text-xs font-medium text-zinc-400 tracking-widest">OLLAMA</div>
             <div>
-              <label htmlFor="ollama-endpoint" style={labelStyle}>
-                Endpoint
-              </label>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">Endpoint</label>
               <input
-                id="ollama-endpoint"
                 type="text"
                 value={config.ollama.endpoint}
                 onChange={(e) =>
@@ -359,15 +240,12 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     ollama: { ...c.ollama, endpoint: e.target.value },
                   }))
                 }
-                style={inputStyle}
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
               />
             </div>
             <div>
-              <label htmlFor="ollama-model" style={labelStyle}>
-                Model
-              </label>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">Default Model</label>
               <input
-                id="ollama-model"
                 type="text"
                 value={config.ollama.model}
                 onChange={(e) =>
@@ -376,34 +254,20 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     ollama: { ...c.ollama, model: e.target.value },
                   }))
                 }
-                style={inputStyle}
-                placeholder="e.g. llama3.2:3b"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                placeholder="llama3.1:8b"
               />
             </div>
           </div>
         )}
 
-        {/* OpenAI config */}
+        {/* OpenAI Config */}
         {config.provider === 'open_ai' && (
-          <div style={sectionStyle}>
-            <span
-              style={{
-                color: 'var(--text-secondary)',
-                fontFamily: 'var(--font-display)',
-                fontSize: '11px',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              OpenAI
-            </span>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 space-y-6">
+            <div className="text-xs font-medium text-zinc-400 tracking-widest">OPENAI</div>
             <div>
-              <label htmlFor="openai-apikey" style={labelStyle}>
-                API Key
-              </label>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">API Key</label>
               <input
-                id="openai-apikey"
                 type="password"
                 value={config.openai.api_key}
                 onChange={(e) =>
@@ -412,16 +276,13 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     openai: { ...c.openai, api_key: e.target.value },
                   }))
                 }
-                style={inputStyle}
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
                 placeholder="sk-..."
               />
             </div>
             <div>
-              <label htmlFor="openai-model" style={labelStyle}>
-                Model
-              </label>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">Model</label>
               <input
-                id="openai-model"
                 type="text"
                 value={config.openai.model}
                 onChange={(e) =>
@@ -430,16 +291,13 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     openai: { ...c.openai, model: e.target.value },
                   }))
                 }
-                style={inputStyle}
-                placeholder="e.g. gpt-4o-mini"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
+                placeholder="gpt-4o-mini"
               />
             </div>
             <div>
-              <label htmlFor="openai-endpoint" style={labelStyle}>
-                Endpoint
-              </label>
+              <label className="text-xs font-medium text-zinc-400 block mb-2">Endpoint</label>
               <input
-                id="openai-endpoint"
                 type="text"
                 value={config.openai.endpoint}
                 onChange={(e) =>
@@ -448,38 +306,20 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                     openai: { ...c.openai, endpoint: e.target.value },
                   }))
                 }
-                style={inputStyle}
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
               />
             </div>
           </div>
         )}
 
-        {/* Pull new model — Ollama only, Tauri only */}
+        {/* Pull New Model (Ollama only) */}
         {isOllama && isTauri && (
-          <div style={sectionStyle}>
-            <span
-              style={{
-                color: 'var(--text-secondary)',
-                fontFamily: 'var(--font-display)',
-                fontSize: '11px',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Pull New Model
-            </span>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 space-y-6">
+            <div className="text-xs font-medium text-zinc-400 tracking-widest">PULL NEW MODEL</div>
 
-            {/* Recommended models for studying STEM coursework */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {[
-                { name: 'llama3.1:8b', size: '~4.7 GB', desc: 'General chat & writing (default)' },
-                { name: 'qwen2.5:7b', size: '~4.4 GB', desc: 'Strong at math & reasoning' },
-                { name: 'qwen2.5-coder:7b', size: '~4.4 GB', desc: 'Code (Python / MATLAB / Verilog)' },
-                { name: 'deepseek-r1:7b', size: '~4.7 GB', desc: 'Step-by-step reasoning for proofs' },
-                { name: 'mathstral:7b', size: '~4.1 GB', desc: 'Math-specialized' },
-                { name: 'llava:7b', size: '~4.7 GB', desc: 'Vision — explain screenshots & diagrams' },
-              ].map(({ name, size, desc }) => {
+            {/* Recommended models */}
+            <div className="grid grid-cols-1 gap-3">
+              {RECOMMENDED_MODELS.map((name) => {
                 const isInstalled = models.includes(name);
                 const isPulling = pullingModels.has(name);
                 const prog = pullProgress[name];
@@ -487,72 +327,26 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
                   prog?.total && prog.completed != null && prog.total > 0
                     ? Math.round((prog.completed / prog.total) * 100)
                     : null;
+
                 return (
                   <div
                     key={name}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '6px 8px',
-                      borderRadius: '6px',
-                      backgroundColor: 'var(--bg-input)',
-                      border: '1px solid var(--border-subtle)',
-                    }}
+                    className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-3xl px-5 py-4"
                   >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize: '12px',
-                          fontFamily: 'var(--font-mono, monospace)',
-                          color: 'var(--text-primary)',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {name} <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>{size}</span>
-                      </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>{desc}</div>
-                      {isPulling && (
-                        <div
-                          style={{
-                            marginTop: '4px',
-                            height: '3px',
-                            borderRadius: '2px',
-                            backgroundColor: 'var(--bg-app)',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <div
-                            style={{
-                              height: '100%',
-                              width: pct != null ? `${pct}%` : '100%',
-                              backgroundColor: 'var(--accent)',
-                              borderRadius: '2px',
-                              transition: 'width 0.4s linear',
-                              animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
-                            }}
-                          />
-                        </div>
-                      )}
+                    <div>
+                      <div className="font-medium text-white">{name}</div>
+                      <div className="text-xs text-zinc-400">Recommended for STEM / coding</div>
                     </div>
                     <button
-                      type="button"
                       onClick={() => void handlePull(name)}
                       disabled={isPulling || isInstalled}
-                      style={{
-                        width: '92px',
-                        padding: '4px 10px',
-                        borderRadius: '5px',
-                        fontSize: '11px',
-                        fontFamily: 'var(--font-body)',
-                        backgroundColor: isInstalled ? 'transparent' : 'var(--accent)',
-                        color: isInstalled ? 'var(--success-fg, #5ec49e)' : 'var(--bg-app)',
-                        border: isInstalled ? '1px solid var(--success-fg, #5ec49e)' : 'none',
-                        cursor: isPulling || isInstalled ? 'default' : 'pointer',
-                        whiteSpace: 'nowrap',
-                        textAlign: 'center',
-                        flexShrink: 0,
-                      }}
+                      className={`px-6 py-2 rounded-3xl text-sm font-medium transition-all ${
+                        isInstalled
+                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                          : isPulling
+                            ? 'bg-violet-500/10 text-violet-300'
+                            : 'bg-violet-500 hover:bg-violet-400 text-white'
+                      }`}
                     >
                       {isInstalled ? '✓ Installed' : isPulling ? (pct != null ? `${pct}%` : 'Pulling…') : 'Pull'}
                     </button>
@@ -561,286 +355,115 @@ export function AiSettingsPanel({ onClose, embedded = false }: AiSettingsPanelPr
               })}
             </div>
 
-            {/* Custom model input */}
-            <div className="flex gap-2">
+            {/* Custom pull */}
+            <div className="flex gap-3">
               <input
                 type="text"
                 value={pullInput}
                 onChange={(e) => setPullInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') void handlePull(pullInput);
-                }}
+                onKeyDown={(e) => e.key === 'Enter' && handlePull(pullInput)}
                 placeholder="e.g. llama3.2:3b"
-                style={{ ...inputStyle, flex: 1 }}
+                className="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-4 text-white outline-none"
               />
               <button
-                type="button"
                 onClick={() => void handlePull(pullInput)}
                 disabled={!pullInput.trim() || pullingModels.has(pullInput.trim())}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-body)',
-                  backgroundColor: 'var(--accent)',
-                  color: 'var(--bg-app)',
-                  border: 'none',
-                  cursor: !pullInput.trim() || pullingModels.has(pullInput.trim()) ? 'not-allowed' : 'pointer',
-                  opacity: !pullInput.trim() || pullingModels.has(pullInput.trim()) ? 0.5 : 1,
-                  whiteSpace: 'nowrap',
-                }}
+                className="px-8 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium disabled:opacity-50"
               >
                 Pull
               </button>
             </div>
-
-            {/* In-flight pulls + errors */}
-            {(() => {
-              const modelsToDisplay = [
-                ...Array.from(pullingModels).filter((m) => !RECOMMENDED_MODELS.includes(m)),
-                ...Object.keys(pullErrors).filter((m) => !pullingModels.has(m)),
-              ];
-              return modelsToDisplay.map((m) => {
-                const prog = pullProgress[m];
-                const err = pullErrors[m];
-                const pct =
-                  prog?.total && prog.completed != null && prog.total > 0
-                    ? Math.round((prog.completed / prog.total) * 100)
-                    : null;
-                return (
-                  <div key={m} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div className="flex items-center justify-between">
-                      <span
-                        style={{ fontSize: '11px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}
-                      >
-                        {m}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          fontFamily: 'var(--font-body)',
-                          color: err ? 'var(--error-fg, #e07070)' : 'var(--text-tertiary)',
-                          minWidth: '64px',
-                          textAlign: 'right',
-                        }}
-                      >
-                        {err ?? (pct != null ? `${pct}%` : (prog?.status ?? ''))}
-                      </span>
-                    </div>
-                    {!err && (
-                      <div
-                        style={{
-                          height: '3px',
-                          borderRadius: '2px',
-                          backgroundColor: 'var(--bg-input)',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: '100%',
-                            width: pct != null ? `${pct}%` : '100%',
-                            backgroundColor: 'var(--accent)',
-                            borderRadius: '2px',
-                            transition: 'width 0.4s linear',
-                            animation: pct == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              });
-            })()}
           </div>
         )}
 
-        {/* Model routing config */}
-        <div style={sectionStyle}>
-          <div className="flex items-center justify-between">
-            <span
-              style={{
-                color: 'var(--text-secondary)',
-                fontFamily: 'var(--font-display)',
-                fontSize: '11px',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Model Routing
-            </span>
+        {/* Model Routing */}
+        <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+          <div className="flex justify-between items-center mb-4">
+            <div className="text-xs font-medium text-zinc-400 tracking-widest">MODEL ROUTING</div>
             {isOllama && (
               <button
-                type="button"
                 onClick={() => void refreshModels()}
                 disabled={loadingModels}
-                className="flex items-center gap-1 text-xs px-2 py-1 rounded"
-                style={{
-                  backgroundColor: 'var(--bg-input)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--text-secondary)',
-                  fontFamily: 'var(--font-body)',
-                  cursor: loadingModels ? 'not-allowed' : 'pointer',
-                }}
+                className="flex items-center gap-2 text-xs text-zinc-400 hover:text-white"
               >
-                {loadingModels ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-                Refresh
+                {loadingModels && <Loader2 size={14} className="animate-spin" />}
+                Refresh models
               </button>
             )}
           </div>
-          {isOllama && modelsError && (
-            <span
-              style={{
-                color: 'var(--color-red, #f87171)',
-                fontFamily: 'var(--font-body)',
-                fontSize: '11px',
-              }}
-            >
-              {modelsError}
-            </span>
-          )}
-          {isOllama && !modelsError && models.length === 0 && !loadingModels && (
-            <span
-              style={{
-                color: 'var(--text-secondary)',
-                fontFamily: 'var(--font-body)',
-                fontSize: '11px',
-              }}
-            >
-              No Ollama models installed. Use the <strong>Pull New Model</strong> section above to download one.
-            </span>
-          )}
-          {(
-            [
+
+          <div className="space-y-5">
+            {[
               { key: 'chat', label: 'Chat' },
               { key: 'summarize', label: 'Summarize' },
               { key: 'flashcards', label: 'Flashcards' },
               { key: 'explain', label: 'Explain' },
-              { key: 'vision', label: 'Vision (Screenshot)' },
-            ] as const
-          ).map(({ key, label }) => (
-            <div key={key}>
-              <label htmlFor={`model-routing-${key}`} style={labelStyle}>
-                {label}
-              </label>
-              {isOllama ? (
+              { key: 'vision', label: 'Vision (Screenshots)' },
+            ].map(({ key, label }) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-sm text-zinc-300">{label}</span>
                 <select
-                  id={`model-routing-${key}`}
-                  value={config.model_routing[key]}
+                  value={config.model_routing[key as keyof typeof config.model_routing]}
                   onChange={(e) =>
                     setConfig((c) => ({
                       ...c,
                       model_routing: { ...c.model_routing, [key]: e.target.value },
                     }))
                   }
-                  style={inputStyle}
+                  className="bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-3xl px-5 py-3 text-white outline-none"
                 >
-                  {getModelOptions(config.model_routing[key]).map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
+                  {models.length > 0
+                    ? models.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))
+                    : (
+                        <option value={config.model_routing[key as keyof typeof config.model_routing]}>
+                          {config.model_routing[key as keyof typeof config.model_routing]}
+                        </option>
+                      )}
                 </select>
-              ) : (
-                <input
-                  id={`model-routing-${key}`}
-                  type="text"
-                  value={config.model_routing[key]}
-                  onChange={(e) =>
-                    setConfig((c) => ({
-                      ...c,
-                      model_routing: { ...c.model_routing, [key]: e.target.value },
-                    }))
-                  }
-                  style={inputStyle}
-                  placeholder="e.g. gpt-4o-mini"
-                />
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Test connection */}
-        <div
-          className="flex flex-col gap-2"
-          style={{
-            padding: '12px',
-            backgroundColor: 'var(--bg-elevated)',
-            borderRadius: '8px',
-            border: '1px solid var(--border-subtle)',
-          }}
-        >
+        {/* Test Connection */}
+        <div className="flex justify-end">
           <button
-            type="button"
             onClick={runTest}
             disabled={testResult.kind === 'testing'}
-            title="Tests the currently-saved configuration. Save first to test new values."
-            className="text-xs px-3 py-1.5 rounded flex items-center gap-1 self-start"
-            style={{
-              backgroundColor: 'var(--bg-input)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-secondary)',
-              fontFamily: 'var(--font-body)',
-              cursor: testResult.kind === 'testing' ? 'not-allowed' : 'pointer',
-            }}
+            className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl text-sm font-medium flex items-center gap-2"
           >
-            {testResult.kind === 'testing' ? <Loader2 size={11} className="animate-spin" /> : null}
-            {testResult.kind === 'testing' ? 'Testing…' : 'Test connection'}
+            {testResult.kind === 'testing' && <Loader2 size={16} className="animate-spin" />}
+            Test Connection
           </button>
-
-          {testResult.kind === 'ok' && (
-            <span className="text-xs" style={{ color: 'var(--success-fg, #5ec49e)', fontFamily: 'var(--font-body)' }}>
-              ✓ Connected — {testResult.models.length} model{testResult.models.length === 1 ? '' : 's'}
-              {testResult.models.length > 0 &&
-                `: ${testResult.models.slice(0, 5).join(', ')}${testResult.models.length > 5 ? `, +${testResult.models.length - 5} more` : ''}`}
-            </span>
-          )}
-
-          {testResult.kind === 'connected_no_listing' && (
-            <span className="text-xs" style={{ color: 'var(--success-fg, #5ec49e)', fontFamily: 'var(--font-body)' }}>
-              ✓ Connected
-            </span>
-          )}
-
-          {testResult.kind === 'fail' && (
-            <span className="text-xs" style={{ color: 'var(--error-fg, #e07070)', fontFamily: 'var(--font-body)' }}>
-              ✗ Failed: {testResult.error}
-            </span>
-          )}
         </div>
+
+        {testResult.kind === 'ok' && (
+          <div className="text-emerald-300 text-sm">✓ Connected — {testResult.models.length} models found</div>
+        )}
+        {testResult.kind === 'fail' && (
+          <div className="text-red-400 text-sm">✗ {testResult.error}</div>
+        )}
       </div>
 
-      {/* Footer actions */}
-      <div className="px-3 py-3 flex justify-end gap-2" style={{ borderTop: '1px solid var(--border)' }}>
+      {/* Footer */}
+      <div className="px-6 py-6 border-t border-zinc-700 flex justify-end gap-3">
         <button
-          type="button"
           onClick={onClose}
-          className="text-xs px-3 py-1.5 rounded"
-          style={{
-            backgroundColor: 'var(--bg-input)',
-            border: '1px solid var(--border)',
-            color: 'var(--text-secondary)',
-            fontFamily: 'var(--font-body)',
-            cursor: 'pointer',
-          }}
+          className="px-8 py-3 text-zinc-400 hover:bg-zinc-800 rounded-3xl font-medium"
         >
           Cancel
         </button>
         <button
-          type="button"
           onClick={handleSave}
           disabled={isSaving || !vaultPath}
-          className="text-xs px-3 py-1.5 rounded flex items-center gap-1"
-          style={{
-            backgroundColor: saveSuccess ? 'var(--color-green, #4ade80)' : 'var(--accent)',
-            color: 'var(--bg-app)',
-            fontFamily: 'var(--font-body)',
-            cursor: isSaving || !vaultPath ? 'not-allowed' : 'pointer',
-          }}
+          className="px-8 py-3 bg-violet-500 hover:bg-violet-400 text-white rounded-3xl font-medium flex items-center gap-2 disabled:opacity-50"
         >
-          {isSaving ? <Loader2 size={11} className="animate-spin" /> : saveSuccess ? <Check size={11} /> : null}
-          {saveSuccess ? 'Saved!' : 'Save'}
+          {isSaving && <Loader2 size={16} className="animate-spin" />}
+          {saveSuccess ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
     </div>

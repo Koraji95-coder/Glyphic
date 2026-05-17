@@ -4,6 +4,7 @@ pub mod commands;
 pub mod db;
 pub mod export;
 pub mod ocr;
+pub mod services;
 pub mod vault;
 // ← Remove pub mod diagrams; and pub mod fe; from here
 //   They belong inside commands/mod.rs
@@ -87,6 +88,14 @@ pub fn run() {
             // settings
             settings_commands::get_settings,
             settings_commands::update_settings,
+            // backup
+            commands::backup_commands::backup_now,
+            commands::backup_commands::get_backup_status,
+            commands::backup_commands::set_dropbox_token,
+            commands::backup_commands::get_backup_history,
+            commands::backup_commands::detect_changes,
+            commands::backup_commands::get_restore_points,
+            commands::backup_commands::restore_from_point,
             // state
             state_commands::get_recent_vaults,
             state_commands::add_recent_vault,
@@ -148,6 +157,12 @@ pub fn run() {
             commands::study::grade_math_answer,
             commands::study::solve_math,
             commands::study::generate_problems,
+            // MasteryMode dashboard
+            commands::mastery_commands::get_mastery_history,
+            commands::mastery_commands::get_recent_attempts,
+            commands::mastery_commands::get_mastery_by_topics,
+            commands::mastery_commands::get_topic_prerequisites,
+            commands::mastery_commands::get_topic_relationship_counts,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::Destroyed = event {

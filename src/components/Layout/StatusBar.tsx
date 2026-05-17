@@ -11,79 +11,54 @@ export function StatusBar() {
   const isMobile = useIsMobile();
 
   const saveLabel = isSaving ? 'Saving...' : isDirty ? 'Unsaved' : 'Saved';
-  const dotColor = isSaving ? 'var(--warning)' : isDirty ? 'var(--error)' : 'var(--green)';
+  const dotColor = isSaving ? 'bg-amber-400' : isDirty ? 'bg-red-400' : 'bg-emerald-400';
 
-  // Estimate reading time (~238 wpm average)
   const readTime = Math.max(1, Math.ceil(wordCount / 238));
 
   return (
-    <div
-      className="flex items-center justify-between shrink-0"
-      style={{
-        height: isMobile ? '34px' : 'var(--statusbar-height)',
-        background:
-          'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%), var(--glass-surface)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        borderTop: '1px solid var(--glass-border)',
-        paddingLeft: '14px',
-        paddingRight: '14px',
-        fontSize: '10px',
-        color: 'var(--text-secondary)',
-        fontFamily: 'var(--font-mono)',
-      }}
-    >
-      <div className="flex items-center" style={{ gap: '8px' }}>
-        <StatusPill>
-          <span
-            style={{
-              width: '5px',
-              height: '5px',
-              borderRadius: '50%',
-              backgroundColor: dotColor,
-              display: 'inline-block',
-              flexShrink: 0,
-            }}
-          />
-          {saveLabel}
-        </StatusPill>
-        <StatusPill>{wordCount} words</StatusPill>
+    <div className="flex items-center justify-between shrink-0 h-9 bg-[#050507] border-t border-zinc-800 px-4 text-xs font-mono text-zinc-400">
+      {/* Left side */}
+      <div className="flex items-center gap-2">
+        {/* Save status */}
+        <div className="flex items-center gap-1.5 px-3 h-6 bg-zinc-900 border border-zinc-700 rounded-2xl">
+          <div className={`w-2 h-2 rounded-full ${dotColor}`} />
+          <span>{saveLabel}</span>
+        </div>
+
+        <div className="px-3 h-6 bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center">
+          {wordCount} words
+        </div>
+
         {!isMobile && (
           <>
-            <StatusPill>~{readTime} min read</StatusPill>
+            <div className="px-3 h-6 bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center">
+              ~{readTime} min read
+            </div>
+
             {cursorPosition && (
-              <StatusPill>
+              <div className="px-3 h-6 bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center">
                 Ln {cursorPosition.line}, Col {cursorPosition.col}
-              </StatusPill>
+              </div>
             )}
           </>
         )}
       </div>
 
-      <div className="flex items-center" style={{ gap: '8px' }}>
-        {lectureModeActive && <StatusPill style={{ color: 'var(--green)' }}>● Lecture {getElapsedTime()}</StatusPill>}
-        {!isMobile && <StatusPill>Glyphic v1.0</StatusPill>}
+      {/* Right side */}
+      <div className="flex items-center gap-2">
+        {lectureModeActive && (
+          <div className="flex items-center gap-1.5 px-3 h-6 bg-emerald-950 border border-emerald-700 text-emerald-300 rounded-2xl text-xs">
+            <span className="text-xs">●</span>
+            Lecture {getElapsedTime()}
+          </div>
+        )}
+
+        {!isMobile && (
+          <div className="px-3 h-6 bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center text-zinc-400">
+            Glyphic v1.0
+          </div>
+        )}
       </div>
     </div>
-  );
-}
-
-function StatusPill({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '6px',
-        padding: '4px 8px',
-        borderRadius: '999px',
-        border: '1px solid var(--glass-border)',
-        background: 'rgba(255,255,255,0.03)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-        ...style,
-      }}
-    >
-      {children}
-    </span>
   );
 }

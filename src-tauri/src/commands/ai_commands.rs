@@ -1,6 +1,7 @@
 use std::sync::Mutex;
 
 use tauri::{Emitter, Manager, State};
+use serde::{Serialize, Deserialize};
 
 use crate::ai::config::AiConfig;
 use crate::ai::mcp_server;
@@ -11,6 +12,35 @@ use crate::DbState;
 
 // Maximum number of tool-calling iterations per chat message to prevent loops.
 const MAX_TOOL_ITERATIONS: usize = 3;
+
+// ---------------------------------------------------------------------------
+// Phase 3: Enhanced Response Types with Metadata
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SourceTrace {
+    pub note_id: String,
+    pub note_title: String,
+    pub context: String,
+    pub relevance_score: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ToolExecution {
+    pub tool_name: String,
+    pub success: bool,
+    pub result: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AiResponseWithMetadata {
+    pub content: String,
+    pub confidence: f32,
+    pub sources: Vec<SourceTrace>,
+    pub model_used: String,
+    pub tool_calls: Vec<ToolExecution>,
+    pub processing_time_ms: u128,
+}
 
 // ---------------------------------------------------------------------------
 // Managed state
@@ -619,6 +649,55 @@ fn extract_json_array(text: &str) -> String {
     }
 
     content.to_string()
+}
+
+// ---------------------------------------------------------------------------
+// Phase 3: AI Chat with Confidence & Source Metadata
+// ---------------------------------------------------------------------------
+
+/// Enhanced version of ai_chat that returns confidence scoring and source traces.
+/// This command is used by Phase 3 agents (Sage, Scout, Forge, Prism, Pathfinder)
+/// to provide explainable, trustworthy responses with source attribution.
+///
+/// Implementation Notes:
+/// - Confidence = model's estimated probability that response is helpful (0.0-1.0)
+/// - Sources = list of vault notes used to construct the response (with relevance scores)
+/// - Tool calls tracked for debugging and audit trails
+/// - Processing time captured for performance monitoring
+#[tauri::command]
+pub async fn ai_chat_with_metadata(
+    message: String,
+    note_context: Option<String>,
+    model_override: Option<String>,
+    state: State<'_, AiState>,
+    db_state: State<'_, DbState>,
+) -> Result<AiResponseWithMetadata, String> {
+    let start = std::time::Instant::now();
+    let _provider = state.provider()?;
+    let model = {
+        let config = state.get_config()?;
+        model_override
+            .clone()
+            .unwrap_or_else(|| config.model_routing.chat.clone())
+    };
+
+    // For now, return placeholder metadata. In Phase 3 implementation,
+    // this will be enriched with actual confidence scoring and source tracking.
+    // TODO: Parse confidence markers from model response
+    // TODO: Track tool calls and map to source notes
+    // TODO: Compute relevance scores for attribution
+    
+    let content = ai_chat(message, note_context, model_override, state, db_state).await?;
+    let processing_time_ms = start.elapsed().as_millis();
+
+    Ok(AiResponseWithMetadata {
+        content,
+        confidence: 0.85,  // TODO: Compute from response analysis
+        sources: vec![],   // TODO: Extract from tool calls
+        model_used: model,
+        tool_calls: vec![],  // TODO: Track tool execution
+        processing_time_ms,
+    })
 }
 
 // ---------------------------------------------------------------------------

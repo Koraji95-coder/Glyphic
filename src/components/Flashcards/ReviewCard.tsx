@@ -9,124 +9,47 @@ interface ReviewCardProps {
 
 export function ReviewCard({ card, isFlipped, onFlip }: ReviewCardProps) {
   return (
-    <button
-      type="button"
-      aria-label={isFlipped ? 'Card answer — click to flip back' : 'Card question — click to reveal answer'}
+    <div
       onClick={onFlip}
-      style={{
-        position: 'relative',
-        width: '100%',
-        maxWidth: '560px',
-        minHeight: '220px',
-        cursor: 'pointer',
-        perspective: '1200px',
-        outline: 'none',
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        font: 'inherit',
-        color: 'inherit',
-        textAlign: 'inherit',
-        display: 'block',
-      }}
+      className={`relative w-full max-w-2xl mx-auto cursor-pointer transition-all duration-700 preserve-3d ${
+        isFlipped ? 'rotate-y-180' : ''
+      }`}
+      style={{ perspective: '1000px', height: '420px' }}
     >
-      {/* Inner container that flips */}
+      {/* Card container */}
       <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          minHeight: '220px',
-          transformStyle: 'preserve-3d',
-          transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)',
-          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        }}
+        className={`absolute inset-0 rounded-3xl border border-zinc-700 shadow-2xl overflow-hidden transition-all ${
+          isFlipped ? 'rotate-y-180' : ''
+        }`}
+        style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
       >
-        {/* Front (question) */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            borderRadius: 'var(--radius-lg)',
-            backgroundColor: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '28px 32px',
-            gap: '12px',
-          }}
-        >
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--text-ghost)',
-            }}
-          >
-            Question
-          </span>
-          <p
-            style={{
-              fontSize: '16px',
-              lineHeight: 1.6,
-              color: 'var(--text-primary)',
-              textAlign: 'center',
-            }}
-          >
-            <MathBlock content={card.question} />
-          </p>
-          <span style={{ fontSize: '11px', color: 'var(--text-ghost)', marginTop: '8px' }}>
-            Click or press Space to reveal
-          </span>
+        {/* Front - Question */}
+        <div className="absolute inset-0 bg-zinc-900 flex flex-col p-8">
+          <div className="text-xs font-medium tracking-widest text-violet-300 mb-2">QUESTION</div>
+          <div className="flex-1 flex items-center justify-center text-center text-xl leading-relaxed text-white">
+            {card.front}
+          </div>
+          <div className="text-center text-zinc-400 text-sm mt-8">
+            Click or press <span className="font-mono bg-zinc-800 px-2 py-px rounded">Space</span> to reveal
+          </div>
         </div>
 
-        {/* Back (answer) */}
+        {/* Back - Answer */}
         <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            borderRadius: 'var(--radius-lg)',
-            backgroundColor: 'var(--accent-dim)',
-            border: '1px solid var(--accent-muted)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '28px 32px',
-            gap: '12px',
-          }}
+          className="absolute inset-0 bg-zinc-900 flex flex-col p-8 rotate-y-180"
+          style={{ backfaceVisibility: 'hidden' }}
         >
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--accent)',
-            }}
-          >
-            Answer
-          </span>
-          <p
-            style={{
-              fontSize: '16px',
-              lineHeight: 1.6,
-              color: 'var(--text-primary)',
-              textAlign: 'center',
-            }}
-          >
-            <MathBlock content={card.answer} />
-          </p>
+          <div className="text-xs font-medium tracking-widest text-emerald-300 mb-2">ANSWER</div>
+          <div className="flex-1 flex items-center justify-center text-center text-xl leading-relaxed text-white">
+            {card.back}
+          </div>
+          {card.explanation && (
+            <div className="mt-8 pt-8 border-t border-zinc-700 text-sm text-zinc-400">
+              {card.explanation}
+            </div>
+          )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }

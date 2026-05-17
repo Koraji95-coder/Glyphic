@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { useChatStore } from '../../stores/chatStore';
 
 const POLL_MS = 30_000;
 
 export function OllamaStatusBanner() {
-  // Read all AI status from the shared chatStore — avoids duplicate Ollama calls
-  // that ChatPanel already triggers via refreshAiStatus() when the panel opens.
   const refreshAiStatus = useChatStore((s) => s.refreshAiStatus);
   const provider = useChatStore((s) => s.aiProvider);
   const endpoint = useChatStore((s) => s.aiEndpoint);
@@ -29,7 +28,6 @@ export function OllamaStatusBanner() {
 
   useEffect(() => {
     mountedRef.current = true;
-    // Only set up the interval if we're actually going to render the banner
     if (provider === 'ollama') {
       intervalRef.current = setInterval(checkNow, POLL_MS);
     }
@@ -42,45 +40,20 @@ export function OllamaStatusBanner() {
     };
   }, [checkNow, provider]);
 
-  // Don't render if not using Ollama provider
   if (provider !== 'ollama') return null;
 
-  // Disconnected — warning banner.
+  // Disconnected
   if (connected === false) {
     return (
-      <div
-        role="status"
-        className="flex items-center justify-between gap-3 px-4 py-2 text-sm shrink-0"
-        style={{
-          backgroundColor: 'rgba(224, 160, 80, 0.08)',
-          color: 'var(--warning)',
-          borderBottom: '1px solid rgba(224, 160, 80, 0.2)',
-        }}
-      >
-        <span style={{ color: 'var(--text-secondary)' }}>
-          Ollama is not running ({endpoint || 'http://localhost:11434'}). Install from{' '}
-          <a
-            href="https://ollama.com/download"
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: 'var(--warning)', textDecoration: 'underline' }}
-          >
-            ollama.com/download
-          </a>
-          , then start it.
+      <div className="flex items-center justify-between gap-3 px-6 py-3 text-sm shrink-0 bg-amber-500/10 border-b border-amber-500/20 text-amber-300">
+        <span className="text-zinc-300">
+          Ollama is not running{' '}
+          <span className="font-mono text-xs">({endpoint || 'http://localhost:11434'})</span>
         </span>
         <button
-          type="button"
           onClick={checkNow}
           disabled={checking}
-          className="px-2 py-0.5 rounded shrink-0 text-xs"
-          style={{
-            background: 'transparent',
-            border: '1px solid var(--warning)',
-            color: 'var(--warning)',
-            cursor: checking ? 'not-allowed' : 'pointer',
-            opacity: checking ? 0.5 : 1,
-          }}
+          className="px-4 py-1 text-xs font-medium bg-transparent border border-amber-400 text-amber-300 hover:bg-amber-500/10 rounded-2xl transition-colors disabled:opacity-50"
         >
           {checking ? 'Checking…' : 'Retry'}
         </button>
@@ -88,34 +61,17 @@ export function OllamaStatusBanner() {
     );
   }
 
-  // Connected but the configured model isn't pulled yet — actionable hint.
+  // Connected but model not installed
   if (connected === true && modelInstalled === false && model) {
     return (
-      <div
-        role="status"
-        className="flex items-center justify-between gap-3 px-4 py-2 text-xs shrink-0"
-        style={{
-          backgroundColor: 'rgba(124, 109, 240, 0.08)',
-          borderBottom: '1px solid rgba(124, 109, 240, 0.2)',
-          color: 'var(--text-secondary)',
-        }}
-      >
+      <div className="flex items-center justify-between gap-3 px-6 py-3 text-sm shrink-0 bg-violet-500/10 border-b border-violet-500/20 text-violet-300">
         <span>
-          Ollama is running, but model <strong style={{ color: 'var(--accent)' }}>{model}</strong> isn't installed. Pull
-          it from Settings → AI.
+          Model <span className="font-medium text-violet-200">{model}</span> is not installed
         </span>
         <button
-          type="button"
           onClick={checkNow}
           disabled={checking}
-          className="px-2 py-0.5 rounded shrink-0 text-xs"
-          style={{
-            background: 'transparent',
-            border: '1px solid var(--accent)',
-            color: 'var(--accent)',
-            cursor: checking ? 'not-allowed' : 'pointer',
-            opacity: checking ? 0.5 : 1,
-          }}
+          className="px-4 py-1 text-xs font-medium bg-transparent border border-violet-400 text-violet-300 hover:bg-violet-500/10 rounded-2xl transition-colors disabled:opacity-50"
         >
           {checking ? 'Checking…' : 'Recheck'}
         </button>
@@ -123,6 +79,5 @@ export function OllamaStatusBanner() {
     );
   }
 
-  // Connected and model is installed — silent (don't add chrome).
   return null;
 }
