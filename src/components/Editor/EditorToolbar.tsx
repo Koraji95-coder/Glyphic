@@ -165,12 +165,12 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   ];
 
   return (
-    <div className="flex items-center shrink-0 h-12 bg-[#050507] border-b border-zinc-800 px-4 gap-2">
+    <div className="flex items-center shrink-0 h-12 bg-zinc-950 border-b border-zinc-800 px-4 gap-2">
       <div className="flex items-center flex-1 min-w-0 gap-1 overflow-x-auto">
         {groups.map((group) => (
           <div
             key={`group-${group[0]?.label}`}
-            className="flex items-center shrink-0 gap-px p-1 bg-zinc-900/70 border border-zinc-700 rounded-3xl"
+            className="flex items-center shrink-0 gap-px p-1 bg-zinc-900/70 border border-zinc-700 rounded-lg"
           >
             {group.map((btn) => {
               const active = btn.isActive?.() ?? false;
@@ -180,8 +180,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                   key={btn.label}
                   onClick={btn.action}
                   title={btn.label}
-                  className={`flex items-center justify-center rounded-2xl transition-all ${
-                    active ? 'bg-violet-500/10 text-violet-300' : 'hover:bg-zinc-800 text-zinc-400'
+                  className={`flex items-center justify-center rounded-md transition-all ${
+                    active ? 'bg-blue-500/10 text-blue-300' : 'hover:bg-zinc-800 text-zinc-400'
                   }`}
                   style={{
                     width: isMobile ? '44px' : '32px',
@@ -200,8 +200,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         {/* Ink Mode */}
         <button
           onClick={toggleInkMode}
-          className={`flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium transition-all ${
-            isInkMode ? 'bg-violet-500/10 text-violet-300 border border-violet-500/30' : 'hover:bg-zinc-800 text-zinc-400'
+          className={`flex items-center gap-2 px-5 h-9 rounded-lg text-sm font-medium transition-all ${
+            isInkMode ? 'bg-blue-500/10 text-blue-300 border border-blue-500/30' : 'hover:bg-zinc-800 text-zinc-400'
           }`}
         >
           <Pencil size={16} />
@@ -211,7 +211,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         {/* Lecture Mode */}
         <button
           onClick={toggleLectureMode}
-          className={`flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium transition-all ${
+          className={`flex items-center gap-2 px-5 h-9 rounded-lg text-sm font-medium transition-all ${
             lectureModeActive
               ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
               : 'hover:bg-zinc-800 text-zinc-400'
@@ -226,14 +226,14 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <div className="relative">
           <button
             onClick={() => setExportMenuOpen(!exportMenuOpen)}
-            className="flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium hover:bg-zinc-800 text-zinc-400 transition-all"
+            className="flex items-center gap-2 px-5 h-9 rounded-lg text-sm font-medium hover:bg-zinc-800 text-zinc-400 transition-all"
           >
             <Download size={16} />
             Export
           </button>
 
           {exportMenuOpen && (
-            <div className="absolute top-full right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl py-2 z-50">
+            <div className="absolute top-full right-0 mt-2 w-48 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl py-2 z-50">
               <button
                 onClick={handleExportMarkdown}
                 className="w-full px-5 py-3 text-left hover:bg-zinc-800 text-sm text-zinc-200"
@@ -257,7 +257,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               reportError({ context: 'Capture', message: 'Failed to start capture', error: e });
             })
           }
-          className="flex items-center gap-2 px-5 h-9 rounded-3xl text-sm font-medium bg-gradient-to-r from-violet-500 to-cyan-400 text-white shadow-lg hover:brightness-110 transition-all"
+          className="flex items-center gap-2 px-5 h-9 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-500 to-cyan-400 text-white shadow-lg hover:brightness-110 transition-all"
         >
           <Camera size={16} />
           Capture

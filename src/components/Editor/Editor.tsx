@@ -180,7 +180,7 @@ export function Editor({
   const pathParts = activeNotePath.replace(/\.md$/, '').split('/').filter(Boolean);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#050507]">
+    <div className="flex-1 flex flex-col min-h-0 bg-zinc-950">
       {!readOnly && <EditorToolbar editor={editor} />}
       {!readOnly && <LectureModeToggle />}
       <NoteTagChips notePath={activeNotePath} />
@@ -196,7 +196,7 @@ export function Editor({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-8 bg-[#050507]">
+      <div className="flex-1 overflow-y-auto p-8 bg-zinc-950">
         <EditorContent editor={editor} />
       </div>
 

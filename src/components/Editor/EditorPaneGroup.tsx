@@ -75,7 +75,7 @@ export function EditorPaneGroup() {
       {/* Divider */}
       <div
         onMouseDown={onMouseDown}
-        className={`flex-shrink-0 bg-zinc-700 hover:bg-violet-500 transition-colors ${
+        className={`flex-shrink-0 bg-zinc-700 hover:bg-blue-500 transition-colors ${
           isVertical ? 'w-1 cursor-col-resize' : 'h-1 cursor-row-resize'
         }`}
       />
@@ -125,12 +125,12 @@ function SecondaryPaneHeader({
       )}
       <span className="flex-1 truncate font-medium text-white">{title}</span>
 
-      <span className="px-3 py-1 text-[10px] bg-zinc-800 border border-zinc-600 rounded-3xl text-zinc-400">Read-only</span>
+      <span className="px-3 py-1 text-[10px] bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-400">Read-only</span>
 
       <button
         onClick={onSwapInActive}
         title="Swap current note into this pane"
-        className="ml-4 px-3 py-1 hover:bg-zinc-800 rounded-2xl transition-colors text-zinc-400 hover:text-white"
+        className="ml-4 px-3 py-1 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
       >
         ⇆
       </button>
@@ -138,7 +138,7 @@ function SecondaryPaneHeader({
       <button
         onClick={onClose}
         title="Close split pane"
-        className="ml-2 px-3 py-1 hover:bg-zinc-800 rounded-2xl transition-colors text-zinc-400 hover:text-white"
+        className="ml-2 px-3 py-1 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
       >
         <X size={16} />
       </button>

@@ -170,17 +170,17 @@ export function ReferenceModal() {
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
-        className="w-full max-w-[460px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-[460px] mx-4 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700 rounded-lg shadow-2xl overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-zinc-700 flex items-center justify-between bg-zinc-900">
           <div className="flex items-center gap-3">
-            <Link2 className="text-violet-400" size={18} />
+            <Link2 className="text-blue-400" size={18} />
             <h2 className="text-lg font-semibold text-white">Insert Reference</h2>
           </div>
           <button
             onClick={closeReferenceModal}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
           >
             <X size={20} />
           </button>
@@ -194,9 +194,9 @@ export function ReferenceModal() {
               <button
                 key={mode}
                 onClick={() => onModeChange(mode)}
-                className={`px-5 py-2 rounded-3xl text-sm font-medium transition-all ${
+                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                   active
-                    ? 'bg-violet-500 text-white shadow-inner'
+                    ? 'bg-blue-500 text-white'
                     : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                 }`}
               >
@@ -217,7 +217,7 @@ export function ReferenceModal() {
                 placeholder="https://example.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-4 py-3 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-md px-4 py-3 text-white outline-none"
               />
             </div>
 
@@ -228,21 +228,21 @@ export function ReferenceModal() {
                 placeholder="Leave empty to use URL"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-4 py-3 text-white outline-none"
+                className="w-full bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-md px-4 py-3 text-white outline-none"
               />
             </div>
 
             <div className="flex justify-end gap-3">
               <button
                 onClick={closeReferenceModal}
-                className="px-6 py-3 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors"
+                className="px-6 py-3 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={insertLink}
                 disabled={!url.trim()}
-                className="px-6 py-3 bg-violet-500 hover:bg-violet-400 disabled:opacity-50 text-white font-medium rounded-2xl transition-colors"
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-300 disabled:opacity-50 text-white font-medium rounded-md transition-colors"
               >
                 Insert Link
               </button>
@@ -252,7 +252,7 @@ export function ReferenceModal() {
           /* Backlink mode */
           <>
             <div className="px-6 pt-4 pb-3 border-b border-zinc-700">
-              <div className="flex items-center bg-zinc-800 border border-zinc-700 rounded-3xl px-4">
+              <div className="flex items-center bg-zinc-800 border border-zinc-700 rounded-lg px-4">
                 <Search size={16} className="text-zinc-400" />
                 <input
                   ref={primaryInputRef}
@@ -274,7 +274,7 @@ export function ReferenceModal() {
                   <p className="text-zinc-400 mb-4">No notes found</p>
                   <button
                     onClick={() => onModeChange('link')}
-                    className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-2xl text-sm"
+                    className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md text-sm"
                   >
                     Insert External Link Instead
                   </button>
@@ -289,7 +289,7 @@ export function ReferenceModal() {
                       onClick={() => insertBacklink(note.title)}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       className={`w-full px-6 py-4 text-left transition-colors ${
-                        idx === selectedIndex ? 'bg-violet-500/10 text-violet-300' : 'hover:bg-zinc-800'
+                        idx === selectedIndex ? 'bg-blue-500/10 text-blue-300' : 'hover:bg-zinc-800'
                       }`}
                     >
                       {note.title}
