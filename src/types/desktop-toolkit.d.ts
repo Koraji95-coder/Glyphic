@@ -30,3 +30,44 @@ declare module "@chamber-19/desktop-toolkit/activation/bearer" {
    */
   export function withToolkitBearer(init?: RequestInit): Promise<RequestInit>;
 }
+
+declare module "@chamber-19/desktop-toolkit/ai/shell" {
+  import type { ReactNode } from "react";
+
+  export interface AiChatMessage {
+    id?: string;
+    role?: string;
+    content?: string;
+    timestamp?: string;
+    createdAt?: string;
+    [key: string]: unknown;
+  }
+
+  export interface AiChatShellContext {
+    messages: AiChatMessage[];
+    isStreaming: boolean;
+    error: string | null;
+    meta: Record<string, unknown> | null;
+    send: (content: string) => Promise<void> | void;
+    cancel: () => Promise<void> | void;
+    clear: () => void;
+  }
+
+  export interface AiChatShellProps {
+    lane: string;
+    modelOverride?: string;
+    initialMessages?: AiChatMessage[];
+    placeholder?: string;
+    emptyState?: ReactNode;
+    className?: string;
+    onError?: (error: string) => void;
+    renderHeader?: (ctx: AiChatShellContext) => ReactNode;
+    renderMessage?: (message: AiChatMessage, index: number) => ReactNode;
+    renderEmpty?: () => ReactNode;
+    renderMeta?: (meta: Record<string, unknown> | null) => ReactNode;
+    renderError?: (error: string | null) => ReactNode;
+    renderInput?: (ctx: AiChatShellContext) => ReactNode;
+  }
+
+  export function AiChatShell(props: AiChatShellProps): JSX.Element;
+}

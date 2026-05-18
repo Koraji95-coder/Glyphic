@@ -17,10 +17,7 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@chamber-19/desktop-toolkit": "2.5.0",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.0.0",
-    "tailwind-merge": "^2.5.4",
+    "@chamber-19/desktop-toolkit": "2.6.0",
     "@tauri-apps/api": "2.11.0",
     "@tauri-apps/plugin-clipboard-manager": "^2",
     "@tauri-apps/plugin-dialog": "^2",
@@ -40,9 +37,11 @@
     "@tiptap/starter-kit": "^2",
     "@tiptap/suggestion": "^2.27.2",
     "@types/recharts": "^2.0.1",
+    "clsx": "^2.1.1",
     "date-fns": "^4",
     "dompurify": "^3.4.1",
     "fabric": "^7.2.0",
+    "framer-motion": "^12.0.0",
     "fuse.js": "^7",
     "katex": "^0.16.47",
     "lowlight": "^3",
@@ -52,13 +51,14 @@
     "react-dom": "^19",
     "react-router-dom": "^6",
     "recharts": "^3.8.1",
+    "tailwind-merge": "^2.5.4",
     "zustand": "^4"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
     "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "@tauri-apps/cli": "2.11.2",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/dompurify": "^3.2.0",
@@ -67,6 +67,7 @@
     "@vitejs/plugin-react": "^6",
     "@vitest/ui": "^4.1.6",
     "jsdom": "^29.0.2",
+    "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8",
     "vitest": "^4.1.4"
