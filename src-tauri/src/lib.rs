@@ -9,7 +9,6 @@ pub mod vault;
 // ← Remove pub mod diagrams; and pub mod fe; from here
 //   They belong inside commands/mod.rs
 
-use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -27,10 +26,6 @@ pub struct DbState(pub Mutex<rusqlite::Connection>);
 pub struct WatcherState(pub Mutex<Option<VaultWatcher>>);
 pub struct CaptureSessionState(pub Mutex<Option<PathBuf>>);
 
-pub struct ActiveStreams(
-    pub tokio::sync::Mutex<HashMap<String, tokio::sync::oneshot::Sender<()>>>,
-);
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -47,7 +42,6 @@ pub fn run() {
             app.manage(CaptureSessionState(Mutex::new(None)));
             app.manage(WatcherState(Mutex::new(None)));
             app.manage(AiState::new());
-            app.manage(ActiveStreams(tokio::sync::Mutex::new(HashMap::new())));
 
             // Start the MCP HTTP server so the Foundry broker can call
             // Glyphic's vault tools (search_notes, get_note, list_notes,
@@ -113,7 +107,6 @@ pub fn run() {
             state_commands::get_recent_vaults,
             state_commands::add_recent_vault,
             // ai
-            ai_commands::ai_chat,
             ai_commands::ai_summarize,
             ai_commands::ai_flashcards,
             ai_commands::ai_explain,
@@ -123,8 +116,6 @@ pub fn run() {
             ai_commands::ai_update_config,
             ai_commands::ai_list_models,
             ai_commands::pull_model,
-            ai_commands::ai_chat_stream,
-            ai_commands::cancel_chat,
             ai_commands::ai_study_chat,
             // vault ingestion
             commands::vault_study::ingest_document,

@@ -30,15 +30,6 @@ interface IndexUpdatedPayload {
   screenshots_count: number;
 }
 
-export interface ChatStreamChunkPayload {
-  stream_id: string;
-  content: string;
-}
-
-export interface ChatStreamEndPayload {
-  stream_id: string;
-}
-
 export interface VaultIngestProgressPayload {
   status: 'progress';
   message: string;
@@ -65,16 +56,6 @@ export const events = {
     safeListen<IndexUpdatedPayload>('index-updated', handler),
 
   onCaptureCancelled: (handler: () => void): Promise<UnlistenFn> => safeListenNoPayload('capture-cancelled', handler),
-
-  onChatStreamChunk: (handler: (payload: ChatStreamChunkPayload) => void): Promise<UnlistenFn> =>
-    safeListen<ChatStreamChunkPayload>('chat-stream-chunk', handler),
-
-  onChatStreamDone: (handler: (payload: ChatStreamEndPayload) => void): Promise<UnlistenFn> =>
-    safeListen<ChatStreamEndPayload>('chat-stream-done', handler),
-
-  onChatStreamCancelled: (handler: (payload: ChatStreamEndPayload) => void): Promise<UnlistenFn> =>
-    safeListen<ChatStreamEndPayload>('chat-stream-cancelled', handler),
-
   onVaultIngestProgress: (handler: (payload: VaultIngestProgressPayload) => void): Promise<UnlistenFn> =>
     safeListen<VaultIngestProgressPayload>('vault-ingest-progress', handler),
 
