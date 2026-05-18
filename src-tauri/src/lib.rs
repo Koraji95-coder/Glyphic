@@ -67,6 +67,7 @@ pub fn run() {
             // activation (toolkit-owned: PIN entry, machine-bound HMAC token, bearer for backend HTTP)
             activation::commands::toolkit_check_activation,
             activation::commands::toolkit_activate_with_pin,
+            activation::commands::toolkit_activation_status,
             activation::commands::toolkit_deactivate,
             activation::commands::toolkit_get_bearer_token,
             // capture
