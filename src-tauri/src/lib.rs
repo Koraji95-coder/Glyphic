@@ -106,7 +106,11 @@ pub fn run() {
             // state
             state_commands::get_recent_vaults,
             state_commands::add_recent_vault,
-            // ai
+            // ai (broker-routed chat: AiChatShell uses these)
+            desktop_toolkit::ai::commands::ai_chat_stream,
+            desktop_toolkit::ai::commands::ai_cancel_stream,
+            desktop_toolkit::ai::commands::ai_list_lanes,
+            // ai (local-Ollama: secondary features pending broker migration)
             ai_commands::ai_summarize,
             ai_commands::ai_flashcards,
             ai_commands::ai_explain,
