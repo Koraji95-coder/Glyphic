@@ -43,6 +43,17 @@ pub fn run() {
             app.manage(WatcherState(Mutex::new(None)));
             app.manage(AiState::new());
 
+            // Broker-routed AI state for the toolkit's AiChatShell.
+            // Source the broker URL + API key from env vars so dev workflows
+            // can point at any local broker without recompiling. Defaults
+            // match a freshly-booted loopback broker; FOUNDRY_API_KEY has no
+            // default -- chat commands will return a 401 from the broker
+            // until a real key is provided.
+            let broker_url = std::env::var("FOUNDRY_BROKER_URL")
+                .unwrap_or_else(|_| "http://127.0.0.1:57420".to_string());
+            let api_key = std::env::var("FOUNDRY_API_KEY").unwrap_or_default();
+            app.manage(desktop_toolkit::ai::AiState::new(broker_url, api_key));
+
             // Start the MCP HTTP server so the Foundry broker can call
             // Glyphic's vault tools (search_notes, get_note, list_notes,
             // get_recent_notes) when serving a `glyphic-vault` lane.
