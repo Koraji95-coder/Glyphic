@@ -304,7 +304,6 @@ export const commands = {
       noteContext: noteContext ?? null,
       modelOverride: modelOverride ?? null,
     }),
-  cancelChat: (streamId: string) => invoke<void>('cancel_chat', { streamId }),
   aiSummarize: (noteContent: string) => invoke<string>('ai_summarize', { noteContent }),
   aiFlashcards: (noteContent: string) => invoke<Flashcard[]>('ai_flashcards', { noteContent }),
   aiExplain: (text: string) => invoke<string>('ai_explain', { text }),
