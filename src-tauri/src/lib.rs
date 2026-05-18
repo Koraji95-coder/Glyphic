@@ -48,6 +48,13 @@ pub fn run() {
             app.manage(WatcherState(Mutex::new(None)));
             app.manage(AiState::new());
             app.manage(ActiveStreams(tokio::sync::Mutex::new(HashMap::new())));
+
+            // Start the MCP HTTP server so the Foundry broker can call
+            // Glyphic's vault tools (search_notes, get_note, list_notes,
+            // get_recent_notes) when serving a `glyphic-vault` lane.
+            // Loopback only; port from $GLYPHIC_MCP_PORT or 58001.
+            ai::mcp_http::start_mcp_http_server(app.handle().clone());
+
             Ok(())
             // ← No invoke_handler inside setup — that was the syntax error
         })
